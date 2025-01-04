@@ -1,0 +1,76 @@
+/* Container for horizontal scrolling */
+.category-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px;
+    background-color: #f8f8f8; /* Optional background color */
+    border-radius: 15px; /* Rounded corners */
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.category-container::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Edge, and Safari */
+}
+
+/* Flexbox for aligning items */
+.categories {
+    display: flex;
+    gap: 20px; /* Space between items */
+}
+
+/* Individual category items */
+.category-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 80px; /* Set fixed width for uniformity */
+    border-radius: 15px; /* Rounded corners */
+    background-color: white;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for better design */
+    transition: transform 0.3s;
+    cursor: pointer;
+}
+
+.category-item:hover {
+    transform: scale(1.1); /* Slight zoom on hover */
+}
+
+/* Category icons */
+.category-item img {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 5px;
+    border-radius: 50%; /* Optional for rounded icons */
+    background-color: #eaeaea; /* Icon background color */
+}
+
+/* Category text */
+.category-item span {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.card-slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 16px;
+    padding: 16px 0;
+}
+
+.card-slider::-webkit-scrollbar {
+    height: 8px;
+}
+
+.card-slider::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+}
+
+.card-slider::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
