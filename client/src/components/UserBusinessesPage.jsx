@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import ItemCard from './ItemCard';
+import BusinessCard from './BusinessCard';
 import  '../styles/userItems.css';
 
-const UserItemsPage = () => {
-    const [myBooks, setMyBooks] = useState([]);
+const UserBusinessesPage = () => {
+    const [myBusiness, setMyBusinesses] = useState([]);
 
     useEffect(() => {
         const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
@@ -12,8 +12,8 @@ const UserItemsPage = () => {
             return;
         }
 
-        const fetchMyBooks = async () => {
-            const response = await fetch(process.env.REACT_APP_API_DOMAIN + '/api/v1/items/user-items', {
+        const fetchUserBusinesses = async () => {
+            const response = await fetch(process.env.REACT_APP_API_DOMAIN + '/api/v1/businesses/user-businesses', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.status === 401 || response.status === 403) {
@@ -21,13 +21,13 @@ const UserItemsPage = () => {
                 return;
             }
             const data = await response.json();
-            setMyBooks(data);
+            setMyBusinesses(data);
         };
 
-        fetchMyBooks().then();
+        fetchUserBusinesses().then();
     }, []);
 
-    function apiUpdateBook(id, updatedData) {
+    function apiUpdateBusiness(id, updatedData) {
         console.log(updatedData)
 
     }
@@ -36,16 +36,16 @@ const UserItemsPage = () => {
         <div className='container'>
             <button onClick={() => {window.location.href = '/upload'}}>+</button>
             <br/><br/>
-            {myBooks && myBooks.map(book => (
-                <ItemCard
+            {myBusiness && myBusiness.map(book => (
+                <BusinessCard
                     key={book._id}
-                    book={book}
-                    fromUserItems={true}
-                    onUpdate={(updatedData) => apiUpdateBook(book.id, updatedData)}
+                    business={book}
+                    fromUserBusinesses={true}
+                    onUpdate={(updatedData) => apiUpdateBusiness(business.id, updatedData)}
                 />
             ))}
         </div>
     );
 }
 
-export default UserItemsPage;
+export default UserBusinessesPage;

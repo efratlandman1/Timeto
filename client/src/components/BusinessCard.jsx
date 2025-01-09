@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import '../styles/ItemCard.css';
 
-const ItemCard = ({ book, fromUserItems, onUpdate }) => {
+const BusinessCard = ({ business, fromUserItems: fromBusinessesItems, onUpdate }) => {
         const [isEditing, setIsEditing] = useState(false);
         const [formData, setFormData] = useState({
-                name: book.name,
-                category: book.category,
-                description: book.description,
-                photoPath: book.photoPath,
-                rating: book.rating, // Include rating
+                name: business.name,
+                category: business.category,
+                description: business.description,
+                photoPath: business.photoPath,
+                rating: business.rating, // Include rating
         });
 
         const handleInputChange = (e) => {
@@ -18,7 +18,7 @@ const ItemCard = ({ book, fromUserItems, onUpdate }) => {
 
         const handlePhotoChange = (e) => {
                 const file = e.target.files[0];
-                setFormData((prev) => ({ ...prev, photoPath: file }));
+                setFormData((prev) => ({ ...prev, logo: file }));
         };
 
         const handleUpdate = async () => {
@@ -35,14 +35,14 @@ const ItemCard = ({ book, fromUserItems, onUpdate }) => {
                         await onUpdate(updatedData); // Call the update function passed as a prop
                         setIsEditing(false);
                 } catch (error) {
-                        console.error('Failed to update item:', error);
+                        console.error('Failed to update business:', error);
                 }
         };
 
         return (
-            <div className="item-card">
+            <div className="business-card">
                     {isEditing ? (
-                        <div className="item-card-edit">
+                        <div className="business-card-edit">
                                 <input
                                     type="text"
                                     name="name"
@@ -75,10 +75,10 @@ const ItemCard = ({ book, fromUserItems, onUpdate }) => {
                                 />
                                 <div>
                                         <input type="file" accept="image/*" onChange={handlePhotoChange} />
-                                        {formData.photoPath && !(formData.photoPath instanceof File) && (
+                                        {formData.logo && !(formData.logo instanceof File) && (
                                             <img
-                                                src={process.env.REACT_APP_API_DOMAIN + `/uploads/${formData.photoPath.split('/').pop()}`}
-                                                alt={book.name}
+                                                src={process.env.REACT_APP_API_DOMAIN + `/uploads/${formData.logo.split('/').pop()}`}
+                                                alt={business.name}
                                                 style={{ maxWidth: '100px', maxHeight: '100px' }}
                                             />
                                         )}
@@ -87,23 +87,23 @@ const ItemCard = ({ book, fromUserItems, onUpdate }) => {
                                 <button onClick={() => setIsEditing(false)}>Cancel</button>
                         </div>
                     ) : (
-                        <div className="item-card-content">
+                        <div className="business-card-content">
                                 <img
-                                    className="item-card-image"
-                                    src={process.env.REACT_APP_API_DOMAIN + `/uploads/${book.photoPath.split('/').pop()}`}
-                                    alt={book.name}
+                                    className="business-card-image"
+                                    src={process.env.REACT_APP_API_DOMAIN + `/uploads/${business.logo.split('/').pop()}`}
+                                    alt={business.name}
                                 />
-                                <div className="item-card-details">
-                                        <h3 className="item-card-name">{book.name}</h3>
-                                        <p className="item-card-category">{book.category}</p>
-                                        <p className="item-card-description">{book.description}</p>
-                                        <div className="item-card-rating">
+                                <div className="business-card-details">
+                                        <h3 className="business-card-name">{business.name}</h3>
+                                        <p className="business-card-category">{business.category}</p>
+                                        <p className="business-card-description">{business.description}</p>
+                                        <div className="business-card-rating">
                                                 <span>1</span>
                                                 <span>⭐</span>
                                         </div>
                                 </div>
-                                {fromUserItems && (
-                                    <button className="item-card-edit-button" onClick={() => setIsEditing(true)}>
+                                {fromBusinessesItems && (
+                                    <button className="business-card-edit-button" onClick={() => setIsEditing(true)}>
                                             Edit
                                     </button>
                                 )}
@@ -113,4 +113,4 @@ const ItemCard = ({ book, fromUserItems, onUpdate }) => {
         );
 };
 
-export default ItemCard;
+export default BusinessCard;

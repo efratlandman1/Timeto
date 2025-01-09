@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 require('dotenv').config();
-const PORT = 5000;
+const PORT = 5050;
 const MONGO_URI = process.env.MONGO_URI;
 
 const usersRouter = require('./routes/usersRoutes');
-const itemsRouter = require('./routes/itemsRoutes');
+const businessesRouter = require('./routes/businessesRoutes');
 const authRouter = require('./routes/authRoutes');
 const jwtAuthMiddleware = require("./middlewares/authMiddleware");
 
@@ -26,7 +26,7 @@ mongoose.connect(MONGO_URI)
 app.use(jwtAuthMiddleware)
 
 app.use('/api/v1/users', usersRouter);
-app.use('/api/v1/items', itemsRouter);
+app.use('/api/v1/businesses', businessesRouter);
 app.use('/api/v1', authRouter);
 
 app.listen(PORT, () => {

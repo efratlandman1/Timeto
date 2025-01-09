@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Filter } from '../styles/MainPageStyles';
-import ItemCard from './ItemCard';
+import BusinessCard from './BusinessCard';
 import axios from 'axios';
 import '../styles/MainPage.css';
 
 const MainPage = () => {
-    const [books, setBooks] = useState([]);
-    const [filteredBooks, setFilteredBooks] = useState([]);
+    const [business, setBusiness] = useState([]);
+    const [filteredBusinesses, setFilteredBusinesses] = useState([]);
     const [category, setCategory] = useState('');
 
     useEffect(() => {
-        fetchBooks().then(response => {
-            setBooks(response);
-            setFilteredBooks(response);
+        fetchBusinesses().then(response => {
+            setBusiness(response);
+            setFilteredBusinesses(response);
         });
     }, []);
 
-    const fetchBooks = async () => {
+    const fetchBusinesses = async () => {
         try {
-            const response = await axios.get(process.env.REACT_APP_API_DOMAIN + '/api/v1/items');
+            const response = await axios.get(process.env.REACT_APP_API_DOMAIN + '/api/v1/businesses');
             return response.data;
         } catch (err) {
         }
@@ -29,11 +29,11 @@ const MainPage = () => {
         setCategory(selectedCategory);
 
         if (selectedCategory === "") {
-            // Show all books when "All Categories" is clicked
-            setFilteredBooks(books);
+            // Show all business when "All Categories" is clicked
+            setFilteredBusinesses(business);
         } else {
-            // Filter books by the selected category
-            setFilteredBooks(books.filter((book) => book.category === selectedCategory));
+            // Filter business by the selected category
+            setFilteredBusinesses(business.filter((business) => business.category === selectedCategory));
         }
     };
 
@@ -47,38 +47,38 @@ const MainPage = () => {
     // const categoryContainer = document.querySelector(".categories");
     //
     // categories.forEach((category) => {
-    //     const item = document.createElement("div");
-    //     item.className = "category-item";
+    //     const business = document.createElement("div");
+    //     business.className = "category-business";
     //
-    //     item.innerHTML = `
+    //     business.innerHTML = `
     //     <img src="${category.icon}" alt="${category.name}" />
     //     <span>${category.name}</span>
     // `;
     //
-    //     categoryContainer.appendChild(item);
+    //     categoryContainer.appendChild(business);
     // });
 
     return (
         <Container>
             <div className="category-container">
                 <div className="categories">
-                    <div className="category-item" onClick={() => handleFilterChange("Fiction")}>
+                    <div className="category-business" onClick={() => handleFilterChange("Fiction")}>
                         <img src="/home/dev-it/docker/server/config/uploads/1734539710124.png" alt="Category 1" />
                         <span>Category 1</span>
                     </div>
-                    <div className="category-item" onClick={() => handleFilterChange("Non-Fiction")}>
+                    <div className="category-business" onClick={() => handleFilterChange("Non-Fiction")}>
                         <img src="/home/dev-it/docker/server/config/uploads/1734539710124.png" alt="Category 2" />
                         <span>Category 2</span>
                     </div>
-                    <div className="category-item">
+                    <div className="category-business">
                         <img src="/home/dev-it/docker/server/config/uploads/1734539710124.png" alt="Category 3" />
                         <span>Category 3</span>
                     </div>
                 </div>
             </div>
             <div className="card-slider">
-                {filteredBooks && filteredBooks.map(book => (
-                    <ItemCard key={book._id} book={book} />
+                {filteredBusinesses && filteredBusinesses.map(business => (
+                    <BusinessCard key={business._id} business={business} />
                 ))}
             </div>
         </Container>
