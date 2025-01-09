@@ -16,7 +16,7 @@ const Header = () => {
 
     const onPersonalAreaClicked = () => {
         if (token) {
-            navigate("/user-items");
+            navigate("/user-businesses");
             return;
         }
         if (buttonRef.current) {

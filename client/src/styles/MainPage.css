@@ -12,14 +12,14 @@
     display: none; /* Hide scrollbar for Chrome, Edge, and Safari */
 }
 
-/* Flexbox for aligning items */
+/* Flexbox for aligning businesses */
 .categories {
     display: flex;
-    gap: 20px; /* Space between items */
+    gap: 20px; /* Space between businesses */
 }
 
-/* Individual category items */
-.category-item {
+/* Individual category businesses */
+.category-business {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -33,12 +33,12 @@
     cursor: pointer;
 }
 
-.category-item:hover {
+.category-business:hover {
     transform: scale(1.1); /* Slight zoom on hover */
 }
 
 /* Category icons */
-.category-item img {
+.category-business img {
     width: 40px;
     height: 40px;
     margin-bottom: 5px;
@@ -47,7 +47,7 @@
 }
 
 /* Category text */
-.category-item span {
+.category-business span {
     font-size: 14px;
     color: #333;
     font-weight: 500;
