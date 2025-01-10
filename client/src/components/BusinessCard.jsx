@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/ItemCard.css';
+import '../styles/businessCard.css';
 
 const BusinessCard = ({ business, fromUserItems: fromBusinessesItems, onUpdate }) => {
         const [isEditing, setIsEditing] = useState(false);
