@@ -1,11 +1,12 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import '../styles/uploadPage.css';
 import { Form, Input, Select, Textarea, Button } from '../styles/UploadPageStyles';
 
 const UploadPage = () => {
     const [businessData, setBusinessData] = useState({
         name: '',
-        category: '',
+        categoryId: '',
         description: '',
         photos: [] // Store multiple photos
     });
@@ -45,10 +46,14 @@ const UploadPage = () => {
         // Use FormData for multipart/form-data requests
         const formData = new FormData();
         formData.append('name', businessData.name);
-        formData.append('category', businessData.category);
+        formData.append('categoryId', businessData.categoryId);
         formData.append('description', businessData.description);
-        businessData.photos.forEach((photo, index) => {
-            formData.append(`photos`, photo); // Append each photo
+        formData.append('address', businessData.address);
+        formData.append('phone', businessData.phone);
+        formData.append('email', businessData.email);
+
+        businessData.logo.forEach((logo, index) => {
+            formData.append(`logo`, logo); // Append each photo
         });
 
         try {
@@ -72,20 +77,20 @@ const UploadPage = () => {
     };
 
     return (
-        <Form onSubmit={handleSubmit}>
-            <Input type="text" name="name" placeholder="Business Name" onChange={handleChange} required />
-            <Input type="text" name="address" placeholder="Address" onChange={handleChange} required />
-            <Input type="tel" name="phone" placeholder="Phone number" onChange={handleChange} required />
-            <Input type="tel" name="email" placeholder="Email" onChange={handleChange} required />
-            <Select name="categoryId" onChange={handleChange} required>
+        <form className='upload-form' onSubmit={handleSubmit}>
+            <input className='upload-input' type="text" name="name" placeholder="Business Name" onChange={handleChange} required />
+            <input className='upload-input' type="text" name="address" placeholder="Address" onChange={handleChange} required />
+            <input className='upload-input' type="tel" name="phone" placeholder="Phone number" onChange={handleChange} required />
+            <input className='upload-input' type="tel" name="email" placeholder="Email" onChange={handleChange} required />
+            <select className='categories-dropdown' name="categoryId" onChange={handleChange} required>
                 <option value="">Select Category</option>
                 <option value="Fiction">Fiction</option>
                 <option value="Non-Fiction">Non-Fiction</option>
-            </Select>
-            <Textarea name="description" placeholder="Description" onChange={handleChange} required />
-            <Input type="file" name="logo" onChange={handleChange} multiple required />
-            <Button type="submit">Upload Book</Button>
-        </Form>
+            </select>
+            <textarea className='upload-textarea' name="description" placeholder="Description" onChange={handleChange} required />
+            <input className='upload-input' type="file" name="logo" onChange={handleChange} multiple required />
+            <button className='upload-button' type="submit">Upload Book</button>
+        </form>
     );
 }
 

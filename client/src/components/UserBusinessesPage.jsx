@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import BusinessCard from './BusinessCard';
-import  '../styles/userItems.css';
+import  '../styles/userBusinesses.css';
 
 const UserBusinessesPage = () => {
     const [myBusiness, setMyBusinesses] = useState([]);

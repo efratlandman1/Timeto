@@ -1,10 +1,10 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import {Form, Input, LoginButton, RegisterButton} from '../styles/LoginPageStyles';
-import { useNavigate } from 'react-router-dom';
+import '../styles/LoginPage.css'
+// import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
@@ -17,7 +17,7 @@ const LoginPage = () => {
             });
             if (response.data.token) {
                 document.cookie = `token=${response.data.token}`;
-                window.location.href = '/';
+                window.location.href = '/user-businesses';
             }
         } catch (e) {
 
@@ -25,11 +25,11 @@ const LoginPage = () => {
     };
 
     return (
-        <Form onSubmit={handleLogin}>
-            <Input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
-            <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            <LoginButton type="submit">Login</LoginButton>
-        </Form>
+        <form className='login-form' onSubmit={handleLogin}>
+            <input className='login-input' type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+            <input className='login-input' type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <button className='login-button' type="submit">Login</button>
+        </form>
     );
 }
 
