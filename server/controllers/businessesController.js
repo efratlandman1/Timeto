@@ -27,9 +27,10 @@ exports.uploadBusinesses = async (req, res) => {
 
 exports.getItems = async (req, res) => {
     try {
-        const businesses = await business.find({});
+        const businesses = await Business.find({});
         res.status(200).json(businesses);
     } catch (err) {
+        console.log(err);
         res.status(500).json({message: err.message});
     }
 };

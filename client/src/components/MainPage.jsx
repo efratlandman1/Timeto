@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Filter } from '../styles/MainPageStyles';
 import BusinessCard from './BusinessCard';
 import axios from 'axios';
 import '../styles/MainPage.css';
@@ -59,7 +58,7 @@ const MainPage = () => {
     // });
 
     return (
-        <Container>
+        <div className='main-page-container'>
             <div className="category-container">
                 <div className="categories">
                     <div className="category-business" onClick={() => handleFilterChange("Fiction")}>
@@ -81,7 +80,7 @@ const MainPage = () => {
                     <BusinessCard key={business._id} business={business} />
                 ))}
             </div>
-        </Container>
+        </div>
     );
 }
 
