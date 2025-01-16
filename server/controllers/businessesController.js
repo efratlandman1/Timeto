@@ -11,11 +11,12 @@ exports.uploadBusinesses = async (req, res) => {
 
         const newBusiness = new Business({
             name: req.body.name,
-            category: req.body.category,
+            categoryId: req.body.categoryId,
             description: req.body.description,
             userId: userId,
-            photoPath: req.file.path // Path to uploaded photo
+            logo: req.file.path // Path to uploaded photo
         });
+        console.log(newBusiness)
 
         const savedItem = await newBusiness.save();
         res.status(201).json(savedItem);

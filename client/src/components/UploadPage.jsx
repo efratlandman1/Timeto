@@ -6,9 +6,15 @@ import { Form, Input, Select, Textarea, Button } from '../styles/UploadPageStyle
 const UploadPage = () => {
     const [businessData, setBusinessData] = useState({
         name: '',
+<<<<<<< Updated upstream
+=======
+        address: '',
+        phone: '',
+        email: '',
+>>>>>>> Stashed changes
         categoryId: '',
         description: '',
-        photos: [] // Store multiple photos
+        logo: [] // Store multiple photos
     });
 
     useEffect(() => {
@@ -26,7 +32,7 @@ const UploadPage = () => {
     const handleChange = (e) => {
         const { name, value, files } = e.target;
 
-        if (name === 'photos') {
+        if (name === 'logo') {
             setBusinessData(prev => ({
                 ...prev,
                 [name]: files ? Array.from(files) : [] // Convert FileList to Array
@@ -46,6 +52,7 @@ const UploadPage = () => {
         // Use FormData for multipart/form-data requests
         const formData = new FormData();
         formData.append('name', businessData.name);
+<<<<<<< Updated upstream
         formData.append('categoryId', businessData.categoryId);
         formData.append('description', businessData.description);
         formData.append('address', businessData.address);
@@ -54,6 +61,15 @@ const UploadPage = () => {
 
         businessData.logo.forEach((logo, index) => {
             formData.append(`logo`, logo); // Append each photo
+=======
+        formData.append('address', businessData.address);
+        formData.append('phone', businessData.phone);
+        formData.append('email', businessData.email);
+        formData.append('categoryId', businessData.categoryId);
+        formData.append('description', businessData.description);
+        businessData.logo.forEach((photo, index) => {
+            formData.append(`logo`, photo); // Append each photo
+>>>>>>> Stashed changes
         });
 
         try {
