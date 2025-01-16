@@ -36,10 +36,10 @@ const UserBusinessesPage = () => {
         <div className='container'>
             <button onClick={() => {window.location.href = '/upload'}}>+</button>
             <br/><br/>
-            {myBusiness && myBusiness.map(book => (
+            {myBusiness && myBusiness.map(business => (
                 <BusinessCard
-                    key={book._id}
-                    business={book}
+                    key={business._id}
+                    business={business}
                     fromUserBusinesses={true}
                     onUpdate={(updatedData) => apiUpdateBusiness(business.id, updatedData)}
                 />
