@@ -10,7 +10,7 @@ const UploadPage = () => {
         email: '',
         categoryId: '',
         description: '',
-        logo: [] // Store multiple photos
+        logo: '' // Store multiple photos
     });
     const [categories, setCategories] = useState([]);
     const [errors, setErrors] = useState({});
@@ -23,16 +23,17 @@ const UploadPage = () => {
         }
 
         // Fetch categories dynamically
-        const fetchCategories = async () => {
-            try {
-                const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
-                setCategories(response.data);
-            } catch (error) {
-                console.error('Failed to fetch categories:', error);
-            }
-        };
-
-        fetchCategories();
+        // const fetchCategories = async () => {
+        //     try {
+        //         const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
+        //         setCategories(response.data);
+        //     } catch (error) {
+        //         console.error('Failed to fetch categories:', error);
+        //     }
+        // };
+        //
+        // fetchCategories();
+        setCategories([{'name': 'מניקור', 'id': 1},{'name': 'פדיקור', 'id': 2}]);
     }, []);
 
     const getToken = () => {
