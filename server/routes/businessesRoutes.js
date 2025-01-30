@@ -6,7 +6,7 @@ const upload = require('../config/multerConfig');
 router
     .route('/')
     .get(businessesController.getItems)
-    .post(upload.single('photos'), businessesController.uploadBusinesses);
+    .post(upload.single('logo'), businessesController.uploadBusinesses);
 
 router
     .route('/user-businesses')

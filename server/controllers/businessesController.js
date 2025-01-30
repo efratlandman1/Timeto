@@ -11,9 +11,12 @@ exports.uploadBusinesses = async (req, res) => {
 
         const newBusiness = new Business({
             name: req.body.name,
+            email: req.body.email,
+            phone: req.body.phone,
             categoryId: req.body.categoryId,
             description: req.body.description,
             userId: userId,
+            address: req.body.address,
             logo: req.file.path // Path to uploaded photo
         });
         console.log(newBusiness)
