@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import '../styles/uploadPage.css';
 
-const UploadPage = () => {
+const EditBusinessPage = () => {
     const [businessData, setBusinessData] = useState({
         name: '',
         address: '',
@@ -10,7 +10,7 @@ const UploadPage = () => {
         email: '',
         categoryId: '',
         description: '',
-        logo: '' // Store multiple photos
+        logo: ''
     });
     const [categories, setCategories] = useState([]);
     const [errors, setErrors] = useState({});
@@ -43,7 +43,6 @@ const UploadPage = () => {
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
-
         if (name === 'logo') {
             setBusinessData(prev => ({
                 ...prev,
@@ -211,4 +210,4 @@ const UploadPage = () => {
     );
 };
 
-export default UploadPage;
+export default EditBusinessPage;

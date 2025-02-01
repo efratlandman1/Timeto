@@ -34,7 +34,7 @@ const UserBusinessesPage = () => {
 
     return (
         <div className='container'>
-            <button onClick={() => {window.location.href = '/upload'}}>+</button>
+            <button onClick={() => {window.location.href = '/edit'}}>+</button>
             <br/><br/>
             {myBusiness && myBusiness.map(business => (
                 <BusinessCard
