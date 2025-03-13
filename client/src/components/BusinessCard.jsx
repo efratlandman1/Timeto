@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { setSelectedBusiness } from '../redux/businessSlice';
+import { useNavigate } from 'react-router-dom';
 import '../styles/businessCard.css';
 
 const BusinessCard = ({ business }) => {
+        const dispatch = useDispatch();
+        const navigate = useNavigate();
+
+        const handleEdit = () => {
+                dispatch(setSelectedBusiness(business));
+                navigate('/edit');
+        };
+
         const [formData, setFormData] = useState({
                 name: business.name,
                 category: business.category,
@@ -46,6 +57,7 @@ const BusinessCard = ({ business }) => {
         return (
             <div className="business-card">
                     <div className="business-card-content">
+                            <button onClick={handleEdit}>Edit</button>
                             <img
                                 className="business-card-image"
                                 src={
