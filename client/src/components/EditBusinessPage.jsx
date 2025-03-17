@@ -14,17 +14,26 @@ const EditBusinessPage = () => {
         description: '',
         logo: []
     });
+    const [categories, setCategories] = useState([
+        { id: 1, name: 'Manicure' },
+        { id: 2, name: 'Pedicure' },
+        { id: 3, name: 'Hair Styling' },
+        { id: 4, name: 'Massage Therapy' }
+    ]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [message, setMessage] = useState(null);
 
     useEffect(() => {
         if (selectedBusiness) {
             setBusinessData({
+                id: selectedBusiness._id,
                 name: selectedBusiness.name,
                 address: selectedBusiness.address,
                 phone: selectedBusiness.phone,
                 email: selectedBusiness.email,
                 categoryId: selectedBusiness.categoryId,
                 description: selectedBusiness.description,
-                logo: []
+                logo: selectedBusiness.logo || []
             });
         }
     }, [selectedBusiness]);
@@ -46,11 +55,9 @@ const EditBusinessPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validateInputs()) return;
-
         setIsLoading(true);
+        setMessage(null);
 
-        // Prepare FormData for multipart/form-data requests
         const formData = new FormData();
         formData.append('name', businessData.name);
         formData.append('categoryId', businessData.categoryId);
@@ -63,69 +70,103 @@ const EditBusinessPage = () => {
             formData.append('logo', logo);
         });
 
+        if (businessData.id) { // Append ID only if it exists
+            formData.append('id',businessData.id);
+        }
         try {
             const token = getToken();
-            let response;
+            await uploadBusiness(token, formData)
 
-            if (businessData._id) {
-                // Update existing business
-                response = await updateBusiness(token, businessData._id, formData);
-            } else {
-                // Upload new business
-                response = await uploadBusiness(token, formData);
-            }
-
-            if (response.status === 201 || response.status === 200) {
-                alert(`Business ${businessData._id ? 'updated' : 'uploaded'} successfully`);
-            } else {
-                alert('Session expired, please log in again');
-                window.location.href = '/login';
-            }
+            setMessage({ type: 'success', text: `Business ${selectedBusiness ? 'updated' : 'created'} successfully!` });
         } catch (error) {
-            console.error('Error submitting business:', error);
-            alert('An error occurred while processing the business');
+            setMessage({ type: 'error', text: 'An error occurred while processing the business' });
         } finally {
             setIsLoading(false);
         }
     };
 
-// Function to upload a new business
-    const uploadBusiness = async (token, formData) => {
-        return await axios.post(
-            `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`,
-            formData,
-            {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                }
-            }
-        );
+    const getToken = () => {
+        const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+        return tokenCookie ? tokenCookie.split('=')[1] : null;
     };
 
-// Function to update an existing business
-    const updateBusiness = async (token, businessId, formData) => {
-        return axios.put(
-            `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${businessId}`,
-            formData,
-            {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                }
+    // Upload a new business
+    const uploadBusiness = async (token, formData) => {
+        return await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, formData, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
             }
-        );
+        });
     };
 
     return (
-        <form className='upload-form' onSubmit={handleSubmit}>
-            <input type="text" name="name" value={businessData.name} onChange={handleChange} />
-            <input type="text" name="address" value={businessData.address} onChange={handleChange} />
-            <input type="tel" name="phone" value={businessData.phone} onChange={handleChange} />
-            <input type="email" name="email" value={businessData.email} onChange={handleChange} />
-            <textarea name="description" value={businessData.description} onChange={handleChange} />
-            <button type="submit">Update Business</button>
-        </form>
+        <div className={`page-container ${isLoading ? 'disabled' : ''}`}>
+            {isLoading && (
+                <div className="loading-overlay">
+                    <div className="loading-animation">🕺💃 Loading... Please dance with me! 🎵</div>
+                </div>
+            )}
+
+            {message && (
+                <div className={`message-box ${message.type === 'success' ? 'success' : 'error'}`}>
+                    {message.text}
+                </div>
+            )}
+
+            <form className='upload-form' onSubmit={handleSubmit}>
+                <div className='form-group'>
+                    <label htmlFor="name">Business Name:</label>
+                    <input type="text" id="name" name="name" value={businessData.name} onChange={handleChange} />
+                </div>
+
+                <div className='form-group'>
+                    <label htmlFor="address">Address:</label>
+                    <input type="text" id="address" name="address" value={businessData.address} onChange={handleChange} />
+                </div>
+
+                <div className='form-group'>
+                    <label htmlFor="phone">Phone Number:</label>
+                    <input type="tel" id="phone" name="phone" value={businessData.phone} onChange={handleChange} />
+                </div>
+
+                <div className='form-group'>
+                    <label htmlFor="email">Email:</label>
+                    <input type="email" id="email" name="email" value={businessData.email} onChange={handleChange} />
+                </div>
+
+                <div className='form-group'>
+                    <label htmlFor="categoryId">Category:</label>
+                    <select id="categoryId" name="categoryId" value={businessData.categoryId} onChange={handleChange}>
+                        <option value="">Select Category</option>
+                        {categories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className='form-group'>
+                    <label htmlFor="description">Description:</label>
+                    <textarea id="description" name="description" value={businessData.description} onChange={handleChange} />
+                </div>
+
+                {selectedBusiness?.logo && (
+                    <div className='form-group'>
+                        <label>Current Logo:</label>
+                        <img src={`${process.env.REACT_APP_API_DOMAIN}/uploads/${selectedBusiness.logo.split('/').pop()}`} alt="Current Logo" className="business-logo-preview" />
+                    </div>
+                )}
+
+                <div className='form-group'>
+                    <label htmlFor="logo">Upload New Logo:</label>
+                    <input type="file" id="logo" name="logo" onChange={handleChange} />
+                </div>
+
+                <button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Uploading...' : selectedBusiness ? 'Update Business' : 'Create Business'}
+                </button>
+            </form>
+        </div>
     );
 };
 
