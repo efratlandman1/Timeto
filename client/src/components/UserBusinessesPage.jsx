@@ -27,22 +27,18 @@ const UserBusinessesPage = () => {
         fetchUserBusinesses().then();
     }, []);
 
-    function apiUpdateBusiness(id, updatedData) {
-        console.log(updatedData)
-
-    }
-
     return (
         <div className='container'>
             <button onClick={() => {window.location.href = '/edit'}}>+</button>
             <br/><br/>
             {myBusiness && myBusiness.map(business => (
-                <BusinessCard
-                    key={business._id}
-                    business={business}
-                    fromUserBusinesses={true}
-                    onUpdate={(updatedData) => apiUpdateBusiness(business.id, updatedData)}
-                />
+                <div className='businessCard'>
+                    <BusinessCard
+                        key={business._id}
+                        business={business}
+                        fromUserBusinesses={true}
+                    />
+                </div>
             ))}
         </div>
     );
