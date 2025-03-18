@@ -24,10 +24,10 @@ const createBusiness = async (req, res, userId) => {
             email: req.body.email,
             phone: req.body.phone,
             categoryId: req.body.categoryId,
-            description: req.body.description,
+            description: req.body.description || '',
             userId: userId,
             address: req.body.address,
-            logo: req.file.path
+            logo: req.file?.path || ''
         });
 
         const savedItem = await newBusiness.save();

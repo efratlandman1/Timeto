@@ -58,6 +58,16 @@ const EditBusinessPage = () => {
         setIsLoading(true);
         setMessage(null);
 
+        // Required fields (excluding logo and description)
+        const requiredFields = ["name", "categoryId", "address", "phone", "email"];
+        const missingFields = requiredFields.filter(field => !businessData[field] || businessData[field].trim() === "");
+
+        if (missingFields.length > 0) {
+            setIsLoading(false);
+            setMessage({ type: 'error', text: `Please fill in the required fields: ${missingFields.join(", ")}` });
+            return;
+        }
+
         const formData = new FormData();
         formData.append('name', businessData.name);
         formData.append('categoryId', businessData.categoryId);
