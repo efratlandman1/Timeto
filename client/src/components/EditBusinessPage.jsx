@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
-import '../styles/uploadPage.css';
+import '../styles/EditBusinessPage.css';
 
 const EditBusinessPage = () => {
     const selectedBusiness = useSelector(state => state.business.selectedBusiness);
@@ -162,7 +162,7 @@ const EditBusinessPage = () => {
                     <input type="file" id="logo" name="logo" onChange={handleChange} />
                 </div>
 
-                <button type="submit" disabled={isLoading}>
+                <button className='submit-business-form' type="submit" disabled={isLoading}>
                     {isLoading ? 'Uploading...' : selectedBusiness ? 'Update Business' : 'Create Business'}
                 </button>
             </form>

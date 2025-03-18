@@ -1,6 +1,7 @@
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: min(80%, 1400px);
+    width: 100%;
+    margin: 0 auto; /* Centers the container */
     padding: 6rem 1rem 1rem; /* padding to account for the fixed header */
 }
 
