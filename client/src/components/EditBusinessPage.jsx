@@ -12,7 +12,7 @@ const EditBusinessPage = () => {
         email: '',
         categoryId: '',
         description: '',
-        logo: []
+        logo: null // Changed to null since only one file is allowed
     });
     const [categories, setCategories] = useState([
         { id: 1, name: 'Manicure' },
@@ -33,7 +33,7 @@ const EditBusinessPage = () => {
                 email: selectedBusiness.email,
                 categoryId: selectedBusiness.categoryId,
                 description: selectedBusiness.description,
-                logo: selectedBusiness.logo || []
+                logo: selectedBusiness.logo || null // Set to null if no logo
             });
         }
     }, [selectedBusiness]);
@@ -43,7 +43,7 @@ const EditBusinessPage = () => {
         if (name === 'logo') {
             setBusinessData(prev => ({
                 ...prev,
-                [name]: files ? Array.from(files) : []
+                [name]: files && files[0] ? files[0] : null // Only set the first file or null
             }));
         } else {
             setBusinessData(prev => ({
@@ -60,7 +60,7 @@ const EditBusinessPage = () => {
 
         // Required fields (excluding logo and description)
         const requiredFields = ["name", "categoryId", "address", "phone", "email"];
-        const missingFields = requiredFields.filter(field => !businessData[field] || businessData[field].trim() === "");
+        const missingFields = requiredFields.filter(field => !businessData[field] || String(businessData[field]).trim() === "");
 
         if (missingFields.length > 0) {
             setIsLoading(false);
@@ -76,17 +76,17 @@ const EditBusinessPage = () => {
         formData.append('phone', businessData.phone);
         formData.append('email', businessData.email);
 
-        businessData.logo.forEach((logo) => {
-            formData.append('logo', logo);
-        });
+        if (businessData.logo) { // Append logo only if it exists
+            formData.append('logo', businessData.logo);
+        }
 
         if (businessData.id) { // Append ID only if it exists
-            formData.append('id',businessData.id);
+            formData.append('id', businessData.id);
         }
+
         try {
             const token = getToken();
-            await uploadBusiness(token, formData)
-
+            await uploadBusiness(token, formData);
             setMessage({ type: 'success', text: `Business ${selectedBusiness ? 'updated' : 'created'} successfully!` });
         } catch (error) {
             setMessage({ type: 'error', text: 'An error occurred while processing the business' });
