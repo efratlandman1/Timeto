@@ -36,6 +36,6 @@ exports.login = async (req, res) => {
     if (!isMatch) {
         return res.status(400).json({ error: 'Wrong password' });
     }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id, userName: user.name }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.status(201).json({ token });
 };

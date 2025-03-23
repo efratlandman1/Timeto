@@ -1,40 +1,81 @@
+/* עיצוב כללי לכותרת */
 .header-container {
-    display: flex;
-    justify-content: flex-end;
-    padding: 1rem;
     background-color: #343a40;
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
-}
-
-.personal-area-button {
-    margin-left: 1rem;
-    padding: 0.5rem 1rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.personal-area-button:hover {
-    background-color: #0056b3;
-}
-
-.bubble {
-    position: fixed; /* Matches the fixed position of the header */
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* עיצוב הניווט */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    color: white;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* עיצוב כפתור המשתמש */
+.user-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.user-button:hover {
+    opacity: 0.8;
+}
+
+.user-icon {
+    font-size: 1.5rem;
+}
+
+/* עיצוב התפריט הנפתח */
+.dropdown-menu {
+    position: absolute;
+    /* right: 2rem; */
+    top: 60px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    z-index: 1000;
+    gap: 10px;
+    width: 180px;
     animation: fadeIn 0.3s ease-in-out;
+}
+
+.dropdown-menu button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    text-align: left;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 5px;
+}
+
+.dropdown-menu button:hover {
+    background: #f1f1f1;
 }
 
 @keyframes fadeIn {

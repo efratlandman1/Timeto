@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import BusinessCard from './BusinessCard';
-import  '../styles/userBusinesses.css';
+import '../styles/userBusinesses.css';
+import { FaPlus } from "react-icons/fa";
 
 const UserBusinessesPage = () => {
     const [myBusiness, setMyBusinesses] = useState([]);
@@ -29,18 +30,23 @@ const UserBusinessesPage = () => {
 
     return (
         <div className='container'>
-            <button onClick={() => {window.location.href = '/edit'}}>+</button>
-            <br/><br/>
+            <div className="add-business-container">
+                <button className="add-business-button" onClick={() => window.location.href = '/edit'}>
+                    <FaPlus className="add-business-icon" />
+                    <span className="tooltip">הוספת עסק חדש</span>
+                </button>
+            </div>
+            {/* <br /><br /> */}
             {myBusiness && myBusiness.map(business => (
-                <div className='businessCard'>
+                <div className='businessCard' key={business._id}>
                     <BusinessCard
-                        key={business._id}
                         business={business}
                         fromUserBusinesses={true}
                     />
                 </div>
             ))}
         </div>
+
     );
 }
 
