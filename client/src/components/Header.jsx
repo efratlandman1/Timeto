@@ -1,68 +1,72 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaUserCircle, FaSignOutAlt, FaSignInAlt, FaUserPlus } from "react-icons/fa";
 import "../styles/Header.css";
+import { jwtDecode } from "jwt-decode";
 
 const Header = () => {
     const navigate = useNavigate();
-    const [showButtons, setShowButtons] = useState(false);
-    const [bubblePosition, setBubblePosition] = useState({ top: 0, left: 0 });
-    const buttonRef = useRef(null);
-    const token = document.cookie.split("; ").find((row) => row.startsWith("token="));
-
+    const [showMenu, setShowMenu] = useState(false);
+    const [username, setUsername] = useState(null);
+    const menuRef = useRef(null);    
+    
     const handleLogout = () => {
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        setUsername(null);
         navigate("/login");
     };
 
-    const onPersonalAreaClicked = () => {
+    useEffect(() => {
+        const token = document.cookie.split("; ").find(row => row.startsWith("token="))?.split("=")[1];
         if (token) {
-            navigate("/user-businesses");
-            return;
+            let parsedToken = jwtDecode(token);
+            setUsername(parsedToken.userName);
         }
-        if (buttonRef.current) {
-            const buttonRect = buttonRef.current.getBoundingClientRect();
-            setBubblePosition({
-                top: buttonRect.bottom, // No scroll offset because header is fixed
-                left: buttonRect.left,
-            });
-            setShowButtons((prev) => !prev);
-        }
-    };
 
-    function onLoginClicked() {
-        setShowButtons(false);
-        navigate("/login");
-    }
-
-    function onRegistrationClicked() {
-        setShowButtons(false);
-        navigate("/register");
-    }
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setShowMenu(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     return (
         <div className="header-container">
-            {token && <button onClick={handleLogout}>התנתק</button>}
-            <button
-                className="personal-area-button"
-                ref={buttonRef}
-                onClick={onPersonalAreaClicked}
-            >
-                האיזור האישי
-            </button>
-
-            {showButtons && (
-                <div
-                    className="bubble"
-                    style={{
-                        position: "fixed", // Fixed relative to the viewport
-                        top: `${bubblePosition.top}px`,
-                        left: `${bubblePosition.left}px`,
-                    }}
-                >
-                    <button onClick={onLoginClicked}>רוצה להתחבר</button>
-                    <button onClick={onRegistrationClicked}>רוצה להירשם</button>
+            <nav className="navbar">
+                
+                <div className="user-menu" ref={menuRef}>
+                    <button className="user-button" onClick={() => setShowMenu(!showMenu)}>
+                        {username ? ` ${username}` : "כניסה"}
+                        <FaUserCircle className="user-icon" />
+                    </button>
+                    {showMenu && (
+                        <div className="dropdown-menu">
+                            {username ? (
+                                <>
+                                    <button onClick={() => navigate("/user-businesses")}>
+                                        <FaUserCircle /> אזור אישי
+                                    </button>
+                                    <button onClick={handleLogout}>
+                                        <FaSignOutAlt /> יציאה
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button onClick={() => navigate("/login")}>
+                                        <FaSignInAlt /> כניסה
+                                    </button>
+                                    <button onClick={() => navigate("/register")}>
+                                        <FaUserPlus /> הרשמה
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    )}
                 </div>
-            )}
+                <div className="logo">זה הזמן</div>
+            </nav>
         </div>
     );
 };

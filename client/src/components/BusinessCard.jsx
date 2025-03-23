@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch } from 'react-redux';
 import { setSelectedBusiness } from '../redux/businessSlice';
 import { useNavigate } from 'react-router-dom';
+import { FaPencilAlt, FaPhone, FaWhatsapp, FaEnvelope, FaStar } from "react-icons/fa";
 import '../styles/businessCard.css';
 
 const BusinessCard = ({ business, fromUserBusinesses }) => {
@@ -13,43 +14,54 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                 navigate('/edit');
         };
 
-        const [formData, setFormData] = useState({
-                name: business.name,
-                category: business.category,
-                description: business.description,
-                photoPath: business.photoPath,
-                rating: business.rating, // Include rating
-                address: business.address,
-                phone: business.phone,
-                email: business.email,
-                categoryId: business.categoryId,
-                logo: business.logo // Store multiple photos
-        });
-
         return (
-            <div className="business-card">
-                    <div className="business-card-content">
-                            {fromUserBusinesses && <button onClick={handleEdit}>Edit</button>}
-                            <img
-                                className="business-card-image"
-                                src={
-                                        business.logo
-                                            ? `${process.env.REACT_APP_API_DOMAIN}/uploads/${business.logo.split('/').pop()}`
-                                            : `${process.env.REACT_APP_API_DOMAIN}/uploads/default-logo.png` // Provide a fallback image
+                <div className="business-card">
+                        {/* Left side of the card (10%) for buttons */}
+                        <div className="business-card-left">
+                                {fromUserBusinesses &&
+                                        <button className="business-card-action-button edit" onClick={handleEdit}>
+                                                <FaPencilAlt />
+                                        </button>
                                 }
-                                alt={business.name}
-                            />
-                            <div className="business-card-details">
-                                    <h3 className="business-card-name">{business.name}</h3>
-                                    <p className="business-card-category">{business.category}</p>
-                                    <p className="business-card-description">{business.description}</p>
-                                    <div className="business-card-rating">
-                                            <span>1</span>
-                                            <span>⭐</span>
-                                    </div>
-                            </div>
-                    </div>
-            </div>
+                                {!fromUserBusinesses && (
+                                        <>
+                                                <a href={`mailto:${business.email}`} className="business-card-action-button email" aria-label="Email">
+                                                        <FaEnvelope />
+                                                </a>
+                                                <a href={`https://wa.me/${business.phone}`} className="business-card-action-button whatsapp" aria-label="WhatsApp">
+                                                        <FaWhatsapp />
+                                                </a>
+                                                <a href={`tel:${business.phone}`} className="business-card-action-button phone" aria-label="Call">
+                                                        <FaPhone />
+                                                </a>
+                                        </>
+                                )}
+                        </div>
+
+                        {/* Right side of the card (90%) for image, name, description, and rating */}
+                        <div className="business-card-right">
+                                <div className="business-card-header">
+                                        {/* Image section */}
+                                        <img
+                                                className="business-card-image"
+                                                src={business.logo ? `${process.env.REACT_APP_API_DOMAIN}/uploads/${business.logo.split('/').pop()}` : `${process.env.REACT_APP_API_DOMAIN}/uploads/default-logo.png`}
+                                                alt={business.name}
+                                        />
+                                        {/* Business name and description */}
+                                        <h3 className="business-card-name">{business.name}</h3>
+                                        <p className="business-card-category">{business.category}</p>
+                                        <div className="business-card-description-rating">
+
+                                                <div className="business-card-rating">
+                                                        <FaStar />
+                                                        <span>   {business.rating ? `${business.rating}/5` : '0/5'}</span>
+
+                                                </div>
+                                                <div className="business-card-description">{business.description}</div>
+                                        </div>
+                                </div>
+                        </div>
+                </div>
         );
 };
 
