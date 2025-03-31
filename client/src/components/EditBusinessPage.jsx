@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import '../styles/EditBusinessPage.css';
+import { FaSave, FaTrash, FaPlus, FaUpload ,FaEdit} from 'react-icons/fa'; // אייקונים של שמירה ומחיקה
 
 const EditBusinessPage = () => {
     const selectedBusiness = useSelector(state => state.business.selectedBusiness);
@@ -12,7 +13,7 @@ const EditBusinessPage = () => {
         email: '',
         categoryId: '',
         description: '',
-        logo: null // Changed to null since only one file is allowed
+        logo: null
     });
     const [categories, setCategories] = useState([
         { id: 1, name: 'Manicure' },
@@ -33,7 +34,7 @@ const EditBusinessPage = () => {
                 email: selectedBusiness.email,
                 categoryId: selectedBusiness.categoryId,
                 description: selectedBusiness.description,
-                logo: selectedBusiness.logo || null // Set to null if no logo
+                logo: selectedBusiness.logo || null
             });
         }
     }, [selectedBusiness]);
@@ -43,7 +44,7 @@ const EditBusinessPage = () => {
         if (name === 'logo') {
             setBusinessData(prev => ({
                 ...prev,
-                [name]: files && files[0] ? files[0] : null // Only set the first file or null
+                [name]: files && files[0] ? files[0] : null
             }));
         } else {
             setBusinessData(prev => ({
@@ -58,7 +59,6 @@ const EditBusinessPage = () => {
         setIsLoading(true);
         setMessage(null);
 
-        // Required fields (excluding logo and description)
         const requiredFields = ["name", "categoryId", "address", "phone", "email"];
         const missingFields = requiredFields.filter(field => !businessData[field] || String(businessData[field]).trim() === "");
 
@@ -76,11 +76,11 @@ const EditBusinessPage = () => {
         formData.append('phone', businessData.phone);
         formData.append('email', businessData.email);
 
-        if (businessData.logo) { // Append logo only if it exists
+        if (businessData.logo) {
             formData.append('logo', businessData.logo);
         }
 
-        if (businessData.id) { // Append ID only if it exists
+        if (businessData.id) {
             formData.append('id', businessData.id);
         }
 
@@ -100,7 +100,6 @@ const EditBusinessPage = () => {
         return tokenCookie ? tokenCookie.split('=')[1] : null;
     };
 
-    // Upload a new business
     const uploadBusiness = async (token, formData) => {
         return await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, formData, {
             headers: {
@@ -124,31 +123,36 @@ const EditBusinessPage = () => {
                 </div>
             )}
 
+            <div className="page-header">
+                <h1>{selectedBusiness ? 'עדכון פרטי עסק' : 'הוספת עסק'}</h1>
+                <div className="header-line"></div> {/* אלמנט אדום קטן מתחת לכותרת */}
+            </div>
+
             <form className='upload-form' onSubmit={handleSubmit}>
                 <div className='form-group'>
-                    <label htmlFor="name">Business Name:</label>
+                    <label htmlFor="name">שם העסק</label>
                     <input type="text" id="name" name="name" value={businessData.name} onChange={handleChange} />
                 </div>
 
                 <div className='form-group'>
-                    <label htmlFor="address">Address:</label>
+                    <label htmlFor="address">כתובת</label>
                     <input type="text" id="address" name="address" value={businessData.address} onChange={handleChange} />
                 </div>
 
                 <div className='form-group'>
-                    <label htmlFor="phone">Phone Number:</label>
+                    <label htmlFor="phone">טלפון</label>
                     <input type="tel" id="phone" name="phone" value={businessData.phone} onChange={handleChange} />
                 </div>
 
                 <div className='form-group'>
-                    <label htmlFor="email">Email:</label>
+                    <label htmlFor="email">כתובת דואר אלקטרונית</label>
                     <input type="email" id="email" name="email" value={businessData.email} onChange={handleChange} />
                 </div>
 
                 <div className='form-group'>
-                    <label htmlFor="categoryId">Category:</label>
+                    <label htmlFor="categoryId">תחום שירות</label>
                     <select id="categoryId" name="categoryId" value={businessData.categoryId} onChange={handleChange}>
-                        <option value="">Select Category</option>
+                        <option value="">בחר תחום</option>
                         {categories.map((cat) => (
                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                         ))}
@@ -156,25 +160,108 @@ const EditBusinessPage = () => {
                 </div>
 
                 <div className='form-group'>
-                    <label htmlFor="description">Description:</label>
-                    <textarea id="description" name="description" value={businessData.description} onChange={handleChange} />
+                    <label htmlFor="description">תיאור העסק</label>
+                    <input type="text" id="description" name="description" value={businessData.description} onChange={handleChange} />
                 </div>
-
+{/* 
                 {selectedBusiness?.logo && (
                     <div className='form-group'>
-                        <label>Current Logo:</label>
+                        <label>לוגו</label>
                         <img src={`${process.env.REACT_APP_API_DOMAIN}/uploads/${selectedBusiness.logo.split('/').pop()}`} alt="Current Logo" className="business-logo-preview" />
                     </div>
                 )}
 
                 <div className='form-group'>
-                    <label htmlFor="logo">Upload New Logo:</label>
                     <input type="file" id="logo" name="logo" onChange={handleChange} />
+                </div> */}
+
+                <div className='form-group'>
+                    {/* אם יש לוגו, הצג את כפתור עדכון */}
+                    {selectedBusiness?.logo ? (
+                        <>
+                            <label htmlFor="logo" className="button file-upload">
+                                <FaEdit className="icon" />
+                                עריכת לוגו
+                                <input 
+                                    type="file" 
+                                    id="logo" 
+                                    name="logo" 
+                                    onChange={handleChange} 
+                                    style={{ display: 'none' }} 
+                                />
+                            </label>
+
+                            {/* הצג את הלוגו */}
+                            <img 
+                                src={`${process.env.REACT_APP_API_DOMAIN}/uploads/${selectedBusiness.logo.split('/').pop()}`} 
+                                alt="Current Logo" 
+                                className="business-logo-preview" 
+                            />
+                        </>
+                    ) : (
+                        // אם אין לוגו, הצג כפתור בחירת לוגו
+                        <label htmlFor="logo" className="button file-upload">
+                            <FaUpload className="icon" />
+                            {'בחירת לוגו'}
+                            <input 
+                                type="file" 
+                                id="logo" 
+                                name="logo" 
+                                onChange={handleChange} 
+                                style={{ display: 'none' }} 
+                            />
+                        </label>
+                    )}
                 </div>
 
-                <button className='submit-business-form' type="submit" disabled={isLoading}>
-                    {isLoading ? 'Uploading...' : selectedBusiness ? 'Update Business' : 'Create Business'}
-                </button>
+
+            {/* <div className='form-group'>
+                <label htmlFor="logo" className="button file-upload">
+                    <FaUpload className="icon" />
+                    {selectedBusiness?.logo ? 'עדכון לוגו' : 'בחירת לוגו'}
+                    <input 
+                        type="file" 
+                        id="logo" 
+                        name="logo" 
+                        onChange={handleChange} 
+                        style={{ display: 'none' }} 
+                    />
+                </label>
+            </div> */}
+
+
+
+
+                <div className="button-container">
+                    {/* כפתור עדכון עם אייקון שמירה */}
+                    <button className='button update' type="submit" disabled={isLoading}>
+                        {isLoading ? 'Uploading...' : selectedBusiness ? (
+                            <>
+                                <FaSave className="icon" />
+                                שמירה  
+                            </>
+                        ) : (
+                            <>
+                                {/* <FaPlus className="icon" /> */}
+                                הוספת עסק 
+                            </>
+                        )}
+                    </button>
+
+                    {/* כפתור מחיקה */}
+                    {selectedBusiness && (
+                        <button
+                            className='button delete'
+                            type="button"
+                            onClick={() => handleDeleteBusiness(selectedBusiness._id)}
+                        >
+                            <FaTrash className="icon" />
+                            מחיקה
+                        </button>
+                    )}
+                </div>
+
+                
             </form>
         </div>
     );
