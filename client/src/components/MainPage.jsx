@@ -4,79 +4,62 @@ import axios from 'axios';
 import '../styles/MainPage.css';
 
 const MainPage = () => {
-    const [business, setBusiness] = useState([]);
+    const [businesses, setBusinesses] = useState([]);
     const [filteredBusinesses, setFilteredBusinesses] = useState([]);
-    const [category, setCategory] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('');
 
     useEffect(() => {
-        fetchBusinesses().then(response => {
-            setBusiness(response);
-            setFilteredBusinesses(response);
-        });
+        fetchCategories();
+        fetchBusinesses();
     }, []);
+
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
+            setCategories(response.data);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
+    };
 
     const fetchBusinesses = async () => {
         try {
-            const response = await axios.get(process.env.REACT_APP_API_DOMAIN + '/api/v1/businesses');
-            return response.data;
-        } catch (err) {
+            const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`);
+            setBusinesses(response.data);
+            setFilteredBusinesses(response.data);
+        } catch (error) {
+            console.error("Error fetching businesses:", error);
         }
     };
 
-
-    const handleFilterChange = (selectedCategory) => {
-        setCategory(selectedCategory);
-
-        if (selectedCategory === "") {
-            // Show all business when "All Categories" is clicked
-            setFilteredBusinesses(business);
+    const handleFilterChange = (category) => {
+        setSelectedCategory(category);
+        if (category === "") {
+            setFilteredBusinesses(businesses);
         } else {
-            // Filter business by the selected category
-            setFilteredBusinesses(business.filter((business) => business.category === selectedCategory));
+            setFilteredBusinesses(businesses.filter(b => b.category === category));
         }
     };
-
-    // const categories = [
-    //     { name: "Category 1", icon: "icon1.png" },
-    //     { name: "Category 2", icon: "icon2.png" },
-    //     { name: "Category 3", icon: "icon3.png" },
-    //     // Add more categories dynamically
-    // ];
-    //
-    // const categoryContainer = document.querySelector(".categories");
-    //
-    // categories.forEach((category) => {
-    //     const business = document.createElement("div");
-    //     business.className = "category-business";
-    //
-    //     business.innerHTML = `
-    //     <img src="${category.icon}" alt="${category.name}" />
-    //     <span>${category.name}</span>
-    // `;
-    //
-    //     categoryContainer.appendChild(business);
-    // });
 
     return (
         <div className='main-page-container'>
             <div className="category-container">
                 <div className="categories">
-                    <div className="category-business" onClick={() => handleFilterChange("Fiction")}>
-                        <img src="/home/dev-it/docker/server/config/uploads/1734539710124.png" alt="Category 1" />
-                        <span>Category 1</span>
+                    <div className="category-business" onClick={() => handleFilterChange("")}>
+                        <img src="/path/to/default-icon.png" alt="All" />
+                        <span>All Categories</span>
                     </div>
-                    <div className="category-business" onClick={() => handleFilterChange("Non-Fiction")}>
-                        <img src="/home/dev-it/docker/server/config/uploads/1734539710124.png" alt="Category 2" />
-                        <span>Category 2</span>
-                    </div>
-                    <div className="category-business">
-                        <img src="/home/dev-it/docker/server/config/uploads/1734539710124.png" alt="Category 3" />
-                        <span>Category 3</span>
-                    </div>
+                    {categories.map((category) => (
+                        <div key={category._id} className="category-business" onClick={() => handleFilterChange(category.name)}>
+                            <img src={category.icon || "/path/to/default-icon.png"} alt={category.name} />
+                            <span>{category.name}</span>
+                        </div>
+                    ))}
                 </div>
             </div>
             <div className="card-slider">
-                {filteredBusinesses && filteredBusinesses.map(business => (
+                {filteredBusinesses.map((business) => (
                     <BusinessCard key={business._id} business={business} />
                 ))}
             </div>

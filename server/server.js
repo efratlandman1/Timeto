@@ -9,6 +9,7 @@ const MONGO_URI = process.env.MONGO_URI;
 const usersRouter = require('./routes/usersRoutes');
 const businessesRouter = require('./routes/businessesRoutes');
 const authRouter = require('./routes/authRoutes');
+const categoryRoutes = require("./routes/categoryRoutes");
 const jwtAuthMiddleware = require("./middlewares/authMiddleware");
 
 app.use(cors());
@@ -28,6 +29,7 @@ app.use(jwtAuthMiddleware)
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/businesses', businessesRouter);
 app.use('/api/v1', authRouter);
+app.use("/api/categories", categoryRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
