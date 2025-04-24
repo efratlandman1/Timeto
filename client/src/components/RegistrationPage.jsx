@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/registrationPage.css';
+import { FaUser, FaLock, FaClock } from 'react-icons/fa';
 
 const RegistrationPage = () => {
     const [username, setUsername] = useState('');
@@ -20,11 +21,22 @@ const RegistrationPage = () => {
     };
 
     return (
-        <from className='registration-from' onSubmit={handleRegister}>
-            <input className='registration-input' type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
-            <input className='registration-input' type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            <button className='registration-button' type="submit">Send</button>
-        </from>
+        <div className="login-container">
+            <form className="login-form" onSubmit={handleRegister}>
+                {/* <img src={logo} alt="Logo" className="login-logo" /> */}
+                <FaClock className="login-logo" />
+                <h1 className="login-title">זה הזמן</h1>
+                <div className="input-wrapper">
+                    <FaUser className="input-icon" />
+                    <input className="login-input" type="text" placeholder="שם משתמש" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                </div>
+                <div className="input-wrapper">
+                    <FaLock className="input-icon" />
+                    <input className="login-input" type="password" placeholder="סיסמה" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                </div>
+                <button className="login-button" type="submit">התחברות</button>
+            </form>
+        </div>
     );
 };
 
