@@ -1,27 +1,90 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    direction: rtl;
+}
+
 .login-form {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 6rem 1rem 1rem; /* padding to account for the fixed header */
+    width: 100%;
+    max-width: 400px;
     background-color: #ffffff;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    direction: rtl;
+
+    /* אנימציית כניסה */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-logo {
+    font-size: 4rem;
+    color: #000000;
+    margin-bottom: 1rem;
+}
+
+.login-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #000000;
+    font-weight: bold;
+}
+
+.input-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+    direction: rtl;
+}
+
+.input-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    color: #6c757d;
+    pointer-events: none;
 }
 
 .login-input {
     width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border-radius: 5px;
-    border: 1px solid #ced4da;
-    outline: none;
+    padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #adb5bd;
+    font-size: 1rem;
+    text-align: right;
 }
 
 .login-button {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #343a40;
     color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
     cursor: pointer;
+
+    /* מעבר חלק בלחיצה וב-hover */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.login-button:hover {
+    background-color: #495057;
+}
+
+.login-button:active {
+    transform: scale(0.98);
 }

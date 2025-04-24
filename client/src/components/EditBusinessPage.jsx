@@ -23,7 +23,7 @@ const EditBusinessPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState(null);
 
-    useEffect(() => {
+    useEffect(() => { 
         if (selectedBusiness) {
             setBusinessData({
                 id: selectedBusiness._id,
