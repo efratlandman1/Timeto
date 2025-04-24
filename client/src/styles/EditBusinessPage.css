@@ -2,131 +2,213 @@
     padding: 6rem 1rem 1rem;
     max-width: min(80%, 1400px);
     width: 100%;
-    margin: 0 auto; /* Centers the container */
+    margin: 0 auto;
+    text-align: center;
 }
-.page-container.disabled {
-    pointer-events: none;
-    opacity: 0.5;
+
+/* עיצוב הכותרת */
+.page-header {
+    text-align: center;
+    margin-bottom: 2rem; /* רווח מתחת לכותרת */
+    width: 100%;
+    max-width: 500px; /* מכיוון שהטופס ברוחב 500px, ניתן להחיל את אותו רוחב גם על הכותרת */
+    margin: 0 auto; /* ממורכז */
+    background-color: #333; /* רקע כהה לכותרת */
+    padding: 1rem 0; /* ריפוד פנימי בכותרת */
+    border-radius: 12px 12px 0 0; /* פינות מעוגלות בחלק העליון */
 }
+
+.page-header h1 {
+    font-size: 24px;
+    color: #fff;  /* צבע טקסט בהיר */
+    font-weight: bold;
+    margin: 0;
+    text-transform: uppercase; /* אם רוצים לתת לכותרת עיצוב חד יותר */
+    line-height: 1.4; /* רווח בין השורות */
+}
+
+/* אלמנט אדום קטן מתחת לכותרת */
+.header-line {
+    width: 50px; /* רוחב האלמנט האדום */
+    height: 4px; /* גובה האלמנט */
+    background-color: #e63946; /* אדום כהה */
+    margin: 10px auto 0; /* מיקום ממורכז עם רווח עליון */
+}
+
+
 
 .upload-form {
     max-width: 500px;
     margin: 0 auto;
-    padding: 1rem 1rem;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
 }
 
+/* עיצוב שדה קלט עם תווית מחוץ לשדה בצד ימין */
 .form-group {
+    position: relative;
     display: flex;
     flex-direction: column;
+    text-align: right;
 }
 
 .form-group label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #333;
-}
-
-.form-group input,
-.form-group textarea {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
     font-size: 16px;
+    color: #888;
+    margin-bottom: 1px;
+    text-align: right; /* שים לב שהכותרת תישאר מימין */
 }
 
-.form-group textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-
-.submit-business-form {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
+/* שדות קלט עם בורדר תחתון */
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 8px;
     border: none;
-    border-radius: 5px;
+    border-bottom: 2px solid #ddd;
+    font-size: 16px;
+    width: 100%;
+    background-color: transparent;
+    transition: border-color 0.3s;
+    direction: rtl;
+    text-align: right;
+}
+
+/* שינוי צבע הבורדר בעת פוקוס */
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-bottom-color: #d32f2f;
+}
+
+/* שינוי צבע של הבורדר כאשר יש טקסט בשדה */
+.form-group input:not(:placeholder-shown) + label,
+.form-group textarea:not(:placeholder-shown) + label {
+    color: #d32f2f;
+}
+
+/* בסיס כפתור */
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+/* כפתור העלאת תמונה 
+.upload-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: #ffffff;
     cursor: pointer;
     font-size: 16px;
     transition: background 0.3s ease;
 }
 
-.submit-business-form:hover {
+.upload-button:hover {
     background-color: #0056b3;
-}
+}*/
 
-.categories-dropdown {
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
+/* כפתור העלאת קובץ - עיצוב קטן ומינימליסטי */
+.button.file-upload {
+    display: inline-block;
+    padding: 8px 16px; /* גודל קטן יותר */
+    border: 2px solid #333; /* גבול בצבע אפור כהה */
+    background-color: transparent; /* רקע שקוף */
+    color: #333; /* צבע טקסט אפור כהה */
     border-radius: 5px;
-    border: 1px solid #ced4da;
-    outline: none;
-}
-
-.upload-texterea {
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border-radius: 5px;
-    border: 1px solid #ced4da;
-    outline: none;
-}
-
-.upload-button {
-    padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 5px;
-  background-color: #007bff;
-  color: #ffffff;
-  cursor: pointer;
-}
-
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
+    cursor: pointer;
+    font-size: 14px; /* גודל טקסט קטן יותר */
     font-weight: bold;
-    z-index: 9999;
-}
-
-.loading-animation {
-    animation: bounce 1s infinite alternate;
-}
-
-@keyframes bounce {
-    from { transform: translateY(0); }
-    to { transform: translateY(-20px); }
-}
-
-.message-box {
-    padding: 10px;
-    margin: 10px 0;
     text-align: center;
-    font-weight: bold;
-    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    position: relative;
+    width: fit-content;
+    align-self: anchor-center;
 }
 
-.success {
-    background-color: #4caf50;
+/* כאשר הכפתור נמצא במצב ריחוף */
+.button.file-upload:hover {
+    background-color: #e63946; /* אדום כהה */
+    color: white; /* צבע טקסט לבן */
+    border-color: #e63946; /* גבול אדום כהה */
+}
+
+/* כאשר הכפתור נמצא במצב לחיצה */
+.button.file-upload:active {
+    background-color: #d62828; /* אדום כהה יותר */
+    color: white; /* צבע טקסט לבן */
+    border-color: #d62828; /* גבול אדום כהה יותר */
+}
+
+/* אייקון בתוך הכפתור */
+.button.file-upload .icon {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+
+/* כפתור מחיקה */
+.button.delete {
+    background-color: #dc3545; /* צבע אדום */
+    color: white;
+    margin-left: 10px;
+}
+
+.button.delete:hover {
+    background-color: #c82333; /* צבע כהה יותר ב-hover */
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3); /* הבלטה רכה */
+}
+
+.button.delete:active {
+    transform: scale(0.98); /* אפקט לחיצה */
+}
+/* כפתור עדכון  */
+.button.update {
+    background-color: #28a745; /* צבע ירוק */
     color: white;
 }
 
-.error {
-    background-color: #f44336;
-    color: white;
+.button.update:hover {
+    background-color: #218838; /* צבע כהה יותר ב-hover */
+    box-shadow: 0 4px 10px rgba(0, 128, 0, 0.3); /* הבלטה רכה */
 }
 
+.button.update:active {
+    transform: scale(0.98); /* אפקט לחיצה */
+}
+
+/* אייקון בכפתור עדכון */
+.button .icon {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.business-logo-preview {    
+    margin-top: 16px;
+}
+
+/* התאמות למובייל */
+@media (max-width: 768px) {
+    .page-container {
+        max-width: 90%;
+    }
+    .upload-form {
+        padding: 15px;
+    }
+}
