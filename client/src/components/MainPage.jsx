@@ -7,7 +7,6 @@ const MainPage = () => {
     const [businesses, setBusinesses] = useState([]);
     const [filteredBusinesses, setFilteredBusinesses] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('');
 
     useEffect(() => {
         fetchCategories();
@@ -33,12 +32,11 @@ const MainPage = () => {
         }
     };
 
-    const handleFilterChange = (category) => {
-        setSelectedCategory(category);
-        if (category === "") {
+    const handleFilterChange = (categoryId) => {
+        if (categoryId === "") {
             setFilteredBusinesses(businesses);
         } else {
-            setFilteredBusinesses(businesses.filter(b => b.category === category));
+            setFilteredBusinesses(businesses.filter(b => b.categoryId === categoryId));
         }
     };
 
@@ -51,7 +49,7 @@ const MainPage = () => {
                         <span>All Categories</span>
                     </div>
                     {categories.map((category) => (
-                        <div key={category._id} className="category-business" onClick={() => handleFilterChange(category.name)}>
+                        <div key={category._id} className="category-business" onClick={() => handleFilterChange(category._id)}>
                             <img src={category.icon || "/path/to/default-icon.png"} alt={category.name} />
                             <span>{category.name}</span>
                         </div>

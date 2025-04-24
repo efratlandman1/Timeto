@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import '../styles/EditBusinessPage.css';
-import { FaSave, FaTrash, FaPlus, FaUpload ,FaEdit} from 'react-icons/fa'; // אייקונים של שמירה ומחיקה
+import { FaSave, FaTrash, FaPlus, FaUpload ,FaEdit} from 'react-icons/fa';
 
 const EditBusinessPage = () => {
     const selectedBusiness = useSelector(state => state.business.selectedBusiness);
@@ -15,12 +15,7 @@ const EditBusinessPage = () => {
         description: '',
         logo: null
     });
-    const [categories, setCategories] = useState([
-        { id: 1, name: 'Manicure' },
-        { id: 2, name: 'Pedicure' },
-        { id: 3, name: 'Hair Styling' },
-        { id: 4, name: 'Massage Therapy' }
-    ]);
+    const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState(null);
 
@@ -37,7 +32,17 @@ const EditBusinessPage = () => {
                 logo: selectedBusiness.logo || null
             });
         }
-    }, [selectedBusiness]);
+        fetchCategories();
+    }, []);
+
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
+            setCategories(response.data);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -154,7 +159,7 @@ const EditBusinessPage = () => {
                     <select id="categoryId" name="categoryId" value={businessData.categoryId} onChange={handleChange}>
                         <option value="">בחר תחום</option>
                         {categories.map((cat) => (
-                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                            <option key={cat._id} value={cat._id}>{cat.name}</option>
                         ))}
                     </select>
                 </div>
