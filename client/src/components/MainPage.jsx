@@ -62,16 +62,24 @@ const MainPage = () => {
             <div className="category-container">
                 <div className="categories">
                     <div className="category-business" onClick={() => handleFilterChange("Fiction")}>
-                        <img src="/home/dev-it/docker/server/config/uploads/1734539710124.png" alt="Category 1" />
-                        <span>Category 1</span>
+                        <div className="category-icon-wrapper">
+                           <img src="/home/dev-it/docker/server/config/uploads/1734539710124.png" alt="Category 1" />
+                            <span>Category 1</span>
+                        </div>
+                    
+                    
                     </div>
                     <div className="category-business" onClick={() => handleFilterChange("Non-Fiction")}>
-                        <img src="/home/dev-it/docker/server/config/uploads/1734539710124.png" alt="Category 2" />
-                        <span>Category 2</span>
+                        <div className="category-icon-wrapper">
+                            <img src="/home/dev-it/docker/server/config/uploads/1734539710124.png" alt="Category 2" />
+                            <span>Category 2</span>
+                        </div>
                     </div>
                     <div className="category-business">
-                        <img src="/home/dev-it/docker/server/config/uploads/1734539710124.png" alt="Category 3" />
-                        <span>Category 3</span>
+                        <div className="category-icon-wrapper">
+                            <img src="/home/dev-it/docker/server/config/uploads/1734539710124.png" alt="Category 3" />
+                            <span>Category 3</span>
+                        </div>
                     </div>
                 </div>
             </div>
