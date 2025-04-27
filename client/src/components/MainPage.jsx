@@ -2,11 +2,16 @@ import React, { useState, useEffect } from 'react';
 import BusinessCard from './BusinessCard';
 import axios from 'axios';
 import '../styles/MainPage.css';
+import { useNavigate } from 'react-router-dom';
+import { FaSearch, FaFilter } from 'react-icons/fa'; // אייקונים עבור חיפוש ופילטר
 
 const MainPage = () => {
     const [businesses, setBusinesses] = useState([]);
     const [filteredBusinesses, setFilteredBusinesses] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [searchQuery, setSearchQuery] = useState(''); // משתנה למלל חיפוש חופשי
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchCategories();
@@ -40,13 +45,50 @@ const MainPage = () => {
         }
     };
 
+    // פונקציה לחיפוש חופשי
+    const handleSearch = () => {
+        if (searchQuery) {
+            setFilteredBusinesses(businesses.filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase())));
+        } else {
+            setFilteredBusinesses(businesses);
+        }
+    };
+
+    const handleAdvancedSearchClick = () => {
+        navigate('/advanced-search-page'); // נווט לדף חיפוש מתקדם
+    };
+
     return (
         <div className='main-page-container'>
+            {/* שורת חיפוש */}
+            <div className="search-bar">
+                <div className="search-input-wrapper">
+                    <FaSearch className="search-icon" />
+                    <input
+                        type="text"
+                        placeholder="חיפוש חופשי"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyUp={handleSearch} // חיפוש יקרה בעת הקשת מקש
+                    />
+                </div>
+                <div className="filter-button-wrapper">
+                    <button
+                        onClick={handleAdvancedSearchClick}
+                        className="filter-button"
+                        title="חיפוש מורחב"
+                    >
+                        <FaFilter />
+                    </button>
+                </div>
+            </div>
+
+            {/* קטגוריות */}
             <div className="category-container">
                 <div className="categories">
                     <div className="category-business" onClick={() => handleFilterChange("")}>
                         <img src="/path/to/default-icon.png" alt="All" />
-                        <span>All Categories</span>
+                        <span>כל הקטגוריות</span>
                     </div>
                     {categories.map((category) => (
                         <div key={category._id} className="category-business" onClick={() => handleFilterChange(category._id)}>
@@ -56,6 +98,8 @@ const MainPage = () => {
                     ))}
                 </div>
             </div>
+
+            {/* הצגת העסקים */}
             <div className="card-slider">
                 {filteredBusinesses.map((business) => (
                     <BusinessCard key={business._id} business={business} />
