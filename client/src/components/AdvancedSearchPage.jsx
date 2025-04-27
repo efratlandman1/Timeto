@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/AdvancedSearchPage.css';
 import { FaStar } from 'react-icons/fa';
@@ -18,6 +18,17 @@ const AdvancedSearchPage = () => {
     const [priceRange, setPriceRange] = useState([0, 2000]);
     const [distance, setDistance] = useState(10);
     const [rating, setRating] = useState(0);
+
+    useEffect(() => {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                console.log(position.coords.latitude, position.coords.longitude);
+            },
+            (error) => {
+                console.error(error);
+            }
+        );
+    }, []);
 
     const handleSubmit = () => {
         const filters = {
