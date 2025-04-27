@@ -1,69 +1,8 @@
 /* מיכל ראשי */
-.main-page-container {
+.search-result-page-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 6rem 1rem 1rem;
-}
-
-/* באנר מתחלף */
-.banner-carousel {
-    width: 100%;
-    height: 250px;
-    overflow: hidden;
-    border-radius: 20px;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.banner-carousel img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* קטגוריות */
-.category-container {
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 16px 0;
-    background-color: transparent;
-    border-radius: 0;
-} 
-
-.categories {
-    display: flex;
-    gap: 30px;
-    justify-content: center;
-}
-
-.category-business {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    width: 100px;
-    background-color: transparent;
-    border-radius: 0;
-    padding: 0;
-    box-shadow: none;
-}
-
-.category-business:hover {
-    transform: scale(1.08);
-}
-
-.category-business img {
-    width: 150px;  
-    height: 100px; 
-    border-radius: 50%;
-    background-color: #e0e0e0;
-    margin-bottom: 8px;
-}
-
-.category-business span {
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
 }
 
 /* שורת חיפוש */
@@ -152,7 +91,8 @@
     grid-template-columns: repeat(4, 1fr);
     gap: 24px;
     padding-bottom: 2rem;
-    justify-content: center
+    justify-content: center;
+    margin-top: 40px; /* רווח מעל ה- card-slider */
 }
 
 /* המעטפת של התמונה והטקסט */
@@ -174,6 +114,53 @@
     border: 2px solid gray;
     box-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
 }
+/* עיצוב תוויות הפילטרים */
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.filter-label {
+    background-color: #f0f0f0;
+    padding: 5px 10px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+}
+
+.filters-container {
+    display: flex;
+    justify-content: center; /* מרכז את התוכן בציר ה-X (לרוחב) */
+    align-items: center; /* מרכז את התוכן בציר ה-Y (לגובה) */
+    gap: 10px; /* מרווח בין כל פילטר */
+    flex-wrap: wrap; /* מאפשר למרכיבי הפילטר להתעגל שורות במידת הצורך */
+    margin-top: 20px; /* רווח מעל הפילטרים */
+}
+
+.filter-tag {
+    background-color: #e0e0e0; /* רקע לתוויות */
+    color: #333; /* צבע טקסט */
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.filter-tag .remove-filter {
+    margin-left: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.remove-filter:hover {
+    color: #e60000; /* צבע אדום כהה בהובר */
+}
+
+
 
 /* ריספונסיביות */
 @media (max-width: 1024px) {
@@ -191,28 +178,7 @@
         padding: 0 1rem 2rem;
     }
 
-    .main-page-container {
+    .search-result-page-container {
         padding: 4rem 1rem 1rem;
-    }
-
-    .categories {
-        justify-content: flex-start;
-        gap: 16px;
-        padding: 0 1rem;
-    }
-
-    .category-icon-wrapper {
-        width: 80px;
-        min-height: 100px;
-        padding: 8px;
-    }
-
-    .category-business img {
-        width: 50px;
-        height: 50px;
-    }
-
-    .category-business span {
-        font-size: 14px;
     }
 }
