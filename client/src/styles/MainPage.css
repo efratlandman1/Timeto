@@ -1,82 +1,164 @@
-/* Container for horizontal scrolling */
-.category-container {
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 10px;
-    background-color: #f8f8f8; /* Optional background color */
-    border-radius: 15px; /* Rounded corners */
-    scrollbar-width: none; /* Hide scrollbar for Firefox */
-}
-
-.category-container::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for Chrome, Edge, and Safari */
-}
-
-/* Flexbox for aligning businesses */
-.categories {
-    display: flex;
-    gap: 20px; /* Space between businesses */
-}
-
-/* Individual category businesses */
-.category-business {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    width: 80px; /* Set fixed width for uniformity */
-    border-radius: 15px; /* Rounded corners */
-    background-color: white;
-    padding: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for better design */
-    transition: transform 0.3s;
-    cursor: pointer;
-}
-
-.category-business:hover {
-    transform: scale(1.1); /* Slight zoom on hover */
-}
-
-/* Category icons */
-.category-business img {
-    width: 40px;
-    height: 40px;
-    margin-bottom: 5px;
-    border-radius: 50%; /* Optional for rounded icons */
-    background-color: #eaeaea; /* Icon background color */
-}
-
-/* Category text */
-.category-business span {
-    font-size: 14px;
-    color: #333;
-    font-weight: 500;
-}
-
-.card-slider {
-    display: flex;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    gap: 16px;
-    padding: 16px 0;
-}
-
-.card-slider::-webkit-scrollbar {
-    height: 8px;
-}
-
-.card-slider::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 4px;
-}
-
-.card-slider::-webkit-scrollbar-thumb:hover {
-    background-color: #aaa;
-}
-
+/* מיכל ראשי */
 .main-page-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 6rem 1rem 1rem; /* padding to account for the fixed header */
+    padding: 6rem 1rem 1rem;
+}
+
+/* באנר מתחלף */
+.banner-carousel {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.banner-carousel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* קטגוריות */
+.category-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 16px 0;
+    background-color: transparent; /* ביטול רקע */
+    border-radius: 0;
+} 
+
+.categories {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+}
+
+.category-business {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100px;
+    /* padding: 16px; */
+    background: white;
+    /* border-radius: 12px; */
+    /* box-shadow: 0 2px 6px rgba(0,0,0,0.1); */
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    background-color: transparent; /* אין רקע */
+    border-radius: 0;               /* אין פינות מעוגלות */
+    padding: 0;                     /* אין ריפוד */
+    box-shadow: none;              /* אין צל */
+}
+
+
+.category-business:hover {
+    transform: scale(1.08);
+}
+
+.category-business img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    margin-bottom: 8px;
+}
+
+.category-business span {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* כרטיסים */
+.card-slider {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    padding-bottom: 2rem;
+    justify-content: center
+}
+
+.category-business {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.category-business:hover {
+    transform: scale(1.05);
+}
+
+/* המעטפת של התמונה והטקסט */
+.category-icon-wrapper {
+    width: 100px;
+    min-height: 120px;
+    border-radius: 16px; /* פינות מעוגלות קלות – לא עיגול מלא */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border: 2px solid transparent;
+    /* box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); */
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+    /* background-color: transparent;  */
+}
+
+
+/* אפקט מעבר */
+.category-business:hover .category-icon-wrapper {
+    border: 2px solid gray;
+    box-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
+}
+
+
+
+/* ריספונסיביות */
+
+@media (max-width: 1024px) {
+    .card-slider {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        padding: 0 1rem 2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .card-slider {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 0 1rem 2rem;
+    }
+
+    .main-page-container {
+        padding: 4rem 1rem 1rem;
+    }
+
+    .categories {
+        justify-content: flex-start;
+        gap: 16px;
+        padding: 0 1rem;
+    }
+
+    .category-icon-wrapper {
+        width: 80px;
+        min-height: 100px;
+        padding: 8px;
+    }
+
+    .category-business img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .category-business span {
+        font-size: 14px;
+    }
 }
 
