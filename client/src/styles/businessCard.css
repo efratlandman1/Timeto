@@ -79,8 +79,16 @@
     font-size: 14px;
     font-weight: bold;
     color: #f39c12;
-    text-align: left; /* רייטינג מיושר לשמאל */
+    text-align: center; /* מיושר למרכז */
+    display: flex;
+    justify-content: center; /* ממרכז אופקית */
+    align-items: center;     /* ממרכז אנכית */
+    background-color: #fff8dc; /* צהוב בהיר */
+    padding: 6px 10px;
+    border-radius: 8px; /* עיגול קל לפינות */
+    gap: 6px; 
 }
+
 
 /* Action buttons styling */
 .business-card-action-button {
@@ -138,3 +146,4 @@
 .edit:hover {
     background-color: #b71c1c;
 }
+
