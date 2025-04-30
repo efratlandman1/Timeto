@@ -10,15 +10,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.625rem; /* 10px */
-    position: relative;
+    gap: 0.625rem; 
+    /* position: relative; */
 }
 
 .categories {
     display: flex;
-    gap: 2rem; /* 30px */
-    justify-content: flex-start;
-    transition: transform 0.5s ease;
+    gap: 2rem; 
+    /* justify-content: flex-start; */
+    /* transition: transform 0.5s ease; */
     overflow-x: hidden;
     overflow-y: hidden;
     max-width: 90%;
@@ -29,12 +29,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
-    width: 6.25rem; /* 100px */
-    background-color: transparent;
-    border-radius: 0;
-    padding: 0;
-    box-shadow: none;
+    /* text-align: center; */
+    /* width: 6.25rem; */
+    /* background-color: transparent; */
+    /* border-radius: 0; */
+    /* padding: 0; */
+    /* box-shadow: none; */
 }
 
 .category-business:hover {
@@ -42,10 +42,8 @@
 }
 
 .category-business img {
-    width: 7vw;
-    height: 7vw;
-    /* max-width: 9.375rem; 150px */
-    /* aspect-ratio: 3 / 2; */
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     background-color: #e0e0e0;
     margin-bottom: 0.5rem;
@@ -55,7 +53,7 @@
     font-size: 1rem;
     font-weight: 600;
     color: #333;
-}
+} 
 
 .slider-arrow:hover {
     background-color: #ff4d4d;
@@ -254,21 +252,26 @@
     }
 
     .category-business img {
-        width: 20vw; /* תמונה שתהיה יחסית לרוחב המסך */
-        height: 20vw; /* אותו דבר לגבי הגובה */
+        width: 65px; /* תמונה שתהיה יחסית לרוחב המסך */
+        height: 65px; /* אותו דבר לגבי הגובה */
     }
 }
 
 /* חיפוש - תמיכה במובייל */
 @media (max-width: 767px) {
     .search-bar {
-        flex-direction: column; /* עריכת החיפוש בעמודה */
-        gap: 1rem; /* רווח בין שדות החיפוש */
-    }
+        flex-direction: row; /* שמירה על אותו קו גם במובייל */
+        flex-wrap: nowrap;   /* מניעת ירידה שורה */
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 30px;
+        margin-bottom: 5px;
+      }
 
     .search-input-wrapper {
-        width: 100%;
-        max-width: 100%; /* הרחבת שדה החיפוש */
+        width: 100%; /* או אחוז מתאים כדי להשאיר מקום לכפתור */
+        /* max-width: none; */
     }
 
     .search-input-wrapper input {
@@ -279,6 +282,14 @@
     .search-icon {
         left: 0.5rem; /* התאמת אייקון החיפוש */
         font-size: 1rem; /* גודל אייקון קטן יותר */
+    }
+    .filter-button-wrapper {
+        flex-shrink: 0; /* מונע מהכפתור להידחס */
+    }
+    
+    .filter-button {
+        font-size: 1rem;
+        padding: 0.5rem 0.75rem;
     }
 }
 
@@ -314,7 +325,7 @@
 /* כללי - תמיכה במובייל */
 @media (max-width: 767px) {
     .main-page-container {
-        max-width: 90%; /* התאם את הרוחב */
+        max-width: 100%; /* התאם את הרוחב */
         padding: 4rem 1rem;
     }
 
