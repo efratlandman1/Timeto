@@ -3,21 +3,83 @@ import BusinessCard from './BusinessCard';
 import axios from 'axios';
 import '../styles/MainPage.css';
 import { useNavigate } from 'react-router-dom';
-import { FaSearch, FaFilter } from 'react-icons/fa'; // אייקונים עבור חיפוש ופילטר
+import { FaSearch, FaFilter } from 'react-icons/fa';
 
+// ====== קומפוננטת באנר עם תנועה ======
+const Banner = () => {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [direction, setDirection] = useState(1); // 1 קדימה, -1 אחורה
+
+    const images = [
+        `${process.env.REACT_APP_API_DOMAIN}/uploads/business1.jpeg`,
+        `${process.env.REACT_APP_API_DOMAIN}/uploads/business2.png`,
+        `${process.env.REACT_APP_API_DOMAIN}/uploads/business3.jpg`
+    ];
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentImageIndex((prevIndex) => {
+                let nextIndex = prevIndex + direction;
+
+                if (nextIndex >= images.length) {
+                    setDirection(-1);
+                    return prevIndex - 1;
+                } else if (nextIndex < 0) {
+                    setDirection(1);
+                    return prevIndex + 1;
+                }
+
+                return nextIndex;
+            });
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [direction, images.length]);
+
+    const handlePrev = () => {
+        setDirection(-1);
+        setCurrentImageIndex((prevIndex) =>
+            prevIndex === 0 ? 0 : prevIndex - 1
+        );
+    };
+
+    const handleNext = () => {
+        setDirection(1);
+        setCurrentImageIndex((prevIndex) =>
+            prevIndex === images.length - 1 ? prevIndex : prevIndex + 1
+        );
+    };
+
+    return (
+        <div className="banner">
+            <div className="banner-slider" style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
+                {images.map((src, index) => (
+                    <img key={index} src={src} alt={`Business ${index}`} className="banner-image" />
+                ))}
+            </div>
+            <div className="banner-arrows">
+                <button className="arrow-left" onClick={handlePrev}>←</button>
+                <button className="arrow-right" onClick={handleNext}>→</button>
+            </div>
+        </div>
+    );
+};
+
+// ====== קומפוננטת דף ראשי ======
 const MainPage = () => {
     const [businesses, setBusinesses] = useState([]);
     const [filteredBusinesses, setFilteredBusinesses] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [searchQuery, setSearchQuery] = useState(''); // משתנה למלל חיפוש חופשי
-
+    const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
 
+    // ====== טעינת נתונים ======
     useEffect(() => {
-        fetchCategories();
-        fetchBusinesses();
+        fetchCategories(); // שליפת קטגוריות מהשרת
+        fetchBusinesses(); // שליפת עסקים מהשרת
     }, []);
 
+    // === פונקציה: שליפת קטגוריות מהשרת (משמשת לבניית תפריט קטגוריות) ===
     const fetchCategories = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
@@ -27,6 +89,7 @@ const MainPage = () => {
         }
     };
 
+    // === פונקציה: שליפת עסקים מהשרת (משמשת להצגת כלל העסקים) ===
     const fetchBusinesses = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`);
@@ -37,6 +100,7 @@ const MainPage = () => {
         }
     };
 
+    // === סינון עסקים לפי קטגוריה (משתמש עבור קליק על קטגוריה) ===
     const handleFilterChange = (categoryId) => {
         if (categoryId === "") {
             setFilteredBusinesses(businesses);
@@ -45,7 +109,7 @@ const MainPage = () => {
         }
     };
 
-    // פונקציה לחיפוש חופשי
+    // === חיפוש חופשי בטקסט (משתמש עבור שורת חיפוש) ===
     const handleSearch = () => {
         if (searchQuery) {
             setFilteredBusinesses(businesses.filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase())));
@@ -54,13 +118,37 @@ const MainPage = () => {
         }
     };
 
+    // === מעבר לדף חיפוש מתקדם (בלחיצה על כפתור פילטר) ===
     const handleAdvancedSearchClick = () => {
-        navigate('/advanced-search-page'); // נווט לדף חיפוש מתקדם
+        navigate('/advanced-search-page');
+    };
+
+    // === גלילה שמאלה של הקטגוריות (בלחיצה על חץ שמאלי) ===
+    const scrollLeft = () => {
+        const container = document.querySelector('.categories');
+        container.scrollBy({ left: -300, behavior: 'smooth' });
+    };
+
+    // === גלילה ימינה של הקטגוריות (בלחיצה על חץ ימני) ===
+    const scrollRight = () => {
+        const container = document.querySelector('.categories');
+        container.scrollBy({ left: 300, behavior: 'smooth' });
+    };
+
+    // === שליפת 4 עסקים רנדומליים מתוך רשימה (משמש עבור שורות עסקיות) ===
+    const getRandomBusinesses = (businessList) => {
+        let shuffled = [...businessList];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled.slice(0, 4);
     };
 
     return (
         <div className='main-page-container'>
-            {/* שורת חיפוש */}
+
+            {/* === שורת חיפוש === */}
             <div className="search-bar">
                 <div className="search-input-wrapper">
                     <FaSearch className="search-icon" />
@@ -69,7 +157,7 @@ const MainPage = () => {
                         placeholder="חיפוש חופשי"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyUp={handleSearch} // חיפוש יקרה בעת הקשת מקש
+                        onKeyUp={handleSearch}
                     />
                 </div>
                 <div className="filter-button-wrapper">
@@ -83,30 +171,66 @@ const MainPage = () => {
                 </div>
             </div>
 
-            {/* קטגוריות */}
+            {/* === קטגוריות עם חיצים === */}
             <div className="category-container">
+                <button className="arrow-left" onClick={scrollLeft}>←</button>
                 <div className="categories">
-                    <div className="category-business" onClick={() => handleFilterChange("")}>
-                        <img src="/path/to/default-icon.png" alt="All" />
-                        <span>כל הקטגוריות</span>
-                    </div>
                     {categories.map((category) => (
                         <div key={category._id} className="category-business" onClick={() => handleFilterChange(category._id)}>
-                            <img src={category.icon || "/path/to/default-icon.png"} alt={category.name} />
+                            <img src={category.icon || "/path/to/default-icon.png"} />
                             <span>{category.name}</span>
                         </div>
                     ))}
                 </div>
+                <button className="arrow-right" onClick={scrollRight}>→</button>
             </div>
 
-            {/* הצגת העסקים */}
-            <div className="card-slider">
-                {filteredBusinesses.map((business) => (
-                    <BusinessCard key={business._id} business={business} />
-                ))}
+            {/* === באנר === */}
+            <Banner />
+
+            {/* === שורות של קבוצות עסקים === */}
+            <div className="business-groups">
+                {/* שורה: פופולאריים */}
+                <div className="business-row">
+                    <div className="business-row-header">
+                        <h3>פופולאריים בקרבת מקום</h3>
+                        <a href="/search-results?filter=popular" className="view-all">הצג הכל</a>
+                    </div>
+                    <div className="business-list">
+                        {getRandomBusinesses(filteredBusinesses).map((business) => (
+                            <BusinessCard key={business._id} business={business} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* שורה: עסקים חדשים */}
+                <div className="business-row">
+                    <div className="business-row-header">
+                        <h3>עסקים חדשים שנוספו לאחרונה</h3>
+                        <a href="/search-results?filter=new" className="view-all">הצג הכל</a>
+                    </div>
+                    <div className="business-list">
+                        {getRandomBusinesses(filteredBusinesses).map((business) => (
+                            <BusinessCard key={business._id} business={business} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* שורה: עסקים מומלצים */}
+                <div className="business-row">
+                    <div className="business-row-header">
+                        <h3>המומלצים שלנו</h3>
+                        <a href="/search-results?filter=recommended" className="view-all">הצג הכל</a>
+                    </div>
+                    <div className="business-list">
+                        {getRandomBusinesses(filteredBusinesses).map((business) => (
+                            <BusinessCard key={business._id} business={business} />
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );
-}
+};
 
 export default MainPage;
