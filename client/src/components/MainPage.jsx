@@ -5,8 +5,13 @@ import '../styles/MainPage.css';
 import { useNavigate } from 'react-router-dom';
 import { FaSearch, FaFilter } from 'react-icons/fa';
 
-// ====== קומפוננטת באנר עם תנועה ======
-const Banner = () => {
+const MainPage = () => {
+    const [businesses, setBusinesses] = useState([]);
+    const [filteredBusinesses, setFilteredBusinesses] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const navigate = useNavigate();
+
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [direction, setDirection] = useState(1); // 1 קדימה, -1 אחורה
 
@@ -50,33 +55,10 @@ const Banner = () => {
         );
     };
 
-    return (
-        <div className="banner">
-            <div className="banner-slider" style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
-                {images.map((src, index) => (
-                    <img key={index} src={src} alt={`Business ${index}`} className="banner-image" />
-                ))}
-            </div>
-            <div className="banner-arrows">
-                <button className="arrow-left" onClick={handlePrev}>←</button>
-                <button className="arrow-right" onClick={handleNext}>→</button>
-            </div>
-        </div>
-    );
-};
-
-// ====== קומפוננטת דף ראשי ======
-const MainPage = () => {
-    const [businesses, setBusinesses] = useState([]);
-    const [filteredBusinesses, setFilteredBusinesses] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const navigate = useNavigate();
-
     // ====== טעינת נתונים ======
     useEffect(() => {
-        fetchCategories(); // שליפת קטגוריות מהשרת
-        fetchBusinesses(); // שליפת עסקים מהשרת
+        fetchCategories().then(); // שליפת קטגוריות מהשרת
+        fetchBusinesses().then(); // שליפת עסקים מהשרת
     }, []);
 
     // === פונקציה: שליפת קטגוריות מהשרת (משמשת לבניית תפריט קטגוריות) ===
@@ -186,7 +168,17 @@ const MainPage = () => {
             </div>
 
             {/* === באנר === */}
-            <Banner />
+            <div className="banner">
+                <div className="banner-slider" style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
+                    {images.map((src, index) => (
+                        <img key={index} src={src} alt={`Business ${index}`} className="banner-image" />
+                    ))}
+                </div>
+                <div className="banner-arrows">
+                    <button className="arrow-left" onClick={handlePrev}>←</button>
+                    <button className="arrow-right" onClick={handleNext}>→</button>
+                </div>
+            </div>
 
             {/* === שורות של קבוצות עסקים === */}
             <div className="business-groups">
