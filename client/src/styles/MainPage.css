@@ -68,66 +68,6 @@
     right: 0.625rem; /* 10px */
 }
 
-/* שורת חיפוש */
-.search-bar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 1.25rem; /* 20px */
-    gap: 0.625rem;
-}
-
-.search-input-wrapper {
-    display: flex;
-    align-items: center;
-    position: relative;
-    width: 80%;
-    max-width: 40rem; /* 500px */
-}
-
-.search-input-wrapper input {
-    width: 100%;
-    padding: 0.5rem 1.875rem 0.5rem 0.625rem;
-    font-size: 1.25rem;
-    border-radius: 1.5625rem;
-    border: 1px solid #ccc;
-    direction: rtl;
-}
-
-.search-icon {
-    position: absolute;
-    left: 0.625rem;
-    font-size: 1.125rem;
-    color: #888;
-}
-
-/* כפתור סינון מתקדם */
-.filter-button-wrapper {
-    display: flex;
-    align-items: center;
-}
-
-.filter-button {
-    padding: 0.5rem 0.75rem;
-    background-color: transparent;
-    color: #333;
-    border: 0.125rem solid #333;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    font-size: 1.125rem;
-    display: flex;
-    align-items: center;
-}
-
-.filter-button:hover {
-    background-color: #ff4d4d;
-    color: white;
-    border-color: #ff4d4d;
-}
-
-.filter-button svg {
-    font-size: 1.25rem;
-}
 
 /* באנר */
 .banner {
@@ -203,44 +143,16 @@
     background: rgba(255, 255, 255, 0.9);
 }
 
-/* שורות עסקים */
-.business-groups {
-    margin-top: 1.25rem;
+
+/* כללי - תמיכה במובייל */
+@media (max-width: 767px) {
+    .main-page-container {
+        max-width: 100%; /* התאם את הרוחב */
+        padding: 4rem 1rem;
+    }
+
+    
 }
-
-.business-row {
-    margin-bottom: 1.875rem;
-    direction: rtl;
-}
-
-.business-list {
-    display: flex;
-    justify-content: space-between;
-    gap: 1.25rem;
-}
-
-.view-all {
-    color: red;
-    font-weight: normal;
-    text-decoration: none;
-    direction: rtl;
-    cursor: pointer;
-    transition: text-decoration 0.2s ease;
-}
-
-.view-all:hover {
-    text-decoration: underline;
-}
-
-.business-row-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    direction: rtl;
-    margin-bottom: 0.5rem;
-}
-
-
 /* קטגוריות - תמיכה במובייל */
 @media (max-width: 767px) {
     .categories {
@@ -252,46 +164,13 @@
     }
 
     .category-business img {
-        width: 65px; /* תמונה שתהיה יחסית לרוחב המסך */
-        height: 65px; /* אותו דבר לגבי הגובה */
+        width: 65px; 
+        height: 65px; 
+ 
     }
 }
 
-/* חיפוש - תמיכה במובייל */
-@media (max-width: 767px) {
-    .search-bar {
-        flex-direction: row; /* שמירה על אותו קו גם במובייל */
-        flex-wrap: nowrap;   /* מניעת ירידה שורה */
-        justify-content: center;
-        align-items: center;
-        gap: 0.5rem;
-        margin-top: 30px;
-        margin-bottom: 5px;
-      }
 
-    .search-input-wrapper {
-        width: 100%; /* או אחוז מתאים כדי להשאיר מקום לכפתור */
-        /* max-width: none; */
-    }
-
-    .search-input-wrapper input {
-        padding: 0.5rem 1rem;
-        font-size: 1rem; /* הקטנת הגופן למובייל */
-    }
-
-    .search-icon {
-        left: 0.5rem; /* התאמת אייקון החיפוש */
-        font-size: 1rem; /* גודל אייקון קטן יותר */
-    }
-    .filter-button-wrapper {
-        flex-shrink: 0; /* מונע מהכפתור להידחס */
-    }
-    
-    .filter-button {
-        font-size: 1rem;
-        padding: 0.5rem 0.75rem;
-    }
-}
 
 /* באנר - תמיכה במובייל */
 @media (max-width: 767px) {
@@ -306,31 +185,6 @@
     }
 }
 
-/* שורות עסקים - תמיכה במובייל */
-@media (max-width: 767px) {
-    .business-list {
-        flex-direction: column; /* הצגת העסקים בעמודה */
-        gap: 1rem; /* רווח בין העסקים */
-    }
 
-    .view-all {
-        font-size: 1rem; /* גודל טקסט קטן יותר */
-    }
 
-    .business-row {
-        margin-bottom: 1rem; /* ריווח קטן יותר בין שורות העסקים */
-    }
-}
 
-/* כללי - תמיכה במובייל */
-@media (max-width: 767px) {
-    .main-page-container {
-        max-width: 100%; /* התאם את הרוחב */
-        padding: 4rem 1rem;
-    }
-
-    .filter-button {
-        padding: 0.5rem 1rem;
-        font-size: 1rem; /* גודל כפתור קטן יותר */
-    }
-}

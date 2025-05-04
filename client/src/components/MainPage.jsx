@@ -2,12 +2,20 @@ import React, { useState, useEffect } from 'react';
 import BusinessCard from './BusinessCard';
 import axios from 'axios';
 import '../styles/MainPage.css';
+import '../styles/SearchBar.css';
+import '../styles/businessCard.css';
 import { useNavigate } from 'react-router-dom';
 import { FaSearch, FaFilter } from 'react-icons/fa';
 
 const MainPage = () => {
     const [businesses, setBusinesses] = useState([]);
     const [filteredBusinesses, setFilteredBusinesses] = useState([]);
+    
+    const [popularBusinesses, setPopularBusinesses] = useState([]);
+    const [newBusinesses, setNewBusinesses] = useState([]);
+    const [recommendedBusinesses, setRecommendedBusinesses] = useState([]);
+
+
     const [categories, setCategories] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
@@ -72,15 +80,31 @@ const MainPage = () => {
     };
 
     // === פונקציה: שליפת עסקים מהשרת (משמשת להצגת כלל העסקים) ===
+    // const fetchBusinesses = async () => {
+    //     try {
+    //         const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`);
+    //         setBusinesses(response.data);
+    //         setFilteredBusinesses(response.data);
+    //     } catch (error) {
+    //         console.error("Error fetching businesses:", error);
+    //     }
+    // };
     const fetchBusinesses = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`);
-            setBusinesses(response.data);
-            setFilteredBusinesses(response.data);
+            const allBusinesses = response.data;
+            setBusinesses(allBusinesses);
+            setFilteredBusinesses(allBusinesses);
+    
+            // קביעת העסקים לשורות
+            setPopularBusinesses(getRandomBusinesses(allBusinesses));
+            setNewBusinesses(getRandomBusinesses(allBusinesses));
+            setRecommendedBusinesses(getRandomBusinesses(allBusinesses));
         } catch (error) {
             console.error("Error fetching businesses:", error);
         }
     };
+    
 
     // === סינון עסקים לפי קטגוריה (משתמש עבור קליק על קטגוריה) ===
     const handleFilterChange = (categoryId) => {
@@ -188,11 +212,12 @@ const MainPage = () => {
                         <h3>פופולאריים בקרבת מקום</h3>
                         <a href="/search-results?filter=popular" className="view-all">הצג הכל</a>
                     </div>
-                    <div className="business-list">
-                        {getRandomBusinesses(filteredBusinesses).map((business) => (
+                    <div className="card-slider">
+                        {popularBusinesses.map((business) => (
                             <BusinessCard key={business._id} business={business} />
                         ))}
                     </div>
+
                 </div>
 
                 {/* שורה: עסקים חדשים */}
@@ -201,11 +226,12 @@ const MainPage = () => {
                         <h3>עסקים חדשים שנוספו לאחרונה</h3>
                         <a href="/search-results?filter=new" className="view-all">הצג הכל</a>
                     </div>
-                    <div className="business-list">
-                        {getRandomBusinesses(filteredBusinesses).map((business) => (
+                    <div className="card-slider">
+                        {newBusinesses.map((business) => (
                             <BusinessCard key={business._id} business={business} />
                         ))}
                     </div>
+
                 </div>
 
                 {/* שורה: עסקים מומלצים */}
@@ -214,11 +240,12 @@ const MainPage = () => {
                         <h3>המומלצים שלנו</h3>
                         <a href="/search-results?filter=recommended" className="view-all">הצג הכל</a>
                     </div>
-                    <div className="business-list">
-                        {getRandomBusinesses(filteredBusinesses).map((business) => (
-                            <BusinessCard key={business._id} business={business} />
-                        ))}
-                    </div>
+                    <div className="card-slider">
+                    {recommendedBusinesses.map((business) => (
+                        <BusinessCard key={business._id} business={business} />
+                    ))}
+                </div>
+
                 </div>
             </div>
         </div>
