@@ -20,8 +20,11 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
 
     };
 
+    const handleCardClick = () => {
+        navigate(`/business-profile/${business._id}`);
+    };
     return (
-        <div className="business-card">
+        <div className="business-card" >
             {/* Left side of the card (action buttons) */}
             <div className="business-card-left">
                 {fromUserBusinesses ? (
@@ -47,7 +50,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
             </div>
 
             {/* Right side of the card (info) */}
-            <div className="business-card-right">
+            <div className="business-card-right" onClick={handleCardClick} style={{ cursor: 'pointer' }}>
                 <div className="business-card-header">
                     <img
                         className="business-card-image"
