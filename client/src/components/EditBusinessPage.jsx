@@ -140,7 +140,41 @@ const EditBusinessPage = () => {
             </div>
 
             <div class='step-page-container'>
-                <MultiStep activeStep={0} showNavigation={true}>
+                <MultiStep activeStep={0}
+                            showNavigation={true}
+                            prevButton={{
+                                title: '→',
+                                style: {
+                                  backgroundColor: '#444',         // אפור כהה
+                                  color: '#fff',
+                                  border: 'none',
+                                  borderRadius: '8px',
+                                  padding: '10px 24px',
+                                  fontSize: '22px',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.3s ease',
+                                  boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                                  marginInlineStart: '10px',
+                                  marginTop: '24px'                // רווח מהתוכן שמעל
+                                }
+                              }}
+                              nextButton={{
+                                title: '←',
+                                style: {
+                                  backgroundColor: '#d32f2f',      // אדום האפליקציה
+                                  color: '#fff',
+                                  border: 'none',
+                                  borderRadius: '8px',
+                                  padding: '10px 24px',
+                                  fontSize: '22px',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.3s ease',
+                                  boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                                  marginInlineStart: '10px',
+                                  marginTop: '24px'                // רווח מהתוכן שמעל
+                                }
+                              }}
+                            >
                     <StepBusinessDetails    title='פרטים כלליים'    businessData={businessData}  setBusinessData={setBusinessData} categories={categories} />
                     <StepBusinessServices   title='שירותי העסק'     businessData={businessData}  setBusinessData={setBusinessData} categories={categories} />
                     <StepBusinessHours      title='שעות פעילות'     businessData={businessData}  setBusinessData={setBusinessData} categories={categories} />

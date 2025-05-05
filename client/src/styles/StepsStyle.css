@@ -2,75 +2,206 @@
     display: flex;
     justify-content: center;
     direction: rtl;
-}
-
-.step-business-details {
+  }
+  
+  .step-business-details {
     padding: 20px;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.step-title {
+    width: 100%;
+    max-width: 700px;
+  }
+  
+  .step-title {
     font-size: 24px;
     font-weight: bold;
     color: #333;
     margin-bottom: 20px;
     text-align: right;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-label {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+  }
+  
+  .tag.selectable {
+    border: 2px solid #e63946;
+    background-color: #fff;
+    color: #000;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .tag.selectable:hover {
+    background-color: #e63946;
+    color: #fff;
+    transform: scale(1.05);
+  }
+  
+  .tag.selected {
+    background-color: #e63946;
+    color: #fff;
+  }
+  
+  .next-button {
+    padding: 10px 20px;
+    background-color: #e63946;
+    color: white;
     font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: #555;
-}
-
-.form-input,
-.form-select {
-    width: 100%;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .next-button:hover {
+    background-color: #c92c37;
+  }
+  .icon {
+    font-size: 30px;
+    color: #e63946;
+  }
+  
+  .day-hours {
+    margin-bottom: 20px;
+  }
+  
+  .input-group {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .input-group input {
+    width: 45%;
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    background-color: #fff;
-}
-
-.form-input:focus,
-.form-select:focus {
-    border-color: #ff4d4f;
+    margin-bottom: 10px;
+  }
+  
+  .input-group input:focus {
+    border-color: #e63946;
     outline: none;
-}
-
-.button.file-upload {
-    display: inline-block;
+  }
+  
+  .add-hours-button,
+  .next-button {
     padding: 10px 20px;
-    background-color: #ff4d4f;
+    background-color: #e63946;
     color: white;
     font-size: 16px;
-    border-radius: 5px;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
-    text-align: center;
+    transition: background-color 0.3s ease;
     margin-top: 10px;
-}
-
-.button.file-upload:hover {
-    background-color: #e63d3d;
-}
-
-.file-input {
-    display: none;
-}
-
-.business-logo-preview {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    margin-top: 10px;
-    border-radius: 4px;
-}
+  }
+  
+  .add-hours-button:hover,
+  .next-button:hover {
+    background-color: #c92c37;
+  }
+  
+  .add-hours-button {
+    background-color: #00aaff;
+  }
+  
+  .add-hours-button:hover {
+    background-color: #0099cc;
+  }
+  .day-row {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 14px;
+  }
+  
+  .day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .day-name {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .closed-button {
+    font-size: 14px;
+    padding: 4px 12px;
+    border: 2px solid #e63946;
+    border-radius: 20px;
+    background-color: transparent;
+    color: #e63946;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .closed-button.active {
+    background-color: #e63946;
+    color: #fff;
+  }
+  
+  .time-range {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    margin-right: 10px;
+  }
+  
+  .time-range input[type="time"] {
+    padding: 6px 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 120px;
+    background-color: #fff;
+  }
+  
+  .dash {
+    font-size: 16px;
+    color: #888;
+  }
+  
+  .add-range-btn {
+    background-color: transparent;
+    border: none;
+    color: #e63946;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    transition: transform 0.2s;
+    margin-right: 5px;
+  }
+  
+  .add-range-btn:hover {
+    transform: scale(1.2);
+  }
+  .delete-range-btn {
+    background: transparent;
+    border: none;
+    color: #e63946;
+    margin-right: 6px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .delete-range-btn:hover {
+    transform: scale(1.2);
+  }
+  

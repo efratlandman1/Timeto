@@ -1,37 +1,55 @@
 import React, { useState } from 'react';
+import '../styles/StepsStyle.css';
+import { FaTags } from 'react-icons/fa';
 
-const StepBusinessServices = ({ onNext, servicesData }) => {
-  const [services, setServices] = useState(servicesData || []);
+const fixedServices = [
+  'תספורת גברים',
+  'תספורת נשים',
+  'צבע לשיער',
+  'פן',
+  'עיצוב גבות',
+  'פדיקור',
+  'מניקור',
+  'עיסוי שוודי',
+  'עיסוי רקמות עמוק',
+  'טיפול פנים'
+];
 
-  const handleAddService = () => {
-    setServices([...services, '']);
-  };
+const StepBusinessServices = ({ onNext, selectedServicesData = [] }) => {
+  const [selectedServices, setSelectedServices] = useState(selectedServicesData);
 
-  const handleServiceChange = (index, value) => {
-    const updatedServices = [...services];
-    updatedServices[index] = value;
-    setServices(updatedServices);
+  const toggleService = (service) => {
+    if (selectedServices.includes(service)) {
+      setSelectedServices(selectedServices.filter(s => s !== service));
+    } else {
+      setSelectedServices([...selectedServices, service]);
+    }
   };
 
   const handleNext = () => {
-    onNext(services);
+    onNext(selectedServices);
   };
 
   return (
-    <div className="step-content">
-      <h2>שירותי העסק</h2>
-      {services.map((service, index) => (
-        <div key={index} className="input-group">
-          <label>שירות {index + 1}</label>
-          <input
-            type="text"
-            value={service}
-            onChange={(e) => handleServiceChange(index, e.target.value)}
-          />
+    <div className="step-page-container">
+      <div className="step-business-details">
+        <h2 className="step-title">
+          <FaTags style={{ color: '#e63946' }} />
+            שירותים שהעסק מספק
+        </h2>
+        <div className="tags-container">
+          {fixedServices.map((service, index) => (
+            <div
+              key={index}
+              className={`tag selectable ${selectedServices.includes(service) ? 'selected' : ''}`}
+              onClick={() => toggleService(service)}
+            >
+              {service}
+            </div>
+          ))}
         </div>
-      ))}
-      <button onClick={handleAddService}>הוסף שירות</button>
-      <button onClick={handleNext}>הבא</button>
+        {/* <button className="next-button" onClick={handleNext}>הבא</button> */}
+      </div>
     </div>
   );
 };
