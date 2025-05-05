@@ -85,9 +85,9 @@
     border-bottom: none;
   }
   
-  @media (max-width: 768px) {
+  /* @media (max-width: 768px) {
     .page-container {
       max-width: 90%;
     }
   }
-  
+   */
