@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
+import { FaSave, FaTrash } from 'react-icons/fa';
+import MultiStep from 'react-multistep';
+import StepBusinessDetails from './StepBusinessDetails';
+import StepBusinessServices from './StepBusinessServices';
+import StepBusinessHours from './StepBusinessHours';
 import '../styles/EditBusinessPage.css';
-import { FaSave, FaTrash, FaPlus, FaUpload ,FaEdit} from 'react-icons/fa';
-import MultiStep from 'react-multistep'
+
 
 
 const EditBusinessPage = () => {
@@ -118,7 +122,7 @@ const EditBusinessPage = () => {
 
     return (
         <div className={`page-container ${isLoading ? 'disabled' : ''}`}>
-            {isLoading && (
+        {isLoading && (
                 <div className="loading-overlay">
                     <div className="loading-animation">🕺💃 Loading... Please dance with me! 🎵</div>
                 </div>
@@ -135,141 +139,13 @@ const EditBusinessPage = () => {
                 <div className="header-line"></div> {/* אלמנט אדום קטן מתחת לכותרת */}
             </div>
 
-            <form className='upload-form' onSubmit={handleSubmit}>
-                <div className='form-group'>
-                    <label htmlFor="name">שם העסק</label>
-                    <input type="text" id="name" name="name" value={businessData.name} onChange={handleChange} />
-                </div>
-
-                <div className='form-group'>
-                    <label htmlFor="address">כתובת</label>
-                    <input type="text" id="address" name="address" value={businessData.address} onChange={handleChange} />
-                </div>
-
-                <div className='form-group'>
-                    <label htmlFor="phone">טלפון</label>
-                    <input type="tel" id="phone" name="phone" value={businessData.phone} onChange={handleChange} />
-                </div>
-
-                <div className='form-group'>
-                    <label htmlFor="email">כתובת דואר אלקטרונית</label>
-                    <input type="email" id="email" name="email" value={businessData.email} onChange={handleChange} />
-                </div>
-
-                <div className='form-group'>
-                    <label htmlFor="categoryId">תחום שירות</label>
-                    <select id="categoryId" name="categoryId" value={businessData.categoryId} onChange={handleChange}>
-                        <option value="">בחר תחום</option>
-                        {categories.map((cat) => (
-                            <option key={cat._id} value={cat._id}>{cat.name}</option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className='form-group'>
-                    <label htmlFor="description">תיאור העסק</label>
-                    <input type="text" id="description" name="description" value={businessData.description} onChange={handleChange} />
-                </div>
-{/* 
-                {selectedBusiness?.logo && (
-                    <div className='form-group'>
-                        <label>לוגו</label>
-                        <img src={`${process.env.REACT_APP_API_DOMAIN}/uploads/${selectedBusiness.logo.split('/').pop()}`} alt="Current Logo" className="business-logo-preview" />
-                    </div>
-                )}
-
-                <div className='form-group'>
-                    <input type="file" id="logo" name="logo" onChange={handleChange} />
-                </div> */}
-
-                <div className='form-group'>
-                    {/* אם יש לוגו, הצג את כפתור עדכון */}
-                    {selectedBusiness?.logo ? (
-                        <>
-                            <label htmlFor="logo" className="button file-upload">
-                                <FaEdit className="icon" />
-                                עריכת לוגו
-                                <input 
-                                    type="file" 
-                                    id="logo" 
-                                    name="logo" 
-                                    onChange={handleChange} 
-                                    style={{ display: 'none' }} 
-                                />
-                            </label>
-
-                            {/* הצג את הלוגו */}
-                            <img 
-                                src={`${process.env.REACT_APP_API_DOMAIN}/uploads/${selectedBusiness.logo.split('/').pop()}`} 
-                                alt="Current Logo" 
-                                className="business-logo-preview" 
-                            />
-                        </>
-                    ) : (
-                        // אם אין לוגו, הצג כפתור בחירת לוגו
-                        <label htmlFor="logo" className="button file-upload">
-                            <FaUpload className="icon" />
-                            {'בחירת לוגו'}
-                            <input 
-                                type="file" 
-                                id="logo" 
-                                name="logo" 
-                                onChange={handleChange} 
-                                style={{ display: 'none' }} 
-                            />
-                        </label>
-                    )}
-                </div>
-
-
-            {/* <div className='form-group'>
-                <label htmlFor="logo" className="button file-upload">
-                    <FaUpload className="icon" />
-                    {selectedBusiness?.logo ? 'עדכון לוגו' : 'בחירת לוגו'}
-                    <input 
-                        type="file" 
-                        id="logo" 
-                        name="logo" 
-                        onChange={handleChange} 
-                        style={{ display: 'none' }} 
-                    />
-                </label>
-            </div> */}
-
-
-
-
-                <div className="button-container">
-                    {/* כפתור עדכון עם אייקון שמירה */}
-                    <button className='button update' type="submit" disabled={isLoading}>
-                        {isLoading ? 'Uploading...' : selectedBusiness ? (
-                            <>
-                                <FaSave className="icon" />
-                                שמירה  
-                            </>
-                        ) : (
-                            <>
-                                {/* <FaPlus className="icon" /> */}
-                                הוספת עסק 
-                            </>
-                        )}
-                    </button>
-
-                    {/* כפתור מחיקה */}
-                    {selectedBusiness && (
-                        <button
-                            className='button delete'
-                            type="button"
-                            onClick={() => handleDeleteBusiness(selectedBusiness._id)}
-                        >
-                            <FaTrash className="icon" />
-                            מחיקה
-                        </button>
-                    )}
-                </div>
-
-                
-            </form>
+            <div class='step-page-container'>
+                <MultiStep activeStep={0} showNavigation={true}>
+                    <StepBusinessDetails    title='פרטים כלליים'    businessData={businessData}  setBusinessData={setBusinessData} categories={categories} />
+                    <StepBusinessServices   title='שירותי העסק'     businessData={businessData}  setBusinessData={setBusinessData} categories={categories} />
+                    <StepBusinessHours      title='שעות פעילות'     businessData={businessData}  setBusinessData={setBusinessData} categories={categories} />
+                </MultiStep>
+            </div>
         </div>
     );
 };

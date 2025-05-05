@@ -6,7 +6,7 @@ import { FaStar } from 'react-icons/fa';
 const AdvancedSearchPage = () => {
     const navigate = useNavigate();
 
-    const [categories, setCategories] = useState([
+    const [categories/*, setCategories*/] = useState([
         { name: "מניקור", services: ["לק ג'ל", "בניית ציפורניים", "מניקור קלאסי"] },
         { name: "פדיקור", services: ["פדיקור רפואי", "טיפוח רגליים"] },
         { name: "עיצוב שיער", services: ["פן", "תספורת", "צבע לשיער"] },

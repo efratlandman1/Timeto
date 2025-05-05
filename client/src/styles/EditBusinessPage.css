@@ -1,6 +1,7 @@
 .page-container {
     padding: 6rem 1rem 1rem;
-    max-width: min(80%, 1400px);
+    /* max-width: min(80%, 1400px); */
+    max-width: 500px;
     width: 100%;
     margin: 0 auto;
     text-align: center;
