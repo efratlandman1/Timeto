@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import BusinessCard from './BusinessCard';
 import axios from 'axios';
 import '../styles/SearchResultPage.css';
+import '../styles/SearchBar.css';
+import '../styles/businessCard.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaSearch, FaFilter } from 'react-icons/fa'; // אייקונים עבור חיפוש ופילטר
 
