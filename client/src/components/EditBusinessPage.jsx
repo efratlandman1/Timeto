@@ -145,8 +145,8 @@ const EditBusinessPage = () => {
                             prevButton={{
                                 title: '→',
                                 style: {
-                                  backgroundColor: '#444',         // אפור כהה
-                                  color: '#fff',
+                                //   backgroundColor: '#444',         // אפור כהה
+                                //   color: '#fff',
                                   border: 'none',
                                   borderRadius: '8px',
                                   padding: '10px 24px',
@@ -161,8 +161,8 @@ const EditBusinessPage = () => {
                               nextButton={{
                                 title: '←',
                                 style: {
-                                  backgroundColor: '#d32f2f',      // אדום האפליקציה
-                                  color: '#fff',
+                                //   backgroundColor: '#d32f2f',      // אדום האפליקציה
+                                //   color: '#fff',
                                   border: 'none',
                                   borderRadius: '8px',
                                   padding: '10px 24px',
