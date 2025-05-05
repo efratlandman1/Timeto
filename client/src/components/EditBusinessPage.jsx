@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux';
 import axios from 'axios';
 import '../styles/EditBusinessPage.css';
 import { FaSave, FaTrash, FaPlus, FaUpload ,FaEdit} from 'react-icons/fa';
+import MultiStep from 'react-multistep'
+
 
 const EditBusinessPage = () => {
     const selectedBusiness = useSelector(state => state.business.selectedBusiness);
