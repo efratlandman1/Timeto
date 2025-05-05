@@ -9,7 +9,10 @@ import RegistrationPage from "./components/RegistrationPage";
 import GlobalStyles from './GlobalStyles';
 import AdvancedSearchPage from './components/AdvancedSearchPage';
 import SearchResultPage from './components/SearchResultPage';  // הוסף את הדף החדש
-import FeedbackPage from './components/FeedbackPage' // הוסף את הדף החדש
+import FeedbackPage from './components/FeedbackPage' ;
+import BusinessProfilePage from './components/BusinessProfilePage';
+
+
 
 function App() {
     const getToken = () => {
@@ -30,6 +33,8 @@ function App() {
                 <Route path="/advanced-search-page" element={<AdvancedSearchPage />} />
                 <Route path="/search-results" element={<SearchResultPage />} />
                 <Route path="/feedback-page" element={<FeedbackPage />} />
+                <Route path="/business-profile" element={<BusinessProfilePage />} /> 
+                
             </Routes>
         </Router>
     );
