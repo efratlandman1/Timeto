@@ -1,43 +1,128 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import '../styles/registrationPage.css';
-import { FaUser, FaLock, FaClock } from 'react-icons/fa';
+import '../styles/LoginPage.css';
+import { FaUser, FaLock, FaClock, FaEnvelope, FaPhone, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const RegistrationPage = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    confirmPassword: '',
+    email: '',
+    phone: '',
+    firstName: '',
+    lastName: '',
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const navigate = useNavigate();
 
-    const handleRegister = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axios.post(process.env.REACT_APP_API_DOMAIN + '/api/v1/register', { username, password });
-            document.cookie = `token=${response.data.token}`;
-            navigate('/');
-        } catch (err) {
-            console.error('Registration failed:', err);
-        }
-    };
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    return (
-        <div className="login-container">
-            <form className="login-form" onSubmit={handleRegister}>
-                {/* <img src={logo} alt="Logo" className="login-logo" /> */}
-                <FaClock className="login-logo" />
-                <h1 className="login-title">זה הזמן</h1>
-                <div className="input-wrapper">
-                    <FaUser className="input-icon" />
-                    <input className="login-input" type="text" placeholder="שם משתמש" value={username} onChange={(e) => setUsername(e.target.value)} required />
-                </div>
-                <div className="input-wrapper">
-                    <FaLock className="input-icon" />
-                    <input className="login-input" type="password" placeholder="סיסמה" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                </div>
-                <button className="login-button" type="submit">התחברות</button>
-            </form>
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    if (!agreeTerms) {
+      alert('יש לאשר את תנאי השימוש כדי להמשיך');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      alert('הסיסמאות אינן תואמות');
+      return;
+    }
+
+    try {
+      const response = await axios.post(process.env.REACT_APP_API_DOMAIN + '/api/v1/register', formData);
+      document.cookie = `token=${response.data.token}`;
+      navigate('/');
+    } catch (err) {
+      console.error('Registration failed:', err);
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <form className="login-form" onSubmit={handleRegister}>
+        <FaClock className="login-logo" />
+        <h1 className="login-title">זה הזמן</h1>
+
+        {/* שם פרטי */}
+        <div className="login-input-wrapper">
+          <FaUser className="login-input-icon" />
+          <input className="login-input" type="text" name="firstName" placeholder="שם פרטי" value={formData.firstName} onChange={handleChange} required />
         </div>
-    );
+
+        {/* שם משפחה */}
+        <div className="login-input-wrapper">
+          <FaUser className="login-input-icon" />
+          <input className="login-input" type="text" name="lastName" placeholder="שם משפחה" value={formData.lastName} onChange={handleChange} required />
+        </div>
+
+        {/* טלפון */}
+        <div className="login-input-wrapper">
+          <FaPhone className="login-input-icon" />
+          <input className="login-input" type="tel" name="phone" placeholder="טלפון (050-1234567)" pattern="05[0-9]{1}-?[0-9]{7}" value={formData.phone} onChange={handleChange} required />
+        </div>
+
+        {/* אימייל */}
+        <div className="login-input-wrapper">
+          <FaEnvelope className="login-input-icon" />
+          <input className="login-input" type="email" name="email" placeholder="דואר אלקטרוני" value={formData.email} onChange={handleChange} required />
+        </div>
+
+        {/* שם משתמש */}
+        <div className="login-input-wrapper">
+          <FaUser className="login-input-icon" />
+          <input className="login-input" type="text" name="username" placeholder="כינוי באפליקציה" value={formData.username} onChange={handleChange} required />
+        </div>
+
+        {/* סיסמה */}
+        <div className="login-input-wrapper">
+          <FaLock className="login-input-icon" />
+          <input
+            className="login-input"
+            type={showPassword ? "text" : "password"}
+            name="password"
+            placeholder="סיסמה"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <span className="login-password-toggle" onClick={() => setShowPassword(!showPassword)}>
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
+        </div>
+
+        {/* אישור סיסמה */}
+        <div className="login-input-wrapper">
+          <FaLock className="login-input-icon" />
+          <input
+            className="login-input"
+            type={showPassword ? "text" : "password"}
+            name="confirmPassword"
+            placeholder="אישור סיסמה"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        {/* תנאי שימוש */}
+        <div className="login-checkbox">
+          <label>
+            <input type="checkbox" checked={agreeTerms} onChange={() => setAgreeTerms(!agreeTerms)} />
+            אני מאשר/ת את תנאי השימוש
+          </label>
+        </div>
+
+        <button className="login-button" type="submit">הרשמה</button>
+      </form>
+    </div>
+  );
 };
 
 export default RegistrationPage;

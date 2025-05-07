@@ -31,12 +31,12 @@ const LoginPage = () => {
                 {/* <img src={logo} alt="Logo" className="login-logo" /> */}
                 <FaClock className="login-logo" />
                 <h1 className="login-title">זה הזמן</h1>
-                <div className="input-wrapper">
-                    <FaUser className="input-icon" />
+                <div className="login-input-wrapper">
+                    <FaUser className="login-input-icon" />
                     <input className="login-input" type="text" placeholder="שם משתמש" value={username} onChange={(e) => setUsername(e.target.value)} required />
                 </div>
-                <div className="input-wrapper">
-                    <FaLock className="input-icon" />
+                <div className="login-input-wrapper">
+                    <FaLock className="login-input-icon" />
                     <input className="login-input" type="password" placeholder="סיסמה" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
                 <button className="login-button" type="submit">התחברות</button>
