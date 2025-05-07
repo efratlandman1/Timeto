@@ -4,58 +4,73 @@ const User = require('../models/user');
 require('dotenv').config();
 
 exports.registerUser = async (req, res) => {
-    // בדוק אם המשתמש כבר קיים לפי אימייל (כיוון שהאימייל הוא ייחודי)
-    const existingUser = await User.findOne({ email: req.body.email });
-    if (existingUser) {
-        return res.status(400).json({ error: 'Email already exists' });
-    }
-
-    // הצפנת הסיסמה
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
-    // יצירת משתמש חדש
-    const newUser = new User({
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        email: req.body.email,
-        phone: req.body.phone,
-        nickname: req.body.nickname,
-        password: hashedPassword
-    });
-
     try {
-        // שמירה של המשתמש
+        // בדיקה אם קיים משתמש עם אותו אימייל
+        const existingUser = await User.findOne({ email: req.body.email });
+        if (existingUser) {
+            return res.status(400).json({ error: 'Email already exists' });
+        }
+
+        // הצפנת הסיסמה
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+        // יצירת המשתמש
+        const newUser = new User({
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            email: req.body.email,
+            phone: req.body.phone,
+            nickname: req.body.nickname,
+            password: hashedPassword
+        });
+
         const savedUser = await newUser.save();
-        
-        // יצירת JWT עם מזהה המשתמש
-        const token = jwt.sign({ userId: savedUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        
-        // החזרת הטוקן ב-JSON
-        res.status(201).json({ token });
+
+        // יצירת JWT
+        const token = jwt.sign({ userId: savedUser._id, email: savedUser.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        // שליחת טוקן + מידע על המשתמש (בלי הסיסמה)
+        const { password, ...userData } = savedUser.toObject();
+        res.status(201).json({ token, user: userData });
+
     } catch (e) {
         console.error(e);
         res.status(500).json({ error: 'Failed to create user' });
     }
 };
 
+
 exports.login = async (req, res) => {
-    // חיפוש משתמש לפי אימייל
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-        return res.status(400).json({ error: 'Email not found' });
-    }
+    try {
+        const user = await User.findOne({ email: req.body.email });
+        if (!user) {
+            return res.status(400).json({ error: 'Email not found' });
+        }
 
-    // השוואת סיסמה
-    const isMatch = await bcrypt.compare(req.body.password, user.password);
-    if (!isMatch) {
-        return res.status(400).json({ error: 'Incorrect password' });
-    }
+        const isMatch = await bcrypt.compare(req.body.password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Incorrect password' });
+        }
 
-    // יצירת JWT עם מזהה המשתמש
-    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    
-    // החזרת הטוקן ב-JSON
-    res.status(201).json({ token });
+        const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        // בונה את אובייקט המשתמש בלי הסיסמה
+        const userData = {
+            id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            phone: user.phone,
+            email: user.email,
+            nickname: user.nickname,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
+        };
+
+        res.status(200).json({ token, user: userData });
+    } catch (err) {
+        console.error('Login error:', err);
+        res.status(500).json({ error: 'Server error during login' });
+    }
 };
 
 // const jwt = require('jsonwebtoken');

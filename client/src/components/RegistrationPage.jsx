@@ -22,32 +22,38 @@ const RegistrationPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-
-    // בדיקות אימות
-    if (!agreeTerms) {
-      alert('יש לאשר את תנאי השימוש כדי להמשיך');
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      alert('הסיסמאות אינן תואמות');
-      return;
-    }
-
-    try {
-      // שליחת הבקשה לרישום
-      const response = await axios.post(process.env.REACT_APP_API_DOMAIN + '/api/v1/register', formData);
+//   const handleRegister = async (e) => {
+    const handleRegister = async (e) => {
+        e.preventDefault();
       
-      // שמירה של הטוקן בקוקי
-      document.cookie = `token=${response.data.token}`;
-      navigate('/');
-    } catch (err) {
-      console.error('Registration failed:', err);
-      alert('הרשמה נכשלה, נסה שוב');
-    }
-  };
+        if (!agreeTerms) {
+          alert('יש לאשר את תנאי השימוש כדי להמשיך');
+          return;
+        }
+      
+        if (formData.password !== formData.confirmPassword) {
+          alert('הסיסמאות אינן תואמות');
+          return;
+        }
+      
+        try {
+          const response = await axios.post(process.env.REACT_APP_API_DOMAIN + '/api/v1/register', formData);
+      
+          if (response.data.token && response.data.user) {
+            // שמירה ב-localStorage
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+      
+            navigate('/user-businesses');  // או כל דף אחר שתרצה
+          } else {
+            alert('הרשמה נכשלה, נסה שוב');
+          }
+        } catch (err) {
+          console.error('Registration failed:', err);
+          alert('הרשמה נכשלה, נסה שוב');
+        }
+      };
+      
 
   return (
     <div className="login-container">

@@ -2,6 +2,8 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import '../styles/LoginPage.css';
 import { FaEnvelope, FaLock, FaClock, FaEye, FaEyeSlash } from 'react-icons/fa';  // נוספנו את FaEnvelope בשביל האימייל
+import { useDispatch } from 'react-redux';
+import { setUser } from '../redux/userSlice';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');  // שדה האימייל
@@ -9,20 +11,31 @@ const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const dispatch = useDispatch();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
-
+    
         try {
             const response = await axios.post(process.env.REACT_APP_API_DOMAIN + '/api/v1/login', {
-                email,  // העברנו את האימייל במקום שם המשתמש
+                email,
                 password
             });
+    
+            if (response.data.token && response.data.user) {
+               
+                dispatch(setUser({
+                    token: response.data.token,
+                    user: response.data.user
+                }));
 
-            if (response.data.token) {
-                document.cookie = `token=${response.data.token}`;
+                // שמירה ב־localStorage
+                localStorage.setItem('token', response.data.token);
+                // localStorage.setItem('user', JSON.stringify(response.data.user));
+    
+                // הפניה לדף הבא
                 window.location.href = '/user-businesses';
             } else {
                 setError('ההתחברות נכשלה. נסה שוב');
@@ -33,6 +46,7 @@ const LoginPage = () => {
             setLoading(false);
         }
     };
+    
 
     return (
         <div className="login-container">
