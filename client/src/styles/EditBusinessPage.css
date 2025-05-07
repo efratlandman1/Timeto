@@ -34,9 +34,11 @@
 }
 
 .step-page-container {
-    display: flex;
+    /* display: flex; */
     justify-content: center;
     direction: rtl;
+    border: solid;
+    border-radius: 16px 16px 0 0;
   }
 
 @media (max-width: 768px) {

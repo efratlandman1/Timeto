@@ -31,7 +31,7 @@ const StepBusinessServices = ({ onNext, selectedServicesData = [] }) => {
   };
 
   return (
-    <div className="step-page-container">
+    <div>
       <div className="step-business-details">
         <h2 className="step-title">
           <FaTags style={{ color: '#e63946' }} />
