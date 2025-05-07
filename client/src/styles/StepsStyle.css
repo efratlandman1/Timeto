@@ -1,10 +1,5 @@
-.step-page-container {
-    display: flex;
-    justify-content: center;
-    direction: rtl;
-  }
-  
-  .step-business-details {
+/* ----- כלליים ----- */
+.step-business-details {
     padding: 20px;
     background-color: #f9f9f9;
     border-radius: 8px;
@@ -24,103 +19,113 @@
     gap: 8px;
   }
   
-  .tags-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: flex-start;
-    margin-bottom: 20px;
-  }
-  
-  .tag.selectable {
-    border: 2px solid #e63946;
-    background-color: #fff;
-    color: #000;
-    padding: 8px 14px;
-    border-radius: 20px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-  }
-  
-  .tag.selectable:hover {
-    background-color: #e63946;
-    color: #fff;
-    transform: scale(1.05);
-  }
-  
-  .tag.selected {
-    background-color: #e63946;
-    color: #fff;
-  }
-  
-  .next-button {
-    padding: 10px 20px;
-    background-color: #e63946;
-    color: white;
-    font-size: 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .next-button:hover {
-    background-color: #c92c37;
-  }
   .icon {
     font-size: 30px;
     color: #e63946;
   }
   
-  .day-hours {
-    margin-bottom: 20px;
-  }
-  
-  .input-group {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .input-group input {
-    width: 45%;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 10px;
-  }
-  
-  .input-group input:focus {
-    border-color: #e63946;
-    outline: none;
-  }
-  
-  .add-hours-button,
-  .next-button {
+  /* ----- כפתורים ----- */
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 10px 20px;
-    background-color: #e63946;
-    color: white;
     font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
     border: none;
-    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
+    transition: all 0.3s ease;
+    margin-top: 20px;
   }
   
-  .add-hours-button:hover,
-  .next-button:hover {
-    background-color: #c92c37;
+  /* כפתור עלה (סוג כפתור כללי) */
+  .button.file-upload {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1.5px solid #ccc;
+    background-color: #f9f9f9;
+    color: #333;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   }
   
-  .add-hours-button {
-    background-color: #00aaff;
+  .button.file-upload:hover {
+    background-color: #e63946;
+    color: #fff;
+    border-color: #e63946;
+    box-shadow: 0 3px 10px rgba(230, 57, 70, 0.2);
   }
   
-  .add-hours-button:hover {
-    background-color: #0099cc;
+  .button.file-upload:active {
+    background-color: #d62828;
+    border-color: #d62828;
+    box-shadow: 0 2px 6px rgba(214, 40, 40, 0.25);
+    transform: scale(0.98);
   }
+  
+  .button.file-upload .icon {
+    font-size: 18px;
+    color: inherit;
+  }
+  
+  /* .button.delete {
+    background-color: #dc3545;
+    color: white;
+  } */
+  
+  .button.delete:hover {
+    background-color: #c82333;
+  }
+  
+  /* ----- שדות קלט ----- */
+  .form-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+  }
+  
+  .form-group label {
+    font-size: 16px;
+    color: #888;
+    margin-bottom: 1px;
+  }
+  
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    padding: 8px;
+    border: none;
+    border-bottom: 2px solid #ddd;
+    font-size: 16px;
+    width: 100%;
+    background-color: transparent;
+    transition: border-color 0.3s;
+    direction: rtl;
+    text-align: right;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-bottom-color: #d32f2f;
+  }
+  
+  .form-group input:not(:placeholder-shown) + label,
+  .form-group textarea:not(:placeholder-shown) + label {
+    color: #d32f2f;
+  }
+  
+  /* ----- שעות פעילות ----- */
   .day-row {
     margin-bottom: 20px;
     border-bottom: 1px solid #eee;
@@ -192,6 +197,7 @@
   .add-range-btn:hover {
     transform: scale(1.2);
   }
+  
   .delete-range-btn {
     background: transparent;
     border: none;
@@ -203,5 +209,73 @@
   
   .delete-range-btn:hover {
     transform: scale(1.2);
+  }
+  
+  /* ----- שירותים שהעסק מספק ----- */
+  .tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+  }
+  
+  .tag.selectable {
+    border: 2px solid #e63946;
+    background-color: #fff;
+    color: #000;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .tag.selectable:hover {
+    background-color: #e63946;
+    color: #fff;
+    transform: scale(1.05);
+  }
+  
+  .tag.selected {
+    background-color: #e63946;
+    color: #fff;
+  }
+  
+  /* ----- סגנונות נוספים ----- */
+  .step-page-container {
+    margin-bottom: 40px;
+  }
+  
+  /* קטעים שלא בשימוש - השארתי כתגובות */
+  .upload-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+  }
+  
+  .upload-button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* כפתור הבא שהוסתר */
+  /* .next-button {
+    padding: 10px 20px;
+    background-color: #e63946;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  } */
+  
+  .next-button:hover {
+    background-color: #c92c37;
   }
   
