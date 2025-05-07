@@ -101,41 +101,24 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
                 />
             </div>
 
-            <div className="form-group logo-upload">
-                {businessData.logo ? (
-                    <>
+            <div className='form-group'>
                         <label htmlFor="logo" className="button file-upload">
-                            <FaEdit className="icon" />
-                            עריכת לוגו
-                            <input
-                                type="file"
-                                id="logo"
-                                name="logo"
-                                onChange={handleChange}
-                                className="file-input"
+                            <FaUpload className="icon" />
+                            {'בחירת לוגו'}
+                            <input 
+                                type="file" 
+                                id="logo" 
+                                name="logo" 
+                                onChange={handleChange} 
+                                style={{ display: 'none' }} 
                             />
                         </label>
-
-                        <img
-                            src={`${process.env.REACT_APP_API_DOMAIN}/uploads/${businessData.logo.split('/').pop()}`}
-                            alt="Current Logo"
-                            className="business-logo-preview"
+                        <img 
+                                src={`${process.env.REACT_APP_API_DOMAIN}/uploads/business3.jpg`} 
+                                alt="Current Logo" 
+                                className="business-logo-preview" 
                         />
-                    </>
-                ) : (
-                    <label htmlFor="logo" className="button file-upload">
-                        <FaUpload className="icon" />
-                        בחירת לוגו
-                        <input
-                            type="file"
-                            id="logo"
-                            name="logo"
-                            onChange={handleChange}
-                            className="file-input"
-                        />
-                    </label>
-                )}
-            </div>
+                </div>
         </div>
     );
 };
