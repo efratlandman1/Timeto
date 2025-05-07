@@ -122,6 +122,7 @@ const EditBusinessPage = () => {
 
     return (
         <div className={`page-container ${isLoading ? 'disabled' : ''}`}>
+        <div class='step-page-container'>
         {isLoading && (
                 <div className="loading-overlay">
                     <div className="loading-animation">🕺💃 Loading... Please dance with me! 🎵</div>
@@ -139,7 +140,8 @@ const EditBusinessPage = () => {
                 <div className="header-line"></div> {/* אלמנט אדום קטן מתחת לכותרת */}
             </div>
 
-            <div class='step-page-container'>
+            
+            {/* <div> */}
                 <MultiStep activeStep={0}
                             showNavigation={true}
                             prevButton={{
@@ -155,7 +157,8 @@ const EditBusinessPage = () => {
                                   transition: 'all 0.3s ease',
                                   boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
                                   marginInlineStart: '10px',
-                                  marginTop: '24px'                // רווח מהתוכן שמעל
+                                  marginTop: '14px',                // רווח מהתוכן שמעל
+                                  marginBottom: '24px'                // רווח מהתוכן שמעל                                
                                 }
                               }}
                               nextButton={{
@@ -171,7 +174,8 @@ const EditBusinessPage = () => {
                                   transition: 'all 0.3s ease',
                                   boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
                                   marginInlineStart: '10px',
-                                  marginTop: '24px'                // רווח מהתוכן שמעל
+                                  marginTop: '14px',                // רווח מהתוכן שמעל
+                                  marginBottom: '24px'                // רווח מהתוכן שמעל
                                 }
                               }}
                             >

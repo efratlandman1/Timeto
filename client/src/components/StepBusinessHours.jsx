@@ -55,7 +55,7 @@ const StepBusinessHours = ({ onNext, businessHoursData }) => {
   };
   
   return (
-    <div className="step-page-container">
+    <div>
       <div className="step-business-details">
         <h2 className="step-title">
           <FaClock className="icon" />
