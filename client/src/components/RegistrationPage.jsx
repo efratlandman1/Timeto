@@ -6,13 +6,13 @@ import { FaUser, FaLock, FaClock, FaEnvelope, FaPhone, FaEye, FaEyeSlash } from 
 
 const RegistrationPage = () => {
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    confirmPassword: '',
-    email: '',
-    phone: '',
     firstName: '',
     lastName: '',
+    email: '',
+    phone: '',
+    username: '', // כינוי באפליקציה
+    password: '',
+    confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
@@ -25,6 +25,7 @@ const RegistrationPage = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
 
+    // בדיקות אימות
     if (!agreeTerms) {
       alert('יש לאשר את תנאי השימוש כדי להמשיך');
       return;
@@ -36,11 +37,15 @@ const RegistrationPage = () => {
     }
 
     try {
+      // שליחת הבקשה לרישום
       const response = await axios.post(process.env.REACT_APP_API_DOMAIN + '/api/v1/register', formData);
+      
+      // שמירה של הטוקן בקוקי
       document.cookie = `token=${response.data.token}`;
       navigate('/');
     } catch (err) {
       console.error('Registration failed:', err);
+      alert('הרשמה נכשלה, נסה שוב');
     }
   };
 
@@ -53,31 +58,74 @@ const RegistrationPage = () => {
         {/* שם פרטי */}
         <div className="login-input-wrapper">
           <FaUser className="login-input-icon" />
-          <input className="login-input" type="text" name="firstName" placeholder="שם פרטי" value={formData.firstName} onChange={handleChange} required />
+          <input
+            className="login-input"
+            type="text"
+            name="firstName"
+            placeholder="שם פרטי"
+            value={formData.firstName}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         {/* שם משפחה */}
         <div className="login-input-wrapper">
           <FaUser className="login-input-icon" />
-          <input className="login-input" type="text" name="lastName" placeholder="שם משפחה" value={formData.lastName} onChange={handleChange} required />
+          <input
+            className="login-input"
+            type="text"
+            name="lastName"
+            placeholder="שם משפחה"
+            value={formData.lastName}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         {/* טלפון */}
         <div className="login-input-wrapper">
           <FaPhone className="login-input-icon" />
-          <input className="login-input" type="tel" name="phone" placeholder="טלפון (050-1234567)" pattern="05[0-9]{1}-?[0-9]{7}" value={formData.phone} onChange={handleChange} required />
+          <input
+            className="login-input"
+            type="tel"
+            name="phone"
+            placeholder="טלפון (050-1234567)"
+            pattern="05[0-9]{1}-?[0-9]{7}"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         {/* אימייל */}
         <div className="login-input-wrapper">
           <FaEnvelope className="login-input-icon" />
-          <input className="login-input" type="email" name="email" placeholder="דואר אלקטרוני" value={formData.email} onChange={handleChange} required />
+          <input
+            className="login-input"
+            type="email"
+            name="email"
+            placeholder="דואר אלקטרוני"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            onInvalid={(e) => e.target.setCustomValidity('אנא הזן כתובת אימייל חוקית')}
+            onInput={(e) => e.target.setCustomValidity('')}
+          />
         </div>
 
-        {/* שם משתמש */}
+        {/* כינוי באפליקציה */}
         <div className="login-input-wrapper">
           <FaUser className="login-input-icon" />
-          <input className="login-input" type="text" name="username" placeholder="כינוי באפליקציה" value={formData.username} onChange={handleChange} required />
+          <input
+            className="login-input"
+            type="text"
+            name="username"
+            placeholder="כינוי באפליקציה"
+            value={formData.username}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         {/* סיסמה */}
@@ -114,7 +162,11 @@ const RegistrationPage = () => {
         {/* תנאי שימוש */}
         <div className="login-checkbox">
           <label>
-            <input type="checkbox" checked={agreeTerms} onChange={() => setAgreeTerms(!agreeTerms)} />
+            <input
+              type="checkbox"
+              checked={agreeTerms}
+              onChange={() => setAgreeTerms(!agreeTerms)}
+            />
             אני מאשר/ת את תנאי השימוש
           </label>
         </div>
