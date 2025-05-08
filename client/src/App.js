@@ -8,13 +8,21 @@ import Header from './components/Header';
 import RegistrationPage from "./components/RegistrationPage";
 import GlobalStyles from './GlobalStyles';
 import AdvancedSearchPage from './components/AdvancedSearchPage';
-import SearchResultPage from './components/SearchResultPage';  // הוסף את הדף החדש
+import SearchResultPage from './components/SearchResultPage';
 import FeedbackPage from './components/FeedbackPage' ;
 import BusinessProfilePage from './components/BusinessProfilePage';
-
+import { useDispatch } from 'react-redux';
+import { setUser } from './redux/userSlice';
 
 
 function App() {
+    const dispatch = useDispatch();
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      // ?  document.cookie = `token=${user.token}`;
+        dispatch(setUser({user: user}));
+    }
+
     const getToken = () => {
         const cookie = document.cookie.split('; ').find(row => row.startsWith('token='));
         return cookie ? cookie.split('=')[1] : null;
