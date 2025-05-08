@@ -1,36 +1,80 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import BusinessCard from './BusinessCard';
 import axios from 'axios';
 import '../styles/SearchResultPage.css';
-import '../styles/SearchBar.css';
-import '../styles/businessCard.css';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaSearch, FaFilter } from 'react-icons/fa'; // אייקונים עבור חיפוש ופילטר
+import { FaSearch, FaFilter } from 'react-icons/fa';
 
 const SearchResultPage = () => {
     const [businesses, setBusinesses] = useState([]);
     const [filteredBusinesses, setFilteredBusinesses] = useState([]);
-    const [searchQuery, setSearchQuery] = useState(''); // משתנה למלל חיפוש חופשי
-    
-    const location = useLocation();
-    const filters = location.state?.filters || {};  // קבלת הפילטרים שנשלחו
+    const [searchQuery, setSearchQuery] = useState('');
+    const [categoryId, setCategoryId] = useState(null);
+
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const queryParams = new URLSearchParams(location.search);
+    const filters = Object.fromEntries(queryParams.entries());
+
+    // קבלת ID של הקטגוריה לפי השם
+    useEffect(() => {
+        const fetchCategoryId = async () => {
+            if (!filters.category) {
+                setCategoryId(null);
+                return;
+            }
+            try {
+                const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
+                console.log('res:',res);
+                console.log('filters.category:',filters.category);
+                
+                const match = res.data.find(cat => cat.name === filters.category);
+                console.log('match:',match);
+                setCategoryId(match ? match._id : null);
+            } catch (error) {
+                console.error("Error fetching category ID:", error);
+                setCategoryId(null);
+            }
+        };
+        fetchCategoryId();
+    }, [filters.category]);
 
     useEffect(() => {
         fetchBusinesses();
-    }, []);
+    }, [filters, categoryId]);
 
     const fetchBusinesses = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`);
-            setBusinesses(response.data);
-            setFilteredBusinesses(response.data);
+            const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`);
+            let results = res.data;
+
+            if (filters.service) {
+                results = results.filter(b => b.services?.includes(filters.service));
+            }
+            if (filters.minPrice) {
+                results = results.filter(b => b.price >= parseFloat(filters.minPrice));
+            }
+            if (filters.maxPrice) {
+                results = results.filter(b => b.price <= parseFloat(filters.maxPrice));
+            }
+            if (filters.distance) {
+                results = results.filter(b => b.distance <= parseFloat(filters.distance));
+            }
+            if (filters.rating) {
+                results = results.filter(b => b.rating >= parseFloat(filters.rating));
+            }
+            if (categoryId) {
+                results = results.filter(b => b.categoryId === categoryId);
+            }
+
+            setBusinesses(results);
+            setFilteredBusinesses(results);
         } catch (error) {
             console.error("Error fetching businesses:", error);
         }
     };
 
-    // פונקציה לחיפוש חופשי
     const handleSearch = () => {
         if (searchQuery) {
             setFilteredBusinesses(businesses.filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase())));
@@ -40,10 +84,15 @@ const SearchResultPage = () => {
     };
 
     const handleAdvancedSearchClick = () => {
-        navigate('/advanced-search-page'); // נווט לדף חיפוש מתקדם
+        navigate('/advanced-search-page');
     };
 
-    // יצירת תוויות עבור הפילטרים
+    const removeFilter = (key) => {
+        const newParams = new URLSearchParams(location.search);
+        newParams.delete(key);
+        navigate({ pathname: location.pathname, search: newParams.toString() });
+    };
+
     const createLabel = (key, value) => {
         switch (key) {
             case 'category':
@@ -63,18 +112,8 @@ const SearchResultPage = () => {
         }
     };
 
-    // יצירת מערך של תוויות עבור כל הפילטרים
-    const filterLabels = Object.entries(filters).map(([key, value]) => {
-        return (
-            <span key={key} className="filter-label">
-                {createLabel(key, value)}
-            </span>
-        );
-    });
-
     return (
         <div className='search-result-page-container'>
-            {/* שורת חיפוש */}
             <div className="search-bar">
                 <div className="search-input-wrapper">
                     <FaSearch className="search-icon" />
@@ -83,7 +122,7 @@ const SearchResultPage = () => {
                         placeholder="חיפוש חופשי"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyUp={handleSearch} // חיפוש יקרה בעת הקשת מקש
+                        onKeyUp={handleSearch}
                     />
                 </div>
                 <div className="filter-button-wrapper">
@@ -97,24 +136,17 @@ const SearchResultPage = () => {
                 </div>
             </div>
 
-            {/* הצגת הפילטרים הפעילים */}
-            {/* {filterLabels.length > 0 && (
-                <div className="active-filters">
-                    {filterLabels}
-                </div>
-            )} */}
             {Object.keys(filters).length > 0 && (
                 <div className="filters-container">
-                    {filters.category && <div className="filter-tag">תחום: {filters.category} <span className="remove-filter" onClick={() => {/* פונקציה להסרת פילטר */}}>×</span></div>}
-                    {filters.service && <div className="filter-tag">שירות: {filters.service} <span className="remove-filter" onClick={() => {/* פונקציה להסרת פילטר */}}>×</span></div>}
-                    {filters.minPrice && filters.maxPrice && <div className="filter-tag">מחיר: {filters.minPrice} - {filters.maxPrice} <span className="remove-filter" onClick={() => {/* פונקציה להסרת פילטר */}}>×</span></div>}
-                    {filters.distance && <div className="filter-tag">מרחק: {filters.distance} ק"מ <span className="remove-filter" onClick={() => {/* פונקציה להסרת פילטר */}}>×</span></div>}
-                    {filters.rating && <div className="filter-tag">דירוג: {filters.rating} כוכבים <span className="remove-filter" onClick={() => {/* פונקציה להסרת פילטר */}}>×</span></div>}
+                    {Object.entries(filters).map(([key, value]) => (
+                        <div key={key} className="filter-tag">
+                            {createLabel(key, value)}
+                            <span className="remove-filter" onClick={() => removeFilter(key)}>×</span>
+                        </div>
+                    ))}
                 </div>
             )}
 
-
-            {/* הצגת העסקים */}
             <div className="card-slider">
                 {filteredBusinesses.map((business) => (
                     <BusinessCard key={business._id} business={business} />
@@ -122,6 +154,6 @@ const SearchResultPage = () => {
             </div>
         </div>
     );
-}
+};
 
 export default SearchResultPage;
