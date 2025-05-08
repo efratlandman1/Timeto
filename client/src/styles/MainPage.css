@@ -38,15 +38,19 @@
 }
 
 .category-business:hover {
-    transform: scale(1.01);
+    transform: scale(1.08);
 }
 
 .category-business img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background-color: #e0e0e0;
+    /* width: 120px; */
+    /* height: 120px; */
+    /* border-radius: 50%; */
+    /* background-color: #e0e0e0; */
     margin-bottom: 0.5rem;
+    /* width: 100%; */
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    max-width: 130px
 }
 
 .category-business span {
@@ -162,10 +166,18 @@
     .category-business {
         width: 5rem; /* הצרת רוחב הקטגוריות */
     }
+    .category-business:hover {
+        transform: scale(1.01);
+    }
+    
 
     .category-business img {
-        width: 65px; 
-        height: 65px; 
+        /* width: 65px; 
+        height: 65px;  */
+        /* width: 100%; */
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        max-width: 65px
  
     }
 }

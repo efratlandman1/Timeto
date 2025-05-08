@@ -107,12 +107,16 @@ const MainPage = () => {
     
 
     // === סינון עסקים לפי קטגוריה (משתמש עבור קליק על קטגוריה) ===
-    const handleFilterChange = (categoryId) => {
-        if (categoryId === "") {
-            setFilteredBusinesses(businesses);
-        } else {
-            setFilteredBusinesses(businesses.filter(b => b.categoryId === categoryId));
-        }
+    // const handleFilterChange = (categoryId) => {
+    //     if (categoryId === "") {
+    //         setFilteredBusinesses(businesses);
+    //     } else {
+    //         setFilteredBusinesses(businesses.filter(b => b.categoryId === categoryId));
+    //     }
+    // };
+    const handleFilterChange = (categoryName) => {
+        // ניווט לדף תוצאות החיפוש לפי הקטגוריה
+        navigate(`/search-results?category=${categoryName}`);
     };
 
     // === חיפוש חופשי בטקסט (משתמש עבור שורת חיפוש) ===
@@ -182,8 +186,12 @@ const MainPage = () => {
                 <button className="arrow-left" onClick={scrollLeft}>←</button>
                 <div className="categories">
                     {categories.map((category) => (
-                        <div key={category._id} className="category-business" onClick={() => handleFilterChange(category._id)}>
-                            <img src={category.icon || "/path/to/default-icon.png"} />
+                        <div key={category._id} className="category-business" onClick={() => handleFilterChange(category.name)}>
+                            <img
+                                src={`${process.env.REACT_APP_API_DOMAIN}${category.logo}`}
+                                alt={category.name}
+                                className="category-logo"
+                                />
                             <span>{category.name}</span>
                         </div>
                     ))}
