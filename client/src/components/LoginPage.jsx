@@ -28,15 +28,12 @@ const LoginPage = () => {
     
             if (response.data.token && response.data.user) {
                
-                dispatch(setUser({
-                    token: response.data.token,
-                    user: response.data.user
-                }));
+                dispatch(setUser({user: response.data.user}));
 
                 // שמירה ב־localStorage
                 document.cookie = `token=${response.data.token}`;
                 const cookie = document.cookie.split('; ').find(row => row.startsWith('token='));
-                // localStorage.setItem('user', JSON.stringify(response.data.user));
+                localStorage.setItem('user', JSON.stringify(response.data.user));
     
                 // הפניה לדף הבא
                 navigate('/user-businesses');
