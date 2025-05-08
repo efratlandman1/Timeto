@@ -41,7 +41,7 @@ const RegistrationPage = () => {
       
           if (response.data.token && response.data.user) {
             // שמירה ב-localStorage
-            localStorage.setItem('token', response.data.token);
+            document.cookie = `token=${response.data.token}`;
             localStorage.setItem('user', JSON.stringify(response.data.user));
       
             navigate('/user-businesses');  // או כל דף אחר שתרצה

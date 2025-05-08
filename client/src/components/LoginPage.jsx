@@ -4,6 +4,7 @@ import '../styles/LoginPage.css';
 import { FaEnvelope, FaLock, FaClock, FaEye, FaEyeSlash } from 'react-icons/fa';  // נוספנו את FaEnvelope בשביל האימייל
 import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/userSlice';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');  // שדה האימייל
@@ -12,6 +13,7 @@ const LoginPage = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -32,11 +34,12 @@ const LoginPage = () => {
                 }));
 
                 // שמירה ב־localStorage
-                localStorage.setItem('token', response.data.token);
+                document.cookie = `token=${response.data.token}`;
+                const cookie = document.cookie.split('; ').find(row => row.startsWith('token='));
                 // localStorage.setItem('user', JSON.stringify(response.data.user));
     
                 // הפניה לדף הבא
-                window.location.href = '/user-businesses';
+                navigate('/user-businesses');
             } else {
                 setError('ההתחברות נכשלה. נסה שוב');
             }

@@ -26,8 +26,8 @@ function App() {
             <Header />
             <Routes>
                 <Route path="/" element={<MainPage />} />
-                <Route path="/edit" element={getToken() ? <EditBusinessPage /> : <Navigate to="/login" />} />
-                <Route path="/user-businesses" element={getToken() ? <UserBusinessPage /> : <Navigate to="/login" />} />
+                <Route path="/edit" element={getToken() ? <EditBusinessPage /> : <LoginPage/>} />
+                <Route path="/user-businesses" element={getToken() ? <UserBusinessPage /> : <LoginPage/>} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegistrationPage />} />
                 <Route path="/advanced-search-page" element={<AdvancedSearchPage />} />
