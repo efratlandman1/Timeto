@@ -13,8 +13,21 @@ const SearchResultPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // ניתוח הפילטרים מ-URL (לדוגמה: ?category=מסעדות&rating=4)
-    const filters = Object.fromEntries(new URLSearchParams(location.search));
+    const urlParams = new URLSearchParams(location.search);
+
+    // מסך הפילטרים כ-object
+    const filters = {};
+    for (const [key, value] of urlParams.entries()) {
+        if (key in filters) {
+            if (Array.isArray(filters[key])) {
+                filters[key].push(value);
+            } else {
+                filters[key] = [filters[key], value];
+            }
+        } else {
+            filters[key] = value;
+        }
+    }
 
     useEffect(() => {
         const fetchBusinesses = async () => {
@@ -30,7 +43,7 @@ const SearchResultPage = () => {
         };
 
         fetchBusinesses();
-    }, [location.search]); // קריאה מחדש רק אם הפרמטרים ב-URL משתנים
+    }, [location.search]);
 
     const handleSearch = () => {
         if (searchQuery) {
@@ -48,16 +61,24 @@ const SearchResultPage = () => {
         navigate('/advanced-search-page');
     };
 
-    const removeFilter = (keyToRemove) => {
+    const removeFilter = (keyToRemove, valueToRemove = null) => {
         const newParams = new URLSearchParams(location.search);
-        newParams.delete(keyToRemove);
+
+        if (valueToRemove !== null) {
+            const values = newParams.getAll(keyToRemove).filter(val => val !== valueToRemove);
+            newParams.delete(keyToRemove);
+            values.forEach(val => newParams.append(keyToRemove, val));
+        } else {
+            newParams.delete(keyToRemove);
+        }
+
         navigate({ pathname: location.pathname, search: newParams.toString() });
     };
 
     const createLabel = (key, value) => {
         switch (key) {
-            case 'category': return `קטגוריה: ${value}`;
-            case 'service': return `שירות: ${value}`;
+            case 'categoryName': return `קטגוריה: ${value}`;
+            case 'subcategories': return `שירות: ${value}`;
             case 'minPrice': return `מינימום ${value} ש"ח`;
             case 'maxPrice': return `מקסימום ${value} ש"ח`;
             case 'distance': return `עד ${value} ק"מ`;
@@ -93,10 +114,19 @@ const SearchResultPage = () => {
             {Object.keys(filters).length > 0 && (
                 <div className="filters-container">
                     {Object.entries(filters).map(([key, value]) => (
-                        <div key={key} className="filter-tag">
-                            {createLabel(key, value)}
-                            <span className="remove-filter" onClick={() => removeFilter(key)}>×</span>
-                        </div>
+                        Array.isArray(value) ? (
+                            value.map((val, idx) => (
+                                <div key={`${key}-${idx}`} className="filter-tag">
+                                    {createLabel(key, val)}
+                                    <span className="remove-filter" onClick={() => removeFilter(key, val)}>×</span>
+                                </div>
+                            ))
+                        ) : (
+                            <div key={key} className="filter-tag">
+                                {createLabel(key, value)}
+                                <span className="remove-filter" onClick={() => removeFilter(key)}>×</span>
+                            </div>
+                        )
                     ))}
                 </div>
             )}

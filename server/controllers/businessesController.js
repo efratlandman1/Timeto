@@ -80,32 +80,43 @@ const updateBusiness = async (req, res, userId) => {
 
 exports.getItems = async (req, res) => {
     try {
-        console.log("🔍 קבלת פרמטרים:", req.query);
+        console.log("Received query params:", req.query);
 
-        const { categoryName } = req.query;
-
+        const { categoryName, subcategories, rating } = req.query;
         const query = {};
+
+        // Filter by category name
         if (categoryName) {
-            console.log("Search for categoryName:", categoryName);
             const category = await Category.findOne({ name: categoryName });
             if (category) {
-                console.log("category found :", category._id);
-                query.categoryId = category._id;
+                query.categoryId = category._id.toString();
             } else {
-                console.log(" no categoryId found ");
+                console.log("Category not found");
             }
         }
 
+        // Filter by services (using subcategories)
+        if (subcategories) {
+            const serviceList = Array.isArray(subcategories) ? subcategories : [subcategories];
+            query.subCategoryIds = { $all: serviceList };
+        }
+
+        // Filter by rating
+        if (rating) {
+            query.rating = { $gte: Number(rating) };
+        }
+
         const businesses = await Business.find(query);
-        console.log("count of results: ", businesses.length);
+        console.log("Total results found:", businesses.length);
 
         res.json({ data: businesses });
 
     } catch (err) {
-        console.error(" שגיאה ב-getItems:", err);
+        console.error("Error in getItems:", err);
         res.status(500).json({ message: err.message });
     }
 };
+
 
 
 exports.getUserBusinesses = async (req, res) => {
