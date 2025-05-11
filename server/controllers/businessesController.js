@@ -106,10 +106,30 @@ exports.getItems = async (req, res) => {
             query.rating = { $gte: Number(rating) };
         }
 
-        const businesses = await Business.find(query);
-        console.log("Total results found:", businesses.length);
+        // const businesses = await Business.find(query);
+        // console.log("Total results found:", businesses.length);
+        
 
-        res.json({ data: businesses });
+        // res.json({ data: businesses });
+
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 6;
+        const skip = (page - 1) * limit;
+
+        const [businesses, total] = await Promise.all([
+        Business.find(query).skip(skip).limit(limit),
+        Business.countDocuments(query),
+        ]);
+
+        res.json({
+            data: businesses,
+            pagination: {
+              total,
+              page,
+              limit,
+              totalPages: Math.ceil(total / limit),
+            },
+          });
 
     } catch (err) {
         console.error("Error in getItems:", err);

@@ -52,7 +52,33 @@
     color: #e60000;
 }
 
-
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    gap: 8px;
+  }
+  
+  .pagination-button {
+    padding: 8px 14px;
+    border: none;
+    background-color: #eee;
+    color: #333;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+  }
+  
+  .pagination-button:hover {
+    background-color: #ccc;
+  }
+  
+  .pagination-button.active {
+    background-color: #333;
+    color: #fff;
+  }
+  
 @media (max-width: 600px) {
 
     .search-result-page-container {

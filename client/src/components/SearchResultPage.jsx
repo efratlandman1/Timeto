@@ -5,17 +5,18 @@ import '../styles/SearchResultPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaSearch, FaFilter } from 'react-icons/fa';
 
+const ITEMS_PER_PAGE = 6;
+
 const SearchResultPage = () => {
     const [businesses, setBusinesses] = useState([]);
-    const [filteredBusinesses, setFilteredBusinesses] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     const navigate = useNavigate();
     const location = useLocation();
 
     const urlParams = new URLSearchParams(location.search);
-
-    // מסך הפילטרים כ-object
     const filters = {};
     for (const [key, value] of urlParams.entries()) {
         if (key in filters) {
@@ -33,27 +34,32 @@ const SearchResultPage = () => {
         const fetchBusinesses = async () => {
             try {
                 const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
-                    params: filters
+                    params: {
+                        ...filters,
+                        page: currentPage,
+                        limit: ITEMS_PER_PAGE
+                    }
                 });
                 setBusinesses(res.data.data || []);
-                setFilteredBusinesses(res.data.data || []);
+                setTotalPages(res.data.pagination?.totalPages || 1);
             } catch (error) {
                 console.error("Error fetching businesses:", error);
             }
         };
 
         fetchBusinesses();
-    }, [location.search]);
+    }, [location.search, currentPage]);
 
     const handleSearch = () => {
+        // סינון מקומי על שם העסק בלבד
         if (searchQuery) {
-            setFilteredBusinesses(
-                businesses.filter(b =>
-                    b.name.toLowerCase().includes(searchQuery.toLowerCase())
-                )
+            const filtered = businesses.filter(b =>
+                b.name.toLowerCase().includes(searchQuery.toLowerCase())
             );
+            setBusinesses(filtered);
         } else {
-            setFilteredBusinesses(businesses);
+            // נחזיר את הדאטה המלא מהשרת
+            setCurrentPage(1);
         }
     };
 
@@ -63,7 +69,6 @@ const SearchResultPage = () => {
 
     const removeFilter = (keyToRemove, valueToRemove = null) => {
         const newParams = new URLSearchParams(location.search);
-
         if (valueToRemove !== null) {
             const values = newParams.getAll(keyToRemove).filter(val => val !== valueToRemove);
             newParams.delete(keyToRemove);
@@ -87,6 +92,10 @@ const SearchResultPage = () => {
         }
     };
 
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
+
     return (
         <div className='search-result-page-container'>
             <div className="search-bar">
@@ -101,11 +110,7 @@ const SearchResultPage = () => {
                     />
                 </div>
                 <div className="filter-button-wrapper">
-                    <button
-                        onClick={handleAdvancedSearchClick}
-                        className="filter-button"
-                        title="חיפוש מורחב"
-                    >
+                    <button onClick={handleAdvancedSearchClick} className="filter-button" title="חיפוש מורחב">
                         <FaFilter />
                     </button>
                 </div>
@@ -132,10 +137,24 @@ const SearchResultPage = () => {
             )}
 
             <div className="card-slider">
-                {filteredBusinesses.map((business) => (
+                {businesses.map((business) => (
                     <BusinessCard key={business._id} business={business} />
                 ))}
             </div>
+
+            {totalPages > 1 && (
+                <div className="pagination-container">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                            key={page}
+                            onClick={() => handlePageChange(page)}
+                            className={`pagination-button ${currentPage === page ? 'active' : ''}`}
+                        >
+                            {page}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
