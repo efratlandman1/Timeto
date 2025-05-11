@@ -11,6 +11,7 @@
     margin: 14px 12px 0;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     align-items: center;
+    direction: rtl;
 }
 
 .business-card:hover {

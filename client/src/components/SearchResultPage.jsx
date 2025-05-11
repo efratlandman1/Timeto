@@ -97,7 +97,8 @@ const SearchResultPage = () => {
     };
 
     return (
-        <div className='search-result-page-container'>
+        <div className='main-page-container'>
+            {/* 'search-result-page-container' */}
             <div className="search-bar">
                 <div className="search-input-wrapper">
                     <FaSearch className="search-icon" />
