@@ -116,7 +116,7 @@ const MainPage = () => {
     // };
     const handleFilterChange = (categoryName) => {
         // ניווט לדף תוצאות החיפוש לפי הקטגוריה
-        navigate(`/search-results?category=${categoryName}`);
+        navigate(`/search-results?categoryName=${categoryName}`);
     };
 
     // === חיפוש חופשי בטקסט (משתמש עבור שורת חיפוש) ===

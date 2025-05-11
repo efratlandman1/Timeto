@@ -1,5 +1,6 @@
 const Business = require("../models/business");
 const AuthUtils = require('../utils/authUtils');
+const Category = require('../models/category');
 
 exports.uploadBusinesses = async (req, res) => {
     try {
@@ -8,6 +9,7 @@ exports.uploadBusinesses = async (req, res) => {
 
         if (req.body.id) {
             return updateBusiness(req, res, userId);
+
         } else {
             return createBusiness(req, res, userId);
         }
@@ -66,15 +68,45 @@ const updateBusiness = async (req, res, userId) => {
     }
 };
 
+// exports.getItems = async (req, res) => {
+//     try {
+//         const businesses = await Business.find({});
+//         res.status(200).json(businesses);
+//     } catch (err) {
+//         console.log(err);
+//         res.status(500).json({message: err.message});
+//     }
+// };
+
 exports.getItems = async (req, res) => {
     try {
-        const businesses = await Business.find({});
-        res.status(200).json(businesses);
+        console.log("🔍 קבלת פרמטרים:", req.query);
+
+        const { categoryName } = req.query;
+
+        const query = {};
+        if (categoryName) {
+            console.log("Search for categoryName:", categoryName);
+            const category = await Category.findOne({ name: categoryName });
+            if (category) {
+                console.log("category found :", category._id);
+                query.categoryId = category._id;
+            } else {
+                console.log(" no categoryId found ");
+            }
+        }
+
+        const businesses = await Business.find(query);
+        console.log("count of results: ", businesses.length);
+
+        res.json({ data: businesses });
+
     } catch (err) {
-        console.log(err);
-        res.status(500).json({message: err.message});
+        console.error(" שגיאה ב-getItems:", err);
+        res.status(500).json({ message: err.message });
     }
 };
+
 
 exports.getUserBusinesses = async (req, res) => {
     try {
