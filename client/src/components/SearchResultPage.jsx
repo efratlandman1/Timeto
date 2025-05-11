@@ -9,75 +9,36 @@ const SearchResultPage = () => {
     const [businesses, setBusinesses] = useState([]);
     const [filteredBusinesses, setFilteredBusinesses] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [categoryId, setCategoryId] = useState(null);
 
     const navigate = useNavigate();
     const location = useLocation();
 
-    const queryParams = new URLSearchParams(location.search);
-    const filters = Object.fromEntries(queryParams.entries());
+    // ניתוח הפילטרים מ-URL (לדוגמה: ?category=מסעדות&rating=4)
+    const filters = Object.fromEntries(new URLSearchParams(location.search));
 
-    // קבלת ID של הקטגוריה לפי השם
     useEffect(() => {
-        const fetchCategoryId = async () => {
-            if (!filters.category) {
-                setCategoryId(null);
-                return;
-            }
+        const fetchBusinesses = async () => {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
-                console.log('res:',res);
-                console.log('filters.category:',filters.category);
-                
-                const match = res.data.find(cat => cat.name === filters.category);
-                console.log('match:',match);
-                setCategoryId(match ? match._id : null);
+                const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
+                    params: filters
+                });
+                setBusinesses(res.data.data || []);
+                setFilteredBusinesses(res.data.data || []);
             } catch (error) {
-                console.error("Error fetching category ID:", error);
-                setCategoryId(null);
+                console.error("Error fetching businesses:", error);
             }
         };
-        fetchCategoryId();
-    }, [filters.category]);
 
-    useEffect(() => {
         fetchBusinesses();
-    }, [filters, categoryId]);
-
-    const fetchBusinesses = async () => {
-        try {
-            const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`);
-            let results = res.data;
-
-            if (filters.service) {
-                results = results.filter(b => b.services?.includes(filters.service));
-            }
-            if (filters.minPrice) {
-                results = results.filter(b => b.price >= parseFloat(filters.minPrice));
-            }
-            if (filters.maxPrice) {
-                results = results.filter(b => b.price <= parseFloat(filters.maxPrice));
-            }
-            if (filters.distance) {
-                results = results.filter(b => b.distance <= parseFloat(filters.distance));
-            }
-            if (filters.rating) {
-                results = results.filter(b => b.rating >= parseFloat(filters.rating));
-            }
-            if (categoryId) {
-                results = results.filter(b => b.categoryId === categoryId);
-            }
-
-            setBusinesses(results);
-            setFilteredBusinesses(results);
-        } catch (error) {
-            console.error("Error fetching businesses:", error);
-        }
-    };
+    }, [location.search]); // קריאה מחדש רק אם הפרמטרים ב-URL משתנים
 
     const handleSearch = () => {
         if (searchQuery) {
-            setFilteredBusinesses(businesses.filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase())));
+            setFilteredBusinesses(
+                businesses.filter(b =>
+                    b.name.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+            );
         } else {
             setFilteredBusinesses(businesses);
         }
@@ -87,28 +48,21 @@ const SearchResultPage = () => {
         navigate('/advanced-search-page');
     };
 
-    const removeFilter = (key) => {
+    const removeFilter = (keyToRemove) => {
         const newParams = new URLSearchParams(location.search);
-        newParams.delete(key);
+        newParams.delete(keyToRemove);
         navigate({ pathname: location.pathname, search: newParams.toString() });
     };
 
     const createLabel = (key, value) => {
         switch (key) {
-            case 'category':
-                return `קטגוריה ${value}`;
-            case 'service':
-                return `שירות ${value}`;
-            case 'minPrice':
-                return `מחיר מינימלי ${value} ש"ח`;
-            case 'maxPrice':
-                return `מחיר מקסימלי ${value} ש"ח`;
-            case 'distance':
-                return `מרחק ${value} ק"מ`;
-            case 'rating':
-                return `דירוג ${value} כוכבים`;
-            default:
-                return '';
+            case 'category': return `קטגוריה: ${value}`;
+            case 'service': return `שירות: ${value}`;
+            case 'minPrice': return `מינימום ${value} ש"ח`;
+            case 'maxPrice': return `מקסימום ${value} ש"ח`;
+            case 'distance': return `עד ${value} ק"מ`;
+            case 'rating': return `${value} כוכבים ומעלה`;
+            default: return `${key}: ${value}`;
         }
     };
 
