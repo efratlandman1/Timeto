@@ -15,5 +15,8 @@ router
 // router
 //     .get('/search', businessesController.searchBusinesses);
 
-
+router
+  .route('/:id')
+  .get(businessesController.getBusinessById);
+  
 module.exports = router;

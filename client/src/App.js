@@ -33,8 +33,8 @@ function App() {
                 <Route path="/advanced-search-page" element={<AdvancedSearchPage />} />
                 <Route path="/search-results" element={<SearchResultPage />} />
                 <Route path="/feedback-page" element={<FeedbackPage />} />
-                <Route path="/business-profile" element={<BusinessProfilePage />} /> 
-                
+                {/* <Route path="/business-profile" element={<BusinessProfilePage />} />  */}
+                <Route path="/business-profile/:id" element={<BusinessProfilePage />} />
             </Routes>
         </Router>
     );

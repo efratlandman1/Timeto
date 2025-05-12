@@ -15,7 +15,14 @@ const businessSchema = new mongoose.Schema({
     // active: { type: Boolean, required: true },
     // userId: String
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
-    rating: {type: Number}
+    rating: {type: Number},
+    openingHours: [
+        {
+          day: { type: String, required: true },
+          from: { type: String },
+          to: { type: String }
+        }
+      ]
 });
 
 const Business = mongoose.model('businesses', businessSchema);

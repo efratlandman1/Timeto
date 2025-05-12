@@ -7,12 +7,20 @@ const jwtAuthMiddleware = (req, res, next) => {
         '/api/v1/register',
         '/api/v1/businesses',
         '/api/v1/categories',
-        '/api/v1/businesses/search'
+        '/api/v1/businesses/:id'
+
     ];
 
-    if (openRoutes.includes(req.path)) {
-        return next(); // Allow access to open routes
+    // if (openRoutes.includes(req.path)) {
+    //     return next(); // Allow access to open routes
+    // }
+
+    const isOpenRoute = openRoutes.some((route) => req.path === route || req.path.startsWith(route + '/'));
+
+    if (isOpenRoute) {
+        return next(); // Allow access to open routes and their subroutes
     }
+
 
     const token = req.header('Authorization')?.split(' ')[1]; // Expect "Bearer <token>"
 
