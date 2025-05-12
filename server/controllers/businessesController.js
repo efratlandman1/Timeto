@@ -82,60 +82,115 @@ exports.getItems = async (req, res) => {
     try {
         console.log("Received query params:", req.query);
 
-        const { categoryName, subcategories, rating } = req.query;
+        const { q, categoryName, subcategories, rating } = req.query;
+
+        // === חיפוש חופשי אם קיים q ===
+        if (q && q.trim().length > 0) {
+            const regex = new RegExp(q, 'i'); // Case-insensitive
+
+            const matchingCategories = await Category.find({ name: regex });
+            const categoryIds = matchingCategories.map(cat => cat._id);
+
+            const businesses = await Business.find({
+                $or: [
+                    { name: regex },
+                    { address: regex },
+                    { email: regex },
+                    { phone: { $regex: q } },
+                    { categoryId: { $in: categoryIds } },
+                    { subCategoryIds: { $in: [regex] } }
+                ]
+            })
+                .limit(10)
+                .populate('categoryId', 'name');
+
+            const results = businesses.map(business => {
+                const businessObj = business.toObject();
+                businessObj.categoryName = business.categoryId?.name || '';
+                return businessObj;
+            });
+
+            return res.json({
+                data: results,
+                pagination: {
+                    total: results.length,
+                    page: 1,
+                    limit: results.length,
+                    totalPages: 1
+                }
+            });
+        }
+
+        // === סינון רגיל אם אין q ===
         const query = {};
 
-        // Filter by category name
+        // אם יש שם קטגוריה, מצא אותה ובצע סינון לפי categoryId
         if (categoryName) {
             const category = await Category.findOne({ name: categoryName });
             if (category) {
-                query.categoryId = category._id.toString();
+                query.categoryId = category._id;
             } else {
-                console.log("Category not found");
+                console.log("Category not found:", categoryName);
+                return res.json({
+                    data: [],
+                    pagination: {
+                        total: 0,
+                        page: 1,
+                        limit: 0,
+                        totalPages: 0
+                    }
+                });
             }
         }
 
-        // Filter by services (using subcategories)
+        // סינון לפי תתי קטגוריות אם קיימים
         if (subcategories) {
             const serviceList = Array.isArray(subcategories) ? subcategories : [subcategories];
             query.subCategoryIds = { $all: serviceList };
         }
 
-        // Filter by rating
+        // סינון לפי רייטינג - אם קיים, לחפש את כל העסקים עם רייטינג >= הרייטינג שניתן
         if (rating) {
             query.rating = { $gte: Number(rating) };
         }
 
-        // const businesses = await Business.find(query);
-        // console.log("Total results found:", businesses.length);
-        
-
-        // res.json({ data: businesses });
-
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 6;
         const skip = (page - 1) * limit;
+        console.log('query:', query);
 
+        // מבצע את השאילתה ומחזיר את העסקים והתוצאה
         const [businesses, total] = await Promise.all([
-        Business.find(query).skip(skip).limit(limit),
-        Business.countDocuments(query),
+            Business.find(query)
+                .skip(skip)
+                .limit(limit)
+                .populate('categoryId', 'name'),
+            Business.countDocuments(query)
         ]);
+        console.log("Businesses found:", businesses);
+        const results = businesses.map(business => {
+            const businessObj = business.toObject();
+            businessObj.categoryName = business.categoryId?.name || '';
+            return businessObj;
+        });
 
         res.json({
-            data: businesses,
+            data: results,
             pagination: {
-              total,
-              page,
-              limit,
-              totalPages: Math.ceil(total / limit),
-            },
-          });
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            }
+        });
 
     } catch (err) {
         console.error("Error in getItems:", err);
         res.status(500).json({ message: err.message });
     }
 };
+
+    
 
 
 
@@ -150,51 +205,51 @@ exports.getUserBusinesses = async (req, res) => {
     }
 };
 
-exports.searchBusinesses = async (req, res) => {
-    try {
-        console.log('searchBusinesses:');
-        const query = req.query.q;
-        console.log('req.query.q:',req.query.q);
-        if (!query || query.trim().length === 0) {
-            return res.status(400).json({ message: "Missing query parameter" });
-        }
+// exports.searchBusinesses = async (req, res) => {
+//     try {
+//         console.log('searchBusinesses:');
+//         const query = req.query.q;
+//         console.log('req.query.q:',req.query.q);
+//         if (!query || query.trim().length === 0) {
+//             return res.status(400).json({ message: "Missing query parameter" });
+//         }
 
-        const regex = new RegExp(query, 'i'); // Case-insensitive
+//         const regex = new RegExp(query, 'i'); // Case-insensitive
 
-        const matchingCategories = await Category.find({
-            $or: [
-                { name: regex }
-            ]
-        });
-        const categoryIds = matchingCategories.map(cat => cat._id);
+//         const matchingCategories = await Category.find({
+//             $or: [
+//                 { name: regex }
+//             ]
+//         });
+//         const categoryIds = matchingCategories.map(cat => cat._id);
 
-        const businesses = await Business.find({
-            $or: [
-                { name: regex },
-                { address: regex },
-                { email: regex },
-                // { description: regex },
-                { phone: { $regex: query } },
-                { categoryId: { $in: categoryIds } },
-                { subCategoryIds: { $in: [regex] } }
-            ]
-        }).limit(10)
-        .populate('categoryId', 'name')
+//         const businesses = await Business.find({
+//             $or: [
+//                 { name: regex },
+//                 { address: regex },
+//                 { email: regex },
+//                 // { description: regex },
+//                 { phone: { $regex: query } },
+//                 { categoryId: { $in: categoryIds } },
+//                 { subCategoryIds: { $in: [regex] } }
+//             ]
+//         }).limit(10)
+//         .populate('categoryId', 'name')
 
-        console.log(businesses);
+//         console.log(businesses);
         
-        const resultsWithCategoryName = businesses.map(business => {
-            const categoryName = business.categoryId?.name || '';
-            return {
-                ...business.toObject(),
-                categoryName
-            };
-        });
+//         const resultsWithCategoryName = businesses.map(business => {
+//             const categoryName = business.categoryId?.name || '';
+//             return {
+//                 ...business.toObject(),
+//                 categoryName
+//             };
+//         });
 
-        res.json(resultsWithCategoryName);
+//         res.json(resultsWithCategoryName);
 
-    } catch (err) {
-        console.error("Error in searchBusinesses:", err);
-        res.status(500).json({ message: err.message });
-    }
-};
+//     } catch (err) {
+//         console.error("Error in searchBusinesses:", err);
+//         res.status(500).json({ message: err.message });
+//     }
+// };

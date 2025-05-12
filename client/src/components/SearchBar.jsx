@@ -37,10 +37,11 @@ const SearchBar = () => {
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (searchQuery.trim()) {
-        fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/search?q=${encodeURIComponent(searchQuery)}`)
+        // fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/search?q=${encodeURIComponent(searchQuery)}`)
+        fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses?q=${encodeURIComponent(searchQuery)}`)
           .then((res) => res.json())
           .then((data) => {
-            setResults(data);
+            setResults(data.data || []);
             setShowDropdown(true);
           });
       } else {
@@ -55,7 +56,7 @@ const SearchBar = () => {
   const handleSearch = (e) => {
     if (e.key === 'Enter' || e.type === 'click') {
       if (searchQuery.trim()) {
-        navigate(`/search-results?query=${encodeURIComponent(searchQuery.trim())}`);
+        navigate(`/search-results?q=${encodeURIComponent(searchQuery.trim())}`);
         setShowDropdown(false);
       }
     }
@@ -64,7 +65,7 @@ const SearchBar = () => {
   const handleBlur = () => {
     setTimeout(() => {
       if (searchQuery.trim() && !showDropdown) { // רק אם התפריט לא פתוח
-        navigate(`/search-results?query=${encodeURIComponent(searchQuery.trim())}`);
+        navigate(`/search-results?q=${encodeURIComponent(searchQuery.trim())}`);
         setShowDropdown(false);
       }
     }, 150); // מאפשר ללחוץ על תוצאה לפני סגירה
