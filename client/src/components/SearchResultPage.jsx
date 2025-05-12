@@ -3,13 +3,14 @@ import BusinessCard from './BusinessCard';
 import axios from 'axios';
 import '../styles/SearchResultPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaSearch, FaFilter } from 'react-icons/fa';
+// import { FaSearch, FaFilter } from 'react-icons/fa';
+import SearchBar from './SearchBar';
 
 const ITEMS_PER_PAGE = 6;
 
 const SearchResultPage = () => {
     const [businesses, setBusinesses] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
+    // const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
@@ -50,22 +51,22 @@ const SearchResultPage = () => {
         fetchBusinesses();
     }, [location.search, currentPage]);
 
-    const handleSearch = () => {
-        // סינון מקומי על שם העסק בלבד
-        if (searchQuery) {
-            const filtered = businesses.filter(b =>
-                b.name.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setBusinesses(filtered);
-        } else {
-            // נחזיר את הדאטה המלא מהשרת
-            setCurrentPage(1);
-        }
-    };
+    // const handleSearch = () => {
+    //     // סינון מקומי על שם העסק בלבד
+    //     if (searchQuery) {
+    //         const filtered = businesses.filter(b =>
+    //             b.name.toLowerCase().includes(searchQuery.toLowerCase())
+    //         );
+    //         setBusinesses(filtered);
+    //     } else {
+    //         // נחזיר את הדאטה המלא מהשרת
+    //         setCurrentPage(1);
+    //     }
+    // };
 
-    const handleAdvancedSearchClick = () => {
-        navigate('/advanced-search-page');
-    };
+    // const handleAdvancedSearchClick = () => {
+    //     navigate('/advanced-search-page');
+    // };
 
     const removeFilter = (keyToRemove, valueToRemove = null) => {
         const newParams = new URLSearchParams(location.search);
@@ -99,7 +100,7 @@ const SearchResultPage = () => {
     return (
         <div className='main-page-container'>
             {/* 'search-result-page-container' */}
-            <div className="search-bar">
+            {/* <div className="search-bar">
                 <div className="search-input-wrapper">
                     <FaSearch className="search-icon" />
                     <input
@@ -115,7 +116,9 @@ const SearchResultPage = () => {
                         <FaFilter />
                     </button>
                 </div>
-            </div>
+            </div> */}
+
+            <SearchBar />
 
             {Object.keys(filters).length > 0 && (
                 <div className="filters-container">
