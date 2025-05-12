@@ -22,7 +22,7 @@ const SearchBar = () => {
         setResults([]);
         setShowDropdown(false);
       }
-    }, 300); // debounce
+    }, 300);
 
     return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
@@ -41,7 +41,7 @@ const SearchBar = () => {
   };
 
   const highlightMatch = (text) => {
-    const parts = text.split(new RegExp(`(${searchQuery})`, 'gi'));
+    const parts = text?.split(new RegExp(`(${searchQuery})`, 'gi')) || [];
     return parts.map((part, index) =>
       part.toLowerCase() === searchQuery.toLowerCase() ? <strong key={index}>{part}</strong> : part
     );
@@ -53,8 +53,23 @@ const SearchBar = () => {
     setShowDropdown(false);
   };
 
+  const renderTags = (subcategories) => {
+    if (!subcategories || subcategories.length === 0) return null;
+    const displayTags = subcategories.slice(0, 4);
+    const extraCount = subcategories.length - displayTags.length;
+
+    return (
+      <div className="tags-container">
+        {displayTags.map((tag, idx) => (
+          <span key={idx} className="search-tag">{highlightMatch(tag)}</span>
+        ))}
+        {extraCount > 0 && <span className="search-tag extra-tag">+{extraCount}</span>}
+      </div>
+    );
+  };
+
   return (
-    <div className="search-bar relative">
+    <div className="search-bar">
       <div className="search-input-wrapper">
         <FaSearch className="search-icon" />
         <input
@@ -64,7 +79,32 @@ const SearchBar = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyUp={handleSearch}
         />
+        {showDropdown && results.length > 0 && (
+          <ul className="search-results-dropdown">
+          {results.map((business) => (
+            <li
+              key={business._id}
+              className="search-result-item"
+              onClick={() => handleSelectResult(business)}
+            >
+              <div className="search-result-top-row">
+              <div className="serach-business-header">
+                <span className="serach-business-name">{highlightMatch(business.name)}</span>
+                {business.categoryName && (
+                  <span className="serach-business-category-pill">{highlightMatch(business.categoryName)}</span>
+                )}
+              </div>
+
+                {renderTags(business.subCategoryIds)}
+              </div>
+              <div className="business-address">{highlightMatch(business.address)}</div>
+            </li>
+          ))}
+        </ul>
+        
+        )}
       </div>
+
       <div className="filter-button-wrapper">
         <button
           onClick={handleAdvancedSearchClick}
@@ -74,21 +114,6 @@ const SearchBar = () => {
           <FaFilter />
         </button>
       </div>
-
-      {showDropdown && results.length > 0 && (
-        <ul className="absolute z-10 bg-white border w-full max-h-60 overflow-y-auto mt-1 rounded shadow-md">
-          {results.map((business) => (
-            <li
-              key={business._id}
-              className="p-2 hover:bg-gray-100 cursor-pointer"
-              onClick={() => handleSelectResult(business)}
-            >
-              <div className="font-bold">{highlightMatch(business.name)}</div>
-              <div className="text-sm text-gray-500">{highlightMatch(business.address)}</div>
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 };
