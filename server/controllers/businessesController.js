@@ -160,17 +160,39 @@ exports.searchBusinesses = async (req, res) => {
         }
 
         const regex = new RegExp(query, 'i'); // Case-insensitive
+
+        const matchingCategories = await Category.find({
+            $or: [
+                { name: regex }
+            ]
+        });
+        const categoryIds = matchingCategories.map(cat => cat._id);
+
         const businesses = await Business.find({
             $or: [
                 { name: regex },
                 { address: regex },
                 { email: regex },
-                { description: regex },
-                { phone: { $regex: query } } // לחיפוש מספרים
+                // { description: regex },
+                { phone: { $regex: query } },
+                { categoryId: { $in: categoryIds } },
+                { subCategoryIds: { $in: [regex] } }
             ]
-        }).limit(10);
-        console.log('businesses:',businesses);
-        res.json(businesses);
+        }).limit(10)
+        .populate('categoryId', 'name')
+
+        console.log(businesses);
+        
+        const resultsWithCategoryName = businesses.map(business => {
+            const categoryName = business.categoryId?.name || '';
+            return {
+                ...business.toObject(),
+                categoryName
+            };
+        });
+
+        res.json(resultsWithCategoryName);
+
     } catch (err) {
         console.error("Error in searchBusinesses:", err);
         res.status(500).json({ message: err.message });
