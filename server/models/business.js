@@ -14,7 +14,8 @@ const businessSchema = new mongoose.Schema({
     subCategoryIds: [String],
     // active: { type: Boolean, required: true },
     // userId: String
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true }
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
+    rating: {type: Number}
 });
 
 const Business = mongoose.model('businesses', businessSchema);
