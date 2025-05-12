@@ -3,7 +3,6 @@ import BusinessCard from './BusinessCard';
 import SearchBar from './SearchBar'; // ← חדש
 import axios from 'axios';
 import '../styles/MainPage.css';
-import '../styles/SearchBar.css';
 import '../styles/businessCard.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -59,7 +58,7 @@ const MainPage = () => {
         );
     };
 
-    useEffect(() => {
+    useEffect(() => { 
         fetchCategories();
         fetchBusinesses();
     }, []);

@@ -7,6 +7,7 @@ const jwtAuthMiddleware = (req, res, next) => {
         '/api/v1/register',
         '/api/v1/businesses',
         '/api/v1/categories',
+        '/api/v1/businesses/search'
     ];
 
     if (openRoutes.includes(req.path)) {
