@@ -1,6 +1,7 @@
 const Business = require("../models/business");
 const AuthUtils = require('../utils/authUtils');
 const Category = require('../models/category');
+const mongoose = require('mongoose');
 
 exports.uploadBusinesses = async (req, res) => {
     try {
@@ -253,3 +254,23 @@ exports.getUserBusinesses = async (req, res) => {
 //         res.status(500).json({ message: err.message });
 //     }
 // };
+exports.getBusinessById = async (req, res) => {
+    try {
+    console.log(' req.params.id', req.params.id);
+      const businessId = req.params.id;
+      if (!mongoose.Types.ObjectId.isValid(businessId)) {
+        return res.status(400).json({ message: 'מזהה לא תקין' });
+      }
+  
+      const business = await Business.findById(businessId);
+      console.log('business', business);
+      if (!business) {
+        return res.status(404).json({ message: 'העסק לא נמצא' });
+      }
+  
+      res.json(business);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'שגיאה בשרת' });
+    }
+  };
