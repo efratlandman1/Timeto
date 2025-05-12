@@ -12,4 +12,8 @@ router
     .route('/user-businesses')
     .get(businessesController.getUserBusinesses);
 
+router
+    .get('/search', businessesController.searchBusinesses);
+
+
 module.exports = router;

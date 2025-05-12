@@ -5,6 +5,7 @@
     align-items: center;
     margin-bottom: 1.25rem; /* 20px */
     gap: 0.625rem;
+    position: relative; /* חשוב עבור מיקום הדיווחים */
 }
 
 .search-input-wrapper {
@@ -22,8 +23,15 @@
     border-radius: 1.5625rem;
     border: 1px solid #ccc;
     direction: rtl;
+    transition: border 0.3s ease;
 }
 
+.search-input-wrapper input:focus {
+    border-color: #ff4d4d;
+    outline: none;
+}
+
+/* אייקון חיפוש */
 .search-icon {
     position: absolute;
     left: 0.625rem;
@@ -59,6 +67,50 @@
     font-size: 1.25rem;
 }
 
+/* רשימת תוצאות חיפוש נפתחת */
+.search-results-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    margin-top: 0.25rem;
+}
+
+.search-results-dropdown li {
+    padding: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.search-results-dropdown li:hover {
+    background-color: #f0f0f0;
+}
+
+.search-results-dropdown .business-name {
+    font-weight: bold;
+}
+
+.search-results-dropdown .business-address {
+    font-size: 0.875rem;
+    color: #555;
+}
+
+/* הדגשת תו החיפוש */
+.search-results-dropdown strong {
+    font-weight: bold;
+    color: #ff4d4d;
+}
+
 /* חיפוש - תמיכה במובייל */
 @media (max-width: 767px) {
     .search-bar {
@@ -69,11 +121,10 @@
         gap: 0.5rem;
         margin-top: 30px;
         margin-bottom: 5px;
-      }
+    }
 
     .search-input-wrapper {
         width: 100%; /* או אחוז מתאים כדי להשאיר מקום לכפתור */
-        /* max-width: none; */
     }
 
     .search-input-wrapper input {
@@ -85,13 +136,13 @@
         left: 0.5rem; /* התאמת אייקון החיפוש */
         font-size: 1rem; /* גודל אייקון קטן יותר */
     }
+
     .filter-button-wrapper {
         flex-shrink: 0; /* מונע מהכפתור להידחס */
     }
-    
+
     .filter-button {
         font-size: 1rem;
         padding: 0.5rem 1rem;
     }
-   
 }

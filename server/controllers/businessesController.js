@@ -150,3 +150,29 @@ exports.getUserBusinesses = async (req, res) => {
     }
 };
 
+exports.searchBusinesses = async (req, res) => {
+    try {
+        console.log('searchBusinesses:');
+        const query = req.query.q;
+        console.log('req.query.q:',req.query.q);
+        if (!query || query.trim().length === 0) {
+            return res.status(400).json({ message: "Missing query parameter" });
+        }
+
+        const regex = new RegExp(query, 'i'); // Case-insensitive
+        const businesses = await Business.find({
+            $or: [
+                { name: regex },
+                { address: regex },
+                { email: regex },
+                { description: regex },
+                { phone: { $regex: query } } // לחיפוש מספרים
+            ]
+        }).limit(10);
+        console.log('businesses:',businesses);
+        res.json(businesses);
+    } catch (err) {
+        console.error("Error in searchBusinesses:", err);
+        res.status(500).json({ message: err.message });
+    }
+};
