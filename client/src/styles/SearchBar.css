@@ -4,6 +4,8 @@
     align-items: flex-start;
     gap: 0.625rem;
     margin-bottom: 1.25rem;
+    position: relative;
+    z-index: 10; /* גבוה יותר מהטשטוש */
   }
   
   .search-input-wrapper {
@@ -62,7 +64,9 @@
   
   .filter-button svg {
     font-size: 1.25rem;
+
   }
+
   
   /* Dropdown styles */
   .search-results-dropdown {
@@ -176,7 +180,16 @@
     border-radius: 12px;
     white-space: nowrap;
   }
-
+  body.blurred::before {
+    content: "";
+    position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
+    backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, 0.1);
+    z-index: 1; /* נמוך */
+    pointer-events: none;
+  }
+  
   
   /* Mobile support */
   @media (max-width: 767px) {

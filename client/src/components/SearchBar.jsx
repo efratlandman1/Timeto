@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaSearch, FaFilter } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import '../styles/SearchBar.css';
@@ -8,6 +8,31 @@ const SearchBar = () => {
   const [results, setResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
+  const wrapperRef = useRef();
+
+  // סגירת dropdown בלחיצה מחוץ
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // רקע מטושטש כשהתפריט פתוח
+  useEffect(() => {
+    const body = document.body;
+    if (showDropdown) {
+      body.classList.add('blurred');
+    } else {
+      body.classList.remove('blurred');
+    }
+
+    return () => body.classList.remove('blurred');
+  }, [showDropdown]);
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -36,6 +61,15 @@ const SearchBar = () => {
     }
   };
 
+  const handleBlur = () => {
+    setTimeout(() => {
+      if (searchQuery.trim() && !showDropdown) { // רק אם התפריט לא פתוח
+        navigate(`/search-results?query=${encodeURIComponent(searchQuery.trim())}`);
+        setShowDropdown(false);
+      }
+    }, 150); // מאפשר ללחוץ על תוצאה לפני סגירה
+  };
+
   const handleAdvancedSearchClick = () => {
     navigate('/advanced-search-page');
   };
@@ -47,8 +81,9 @@ const SearchBar = () => {
     );
   };
 
-  const handleSelectResult = (business) => {
-    navigate(`/business/${business._id}`);
+  const handleSelectResult = (business, event) => {
+    event.stopPropagation();  // מונע את ההתפשטות של האירוע, כדי שלא תתבצע פעולה נוספת
+    navigate(`/business-profile/${business._id}`);
     setSearchQuery(business.name);
     setShowDropdown(false);
   };
@@ -69,39 +104,46 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="search-bar">
+    <div className="search-bar" ref={wrapperRef}>
       <div className="search-input-wrapper">
         <FaSearch className="search-icon" />
         <input
-          type="text"
-          placeholder="חיפוש חופשי"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyUp={handleSearch}
-        />
+            type="text"
+            placeholder="חיפוש חופשי"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyUp={handleSearch}
+            onBlur={handleBlur}
+            onFocus={() => {
+              if (searchQuery.trim() && results.length > 0) {
+                setShowDropdown(true);
+              }
+            }}
+          />
+
         {showDropdown && results.length > 0 && (
           <ul className="search-results-dropdown">
-          {results.map((business) => (
-            <li
-              key={business._id}
-              className="search-result-item"
-              onClick={() => handleSelectResult(business)}
-            >
-              <div className="search-result-top-row">
-              <div className="serach-business-header">
-                <span className="serach-business-name">{highlightMatch(business.name)}</span>
-                {business.categoryName && (
-                  <span className="serach-business-category-pill">{highlightMatch(business.categoryName)}</span>
-                )}
-              </div>
-
-                {renderTags(business.subCategoryIds)}
-              </div>
-              <div className="business-address">{highlightMatch(business.address)}</div>
-            </li>
-          ))}
-        </ul>
-        
+            {results.map((business) => (
+              <li
+                key={business._id}
+                className="search-result-item"
+                onClick={(e) => handleSelectResult(business, e)} // העברת האיבנט
+              >
+                <div className="search-result-top-row">
+                  <div className="serach-business-header">
+                    <span className="serach-business-name">{highlightMatch(business.name)}</span>
+                    {business.categoryName && (
+                      <span className="serach-business-category-pill">
+                        {highlightMatch(business.categoryName)}
+                      </span>
+                    )}
+                  </div>
+                  {renderTags(business.subCategoryIds)}
+                </div>
+                <div className="business-address">{highlightMatch(business.address)}</div>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
 
@@ -114,6 +156,7 @@ const SearchBar = () => {
           <FaFilter />
         </button>
       </div>
+
     </div>
   );
 };
