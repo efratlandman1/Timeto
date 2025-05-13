@@ -64,7 +64,11 @@ const SearchBar = () => {
     const query = searchQuery.trim();
     if (query) {
       navigate(`/search-results?q=${encodeURIComponent(query)}`);
+    } else {
+      navigate(`/search-results`);
     }
+    document.body.classList.remove('blurred');
+    setShowDropdown(false); // סגירת הרשימה אחרי ביצוע חיפוש
   };
 
   const handleKeyDown = (e) => {
@@ -86,9 +90,11 @@ const SearchBar = () => {
         } else {
           triggerSearch();
         }
+        setShowDropdown(false); // סגירת הרשימה אחרי לחיצה על Enter
         break;
       case 'Escape':
-        setShowDropdown(false);
+        setShowDropdown(false); // סגירת הרשימה אחרי לחיצה על Escape
+        document.body.classList.remove('blurred'); // הסרת ה-blur מידית
         break;
       default:
         break;
@@ -110,6 +116,7 @@ const SearchBar = () => {
     navigate(`/business-profile/${business._id}`);
     setSearchQuery(business.name);
     setShowDropdown(false);
+    document.body.classList.remove('blurred');
   };
 
   const highlightMatch = (text) => {

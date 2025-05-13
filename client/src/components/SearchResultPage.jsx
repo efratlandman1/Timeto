@@ -122,21 +122,23 @@ const SearchResultPage = () => {
 
             {Object.keys(filters).length > 0 && (
                 <div className="filters-container">
-                    {Object.entries(filters).map(([key, value]) => (
-                        Array.isArray(value) ? (
+                   {Object.entries(filters).map(([key, value]) => (
+                        key === 'q' || !value ? null : ( // הימנעי מיצירת תוויות עבור חיפוש חופשי ריק
+                            Array.isArray(value) ? (
                             value.map((val, idx) => (
                                 <div key={`${key}-${idx}`} className="filter-tag">
-                                    {createLabel(key, val)}
-                                    <span className="remove-filter" onClick={() => removeFilter(key, val)}>×</span>
+                                {createLabel(key, val)}
+                                <span className="remove-filter" onClick={() => removeFilter(key, val)}>×</span>
                                 </div>
                             ))
-                        ) : (
+                            ) : (
                             <div key={key} className="filter-tag">
-                                {createLabel(key, value)}
                                 <span className="remove-filter" onClick={() => removeFilter(key)}>×</span>
+                                {createLabel(key, value)}
                             </div>
+                            )
                         )
-                    ))}
+                        ))}
                 </div>
             )}
 
