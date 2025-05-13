@@ -7,42 +7,40 @@ const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const navigate = useNavigate();
   const wrapperRef = useRef();
+  const listRef = useRef();
+  const itemRefs = useRef([]);
 
-  // סגירת dropdown בלחיצה מחוץ
   useEffect(() => {
-    function handleClickOutside(event) {
+    const handleClickOutside = (event) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        triggerSearch();
         setShowDropdown(false);
       }
-    }
+    };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [searchQuery]);
 
-  // רקע מטושטש כשהתפריט פתוח
   useEffect(() => {
     const body = document.body;
-    if (showDropdown) {
-      body.classList.add('blurred');
-    } else {
-      body.classList.remove('blurred');
-    }
-
+    showDropdown ? body.classList.add('blurred') : body.classList.remove('blurred');
     return () => body.classList.remove('blurred');
   }, [showDropdown]);
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      if (searchQuery.trim()) {
-        // fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/search?q=${encodeURIComponent(searchQuery)}`)
-        fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses?q=${encodeURIComponent(searchQuery)}`)
+      const query = searchQuery.trim();
+      if (query) {
+        fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses?q=${encodeURIComponent(query)}`)
           .then((res) => res.json())
           .then((data) => {
             setResults(data.data || []);
             setShowDropdown(true);
+            setHighlightedIndex(-1);
           });
       } else {
         setResults([]);
@@ -53,51 +51,83 @@ const SearchBar = () => {
     return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
 
-  const handleSearch = (e) => {
-    if (e.key === 'Enter' || e.type === 'click') {
-      if (searchQuery.trim()) {
-        navigate(`/search-results?q=${encodeURIComponent(searchQuery.trim())}`);
+  useEffect(() => {
+    if (highlightedIndex >= 0 && itemRefs.current[highlightedIndex]) {
+      itemRefs.current[highlightedIndex].scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest'
+      });
+    }
+  }, [highlightedIndex]);
+
+  const triggerSearch = () => {
+    const query = searchQuery.trim();
+    if (query) {
+      navigate(`/search-results?q=${encodeURIComponent(query)}`);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (!showDropdown || results.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setHighlightedIndex((prev) => (prev + 1) % results.length);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setHighlightedIndex((prev) => (prev - 1 + results.length) % results.length);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (highlightedIndex >= 0 && results[highlightedIndex]) {
+          handleSelectResult(results[highlightedIndex]);
+        } else {
+          triggerSearch();
+        }
+        break;
+      case 'Escape':
         setShowDropdown(false);
-      }
+        break;
+      default:
+        break;
     }
   };
 
   const handleBlur = () => {
     setTimeout(() => {
-      if (searchQuery.trim() && !showDropdown) { // רק אם התפריט לא פתוח
-        navigate(`/search-results?q=${encodeURIComponent(searchQuery.trim())}`);
-        setShowDropdown(false);
-      }
-    }, 150); // מאפשר ללחוץ על תוצאה לפני סגירה
+      triggerSearch();
+      setShowDropdown(false);
+    }, 150);
   };
 
   const handleAdvancedSearchClick = () => {
     navigate('/advanced-search-page');
   };
 
-  const highlightMatch = (text) => {
-    const parts = text?.split(new RegExp(`(${searchQuery})`, 'gi')) || [];
-    return parts.map((part, index) =>
-      part.toLowerCase() === searchQuery.toLowerCase() ? <strong key={index}>{part}</strong> : part
-    );
-  };
-
-  const handleSelectResult = (business, event) => {
-    event.stopPropagation();  // מונע את ההתפשטות של האירוע, כדי שלא תתבצע פעולה נוספת
+  const handleSelectResult = (business) => {
     navigate(`/business-profile/${business._id}`);
     setSearchQuery(business.name);
     setShowDropdown(false);
   };
 
+  const highlightMatch = (text) => {
+    const parts = text?.split(new RegExp(`(${searchQuery})`, 'gi')) || [];
+    return parts.map((part, i) =>
+      part.toLowerCase() === searchQuery.toLowerCase() ? <strong key={i}>{part}</strong> : part
+    );
+  };
+
   const renderTags = (subcategories) => {
-    if (!subcategories || subcategories.length === 0) return null;
+    if (!subcategories?.length) return null;
     const displayTags = subcategories.slice(0, 4);
     const extraCount = subcategories.length - displayTags.length;
 
     return (
       <div className="tags-container">
-        {displayTags.map((tag, idx) => (
-          <span key={idx} className="search-tag">{highlightMatch(tag)}</span>
+        {displayTags.map((tag, i) => (
+          <span key={i} className="search-tag">{highlightMatch(tag)}</span>
         ))}
         {extraCount > 0 && <span className="search-tag extra-tag">+{extraCount}</span>}
       </div>
@@ -109,41 +139,65 @@ const SearchBar = () => {
       <div className="search-input-wrapper">
         <FaSearch className="search-icon" />
         <input
-            type="text"
-            placeholder="חיפוש חופשי"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyUp={handleSearch}
-            onBlur={handleBlur}
-            onFocus={() => {
-              if (searchQuery.trim() && results.length > 0) {
-                setShowDropdown(true);
-              }
-            }}
-          />
+          type="text"
+          placeholder="חיפוש חופשי"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
+          onFocus={() => {
+            if (searchQuery.trim() && results.length > 0) setShowDropdown(true);
+          }}
+          aria-haspopup="listbox"
+          aria-expanded={showDropdown}
+          aria-controls="search-dropdown"
+          aria-activedescendant={
+            highlightedIndex >= 0 && results[highlightedIndex]
+              ? `result-${results[highlightedIndex]._id}`
+              : undefined
+          }
+        />
 
-        {showDropdown && results.length > 0 && (
-          <ul className="search-results-dropdown">
-            {results.map((business) => (
-              <li
-                key={business._id}
-                className="search-result-item"
-                onClick={(e) => handleSelectResult(business, e)} // העברת האיבנט
-              >
-                <div className="search-result-top-row">
-                  <div className="serach-business-header">
-                    <span className="serach-business-name">{highlightMatch(business.name)}</span>
-                    {business.categoryName && (
-                      <span className="serach-business-category-pill">
-                        {highlightMatch(business.categoryName)}
-                      </span>
-                    )}
-                  </div>
-                  {renderTags(business.subCategoryIds)}
-                </div>
-                <div className="business-address">{highlightMatch(business.address)}</div>
+        {showDropdown && (
+          <ul
+            className="search-results-dropdown"
+            id="search-dropdown"
+            role="listbox"
+            ref={listRef}
+          >
+            {results.length === 0 ? (
+              <li className="no-results">
+                <svg className="no-results-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M9.5 3a6.5 6.5 0 0 1 5.2 10.4l5.15 5.15a1 1 0 0 1-1.42 1.42l-5.15-5.15A6.5 6.5 0 1 1 9.5 3Zm0 2a4.5 4.5 0 1 0 0 9a4.5 4.5 0 0 0 0-9Z"/>
+                </svg>
+                <div>לא נמצאו תוצאות תואמות</div>
               </li>
-            ))}
+            ) : (
+              results.map((business, index) => (
+                <li
+                  id={`result-${business._id}`}
+                  key={business._id}
+                  role="option"
+                  aria-selected={index === highlightedIndex}
+                  className={`search-result-item ${index === highlightedIndex ? 'highlighted' : ''}`}
+                  ref={(el) => itemRefs.current[index] = el}
+                  onMouseDown={() => handleSelectResult(business)}
+                >
+                  <div className="search-result-top-row">
+                    <div className="serach-business-header">
+                      <span className="serach-business-name">{highlightMatch(business.name)}</span>
+                      {business.categoryName && (
+                        <span className="serach-business-category-pill">
+                          {highlightMatch(business.categoryName)}
+                        </span>
+                      )}
+                    </div>
+                    {renderTags(business.subCategoryIds)}
+                  </div>
+                  <div className="business-address">{highlightMatch(business.address)}</div>
+                </li>
+              ))
+            )}
           </ul>
         )}
       </div>
@@ -157,7 +211,6 @@ const SearchBar = () => {
           <FaFilter />
         </button>
       </div>
-
     </div>
   );
 };

@@ -1,229 +1,263 @@
 .search-bar {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 0.625rem;
-    margin-bottom: 1.25rem;
-    position: relative;
-    z-index: 10; /* גבוה יותר מהטשטוש */
-  }
-  
-  .search-input-wrapper {
-    position: relative;
-    width: 80%;
-    max-width: 40rem;
-  }
-  
-  .search-input-wrapper input {
-    width: 100%;
-    padding: 0.5rem 1.875rem 0.5rem 0.625rem;
-    font-size: 1.25rem;
-    border-radius: 1.5625rem;
-    border: 1px solid #ccc;
-    direction: rtl;
-    transition: border 0.3s ease;
-  }
-  
-  .search-input-wrapper input:focus {
-    border-color: #ff4d4d;
-    outline: none;
-  }
-  
-  .search-icon {
-    position: absolute;
-    left: 0.625rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.125rem;
-    color: #888;
-    pointer-events: none;
-  }
-  
-  .filter-button-wrapper {
-    display: flex;
-    align-items: center;
-  }
-  
-  .filter-button {
-    padding: 0.5rem 0.75rem;
-    background-color: transparent;
-    color: #333;
-    border: 2px solid #333;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    font-size: 1.125rem;
-    display: flex;
-    align-items: center;
-  }
-  
-  .filter-button:hover {
-    background-color: #ff4d4d;
-    color: white;
-    border-color: #ff4d4d;
-  }
-  
-  .filter-button svg {
-    font-size: 1.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+  z-index: 10;
+}
 
-  }
+.search-input-wrapper {
+  position: relative;
+  width: 80%;
+  max-width: 40rem;
+}
 
-  
-  /* Dropdown styles */
-  .search-results-dropdown {
-    position: absolute;
-    top: calc(100% + 0.25rem);
-    left: 0;
-    width: 100%;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 0.5rem;
-    max-height: 300px;
-    overflow-y: auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    padding: 0.25rem 0;
-  }
-  
-  .search-result-item {
-    border-bottom: 1px solid #eee;
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    transition: background 0.2s ease;
-  }
-  
-  .search-result-item:last-child {
-    border-bottom: none;
-  }
-  
-  .search-result-item:hover {
-    background-color: #f9f9f9;
-  }
-  
-  .search-result-top-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between; /* או flex-start */
-    gap: 10px;
-  }
-  
-  .business-name,
+.search-input-wrapper input {
+  width: 100%;
+  padding: 0.5rem 1.875rem 0.5rem 0.625rem;
+  font-size: 1.25rem;
+  border-radius: 1.5625rem;
+  border: 1px solid #ccc;
+  direction: rtl;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-input-wrapper input:focus {
+  border-color: #ff4d4d;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.2);
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.625rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.125rem;
+  color: #888;
+  pointer-events: none;
+}
+
+.filter-button-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.filter-button {
+  padding: 0.5rem 0.75rem;
+  background-color: transparent;
+  color: #333;
+  border: 2px solid #333;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 1.125rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.filter-button:hover {
+  background-color: #ff4d4d;
+  color: white;
+  border-color: #ff4d4d;
+}
+
+.filter-button svg {
+  font-size: 1.25rem;
+}
+
+/* Dropdown styles */
+.search-results-dropdown {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 0.75rem;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  z-index: 10;
+  padding: 0.25rem 0;
+}
+
+.search-result-item {
+  border-bottom: 1px solid #f1f1f1;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: background 0.2s ease;
+}
+
+.search-result-item:hover,
+.search-result-item.highlighted {
+  background-color: #fff6f6;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-top-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.business-name,
 .business-category {
   font-size: 16px;
   margin-inline-end: 10px;
 }
-  
-  .business-address,
-  .business-description {
-    font-size: 0.9rem;
-    color: #555;
-  }
-  
-  /* תגיות */
-  .tags-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start; /* יישור לשמאל בתוך הדיב */
+
+.business-address,
+.business-description {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* תגיות */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 6px;
+  margin-inline-start: auto;
+}
+
+.search-tag {
+  border: 1px solid #ff4d4d;
+  background-color: white;
+  color: black;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  white-space: nowrap;
+  margin-inline-start: 4px;
+}
+
+.search-tag strong {
+  color: #ff4d4d;
+}
+
+.search-tag.extra-tag {
+  background-color: #fff0f0;
+  border-color: darkred;
+  font-weight: bold;
+}
+
+/* Highlighting */
+.search-results-dropdown strong {
+  color: #ff4d4d;
+  font-weight: bold;
+}
+
+.serach-business-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.serach-business-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #222;
+}
+
+.serach-business-category-pill {
+  background-color: #f2f2f2;
+  color: #666;
+  padding: 3px 10px;
+  font-size: 0.8rem;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+/* אפקט טשטוש */
+body.blurred::before {
+  content: "";
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
+  backdrop-filter: blur(5px);
+  background-color: rgba(255, 255, 255, 0.1);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* פריט מסומן */
+.highlighted {
+  background: #fff0f0;
+}
+
+/* שורת אין תוצאות */
+.no-results {
+  padding: 2rem 1rem;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #999;
+  background-color: #fafafa;
+  border-top: 1px solid #eee;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.no-results-icon {
+  width: 48px;
+  height: 48px;
+  color: #ccc;
+}
+
+
+/* מובייל */
+@media (max-width: 767px) {
+  .search-bar {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
     align-items: center;
-    gap: 6px;
-    margin-inline-start: auto; /* מביא את זה לשמאל בשורה אם RTL */
-  }
-  
-  .search-tag {
-    border: 1px solid red;
-    background-color: white;
-    color: black;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    white-space: nowrap;
-    margin-inline-start: 4px;
-  }
-  
-  .search-tag strong {
-    color: red;
-  }
-  
-  .search-tag.extra-tag {
-    background-color: #fff0f0;
-    border-color: darkred;
-  }
-  
-  
-  /* Highlighting */
-  .search-results-dropdown strong {
-    color: #ff4d4d;
-    font-weight: bold;
-  }
-  
-  .serach-business-header {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
     gap: 0.5rem;
+    margin-top: 30px;
+    margin-bottom: 5px;
   }
-  
-  .serach-business-name {
-    font-weight: 600;
+
+  .search-input-wrapper {
+    width: 100%;
+  }
+
+  .search-input-wrapper input {
+    padding: 0.5rem 1rem;
     font-size: 1rem;
-    color: #222;
   }
-  
-  .serach-business-category-pill {
-    background-color: #f2f2f2;
-    color: #666;
-    padding: 2px 10px;
-    font-size: 0.8rem;
-    border-radius: 12px;
-    white-space: nowrap;
+
+  .search-icon {
+    left: 0.5rem;
+    font-size: 1rem;
   }
-  body.blurred::before {
-    content: "";
-    position: fixed;
-    top: 0; right: 0; bottom: 0; left: 0;
-    backdrop-filter: blur(5px);
-    background-color: rgba(255, 255, 255, 0.1);
-    z-index: 1; /* נמוך */
-    pointer-events: none;
+
+  .filter-button-wrapper {
+    flex-shrink: 0;
   }
-  
-  
-  /* Mobile support */
-  @media (max-width: 767px) {
-    .search-bar {
-      flex-direction: row;
-      flex-wrap: nowrap;
-      justify-content: center;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 30px;
-      margin-bottom: 5px;
-    }
-  
-    .search-input-wrapper {
-      width: 100%;
-    }
-  
-    .search-input-wrapper input {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-    }
-  
-    .search-icon {
-      left: 0.5rem;
-      font-size: 1rem;
-    }
-  
-    .filter-button-wrapper {
-      flex-shrink: 0;
-    }
-  
-    .filter-button {
-      font-size: 1rem;
-      padding: 0.5rem 1rem;
-    }
+
+  .filter-button {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
   }
-  
+
+  .search-results-dropdown {
+    max-height: 50vh;
+  }
+}
