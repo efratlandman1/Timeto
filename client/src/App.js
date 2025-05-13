@@ -8,26 +8,22 @@ import Header from './components/Header';
 import RegistrationPage from "./components/RegistrationPage";
 import GlobalStyles from './GlobalStyles';
 import AdvancedSearchPage from './components/AdvancedSearchPage';
-import SearchResultPage from './components/SearchResultPage';  // הוסף את הדף החדש
+import SearchResultPage from './components/SearchResultPage';
 import FeedbackPage from './components/FeedbackPage' ;
 import BusinessProfilePage from './components/BusinessProfilePage';
-
+import { useDispatch } from 'react-redux';
+import { setUser } from './redux/userSlice';
 
 
 function App() {
-    const getToken = () => {
-        const cookie = document.cookie.split('; ').find(row => row.startsWith('token='));
-        return cookie ? cookie.split('=')[1] : null;
-    };
-
     return (
         <Router>
             <GlobalStyles />
             <Header />
             <Routes>
                 <Route path="/" element={<MainPage />} />
-                <Route path="/edit" element={getToken() ? <EditBusinessPage /> : <Navigate to="/login" />} />
-                <Route path="/user-businesses" element={getToken() ? <UserBusinessPage /> : <Navigate to="/login" />} />
+                <Route path="/edit" element={<EditBusinessPage />} />
+                <Route path="/user-businesses" element={<UserBusinessPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegistrationPage />} />
                 <Route path="/advanced-search-page" element={<AdvancedSearchPage />} />
