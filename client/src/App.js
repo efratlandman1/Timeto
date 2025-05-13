@@ -16,26 +16,14 @@ import { setUser } from './redux/userSlice';
 
 
 function App() {
-    const dispatch = useDispatch();
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      // ?  document.cookie = `token=${user.token}`;
-        dispatch(setUser({user: user}));
-    }
-
-    const getToken = () => {
-        const cookie = document.cookie.split('; ').find(row => row.startsWith('token='));
-        return cookie ? cookie.split('=')[1] : null;
-    };
-
     return (
         <Router>
             <GlobalStyles />
             <Header />
             <Routes>
                 <Route path="/" element={<MainPage />} />
-                <Route path="/edit" element={getToken() ? <EditBusinessPage /> : <LoginPage/>} />
-                <Route path="/user-businesses" element={getToken() ? <UserBusinessPage /> : <LoginPage/>} />
+                <Route path="/edit" element={<EditBusinessPage />} />
+                <Route path="/user-businesses" element={<UserBusinessPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegistrationPage />} />
                 <Route path="/advanced-search-page" element={<AdvancedSearchPage />} />
