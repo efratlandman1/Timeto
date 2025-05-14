@@ -1,21 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import BusinessCard from './BusinessCard';
 import axios from 'axios';
 import '../styles/SearchResultPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
-// import { FaSearch, FaFilter } from 'react-icons/fa';
 import SearchBar from './SearchBar';
+import { FaChevronDown } from 'react-icons/fa'; // 👈 הוספת אייקון
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 8;
+
+const SORT_OPTIONS = {
+    rating: 'דירוג',
+    name: 'שם העסק',
+    distance: 'מרחק'
+};
 
 const SearchResultPage = () => {
     const [businesses, setBusinesses] = useState([]);
-    // const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [showSortOptions, setShowSortOptions] = useState(false);
 
     const navigate = useNavigate();
     const location = useLocation();
+    const sortRef = useRef(null);
 
     const urlParams = new URLSearchParams(location.search);
     const filters = {};
@@ -31,6 +38,8 @@ const SearchResultPage = () => {
         }
     }
 
+    const currentSort = urlParams.get("sort") || "rating";
+
     useEffect(() => {
         const fetchBusinesses = async () => {
             try {
@@ -38,7 +47,8 @@ const SearchResultPage = () => {
                     params: {
                         ...filters,
                         page: currentPage,
-                        limit: ITEMS_PER_PAGE
+                        limit: ITEMS_PER_PAGE,
+                        sort: currentSort
                     }
                 });
                 setBusinesses(res.data.data || []);
@@ -50,23 +60,6 @@ const SearchResultPage = () => {
 
         fetchBusinesses();
     }, [location.search, currentPage]);
-
-    // const handleSearch = () => {
-    //     // סינון מקומי על שם העסק בלבד
-    //     if (searchQuery) {
-    //         const filtered = businesses.filter(b =>
-    //             b.name.toLowerCase().includes(searchQuery.toLowerCase())
-    //         );
-    //         setBusinesses(filtered);
-    //     } else {
-    //         // נחזיר את הדאטה המלא מהשרת
-    //         setCurrentPage(1);
-    //     }
-    // };
-
-    // const handleAdvancedSearchClick = () => {
-    //     navigate('/advanced-search-page');
-    // };
 
     const removeFilter = (keyToRemove, valueToRemove = null) => {
         const newParams = new URLSearchParams(location.search);
@@ -97,50 +90,71 @@ const SearchResultPage = () => {
         setCurrentPage(page);
     };
 
+    const handleSortSelect = (sortKey) => {
+        const newParams = new URLSearchParams(location.search);
+        newParams.set("sort", sortKey);
+        setShowSortOptions(false);
+        navigate({ pathname: location.pathname, search: newParams.toString() });
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (sortRef.current && !sortRef.current.contains(e.target)) {
+                setShowSortOptions(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     return (
         <div className='main-page-container'>
-            {/* 'search-result-page-container' */}
-            {/* <div className="search-bar">
-                <div className="search-input-wrapper">
-                    <FaSearch className="search-icon" />
-                    <input
-                        type="text"
-                        placeholder="חיפוש חופשי"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyUp={handleSearch}
-                    />
-                </div>
-                <div className="filter-button-wrapper">
-                    <button onClick={handleAdvancedSearchClick} className="filter-button" title="חיפוש מורחב">
-                        <FaFilter />
-                    </button>
-                </div>
-            </div> */}
-
             <SearchBar />
 
             {Object.keys(filters).length > 0 && (
                 <div className="filters-container">
-                   {Object.entries(filters).map(([key, value]) => (
-                        key === 'q' || !value ? null : ( // הימנעי מיצירת תוויות עבור חיפוש חופשי ריק
+                    {Object.entries(filters).map(([key, value]) => (
+                        key === 'q' || key === 'sort' || !value ? null : (
                             Array.isArray(value) ? (
-                            value.map((val, idx) => (
-                                <div key={`${key}-${idx}`} className="filter-tag">
-                                {createLabel(key, val)}
-                                <span className="remove-filter" onClick={() => removeFilter(key, val)}>×</span>
-                                </div>
-                            ))
+                                value.map((val, idx) => (
+                                    <div key={`${key}-${idx}`} className="filter-tag">
+                                        {createLabel(key, val)}
+                                        <span className="remove-filter" onClick={() => removeFilter(key, val)}>×</span>
+                                    </div>
+                                ))
                             ) : (
-                            <div key={key} className="filter-tag">
-                                <span className="remove-filter" onClick={() => removeFilter(key)}>×</span>
-                                {createLabel(key, value)}
-                            </div>
+                                <div key={key} className="filter-tag">
+                                    {createLabel(key, value)}
+                                    <span className="remove-filter" onClick={() => removeFilter(key)}>×</span>
+                                </div>
                             )
                         )
-                        ))}
+                    ))}
                 </div>
             )}
+
+            <div className="sort-container" ref={sortRef}>
+                <div className="sort-label" onClick={() => setShowSortOptions(prev => !prev)}>
+                    ממויין לפי {SORT_OPTIONS[currentSort] || "דירוג"}
+                    <FaChevronDown
+                        className={`sort-arrow ${showSortOptions ? 'open' : ''}`}
+                        style={{ marginRight: '8px', color: 'red' }}
+                    />
+                </div>
+                {showSortOptions && (
+                    <div className="sort-options">
+                        {Object.entries(SORT_OPTIONS).map(([key, label]) => (
+                            <div
+                                key={key}
+                                className="sort-option"
+                                onClick={() => handleSortSelect(key)}
+                            >
+                                {label}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
 
             <div className="card-slider">
                 {businesses.map((business) => (

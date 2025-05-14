@@ -78,6 +78,7 @@ const updateBusiness = async (req, res, userId) => {
 //         res.status(500).json({message: err.message});
 //     }
 // };
+const DEFAULT_ITEMS_PER_PAGE = 8; // הגדרת ברירת מחדל
 
 exports.getItems = async (req, res) => {
     try {
@@ -85,53 +86,24 @@ exports.getItems = async (req, res) => {
 
         const { q, categoryName, subcategories, rating } = req.query;
 
-        // === חיפוש חופשי אם קיים q ===
-        if (q && q.trim().length > 0) {
-            const regex = new RegExp(q, 'i'); // Case-insensitive
+        // מיפוי אפשרויות מיון
+        const SORT_FIELDS = {
+            rating: { rating: -1 },
+            name: { name: 1 },
+            distance: { distance: 1 }
+        };
 
-            const matchingCategories = await Category.find({ name: regex });
-            const categoryIds = matchingCategories.map(cat => cat._id);
+        const sort = req.query.sort || 'rating';
+        const sortOption = SORT_FIELDS[sort] || { rating: -1 };
 
-            const businesses = await Business.find({
-                $or: [
-                    { name: regex },
-                    { address: regex },
-                    { email: regex },
-                    { phone: { $regex: q } },
-                    { categoryId: { $in: categoryIds } },
-                    { subCategoryIds: { $in: [regex] } }
-                ]
-            })
-                .limit(10)
-                .populate('categoryId', 'name');
-
-            const results = businesses.map(business => {
-                const businessObj = business.toObject();
-                businessObj.categoryName = business.categoryId?.name || '';
-                return businessObj;
-            });
-
-            return res.json({
-                data: results,
-                pagination: {
-                    total: results.length,
-                    page: 1,
-                    limit: results.length,
-                    totalPages: 1
-                }
-            });
-        }
-
-        // === סינון רגיל אם אין q ===
         const query = {};
 
-        // אם יש שם קטגוריה, מצא אותה ובצע סינון לפי categoryId
+        // סינון לפי קטגוריה
         if (categoryName) {
             const category = await Category.findOne({ name: categoryName });
             if (category) {
                 query.categoryId = category._id;
             } else {
-                console.log("Category not found:", categoryName);
                 return res.json({
                     data: [],
                     pagination: {
@@ -144,31 +116,30 @@ exports.getItems = async (req, res) => {
             }
         }
 
-        // סינון לפי תתי קטגוריות אם קיימים
+        // סינון לפי תתי קטגוריות
         if (subcategories) {
             const serviceList = Array.isArray(subcategories) ? subcategories : [subcategories];
             query.subCategoryIds = { $all: serviceList };
         }
 
-        // סינון לפי רייטינג - אם קיים, לחפש את כל העסקים עם רייטינג >= הרייטינג שניתן
+        // סינון לפי דירוג
         if (rating) {
             query.rating = { $gte: Number(rating) };
         }
 
         const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || 6;
+        const limit = Number(req.query.limit) || DEFAULT_ITEMS_PER_PAGE;
         const skip = (page - 1) * limit;
-        console.log('query:', query);
 
-        // מבצע את השאילתה ומחזיר את העסקים והתוצאה
         const [businesses, total] = await Promise.all([
             Business.find(query)
+                .sort(sortOption)
                 .skip(skip)
                 .limit(limit)
                 .populate('categoryId', 'name'),
             Business.countDocuments(query)
         ]);
-        console.log("Businesses found:", businesses);
+
         const results = businesses.map(business => {
             const businessObj = business.toObject();
             businessObj.categoryName = business.categoryId?.name || '';
@@ -190,9 +161,6 @@ exports.getItems = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
-
-    
-
 
 
 exports.getUserBusinesses = async (req, res) => {
