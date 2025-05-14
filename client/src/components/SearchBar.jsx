@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaSearch, FaFilter } from 'react-icons/fa';
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
 import '../styles/SearchBar.css';
 
@@ -8,10 +9,34 @@ const SearchBar = () => {
   const [results, setResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const navigate = useNavigate();
   const wrapperRef = useRef();
   const listRef = useRef();
   const itemRefs = useRef([]);
+
+  const fetchResults = async (query, pageNum = 1, append = false) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses?q=${encodeURIComponent(query)}&page=${pageNum}`);
+      const data = await res.json();
+      const newResults = data.data || [];
+
+      setHasMore(data.hasMore !== undefined ? data.hasMore : newResults.length >= 10);
+      if (append) {
+        setResults((prev) => [...prev, ...newResults]);
+      } else {
+        setResults(newResults);
+      }
+      setShowDropdown(true);
+      setHighlightedIndex(-1);
+    } catch (error) {
+      console.error('שגיאה בטעינת תוצאות:', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -20,7 +45,6 @@ const SearchBar = () => {
         setShowDropdown(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [searchQuery]);
@@ -35,19 +59,13 @@ const SearchBar = () => {
     const delayDebounce = setTimeout(() => {
       const query = searchQuery.trim();
       if (query) {
-        fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses?q=${encodeURIComponent(query)}`)
-          .then((res) => res.json())
-          .then((data) => {
-            setResults(data.data || []);
-            setShowDropdown(true);
-            setHighlightedIndex(-1);
-          });
+        setPage(1);
+        fetchResults(query, 1);
       } else {
         setResults([]);
         setShowDropdown(false);
       }
     }, 300);
-
     return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
 
@@ -60,20 +78,35 @@ const SearchBar = () => {
     }
   }, [highlightedIndex]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const dropdown = listRef.current;
+      if (
+        dropdown &&
+        hasMore &&
+        !isLoadingMore &&
+        dropdown.scrollTop + dropdown.clientHeight >= dropdown.scrollHeight - 50
+      ) {
+        handleLoadMore();
+      }
+    };
+
+    const dropdown = listRef.current;
+    if (dropdown) dropdown.addEventListener('scroll', handleScroll);
+    return () => {
+      if (dropdown) dropdown.removeEventListener('scroll', handleScroll);
+    };
+  }, [hasMore, isLoadingMore, results]);
+
   const triggerSearch = () => {
     const query = searchQuery.trim();
-    if (query) {
-      navigate(`/search-results?q=${encodeURIComponent(query)}`);
-    } else {
-      navigate(`/search-results`);
-    }
+    navigate(query ? `/search-results?q=${encodeURIComponent(query)}` : `/search-results`);
     document.body.classList.remove('blurred');
-    setShowDropdown(false); // סגירת הרשימה אחרי ביצוע חיפוש
+    setShowDropdown(false);
   };
 
   const handleKeyDown = (e) => {
     if (!showDropdown || results.length === 0) return;
-
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
@@ -90,15 +123,23 @@ const SearchBar = () => {
         } else {
           triggerSearch();
         }
-        setShowDropdown(false); // סגירת הרשימה אחרי לחיצה על Enter
+        setShowDropdown(false);
         break;
       case 'Escape':
-        setShowDropdown(false); // סגירת הרשימה אחרי לחיצה על Escape
-        document.body.classList.remove('blurred'); // הסרת ה-blur מידית
+        setShowDropdown(false);
+        document.body.classList.remove('blurred');
         break;
       default:
         break;
     }
+  };
+
+  const handleLoadMore = () => {
+    if (!hasMore || isLoadingMore) return;
+    const nextPage = page + 1;
+    setIsLoadingMore(true);
+    setPage(nextPage);
+    fetchResults(searchQuery.trim(), nextPage, true);
   };
 
   const handleBlur = () => {
@@ -166,12 +207,7 @@ const SearchBar = () => {
         />
 
         {showDropdown && (
-          <ul
-            className="search-results-dropdown"
-            id="search-dropdown"
-            role="listbox"
-            ref={listRef}
-          >
+          <ul className="search-results-dropdown" id="search-dropdown" role="listbox" ref={listRef}>
             {results.length === 0 ? (
               <li className="no-results">
                 <svg className="no-results-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -180,41 +216,46 @@ const SearchBar = () => {
                 <div>לא נמצאו תוצאות תואמות</div>
               </li>
             ) : (
-              results.map((business, index) => (
-                <li
-                  id={`result-${business._id}`}
-                  key={business._id}
-                  role="option"
-                  aria-selected={index === highlightedIndex}
-                  className={`search-result-item ${index === highlightedIndex ? 'highlighted' : ''}`}
-                  ref={(el) => itemRefs.current[index] = el}
-                  onMouseDown={() => handleSelectResult(business)}
-                >
-                  <div className="search-result-top-row">
-                    <div className="serach-business-header">
-                      <span className="serach-business-name">{highlightMatch(business.name)}</span>
-                      {business.categoryName && (
-                        <span className="serach-business-category-pill">
-                          {highlightMatch(business.categoryName)}
-                        </span>
-                      )}
+              <>
+                {results.map((business, index) => (
+                  <li
+                    id={`result-${business._id}`}
+                    key={business._id}
+                    role="option"
+                    aria-selected={index === highlightedIndex}
+                    className={`search-result-item ${index === highlightedIndex ? 'highlighted' : ''}`}
+                    ref={(el) => itemRefs.current[index] = el}
+                    onClick={() => handleSelectResult(business)}
+                  >
+                    <div className="search-result-top-row">
+                      <div className="serach-business-header">
+                        <span className="serach-business-name">{highlightMatch(business.name)}</span>
+                        {business.categoryName && (
+                          <span className="serach-business-category-pill">
+                            {highlightMatch(business.categoryName)}
+                          </span>
+                        )}
+                      </div>
+                      {renderTags(business.subCategoryIds)}
                     </div>
-                    {renderTags(business.subCategoryIds)}
-                  </div>
-                  <div className="business-address">{highlightMatch(business.address)}</div>
-                </li>
-              ))
+                    <div className="business-address">{highlightMatch(business.address)}</div>
+                  </li>
+                ))}
+                {isLoadingMore && (
+                  <li className="load-more-item">
+                    <div className="loading-spinner red">
+                      <AiOutlineLoading3Quarters className="spinner-icon spin" />
+                    </div>
+                  </li>
+                )}
+              </>
             )}
           </ul>
         )}
       </div>
 
       <div className="filter-button-wrapper">
-        <button
-          onClick={handleAdvancedSearchClick}
-          className="filter-button"
-          title="חיפוש מורחב"
-        >
+        <button onClick={handleAdvancedSearchClick} className="filter-button" title="חיפוש מורחב">
           <FaFilter />
         </button>
       </div>
