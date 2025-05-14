@@ -41,8 +41,12 @@ const SearchBar = () => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        triggerSearch();
-        setShowDropdown(false);
+        // אל תעדכן את ה-URL או תבצע חיפוש מחדש אם כבר יש חיפוש
+        if (searchQuery.trim()) {
+          setShowDropdown(false);  // רק נסגור את הדפדפן, לא נבצע חיפוש מחדש
+        } else {
+          setShowDropdown(false);  // אם אין חיפוש, נסגור את הדפדפן
+        }
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
