@@ -86,7 +86,6 @@ exports.getItems = async (req, res) => {
 
         const { q, categoryName, subcategories, rating } = req.query;
 
-        // מיפוי אפשרויות מיון
         const SORT_FIELDS = {
             rating: { rating: -1 },
             name: { name: 1 },
@@ -96,14 +95,66 @@ exports.getItems = async (req, res) => {
         const sort = req.query.sort || 'rating';
         const sortOption = SORT_FIELDS[sort] || { rating: -1 };
 
+        
+        // === חיפוש חופשי אם קיים q ===
+        if (q && q.trim().length > 0) {
+            const regex = new RegExp(q, 'i'); // Case-insensitive
+
+            const matchingCategories = await Category.find({ name: regex });
+            const categoryIds = matchingCategories.map(cat => cat._id);
+
+            const searchConditions = {
+                $or: [
+                    { name: regex },
+                    { address: regex },
+                    { email: regex },
+                    { phone: { $regex: q } },
+                    { categoryId: { $in: categoryIds } },
+                    { subCategoryIds: { $in: [regex] } }
+                ]
+            };
+
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || DEFAULT_ITEMS_PER_PAGE;
+            const skip = (page - 1) * limit;
+
+            const [businesses, total] = await Promise.all([
+                Business.find(searchConditions)
+                    .sort(sortOption)
+                    .skip(skip)
+                    .limit(limit)
+                    .populate('categoryId', 'name'),
+                Business.countDocuments(searchConditions)
+            ]);
+
+            const results = businesses.map(business => {
+                const businessObj = business.toObject();
+                businessObj.categoryName = business.categoryId?.name || '';
+                return businessObj;
+            });
+
+            return res.json({
+                    data: results,
+                    pagination: {
+                        total,
+                        page,
+                        limit,
+                        totalPages: Math.ceil(total / limit),
+                        hasMore: page < Math.ceil(total / limit)
+                    }
+                });
+        }
+
+        // === סינון רגיל אם אין q ===
         const query = {};
 
-        // סינון לפי קטגוריה
+        // אם יש שם קטגוריה, מצא אותה ובצע סינון לפי categoryId
         if (categoryName) {
             const category = await Category.findOne({ name: categoryName });
             if (category) {
                 query.categoryId = category._id;
             } else {
+                console.log("Category not found:", categoryName);
                 return res.json({
                     data: [],
                     pagination: {
@@ -116,13 +167,13 @@ exports.getItems = async (req, res) => {
             }
         }
 
-        // סינון לפי תתי קטגוריות
+        // סינון לפי תתי קטגוריות אם קיימים
         if (subcategories) {
             const serviceList = Array.isArray(subcategories) ? subcategories : [subcategories];
             query.subCategoryIds = { $all: serviceList };
         }
 
-        // סינון לפי דירוג
+        // סינון לפי רייטינג - אם קיים, לחפש את כל העסקים עם רייטינג >= הרייטינג שניתן
         if (rating) {
             query.rating = { $gte: Number(rating) };
         }
@@ -130,16 +181,18 @@ exports.getItems = async (req, res) => {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || DEFAULT_ITEMS_PER_PAGE;
         const skip = (page - 1) * limit;
+        console.log('query:', query);
 
+        // מבצע את השאילתה ומחזיר את העסקים והתוצאה
         const [businesses, total] = await Promise.all([
             Business.find(query)
-                .sort(sortOption)
+                .sort(sortOption)    
                 .skip(skip)
                 .limit(limit)
                 .populate('categoryId', 'name'),
             Business.countDocuments(query)
         ]);
-
+        console.log("Businesses found:", businesses);
         const results = businesses.map(business => {
             const businessObj = business.toObject();
             businessObj.categoryName = business.categoryId?.name || '';
@@ -152,7 +205,8 @@ exports.getItems = async (req, res) => {
                 total,
                 page,
                 limit,
-                totalPages: Math.ceil(total / limit)
+                totalPages: Math.ceil(total / limit),
+                hasMore: page < Math.ceil(total / limit)
             }
         });
 
@@ -162,6 +216,7 @@ exports.getItems = async (req, res) => {
     }
 };
 
+    
 
 exports.getUserBusinesses = async (req, res) => {
     try {

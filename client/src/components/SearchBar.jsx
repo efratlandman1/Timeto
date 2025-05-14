@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaSearch, FaFilter } from 'react-icons/fa';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/SearchBar.css';
 
 const SearchBar = () => {
@@ -16,6 +16,9 @@ const SearchBar = () => {
   const wrapperRef = useRef();
   const listRef = useRef();
   const itemRefs = useRef([]);
+  const location = useLocation();
+
+  const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
   const fetchResults = async (query, pageNum = 1, append = false) => {
     try {
@@ -23,10 +26,11 @@ const SearchBar = () => {
       const data = await res.json();
       const newResults = data.data || [];
 
-      setHasMore(data.hasMore !== undefined ? data.hasMore : newResults.length >= 10);
+      setHasMore(data.hasMore ?? newResults.length > 0);
       if (append) {
         setResults((prev) => [...prev, ...newResults]);
       } else {
+        itemRefs.current = [];
         setResults(newResults);
       }
       setShowDropdown(true);
@@ -41,22 +45,16 @@ const SearchBar = () => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        // אל תעדכן את ה-URL או תבצע חיפוש מחדש אם כבר יש חיפוש
-        if (searchQuery.trim()) {
-          setShowDropdown(false);  // רק נסגור את הדפדפן, לא נבצע חיפוש מחדש
-        } else {
-          setShowDropdown(false);  // אם אין חיפוש, נסגור את הדפדפן
-        }
+        setShowDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [searchQuery]);
+  }, []);
 
   useEffect(() => {
-    const body = document.body;
-    showDropdown ? body.classList.add('blurred') : body.classList.remove('blurred');
-    return () => body.classList.remove('blurred');
+    document.body.classList.toggle('blurred', showDropdown);
+    return () => document.body.classList.remove('blurred');
   }, [showDropdown]);
 
   useEffect(() => {
@@ -83,24 +81,28 @@ const SearchBar = () => {
   }, [highlightedIndex]);
 
   useEffect(() => {
+    const dropdown = listRef.current;
+    if (!dropdown) return;
+
     const handleScroll = () => {
-      const dropdown = listRef.current;
-      if (
-        dropdown &&
-        hasMore &&
-        !isLoadingMore &&
-        dropdown.scrollTop + dropdown.clientHeight >= dropdown.scrollHeight - 50
-      ) {
+      if (hasMore && !isLoadingMore && dropdown.scrollTop + dropdown.clientHeight >= dropdown.scrollHeight - 50) {
         handleLoadMore();
       }
     };
 
-    const dropdown = listRef.current;
-    if (dropdown) dropdown.addEventListener('scroll', handleScroll);
-    return () => {
-      if (dropdown) dropdown.removeEventListener('scroll', handleScroll);
-    };
-  }, [hasMore, isLoadingMore, results]);
+    dropdown.addEventListener('scroll', handleScroll);
+    return () => dropdown.removeEventListener('scroll', handleScroll);
+  }, [hasMore, isLoadingMore]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get('q');
+    if (q) {
+      setSearchQuery(q);
+      fetchResults(q, 1);
+      setShowDropdown(false);
+    }
+  }, []);
 
   const triggerSearch = () => {
     const query = searchQuery.trim();
@@ -112,23 +114,27 @@ const SearchBar = () => {
   const handleKeyDown = (e) => {
     if (!showDropdown || results.length === 0) return;
     switch (e.key) {
-      case 'ArrowDown':
+      case 'ArrowDown': {
         e.preventDefault();
-        setHighlightedIndex((prev) => (prev + 1) % results.length);
+        const nextIndex = highlightedIndex + 1;
+        if (nextIndex < results.length) setHighlightedIndex(nextIndex);
         break;
-      case 'ArrowUp':
+      }
+      case 'ArrowUp': {
         e.preventDefault();
-        setHighlightedIndex((prev) => (prev - 1 + results.length) % results.length);
+        const prevIndex = highlightedIndex - 1;
+        if (prevIndex >= 0) setHighlightedIndex(prevIndex);
         break;
-      case 'Enter':
+      }
+      case 'Enter': {
         e.preventDefault();
         if (highlightedIndex >= 0 && results[highlightedIndex]) {
           handleSelectResult(results[highlightedIndex]);
         } else {
           triggerSearch();
         }
-        setShowDropdown(false);
         break;
+      }
       case 'Escape':
         setShowDropdown(false);
         document.body.classList.remove('blurred');
@@ -146,13 +152,6 @@ const SearchBar = () => {
     fetchResults(searchQuery.trim(), nextPage, true);
   };
 
-  const handleBlur = () => {
-    setTimeout(() => {
-      triggerSearch();
-      setShowDropdown(false);
-    }, 150);
-  };
-
   const handleAdvancedSearchClick = () => {
     navigate('/advanced-search-page');
   };
@@ -165,7 +164,9 @@ const SearchBar = () => {
   };
 
   const highlightMatch = (text) => {
-    const parts = text?.split(new RegExp(`(${searchQuery})`, 'gi')) || [];
+    if (!text) return null;
+    const escapedQuery = escapeRegExp(searchQuery);
+    const parts = text.split(new RegExp(`(${escapedQuery})`, 'gi'));
     return parts.map((part, i) =>
       part.toLowerCase() === searchQuery.toLowerCase() ? <strong key={i}>{part}</strong> : part
     );
@@ -179,7 +180,7 @@ const SearchBar = () => {
     return (
       <div className="tags-container">
         {displayTags.map((tag, i) => (
-          <span key={i} className="search-tag">{highlightMatch(tag)}</span>
+          <span key={tag + i} className="search-tag">{highlightMatch(tag)}</span>
         ))}
         {extraCount > 0 && <span className="search-tag extra-tag">+{extraCount}</span>}
       </div>
@@ -195,10 +196,16 @@ const SearchBar = () => {
           placeholder="חיפוש חופשי"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={handleBlur}
           onFocus={() => {
             if (searchQuery.trim() && results.length > 0) setShowDropdown(true);
+          }}
+          onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+          onKeyDown={(e) => {
+            if (e.key === 'Tab') {
+              triggerSearch();
+            } else {
+              handleKeyDown(e);
+            }
           }}
           aria-haspopup="listbox"
           aria-expanded={showDropdown}
