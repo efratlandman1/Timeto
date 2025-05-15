@@ -8,4 +8,4 @@ const CategorySchema = new mongoose.Schema({
     logo: { type: String, required: true }
 });
 
-module.exports = mongoose.model('categoty', CategorySchema);
+module.exports = mongoose.model('categories', CategorySchema);

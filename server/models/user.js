@@ -11,6 +11,6 @@ const usersSchema = new mongoose.Schema({
     timestamps: true  // הוספת השדות createdAt ו- updatedAt אוטומטית
   });
 
-const Users = mongoose.model('user', usersSchema);
+const Users = mongoose.model('users', usersSchema);
 
 module.exports = Users;

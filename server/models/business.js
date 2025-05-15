@@ -12,9 +12,9 @@ const businessSchema = new mongoose.Schema({
     // subCategoryIds: [String],
     // // active: { type: Boolean, required: true },
     // userId: String
-    categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'category', required: true },
-    services: [{ type: mongoose.Schema.Types.ObjectId, ref: 'service' }],
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true }
+    categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'categories', required: true },
+    services: [{ type: mongoose.Schema.Types.ObjectId, ref: 'services' }],
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true }
 });
 
 const Business = mongoose.model('businesses', businessSchema);
