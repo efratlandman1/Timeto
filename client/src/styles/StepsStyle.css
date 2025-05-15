@@ -57,6 +57,7 @@
     text-align: center;
     transition: all 0.3s ease;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    width: 50% 
   }
   
   .button.file-upload:hover {
@@ -93,6 +94,16 @@
     display: flex;
     flex-direction: column;
     text-align: right;
+    
+  }
+
+   .form-group-logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-align: right;
+    
   }
   
   .form-group label {
@@ -259,6 +270,7 @@
     cursor: pointer;
     font-size: 16px;
     transition: background 0.3s ease;
+    
   }
   
   .upload-button:hover {
@@ -280,4 +292,49 @@
   .next-button:hover {
     background-color: #c92c37;
   }
-  
+  .logo-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* רווח בין כפתור העלאת לוגו לכפתור הסרה */
+  margin-top: 8px;
+}
+
+.logo-preview-wrapper {
+  position: relative;
+  display: inline-block; /* מתאים למידות התמונה */
+  margin-top: 10px;
+}
+
+.remove-logo-button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  transition: background-color 0.3s ease;
+  z-index: 10;
+}
+
+.remove-logo-button:hover {
+  background-color: #b02a37;
+}
+
+.business-logo-preview {
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 8px;
+  object-fit: contain;
+  border: 1px solid #ddd;
+  display: block;
+}
