@@ -6,8 +6,7 @@ const jwtAuthMiddleware = (req, res, next) => {
         '/api/v1/login',
         '/api/v1/register',
         '/api/v1/businesses',
-        '/api/v1/categories',
-        // '/api/v1/services/byCategory/'//delete!
+        '/api/v1/categories'
 
 
     ];
