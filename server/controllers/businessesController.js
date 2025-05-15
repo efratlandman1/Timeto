@@ -83,34 +83,61 @@ const updateBusiness = async (req, res, userId) => {
 // };
 
 
+exports.getUserBusinesses = async (req, res) => {
+    try {
+         const token = req.headers['authorization']?.split(' ')[1];
+         console.log(token);
+        let userId = AuthUtils.extractUserId(token);
+        console.log(userId);
+        const business = await Business.find({userId: userId});
+        res.status(200).json(business);
+    } catch (err) {
+        res.status(500).json({message: err.message});
+    }
+};
+
+
 exports.getItems = async (req, res) => {
   try {
     console.log("Received query params:", req.query);
 
-    const { categoryName, subcategories, rating } = req.query;
+    const { categoryName, services, rating } = req.query;
     const query = {};
 
+    // טיפול בקטגוריה לפי שם
     if (categoryName) {
       const category = await Category.findOne({ name: categoryName });
       if (category) {
         query.categoryId = category._id;
       } else {
-        console.log("Category not found");
+        return res.status(404).json({ message: "Category not found" });
       }
     }
 
-    if (subcategories) {
-      const serviceList = Array.isArray(subcategories) ? subcategories : [subcategories];
-      query.services = { $all: serviceList.map(id => mongoose.Types.ObjectId(id)) };
+    // טיפול בשירותים (services)
+    if (services) {
+      const serviceList = Array.isArray(services) ? services : [services];
+
+      const validServiceIds = serviceList
+        .filter(id => mongoose.Types.ObjectId.isValid(id))
+        .map(id => mongoose.Types.ObjectId(id));
+
+      if (validServiceIds.length > 0) {
+        query.services = { $all: validServiceIds };
+      }
     }
 
+    // דירוג
     if (rating) {
       query.rating = { $gte: Number(rating) };
     }
 
+    // מידע על פאגינציה
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 6;
     const skip = (page - 1) * limit;
+
+    console.log("Final query:", query); // לוג לבדיקה
 
     const [businesses, total] = await Promise.all([
       Business.find(query)
@@ -130,23 +157,9 @@ exports.getItems = async (req, res) => {
         totalPages: Math.ceil(total / limit),
       },
     });
+
   } catch (err) {
     console.error("Error in getItems:", err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
-
-
-exports.getUserBusinesses = async (req, res) => {
-    try {
-         const token = req.headers['authorization']?.split(' ')[1];
-         console.log(token);
-        let userId = AuthUtils.extractUserId(token);
-        console.log(userId);
-        const business = await Business.find({userId: userId});
-        res.status(200).json(business);
-    } catch (err) {
-        res.status(500).json({message: err.message});
-    }
-};
-
