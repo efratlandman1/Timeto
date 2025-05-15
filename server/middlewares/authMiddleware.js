@@ -7,9 +7,13 @@ const jwtAuthMiddleware = (req, res, next) => {
         '/api/v1/register',
         '/api/v1/businesses',
         '/api/v1/categories',
+        // '/api/v1/services/byCategory/'//delete!
+
+
     ];
 
-    if (openRoutes.includes(req.path)) {
+    if (openRoutes.includes(req.path) ||
+        /^\/api\/v1\/services\/byCategory\/[^\/]+$/.test(req.path)) {  //delete!!!!!!!!!!!!!!
         return next(); // Allow access to open routes
     }
 
