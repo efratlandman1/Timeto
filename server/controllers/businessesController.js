@@ -29,7 +29,8 @@ const createBusiness = async (req, res, userId) => {
             description: req.body.description || '',
             userId: userId,
             address: req.body.address,
-            logo: req.file?.path || ''
+            // logo: req.file?.path || ''
+            logo: req.file?.filename  || ''
         });
 
         const savedItem = await newBusiness.save();
