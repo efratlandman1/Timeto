@@ -10,6 +10,7 @@ const usersRouter = require('./routes/usersRoutes');
 const businessesRouter = require('./routes/businessesRoutes');
 const authRouter = require('./routes/authRoutes');
 const categoryRoutes = require("./routes/categoryRoutes");
+const serviceRoutes = require('./routes/serviceRoutes');
 const jwtAuthMiddleware = require("./middlewares/authMiddleware");
 
 app.use(cors());
@@ -29,6 +30,7 @@ app.use(jwtAuthMiddleware)
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/businesses', businessesRouter);
 app.use("/api/v1/categories", categoryRoutes);
+app.use('/api/v1/services', serviceRoutes);
 app.use('/api/v1', authRouter);
 
 app.listen(PORT, () => {
