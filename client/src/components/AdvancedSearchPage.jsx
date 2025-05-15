@@ -27,14 +27,26 @@ const AdvancedSearchPage = () => {
         fetchCategories();
     }, []);
 
-    // עדכון שירותים כאשר נבחרת קטגוריה
+    // עדכון שירותים כאשר נבחרת קטגוריה - שיניתי לקרוא לשרת לשירותים לפי categoryId
     useEffect(() => {
         if (selectedCategory) {
             const category = categories.find(c => c.name === selectedCategory);
             if (category) {
-                const servicesList = category.subcategories.map(sub => sub.name);
-                setServices(servicesList);
+                const fetchServices = async () => {
+                    try {
+                        const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/services/byCategory/${category._id}`);
+                        setServices(response.data); // מניח שהשרת מחזיר מערך של שירותים
+                    } catch (error) {
+                        console.error("Error fetching services:", error);
+                        setServices([]);
+                    }
+                };
+                fetchServices();
+            } else {
+                setServices([]);
             }
+        } else {
+            setServices([]);
         }
     }, [selectedCategory, categories]);
 
@@ -42,7 +54,7 @@ const AdvancedSearchPage = () => {
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const existingCategory = params.get('categoryName');
-        const existingServices = params.getAll('subcategories');
+        const existingServices = params.getAll('services');
         const existingRating = params.get('rating') || 0;
 
         if (existingCategory) setSelectedCategory(existingCategory);
@@ -65,7 +77,7 @@ const AdvancedSearchPage = () => {
     const handleSubmit = () => {
         const queryParams = new URLSearchParams();
         if (selectedCategory) queryParams.append('categoryName', selectedCategory);
-        selectedServices.forEach(service => queryParams.append('subcategories', service));
+        selectedServices.forEach(service => queryParams.append('services', service));
         if (rating) queryParams.append('rating', rating);
         navigate(`/search-results?${queryParams.toString()}`);
     };
@@ -101,13 +113,14 @@ const AdvancedSearchPage = () => {
                         <div className="tags-container">
                         {services.map((service, idx) => (
                             <div
-                            key={idx}
-                            className={`tag selectable ${selectedServices.includes(service) ? 'selected' : ''}`}
-                            onClick={() => handleServiceClick(service)}
+                                key={service._id}
+                                className={`tag selectable ${selectedServices.includes(service.name) ? 'selected' : ''}`}
+                                onClick={() => handleServiceClick(service.name)}
                             >
-                            {service}
+                                {service.name}
                             </div>
-                        ))}
+                            ))}
+
                         </div>
                     </div>
                     )}
