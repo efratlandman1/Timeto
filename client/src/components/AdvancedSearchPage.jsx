@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { setServices } from '../redux/servicesSlice';
 import { FaStar } from 'react-icons/fa';
-import '../styles/BusinessProfilePage.css'; // שינוי ל-BusinessProfilePage.css
+import '../styles/BusinessProfilePage.css';
 
 const AdvancedSearchPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const dispatch = useDispatch();
 
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedServices, setSelectedServices] = useState([]);
-    const [services, setServices] = useState([]);
+    const [services, setServicesLocal] = useState([]);
     const [rating, setRating] = useState(0);
 
-    // שליפת קטגוריות מהשרת
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -27,7 +29,6 @@ const AdvancedSearchPage = () => {
         fetchCategories();
     }, []);
 
-    // עדכון שירותים כאשר נבחרת קטגוריה - שיניתי לקרוא לשרת לשירותים לפי categoryId
     useEffect(() => {
         if (selectedCategory) {
             const category = categories.find(c => c.name === selectedCategory);
@@ -35,22 +36,22 @@ const AdvancedSearchPage = () => {
                 const fetchServices = async () => {
                     try {
                         const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/services/byCategory/${category._id}`);
-                        setServices(response.data); // מניח שהשרת מחזיר מערך של שירותים
+                        setServicesLocal(response.data);
+                        // לא מעדכנים את רידקס כאן! רק ב-local state
                     } catch (error) {
                         console.error("Error fetching services:", error);
-                        setServices([]);
+                        setServicesLocal([]);
                     }
                 };
                 fetchServices();
             } else {
-                setServices([]);
+                setServicesLocal([]);
             }
         } else {
-            setServices([]);
+            setServicesLocal([]);
         }
     }, [selectedCategory, categories]);
 
-    // טעינת פרמטרים קיימים מה-URL
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const existingCategory = params.get('categoryName');
@@ -62,16 +63,26 @@ const AdvancedSearchPage = () => {
         if (existingRating) setRating(parseInt(existingRating, 10));
     }, [location.search]);
 
-    const handleStarClick = (value) => {
-        setRating(value);
-    };
+    const handleStarClick = (value) => setRating(value);
 
-    const handleServiceClick = (service) => {
-        setSelectedServices(prev =>
-            prev.includes(service)
-                ? prev.filter(s => s !== service)
-                : [...prev, service]
-        );
+    const handleServiceClick = (serviceName) => {
+        setSelectedServices(prev => {
+            let updatedServices;
+            if (prev.includes(serviceName)) {
+                updatedServices = prev.filter(s => s !== serviceName);
+            } else {
+                updatedServices = [...prev, serviceName];
+            }
+
+            // מעדכנים את הרידקס רק כאן, עם השירותים שנבחרו
+            const servicesToSet = services
+                .filter(service => updatedServices.includes(service.name))
+                .map(s => ({ id: s._id, name: s.name }));
+
+            dispatch(setServices(servicesToSet));
+
+            return updatedServices;
+        });
     };
 
     const handleSubmit = () => {
@@ -92,7 +103,6 @@ const AdvancedSearchPage = () => {
                 <button className="close-button" onClick={handleCancel}>×</button>
                 <h2>חיפוש מורחב</h2>
 
-                {/* קטגוריה */}
                 <div className="form-group">
                     <label>קטגוריה</label>
                     <select
@@ -106,26 +116,23 @@ const AdvancedSearchPage = () => {
                     </select>
                 </div>
 
-                {/* שירותים - תגים לבחירה */}
                 {services.length > 0 && (
                     <div className="form-group tags-section">
                         <label>שירותים</label>
                         <div className="tags-container">
-                        {services.map((service, idx) => (
-                            <div
-                                key={service._id}
-                                className={`tag selectable ${selectedServices.includes(service.name) ? 'selected' : ''}`}
-                                onClick={() => handleServiceClick(service.name)}
-                            >
-                                {service.name}
-                            </div>
+                            {services.map((service) => (
+                                <div
+                                    key={service._id}
+                                    className={`tag selectable ${selectedServices.includes(service.name) ? 'selected' : ''}`}
+                                    onClick={() => handleServiceClick(service.name)}
+                                >
+                                    {service.name}
+                                </div>
                             ))}
-
                         </div>
                     </div>
-                    )}
+                )}
 
-                {/* דירוג */}
                 <div className="form-group rating-group">
                     <label>דירוג (החל מ)</label>
                     <div className="star-rating">
@@ -140,7 +147,6 @@ const AdvancedSearchPage = () => {
                     </div>
                 </div>
 
-                {/* כפתורים */}
                 <div className="buttons-container">
                     <button className="cancel-button" onClick={handleCancel}>ביטול</button>
                     <button className="confirm-button" onClick={handleSubmit}>אישור</button>
