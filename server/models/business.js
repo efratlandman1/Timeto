@@ -14,7 +14,19 @@ const businessSchema = new mongoose.Schema({
     // userId: String
     categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'categories', required: true },
     services: [{ type: mongoose.Schema.Types.ObjectId, ref: 'services' }],
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true }
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
+    openingHours: [
+    {
+      day: { type: Number, required: true },
+      closed: { type: Boolean, default: false },
+      ranges: [
+        {
+          open: String,
+          close: String,
+        }
+      ]
+    }
+  ]
 });
 
 const Business = mongoose.model('businesses', businessSchema);

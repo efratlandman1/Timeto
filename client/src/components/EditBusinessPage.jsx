@@ -20,7 +20,8 @@ const EditBusinessPage = () => {
         categoryId: '',
         description: '',
         logo: null,
-        services: []
+        services: [],
+        openingHours: []
     });
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +38,8 @@ const EditBusinessPage = () => {
                 categoryId: selectedBusiness.categoryId,
                 description: selectedBusiness.description,
                 logo: selectedBusiness.logo || null,
-                services: selectedBusiness.services || []
+                services: selectedBusiness.services || [],
+                openingHours: selectedBusiness.openingHours || [] 
             });
         }
         fetchCategories();
@@ -91,6 +93,8 @@ const EditBusinessPage = () => {
         if (businessData.services && businessData.services.length > 0) {
             formData.append('services', JSON.stringify(businessData.services)); // ✅ הוספה כ־JSON
         }
+        const sortedHours = [...businessData.openingHours].sort((a, b) => a.day - b.day);
+        formData.append('openingHours', JSON.stringify(sortedHours));
 
         if (businessData.logo) {
             formData.append('logo', businessData.logo);
