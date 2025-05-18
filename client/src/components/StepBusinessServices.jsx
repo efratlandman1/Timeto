@@ -1,54 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/StepsStyle.css';
 import { FaTags } from 'react-icons/fa';
+import axios from 'axios';
 
-const fixedServices = [
-  'תספורת גברים',
-  'תספורת נשים',
-  'צבע לשיער',
-  'פן',
-  'עיצוב גבות',
-  'פדיקור',
-  'מניקור',
-  'עיסוי שוודי',
-  'עיסוי רקמות עמוק',
-  'טיפול פנים'
-];
+const StepBusinessServices = ({ businessData, setBusinessData }) => {
+  const [availableServices, setAvailableServices] = useState([]);
+  
+  console.log("📦 businessData:", businessData); 
+  
+  const selectedServices = businessData.services || [];
 
-const StepBusinessServices = ({ onNext, selectedServicesData = [] }) => {
-  const [selectedServices, setSelectedServices] = useState(selectedServicesData);
+  useEffect(() => {
+    const fetchServices = async () => {
+      if (!businessData.categoryId) return;
 
-  const toggleService = (service) => {
-    if (selectedServices.includes(service)) {
-      setSelectedServices(selectedServices.filter(s => s !== service));
-    } else {
-      setSelectedServices([...selectedServices, service]);
-    }
-  };
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_DOMAIN}/api/v1/services/byCategory/${businessData.categoryId}`
+        );
+        setAvailableServices(response.data);
+      } catch (error) {
+        console.error('שגיאה בטעינת השירותים:', error);
+      }
+    };
 
-  const handleNext = () => {
-    onNext(selectedServices);
+    fetchServices();
+  }, [businessData.categoryId]);
+
+  const toggleService = (serviceId) => {
+    const updatedServices = selectedServices.includes(serviceId)
+      ? selectedServices.filter(id => id !== serviceId)
+      : [...selectedServices, serviceId];
+
+    setBusinessData(prev => ({
+      ...prev,
+      services: updatedServices
+    }));
   };
 
   return (
-    <div>
-      <div className="step-business-details">
-        <h2 className="step-title">
-          <FaTags style={{ color: '#e63946' }} />
-            שירותים שהעסק מספק
-        </h2>
-        <div className="tags-container">
-          {fixedServices.map((service, index) => (
-            <div
-              key={index}
-              className={`tag selectable ${selectedServices.includes(service) ? 'selected' : ''}`}
-              onClick={() => toggleService(service)}
-            >
-              {service}
-            </div>
-          ))}
-        </div>
-        {/* <button className="next-button" onClick={handleNext}>הבא</button> */}
+    <div className="step-business-details">
+      <h2 className="step-title">
+        <FaTags style={{ color: '#e63946' }} /> שירותים שהעסק מספק
+      </h2>
+      <div className="tags-container">
+        {availableServices.map(service => (
+          <div
+            key={service._id}
+            className={`tag selectable ${selectedServices.includes(service._id) ? 'selected' : ''}`}
+            onClick={() => toggleService(service._id)}
+          >
+            {service.name}
+          </div>
+        ))}
       </div>
     </div>
   );
