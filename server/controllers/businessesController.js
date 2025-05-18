@@ -21,26 +21,32 @@ exports.uploadBusinesses = async (req, res) => {
 };
 
 const createBusiness = async (req, res, userId) => {
-    try {
-        const newBusiness = new Business({
-            name: req.body.name,
-            email: req.body.email,
-            phone: req.body.phone,
-            categoryId: req.body.categoryId,
-            services: req.body.services || [],
-            description: req.body.description || '',
-            userId: userId,
-            address: req.body.address,
-            logo: req.file?.filename || ''
-        });
+  try {
+    console.log("createBusiness");
+    const openingHours = JSON.parse(req.body.openingHours || '[]');
+    const services = JSON.parse(req.body.services || '[]');
 
-        const savedItem = await newBusiness.save();
-        res.status(201).json(savedItem);
-    } catch (error) {
-        console.error('Error creating business: ', error);
-        res.status(500).json({ error: 'Failed to create business' });
-    }
+    const newBusiness = new Business({
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      categoryId: req.body.categoryId,
+      description: req.body.description || '',
+      services,
+      openingHours,
+      userId: userId,
+      address: req.body.address,
+      logo: req.file?.filename || ''
+    });
+
+    const savedItem = await newBusiness.save();
+    res.status(201).json(savedItem);
+  } catch (error) {
+    console.error('Error creating business: ', error);
+    res.status(500).json({ error: 'Failed to create business' });
+  }
 };
+
 
 
 const updateBusiness = async (req, res, userId) => {
@@ -59,10 +65,12 @@ const updateBusiness = async (req, res, userId) => {
     existingBusiness.email = req.body.email || existingBusiness.email;
     existingBusiness.phone = req.body.phone || existingBusiness.phone;
     existingBusiness.categoryId = req.body.categoryId || existingBusiness.categoryId;
-    existingBusiness.services = req.body.services || existingBusiness.services; // עדכון שירותים
+    // existingBusiness.services = req.body.services || existingBusiness.services; // עדכון שירותים
+    existingBusiness.services = typeof req.body.services === 'string' ? JSON.parse(req.body.services) : (req.body.services || existingBusiness.services);
     existingBusiness.description = req.body.description || existingBusiness.description;
     existingBusiness.address = req.body.address || existingBusiness.address;
     existingBusiness.logo = req.file?.path || existingBusiness.logo;
+    existingBusiness.openingHours = typeof req.body.openingHours === 'string' ? JSON.parse(req.body.openingHours) : (req.body.openingHours || existingBusiness.openingHours);
 
     await existingBusiness.save();
     res.status(200).json({ message: 'Business updated successfully', business: existingBusiness });
