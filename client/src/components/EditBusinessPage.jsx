@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
-import { FaSave, FaTrash } from 'react-icons/fa';
+import { FaSave } from 'react-icons/fa';
 import MultiStep from 'react-multistep';
 import StepBusinessDetails from './StepBusinessDetails';
 import StepBusinessServices from './StepBusinessServices';
 import StepBusinessHours from './StepBusinessHours';
 import '../styles/EditBusinessPage.css';
-
-
 
 const EditBusinessPage = () => {
     const selectedBusiness = useSelector(state => state.business.selectedBusiness);
@@ -26,6 +24,7 @@ const EditBusinessPage = () => {
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState(null);
+    const [activeStep, setActiveStep] = useState(0); // שמירת הסטפ הנוכחי
 
     useEffect(() => { 
         if (selectedBusiness) {
@@ -70,18 +69,30 @@ const EditBusinessPage = () => {
     };
 
     const handleSubmit = async (e) => {
+        console.log("1. start handleSubmit");
+        if (e) {
+        console.log("2. e.preventDefault");
         e.preventDefault();
+        }
+
+        console.log("3. set loading true");
         setIsLoading(true);
+
+        console.log("4. clear message");
         setMessage(null);
 
+        console.log("5. checking required fields");
         const requiredFields = ["name", "categoryId", "address", "phone", "email"];
         const missingFields = requiredFields.filter(field => !businessData[field] || String(businessData[field]).trim() === "");
+        console.log("6. missing fields:", missingFields);
 
         if (missingFields.length > 0) {
             setIsLoading(false);
             setMessage({ type: 'error', text: `Please fill in the required fields: ${missingFields.join(", ")}` });
             return;
         }
+        console.log("7. passed required fields check");
+
 
         const formData = new FormData();
         formData.append('name', businessData.name);
@@ -91,7 +102,7 @@ const EditBusinessPage = () => {
         formData.append('phone', businessData.phone);
         formData.append('email', businessData.email);
         if (businessData.services && businessData.services.length > 0) {
-            formData.append('services', JSON.stringify(businessData.services)); // ✅ הוספה כ־JSON
+            formData.append('services', JSON.stringify(businessData.services));
         }
         const sortedHours = [...businessData.openingHours].sort((a, b) => a.day - b.day);
         formData.append('openingHours', JSON.stringify(sortedHours));
@@ -103,9 +114,11 @@ const EditBusinessPage = () => {
         if (businessData.id) {
             formData.append('id', businessData.id);
         }
-
+        console.log("formData:",formData);
         try {
+             console.log("Before get token:");
             const token = getToken();
+             console.log("token:",token);
             await uploadBusiness(token, formData);
             setMessage({ type: 'success', text: `Business ${selectedBusiness ? 'updated' : 'created'} successfully!` });
         } catch (error) {
@@ -113,6 +126,7 @@ const EditBusinessPage = () => {
         } finally {
             setIsLoading(false);
         }
+         console.log("End of handleSubmit:");
     };
 
     const getToken = () => {
@@ -131,67 +145,85 @@ const EditBusinessPage = () => {
 
     return (
         <div className={`page-container ${isLoading ? 'disabled' : ''}`}>
-        <div class='step-page-container'>
-        {isLoading && (
-                <div className="loading-overlay">
-                    <div className="loading-animation">🕺💃 Loading... Please dance with me! 🎵</div>
+            <div className='step-page-container'>
+                {isLoading && (
+                    <div className="loading-overlay">
+                        <div className="loading-animation">🕺💃 Loading... Please dance with me! 🎵</div>
+                    </div>
+                )}
+
+                {message && (
+                    <div className={`message-box ${message.type === 'success' ? 'success' : 'error'}`}>
+                        {message.text}
+                    </div>
+                )}
+
+                <div className="page-header">
+                    <h1>{selectedBusiness ? 'עדכון פרטי עסק' : 'הוספת עסק'}</h1>
+                    <div className="header-line"></div>
                 </div>
-            )}
 
-            {message && (
-                <div className={`message-box ${message.type === 'success' ? 'success' : 'error'}`}>
-                    {message.text}
-                </div>
-            )}
-
-            <div className="page-header">
-                <h1>{selectedBusiness ? 'עדכון פרטי עסק' : 'הוספת עסק'}</h1>
-                <div className="header-line"></div> {/* אלמנט אדום קטן מתחת לכותרת */}
-            </div>
-
-            
-            {/* <div> */}
-                <MultiStep activeStep={0}
-                            showNavigation={true}
-                            prevButton={{
-                                title: '→',
-                                style: {
-                                //   backgroundColor: '#444',         // אפור כהה
-                                //   color: '#fff',
-                                  border: 'none',
-                                  borderRadius: '8px',
-                                  padding: '10px 24px',
-                                  fontSize: '22px',
-                                  cursor: 'pointer',
-                                  transition: 'all 0.3s ease',
-                                  boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-                                  marginInlineStart: '10px',
-                                  marginTop: '14px',                // רווח מהתוכן שמעל
-                                  marginBottom: '24px'                // רווח מהתוכן שמעל                                
-                                }
-                              }}
-                              nextButton={{
-                                title: '←',
-                                style: {
-                                //   backgroundColor: '#d32f2f',      // אדום האפליקציה
-                                //   color: '#fff',
-                                  border: 'none',
-                                  borderRadius: '8px',
-                                  padding: '10px 24px',
-                                  fontSize: '22px',
-                                  cursor: 'pointer',
-                                  transition: 'all 0.3s ease',
-                                  boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-                                  marginInlineStart: '10px',
-                                  marginTop: '14px',                // רווח מהתוכן שמעל
-                                  marginBottom: '24px'                // רווח מהתוכן שמעל
-                                }
-                              }}
-                            >
-                    <StepBusinessDetails    title='פרטים כלליים'    businessData={businessData}  setBusinessData={setBusinessData} categories={categories} />
-                    <StepBusinessServices   title='שירותי העסק'     businessData={businessData}  setBusinessData={setBusinessData} categories={categories} />
-                    <StepBusinessHours      title='שעות פעילות'     businessData={businessData}  setBusinessData={setBusinessData} categories={categories} />
+                <MultiStep
+                    activeStep={activeStep}
+                    showNavigation={true}
+                    onStepChange={setActiveStep}
+                    prevButton={{
+                        title: '→',
+                        style: {
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '10px 24px',
+                            fontSize: '22px',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                            marginInlineStart: '10px',
+                            marginTop: '14px',
+                            marginBottom: '24px'
+                        }
+                    }}
+                    nextButton={{
+                        title: '←',
+                        style: {
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '10px 24px',
+                            fontSize: '22px',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                            marginInlineStart: '10px',
+                            marginTop: '14px',
+                            marginBottom: '24px'
+                        }
+                    }}
+                >
+                    <StepBusinessDetails title='פרטים כלליים' businessData={businessData} setBusinessData={setBusinessData} categories={categories} />
+                    <StepBusinessServices title='שירותי העסק' businessData={businessData} setBusinessData={setBusinessData} categories={categories} />
+                    <StepBusinessHours title='שעות פעילות' businessData={businessData} setBusinessData={setBusinessData} categories={categories} />
                 </MultiStep>
+
+                {/* כפתור שמירה בסיסי שמבצע קריאת API */}
+                <button
+                    onClick={handleSubmit}
+                    disabled={isLoading}
+                    style={{
+                        marginTop: '20px',
+                        padding: '10px 20px',
+                        fontSize: '16px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        borderRadius: '6px',
+                        border: 'none',
+                        backgroundColor: '#1976d2',
+                        color: 'white',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                    }}
+                >
+                    <FaSave /> שמור
+                </button>
             </div>
         </div>
     );
