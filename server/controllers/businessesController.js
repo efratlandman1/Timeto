@@ -1,6 +1,7 @@
 const Business = require("../models/business");
 const AuthUtils = require('../utils/authUtils');
 const Category = require('../models/category');
+const Service = require('../models/service');
 
 exports.uploadBusinesses = async (req, res) => {
     try {
@@ -26,11 +27,11 @@ const createBusiness = async (req, res, userId) => {
             email: req.body.email,
             phone: req.body.phone,
             categoryId: req.body.categoryId,
+            services: req.body.services || [],
             description: req.body.description || '',
             userId: userId,
             address: req.body.address,
-            // logo: req.file?.path || ''
-            logo: req.file?.filename  || ''
+            logo: req.file?.filename || ''
         });
 
         const savedItem = await newBusiness.save();
@@ -41,33 +42,36 @@ const createBusiness = async (req, res, userId) => {
     }
 };
 
+
 const updateBusiness = async (req, res, userId) => {
-    try {
-        const existingBusiness = await Business.findById(req.body.id);
+  try {
+    const existingBusiness = await Business.findById(req.body.id);
 
-        if (!existingBusiness) {
-            return res.status(404).json({ error: 'Business not found' });
-        }
-
-        if (existingBusiness.userId.toString() !== userId) {
-            return res.status(403).json({ error: 'Unauthorized to edit this business' });
-        }
-
-        existingBusiness.name = req.body.name || existingBusiness.name;
-        existingBusiness.email = req.body.email || existingBusiness.email;
-        existingBusiness.phone = req.body.phone || existingBusiness.phone;
-        existingBusiness.categoryId = req.body.categoryId || existingBusiness.categoryId;
-        existingBusiness.description = req.body.description || existingBusiness.description;
-        existingBusiness.address = req.body.address || existingBusiness.address;
-        existingBusiness.logo = req.file?.path || existingBusiness.logo;
-
-        await existingBusiness.save();
-        res.status(200).json({ message: 'Business updated successfully', business: existingBusiness });
-    } catch (error) {
-        console.error('Error updating business: ', error);
-        res.status(500).json({ error: 'Failed to update business' });
+    if (!existingBusiness) {
+      return res.status(404).json({ error: 'Business not found' });
     }
+
+    if (existingBusiness.userId.toString() !== userId) {
+      return res.status(403).json({ error: 'Unauthorized to edit this business' });
+    }
+
+    existingBusiness.name = req.body.name || existingBusiness.name;
+    existingBusiness.email = req.body.email || existingBusiness.email;
+    existingBusiness.phone = req.body.phone || existingBusiness.phone;
+    existingBusiness.categoryId = req.body.categoryId || existingBusiness.categoryId;
+    existingBusiness.services = req.body.services || existingBusiness.services; // עדכון שירותים
+    existingBusiness.description = req.body.description || existingBusiness.description;
+    existingBusiness.address = req.body.address || existingBusiness.address;
+    existingBusiness.logo = req.file?.path || existingBusiness.logo;
+
+    await existingBusiness.save();
+    res.status(200).json({ message: 'Business updated successfully', business: existingBusiness });
+  } catch (error) {
+    console.error('Error updating business: ', error);
+    res.status(500).json({ error: 'Failed to update business' });
+  }
 };
+
 
 // exports.getItems = async (req, res) => {
 //     try {
@@ -78,66 +82,6 @@ const updateBusiness = async (req, res, userId) => {
 //         res.status(500).json({message: err.message});
 //     }
 // };
-
-exports.getItems = async (req, res) => {
-    try {
-        console.log("Received query params:", req.query);
-
-        const { categoryName, subcategories, rating } = req.query;
-        const query = {};
-
-        // Filter by category name
-        if (categoryName) {
-            const category = await Category.findOne({ name: categoryName });
-            if (category) {
-                query.categoryId = category._id.toString();
-            } else {
-                console.log("Category not found");
-            }
-        }
-
-        // Filter by services (using subcategories)
-        if (subcategories) {
-            const serviceList = Array.isArray(subcategories) ? subcategories : [subcategories];
-            query.subCategoryIds = { $all: serviceList };
-        }
-
-        // Filter by rating
-        if (rating) {
-            query.rating = { $gte: Number(rating) };
-        }
-
-        // const businesses = await Business.find(query);
-        // console.log("Total results found:", businesses.length);
-        
-
-        // res.json({ data: businesses });
-
-        const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || 6;
-        const skip = (page - 1) * limit;
-
-        const [businesses, total] = await Promise.all([
-        Business.find(query).skip(skip).limit(limit),
-        Business.countDocuments(query),
-        ]);
-
-        res.json({
-            data: businesses,
-            pagination: {
-              total,
-              page,
-              limit,
-              totalPages: Math.ceil(total / limit),
-            },
-          });
-
-    } catch (err) {
-        console.error("Error in getItems:", err);
-        res.status(500).json({ message: err.message });
-    }
-};
-
 
 
 exports.getUserBusinesses = async (req, res) => {
@@ -153,3 +97,73 @@ exports.getUserBusinesses = async (req, res) => {
     }
 };
 
+const mongoose = require('mongoose'); 
+
+exports.getItems = async (req, res) => {
+  try {
+    const { categoryName, services, rating } = req.query;
+    const query = {};
+
+    if (categoryName) {
+      const category = await Category.findOne({ name: categoryName });
+      if (category) {
+        query.categoryId = category._id;
+      } else {
+        return res.status(404).json({ message: "Category not found" });
+      }
+    }
+
+    if (services) {
+      let serviceList = Array.isArray(services) ? services : [services];
+      console.log("serviceList:",serviceList)
+      // נבדוק אם זה מזהים או מחרוזות
+      const objectIds = serviceList.filter(id => mongoose.Types.ObjectId.isValid(id));
+      console.log("objectIds:",objectIds)
+
+      if (objectIds.length === serviceList.length) {
+         console.log("Services from redux:")
+        query.services = { $in: objectIds.map(id => new mongoose.Types.ObjectId(id)) };
+      } else {
+        // המרה מ-name ל-ID
+        console.log("Services from db:")
+        const serviceDocs = await Service.find({ name: { $in: serviceList } });
+        console.log("serviceDocs:",serviceDocs)
+        const ids = serviceDocs.map(s => s._id);
+        console.log("ids:",ids)
+        if (ids.length > 0) query.services = { $in : ids };
+      }
+    }
+
+    if (rating) {
+      query.rating = { $gte: Number(rating) };
+    }
+
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 6;
+    const skip = (page - 1) * limit;
+
+      console.log("query:",query)
+    const [businesses, total] = await Promise.all([
+      Business.find(query)
+        .populate('categoryId')
+        .populate('services')
+        .skip(skip)
+        .limit(limit),
+      Business.countDocuments(query),
+    ]);
+
+    res.json({
+      data: businesses,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+
+  } catch (err) {
+    console.error("Error in getItems:", err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
