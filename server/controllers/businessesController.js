@@ -1,6 +1,7 @@
 const Business = require("../models/business");
 const AuthUtils = require('../utils/authUtils');
 const Category = require('../models/category');
+const Service = require('../models/service');
 
 exports.uploadBusinesses = async (req, res) => {
     try {
@@ -96,15 +97,13 @@ exports.getUserBusinesses = async (req, res) => {
     }
 };
 
+const mongoose = require('mongoose'); 
 
 exports.getItems = async (req, res) => {
   try {
-    console.log("Received query params:", req.query);
-
     const { categoryName, services, rating } = req.query;
     const query = {};
 
-    // טיפול בקטגוריה לפי שם
     if (categoryName) {
       const category = await Category.findOne({ name: categoryName });
       if (category) {
@@ -114,31 +113,36 @@ exports.getItems = async (req, res) => {
       }
     }
 
-    // טיפול בשירותים (services)
     if (services) {
-      const serviceList = Array.isArray(services) ? services : [services];
+      let serviceList = Array.isArray(services) ? services : [services];
+      console.log("serviceList:",serviceList)
+      // נבדוק אם זה מזהים או מחרוזות
+      const objectIds = serviceList.filter(id => mongoose.Types.ObjectId.isValid(id));
+      console.log("objectIds:",objectIds)
 
-      const validServiceIds = serviceList
-        .filter(id => mongoose.Types.ObjectId.isValid(id))
-        .map(id => mongoose.Types.ObjectId(id));
-
-      if (validServiceIds.length > 0) {
-        query.services = { $all: validServiceIds };
+      if (objectIds.length === serviceList.length) {
+         console.log("Services from redux:")
+        query.services = { $in: objectIds.map(id => new mongoose.Types.ObjectId(id)) };
+      } else {
+        // המרה מ-name ל-ID
+        console.log("Services from db:")
+        const serviceDocs = await Service.find({ name: { $in: serviceList } });
+        console.log("serviceDocs:",serviceDocs)
+        const ids = serviceDocs.map(s => s._id);
+        console.log("ids:",ids)
+        if (ids.length > 0) query.services = { $in : ids };
       }
     }
 
-    // דירוג
     if (rating) {
       query.rating = { $gte: Number(rating) };
     }
 
-    // מידע על פאגינציה
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 6;
     const skip = (page - 1) * limit;
 
-    console.log("Final query:", query); // לוג לבדיקה
-
+      console.log("query:",query)
     const [businesses, total] = await Promise.all([
       Business.find(query)
         .populate('categoryId')
