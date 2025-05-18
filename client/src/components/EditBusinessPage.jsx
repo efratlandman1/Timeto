@@ -19,7 +19,8 @@ const EditBusinessPage = () => {
         email: '',
         categoryId: '',
         description: '',
-        logo: null
+        logo: null,
+        services: []
     });
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +36,8 @@ const EditBusinessPage = () => {
                 email: selectedBusiness.email,
                 categoryId: selectedBusiness.categoryId,
                 description: selectedBusiness.description,
-                logo: selectedBusiness.logo || null
+                logo: selectedBusiness.logo || null,
+                services: selectedBusiness.services || []
             });
         }
         fetchCategories();
@@ -86,6 +88,9 @@ const EditBusinessPage = () => {
         formData.append('address', businessData.address);
         formData.append('phone', businessData.phone);
         formData.append('email', businessData.email);
+        if (businessData.services && businessData.services.length > 0) {
+            formData.append('services', JSON.stringify(businessData.services)); // ✅ הוספה כ־JSON
+        }
 
         if (businessData.logo) {
             formData.append('logo', businessData.logo);
