@@ -16,6 +16,13 @@ import { setUser } from './redux/userSlice';
 
 
 function App() {
+    const dispatch = useDispatch();
+    // Handle represh
+    let user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+         dispatch(setUser({user: user}));
+    }
+
     return (
         <Router>
             <GlobalStyles />
