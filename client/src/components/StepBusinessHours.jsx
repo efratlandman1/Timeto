@@ -16,21 +16,22 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
   const [hours, setHours] = useState([]);
 
   useEffect(() => {
-    if (businessData.openingHours?.length) {
-      setHours(businessData.openingHours);
-    } else {
-      const initial = DAYS.map(({ day }) => ({
+    const initial = DAYS.map(({ day }) => {
+      const existing = businessData.openingHours?.find(d => d.day === day);
+      return {
         day,
-        closed: false,
-        ranges: [{ open: '', close: '' }]
-      }));
-      setHours(initial);
-      setBusinessData(prev => ({
-        ...prev,
-        openingHours: initial
-      }));
-    }
-  }, []); // ריצה פעם אחת באתחול
+        closed: existing?.closed || false,
+        ranges: existing?.ranges?.length ? existing.ranges : [{ open: '', close: '' }]
+      };
+    });
+
+    setHours(initial);
+    setBusinessData(prev => ({
+      ...prev,
+      openingHours: initial
+    }));
+  }, []);
+
 
   useEffect(() => {
     console.log(new Date().toLocaleTimeString(), '🕒 businessData:', businessData);
