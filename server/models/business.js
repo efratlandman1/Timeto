@@ -6,6 +6,7 @@ const businessSchema = new mongoose.Schema({
     phone: { type: Number, required: true },
     email: { type: String, required: true },
     logo: { type: String },
+    rating: { type: Number },
     // heroImage: { type: String, required: true },
     description: String,
     // categoryId: String,

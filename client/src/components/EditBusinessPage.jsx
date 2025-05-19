@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
-import { FaSave } from 'react-icons/fa';
+import { FaSave, FaPlus, FaEdit } from 'react-icons/fa';
 import MultiStep from 'react-multistep';
 import StepBusinessDetails from './StepBusinessDetails';
 import StepBusinessServices from './StepBusinessServices';
@@ -24,10 +24,11 @@ const EditBusinessPage = () => {
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState(null);
-    const [activeStep, setActiveStep] = useState(0); // שמירת הסטפ הנוכחי
+    // const [activeStep, setActiveStep] = useState(0); // שמירת הסטפ הנוכחי
 
     useEffect(() => { 
         if (selectedBusiness) {
+        const deepCopiedHours = JSON.parse(JSON.stringify(selectedBusiness.openingHours || []));
             setBusinessData({
                 id: selectedBusiness._id,
                 name: selectedBusiness.name,
@@ -38,7 +39,7 @@ const EditBusinessPage = () => {
                 description: selectedBusiness.description,
                 logo: selectedBusiness.logo || null,
                 services: selectedBusiness.services || [],
-                openingHours: selectedBusiness.openingHours || [] 
+                openingHours: deepCopiedHours//selectedBusiness.openingHours || [] 
             });
         }
         fetchCategories();
@@ -164,9 +165,9 @@ const EditBusinessPage = () => {
                 </div>
 
                 <MultiStep
-                    activeStep={activeStep}
+                    // activeStep={activeStep}
                     showNavigation={true}
-                    onStepChange={setActiveStep}
+                    // onStepChange={setActiveStep}
                     prevButton={{
                         title: '→',
                         style: {
@@ -204,26 +205,16 @@ const EditBusinessPage = () => {
                 </MultiStep>
 
                 {/* כפתור שמירה בסיסי שמבצע קריאת API */}
-                <button
+                {/* {activeStep === 2 && ( */}
+                    <button
                     onClick={handleSubmit}
                     disabled={isLoading}
-                    style={{
-                        marginTop: '20px',
-                        padding: '10px 20px',
-                        fontSize: '16px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        borderRadius: '6px',
-                        border: 'none',
-                        backgroundColor: '#1976d2',
-                        color: 'white',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                    }}
+                    className="save-button"
                 >
-                    <FaSave /> שמור
+                    {selectedBusiness ? <FaEdit /> : <FaPlus />}
+                    {selectedBusiness ? 'עדכן פרטי עסק' : 'צור עסק חדש'}
                 </button>
+                {/* )} */}
             </div>
         </div>
     );
