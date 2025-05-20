@@ -9,6 +9,9 @@ import StepBusinessServices from './StepBusinessServices';
 import StepBusinessHours from './StepBusinessHours';
 import '../styles/EditBusinessPage.css';
 import { setSelectedBusiness } from '../redux/businessSlice'; // ודא שיש פעולה כזו
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Steps, StepsProvider, useSteps } from 'react-step-builder';
 
 const EditBusinessPage = () => {
   const dispatch = useDispatch();
@@ -110,7 +113,6 @@ const EditBusinessPage = () => {
     }
   };
 
-  // --- שאר הקוד שלך בלי שינוי ---
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
