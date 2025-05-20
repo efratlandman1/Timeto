@@ -23,6 +23,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<MainPage />} />
                 <Route path="/edit" element={<EditBusinessPage />} />
+                <Route path="/edit/:id" element={<EditBusinessPage />} />
                 <Route path="/user-businesses" element={<UserBusinessPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegistrationPage />} />
