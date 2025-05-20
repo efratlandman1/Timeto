@@ -39,11 +39,18 @@ const EditBusinessPage = () => {
   useEffect(() => {
     // פונקציה פנימית לטעינת העסק
     const loadBusiness = async (businessId) => {
+      const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
       setIsLoading(true);
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${businessId}`);
+        const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${businessId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         const biz = response.data;
-        dispatch(setSelectedBusiness(biz)); // עדכון ברידקס
+        dispatch(setSelectedBusiness(biz));
         initializeBusinessData(biz);
       } catch (error) {
         console.error('Error fetching business:', error);
