@@ -11,7 +11,9 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
 
     const handleEdit = () => {
         dispatch(setSelectedBusiness(business));
-        navigate('/edit');
+        // navigate('/edit');
+        navigate(`/edit/${business._id}`);
+
     };
 
     const handleFeedback = () => {

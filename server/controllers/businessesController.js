@@ -175,3 +175,20 @@ exports.getItems = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+exports.getBusinessById = async (req, res) => {
+  try {
+    const business = await Business.findById(req.params.id)
+      .populate('categoryId')
+      .populate('services');
+
+    if (!business) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    res.status(200).json(business);
+  } catch (error) {
+    console.error('Error fetching business by ID:', error);
+    res.status(500).json({ error: 'Failed to fetch business' });
+  }
+};

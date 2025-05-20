@@ -12,6 +12,9 @@ router
     .route('/user-businesses')
     .get(businessesController.getUserBusinesses);
 
+router
+    .route('/:id').get(businessesController.getBusinessById);
+
 module.exports = router;
 
 
