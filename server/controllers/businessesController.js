@@ -56,7 +56,6 @@ const updateBusiness = async (req, res, userId) => {
     if (!existingBusiness) {
       return res.status(404).json({ error: 'Business not found' });
     }
-
     if (existingBusiness.userId.toString() !== userId) {
       return res.status(403).json({ error: 'Unauthorized to edit this business' });
     }
@@ -178,12 +177,22 @@ exports.getItems = async (req, res) => {
 
 exports.getBusinessById = async (req, res) => {
   try {
+     const token = req.headers['authorization']?.split(' ')[1];
+     console.log(token);
+     let userId = AuthUtils.extractUserId(token);
+     console.log("AuthUtils.extractUserId",userId);
+     
     const business = await Business.findById(req.params.id)
       .populate('categoryId')
       .populate('services');
 
     if (!business) {
       return res.status(404).json({ error: 'Business not found' });
+    }
+    let businessUser = business.userId.toString();
+    console.log("req.body.userId.toString()",businessUser);  
+     if (businessUser !== userId) {
+      return res.status(403).json({ error: 'Unauthorized to edit this business' });
     }
 
     res.status(200).json(business);
