@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import BusinessCard from './BusinessCard';
 import axios from 'axios';
+import '../styles/SearchResultPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchBar from './SearchBar';
 import { FaChevronDown } from 'react-icons/fa'; // 👈 הוספת אייקון
-import { useSelector } from 'react-redux';
-import '../styles/SearchResultPage.css';
 
 const ITEMS_PER_PAGE = 8;
 
@@ -23,16 +22,19 @@ const SearchResultPage = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
-    const reduxServices = useSelector(state => state.services.services);
     const sortRef = useRef(null);
 
     const urlParams = new URLSearchParams(location.search);
-    const rawFilters = {};
+    const filters = {};
     for (const [key, value] of urlParams.entries()) {
-        if (rawFilters[key]) {
-            rawFilters[key] = [...rawFilters[key], value];
+        if (key in filters) {
+            if (Array.isArray(filters[key])) {
+                filters[key].push(value);
+            } else {
+                filters[key] = [filters[key], value];
+            }
         } else {
-            rawFilters[key] = [value];
+            filters[key] = value;
         }
     }
 
@@ -41,24 +43,6 @@ const SearchResultPage = () => {
     useEffect(() => {
         const fetchBusinesses = async () => {
             try {
-                const filters = { ...rawFilters };
-
-                // המרת שירותים לפי Redux
-                // if (filters.services) {
-                //     const mapped = filters.services
-                //         .map(name => reduxServices.find(s => s.name === name))
-                //         .filter(Boolean)
-                //         .map(s => s.id);
-
-                //     if (mapped.length > 0) {
-                //         filters.services = mapped;
-                //     } // אחרת נשאר מחרוזת, השרת יתמודד
-                // }
-                console.log("reduxServices:",reduxServices)
-                if (reduxServices.length > 0) {
-                    filters.services = reduxServices.map(s => s.id);
-                }
-
                 const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
                     params: {
                         ...filters,
@@ -67,7 +51,6 @@ const SearchResultPage = () => {
                         sort: currentSort
                     }
                 });
-
                 setBusinesses(res.data.data || []);
                 setTotalPages(res.data.pagination?.totalPages || 1);
             } catch (error) {
@@ -76,22 +59,7 @@ const SearchResultPage = () => {
         };
 
         fetchBusinesses();
-    }, [location.search, currentPage, reduxServices]);
-
-    const handleSearch = () => {
-        if (searchQuery) {
-            const filtered = businesses.filter(b =>
-                b.name.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setBusinesses(filtered);
-        } else {
-            setCurrentPage(1);
-        }
-    };
-
-    const handleAdvancedSearchClick = () => {
-        navigate('/advanced-search-page');
-    };
+    }, [location.search, currentPage]);
 
     const removeFilter = (keyToRemove, valueToRemove = null) => {
         const newParams = new URLSearchParams(location.search);
@@ -110,8 +78,6 @@ const SearchResultPage = () => {
         switch (key) {
             case 'categoryName': return `קטגוריה: ${value}`;
             case 'services': return `שירות: ${value}`;
-            case 'minPrice': return `מינימום ${value} ש"ח`;
-            case 'maxPrice': return `מקסימום ${value} ש"ח`;
             case 'distance': return `עד ${value} ק"מ`;
             case 'rating': return `${value} כוכבים ומעלה`;
             default: return `${key}: ${value}`;
@@ -143,7 +109,7 @@ const SearchResultPage = () => {
         <div className='main-page-container'>
             <SearchBar />
 
-            {Object.keys(rawFilters).length > 0 && (
+            {Object.keys(filters).length > 0 && (
                 <div className="filters-container">
                     {Object.entries(filters).map(([key, value]) => (
                         key === 'q' || key === 'sort' || !value ? null : (
