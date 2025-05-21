@@ -95,19 +95,26 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
-  margin-bottom: 20px;
-  margin-top: 10px;
-  padding: 0 20px;
+  margin: 30px 20px 40px;
+  padding: 0 10px;
 }
 
 .edit-business-progress-bar-line {
   position: absolute;
-  top: 30%;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background-color: #eee;
+  top: 50%;
+  left: 10%;
+  right: 10%;
+  height: 6px;
+  background: linear-gradient(
+    to right,
+    #d32f2f 0%,
+    #d32f2f calc((var(--current-step) - 1) / (var(--total-steps) - 1) * 100%),
+    #eee calc((var(--current-step) - 1) / (var(--total-steps) - 1) * 100%),
+    #eee 100%
+  );
+  border-radius: 4px;
   z-index: 0;
+  transition: background 0.4s ease-in-out;
   transform: translateY(-50%);
 }
 
@@ -118,19 +125,64 @@
   cursor: pointer;
   z-index: 1;
   flex: 1;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.edit-business-progress-step:hover {
+  transform: scale(1.1);
 }
 
 .edit-business-progress-circle {
-  width: 20px;
-  height: 20px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: 2px solid red;
-  margin-bottom: 4px;
+  border: 3px solid #d32f2f;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(211, 47, 47, 0.4);
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: #d32f2f;
+  user-select: none;
 }
 
 .edit-business-progress-circle.active {
-  background-color: red;
+  background-color: #d32f2f;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(211, 47, 47, 0.7);
 }
+
+.edit-business-step-label {
+  font-size: 14px;
+  color: #555;
+  font-weight: 600;
+  user-select: none;
+}
+
+.edit-business-progress-step.active .edit-business-step-label {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+/* למובייל */
+@media (max-width: 480px) {
+  .edit-business-progress-circle {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .edit-business-step-label {
+    font-size: 12px;
+  }
+}
+
 
 .edit-business-step-label {
   font-size: 12px;

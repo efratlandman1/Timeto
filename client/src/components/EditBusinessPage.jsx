@@ -15,7 +15,7 @@ import { Steps, StepsProvider, useSteps } from 'react-step-builder';
 const requiredFields = ["name", "categoryId", "address", "phone", "email"];
 
 const ProgressBar = ({ businessData }) => {
-  const { current, jump } = useSteps();
+  const { current, jump, total } = useSteps();
 
   const canJumpForward = requiredFields.every(
     (field) => businessData[field] && String(businessData[field]).trim() !== ''
@@ -29,22 +29,35 @@ const ProgressBar = ({ businessData }) => {
     jump(stepNumber);
   };
 
+  // עדכון משתני CSS עם ה-current ו-total steps
+  const progressBarStyle = {
+    '--current-step': current,
+    '--total-steps': total,
+  };
+
   return (
-    <div className="edit-business-progress-bar">
+    <div className="edit-business-progress-bar" style={progressBarStyle}>
       <div className="edit-business-progress-bar-line" />
-      {['פרטי עסק', 'שירותים', 'שעות פעילות'].map((label, index) => {
+      {['פרטי עסק', 'שירותי העסק', 'שעות פעילות'].map((label, index) => {
         const stepNumber = index + 1;
         const isActive = stepNumber === current;
+        const isCompleted = stepNumber < current;
         return (
           <div
             key={index}
             onClick={() => handleJump(stepNumber)}
-            className="edit-business-progress-step"
+            className={`edit-business-progress-step ${isActive ? 'active' : ''} ${
+              isCompleted ? 'completed' : ''
+            }`}
           >
             <div
-              className={`edit-business-progress-circle ${isActive ? 'active' : ''}`}
+              className={`edit-business-progress-circle ${isActive ? 'active' : ''} ${
+                isCompleted ? 'completed' : ''
+              }`}
               title={`שלב ${stepNumber}`}
-            />
+            >
+              {stepNumber}
+            </div>
             <span className="edit-business-step-label">{label}</span>
           </div>
         );
@@ -52,6 +65,7 @@ const ProgressBar = ({ businessData }) => {
     </div>
   );
 };
+
 
 const NavigationButtons = ({ businessData }) => {
   const { next, prev, current, total } = useSteps();
