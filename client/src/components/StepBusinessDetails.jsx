@@ -79,7 +79,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
 
   return (
     <div className="step-business-details">
-      {/* <h1 className="step-title">פרטי העסק</h1> */}
+      <h1 className="step-title">פרטי העסק</h1>
 
       <div className="form-group">
         <label htmlFor="name" className="form-label">

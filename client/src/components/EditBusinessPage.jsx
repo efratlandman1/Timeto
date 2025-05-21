@@ -15,7 +15,7 @@ import { Steps, StepsProvider, useSteps } from 'react-step-builder';
 const requiredFields = ["name", "categoryId", "address", "phone", "email"];
 
 const ProgressBar = ({ businessData }) => {
-  const { current, total, jump } = useSteps();
+  const { current, jump } = useSteps();
 
   const canJumpForward = requiredFields.every(
     (field) => businessData[field] && String(businessData[field]).trim() !== ''
@@ -30,50 +30,23 @@ const ProgressBar = ({ businessData }) => {
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        position: 'relative',
-        marginBottom: 20,
-        marginTop: 10,
-        padding: '0 20px',
-      }}
-    >
-      {/* פס רקע */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: 0,
-          right: 0,
-          height: 4,
-          backgroundColor: '#eee',
-          zIndex: 0,
-          transform: 'translateY(-50%)',
-        }}
-      />
-
-      {/* עיגולים */}
-      {[...Array(total)].map((_, index) => {
+    <div className="edit-business-progress-bar">
+      <div className="edit-business-progress-bar-line" />
+      {['פרטי עסק', 'שירותים', 'שעות פעילות'].map((label, index) => {
         const stepNumber = index + 1;
         const isActive = stepNumber === current;
         return (
           <div
             key={index}
             onClick={() => handleJump(stepNumber)}
-            style={{
-              width: 20,
-              height: 20,
-              borderRadius: '50%',
-              border: '2px solid red',
-              backgroundColor: isActive ? 'red' : 'white',
-              cursor: 'pointer',
-              zIndex: 1,
-            }}
-            title={`שלב ${stepNumber}`}
-          />
+            className="edit-business-progress-step"
+          >
+            <div
+              className={`edit-business-progress-circle ${isActive ? 'active' : ''}`}
+              title={`שלב ${stepNumber}`}
+            />
+            <span className="edit-business-step-label">{label}</span>
+          </div>
         );
       })}
     </div>
@@ -96,58 +69,29 @@ const NavigationButtons = ({ businessData }) => {
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center', // יישור החיצים לצדדים (ימין ושמאל)
-        marginTop: 24,
-        marginBottom: 24,
-        padding: '0 10px',
-      }}
-    >
-      {/* חץ שמאלי - חזרה */}
+    <div className="edit-business-navigation-buttons">
       {current > 1 ? (
         <button
           onClick={prev}
-          style={{
-            border: 'none',
-            borderRadius: '8px',
-            padding: '10px 24px',
-            fontSize: '22px',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-            backgroundColor: 'white',
-          }}
+          className="edit-business-arrow-button"
           aria-label="Previous step"
         >
           →
         </button>
       ) : (
-        <div style={{ width: '100px' }} />
-      ) /* לשמור רווח שווה */}
-
-      {/* חץ ימני - קדימה */}
+        <div className="edit-business-arrow-spacer" />
+      )}
       {current < total ? (
         <button
           onClick={handleNext}
-          style={{
-            border: 'none',
-            borderRadius: '8px',
-            padding: '10px 24px',
-            fontSize: '22px',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-            backgroundColor: 'white',
-          }}
+          className="edit-business-arrow-button"
           aria-label="Next step"
         >
           ←
         </button>
       ) : (
-        <div style={{ width: '100px' }} />
-      ) /* לשמור רווח שווה */}
+        <div className="edit-business-arrow-spacer" />
+      )}
     </div>
   );
 };
@@ -164,7 +108,6 @@ const MySteps = ({
   return (
     <>
       <ProgressBar businessData={businessData} />
-
       <Steps>
         <StepBusinessDetails
           title="פרטים כלליים"
@@ -185,14 +128,12 @@ const MySteps = ({
           categories={categories}
         />
       </Steps>
-
       <NavigationButtons businessData={businessData} />
-
       {current === 3 && (
         <button
           onClick={handleSubmit}
+          // className="edit-business-save-button"
           className="save-button"
-          style={{ marginTop: '20px' }}
         >
           {selectedBusiness ? <FaEdit /> : <FaPlus />}
           {selectedBusiness ? 'עדכן פרטי עסק' : 'צור עסק חדש'}
