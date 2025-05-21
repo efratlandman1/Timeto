@@ -12,9 +12,13 @@ router
     .route('/user-businesses')
     .get(businessesController.getUserBusinesses);
 
-router
-    .route('/:id').get(businessesController.getBusinessById);
+// router
+//     .get('/search', businessesController.searchBusinesses);
 
+router
+  .route('/:id')
+  .get(businessesController.getBusinessById);
+  
 module.exports = router;
 
 
