@@ -110,9 +110,70 @@ const mongoose = require('mongoose');
 
 exports.getItems = async (req, res) => {
   try {
-    const { categoryName, services, rating } = req.query;
+    const { q, categoryName, services, rating } = req.query;
     const query = {};
+    const SORT_FIELDS = {
+            rating: { rating: -1 },
+            name: { name: 1 },
+            distance: { distance: 1 }
+        };
+    const sort = req.query.sort || 'rating';
+    const sortOption = SORT_FIELDS[sort] || { rating: -1 };
+    
+            // === חיפוש חופשי אם קיים q ===
+        if (q && q.trim().length > 0) {
+            const regex = new RegExp(q, 'i'); // Case-insensitive
 
+            const matchingCategories = await Category.find({ name: regex });
+            const categoryIds = matchingCategories.map(cat => cat._id);
+
+            const matchingServices = await Service.find({ name: regex });
+            const matchingServiceIds = matchingServices.map(service => service._id);
+
+            const searchConditions = {
+                $or: [
+                    { name: regex },
+                    { address: regex },
+                    { email: regex },
+                    { phone: { $regex: q } },
+                    { categoryId: { $in: categoryIds } },
+                    { services: { $in: matchingServiceIds } } 
+                ]
+            };
+
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || DEFAULT_ITEMS_PER_PAGE;
+            const skip = (page - 1) * limit;
+
+            const [businesses, total] = await Promise.all([
+                Business.find(searchConditions)
+                    .populate('categoryId')
+                    .populate('services')
+                    .sort(sortOption)
+                    .skip(skip)
+                    .limit(limit)
+                    .populate('categoryId', 'name'),
+                Business.countDocuments(searchConditions)
+            ]);
+
+            const results = businesses.map(business => {
+                const businessObj = business.toObject();
+                businessObj.categoryName = business.categoryId?.name || '';
+                return businessObj;
+            });
+
+            return res.json({
+                    data: results,
+                    pagination: {
+                        total,
+                        page,
+                        limit,
+                        totalPages: Math.ceil(total / limit),
+                        hasMore: page < Math.ceil(total / limit)
+                    }
+                });
+        }
+    // === סינון רגיל אם אין q ===
     if (categoryName) {
       const category = await Category.findOne({ name: categoryName });
       if (category) {
@@ -148,7 +209,7 @@ exports.getItems = async (req, res) => {
     }
 
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 6;
+    const limit = Number(req.query.limit) || DEFAULT_ITEMS_PER_PAGE;
     const skip = (page - 1) * limit;
 
       console.log("query:",query)
@@ -168,6 +229,7 @@ exports.getItems = async (req, res) => {
         page,
         limit,
         totalPages: Math.ceil(total / limit),
+        hasMore: page < Math.ceil(total / limit)
       },
     });
 
