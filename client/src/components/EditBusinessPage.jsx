@@ -3,15 +3,163 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { FaSave, FaPlus, FaEdit } from 'react-icons/fa';
-import MultiStep from 'react-multistep';
 import StepBusinessDetails from './StepBusinessDetails';
 import StepBusinessServices from './StepBusinessServices';
 import StepBusinessHours from './StepBusinessHours';
 import '../styles/EditBusinessPage.css';
-import { setSelectedBusiness } from '../redux/businessSlice'; // ודא שיש פעולה כזו
+import { setSelectedBusiness } from '../redux/businessSlice';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Steps, StepsProvider, useSteps } from 'react-step-builder';
+
+const ProgressBar = () => {
+  const { current, total, jump } = useSteps();
+
+  return (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      position: 'relative',
+      marginBottom: 20,
+      marginTop: 10,
+      padding: '0 20px',
+    }}>
+      {/* פס רקע */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: 0,
+        right: 0,
+        height: 4,
+        backgroundColor: '#eee',
+        zIndex: 0,
+        transform: 'translateY(-50%)',
+      }} />
+
+      {/* עיגולים */}
+      {[...Array(total)].map((_, index) => {
+        const stepNumber = index + 1;
+        const isActive = stepNumber === current;
+        return (
+          <div
+            key={index}
+            onClick={() => jump(stepNumber)}
+            style={{
+              width: 20,
+              height: 20,
+              borderRadius: '50%',
+              border: '2px solid red',
+              backgroundColor: isActive ? 'red' : 'white',
+              cursor: 'pointer',
+              zIndex: 1,
+            }}
+            title={`שלב ${stepNumber}`}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+
+const NavigationButtons = () => {
+  const { next, prev, current, total } = useSteps();
+
+  return (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',  // יישור החיצים לצדדים (ימין ושמאל)
+      marginTop: 24,
+      marginBottom: 24,
+      padding: '0 10px'
+    }}>
+      {/* חץ שמאלי - חזרה */}
+      {current > 1 ? (
+        <button
+          onClick={prev}
+          style={{
+            border: 'none',
+            borderRadius: '8px',
+            padding: '10px 24px',
+            fontSize: '22px',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+            backgroundColor: 'white',
+          }}
+          aria-label="Previous step"
+        >
+         → 
+        </button>
+      ) : <div style={{ width: '100px' }} />} {/* לשמור רווח שווה */}
+
+      {/* חץ ימני - קדימה */}
+      {current < total ? (
+        <button
+          onClick={next}
+          style={{
+            border: 'none',
+            borderRadius: '8px',
+            padding: '10px 24px',
+            fontSize: '22px',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+            backgroundColor: 'white',
+          }}
+          aria-label="Next step"
+        >
+          ←
+        </button>
+      ) : <div style={{ width: '100px' }} />} {/* לשמור רווח שווה */}
+    </div>
+  );
+};
+
+const MySteps = ({ businessData, setBusinessData, categories, handleSubmit, selectedBusiness }) => {
+  const { current } = useSteps();
+
+  return (
+    <>
+      <ProgressBar />
+
+      <Steps>
+        <StepBusinessDetails
+          title='פרטים כלליים'
+          businessData={businessData}
+          setBusinessData={setBusinessData}
+          categories={categories}
+        />
+        <StepBusinessServices
+          title='שירותי העסק'
+          businessData={businessData}
+          setBusinessData={setBusinessData}
+          categories={categories}
+        />
+        <StepBusinessHours
+          title='שעות פעילות'
+          businessData={businessData}
+          setBusinessData={setBusinessData}
+          categories={categories}
+        />
+      </Steps>
+
+      <NavigationButtons />
+
+      {current === 3 && (
+        <button
+          onClick={handleSubmit}
+          className="save-button"
+          style={{ marginTop: '20px' }}
+        >
+          {selectedBusiness ? <FaEdit /> : <FaPlus />}
+          {selectedBusiness ? 'עדכן פרטי עסק' : 'צור עסק חדש'}
+        </button>
+      )}
+    </>
+  );
+};
 
 const EditBusinessPage = () => {
   const dispatch = useDispatch();
@@ -40,9 +188,8 @@ const EditBusinessPage = () => {
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
-    // פונקציה פנימית לטעינת העסק
     const loadBusiness = async (businessId) => {
-      const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
+      const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
       if (!token) {
         window.location.href = '/login';
         return;
@@ -82,25 +229,10 @@ const EditBusinessPage = () => {
 
     if (id) {
       if (selectedBusiness) {
-        // יש כבר עסק ברידקס עם ה-ID המבוקש, נאתחל ישירות
         initializeBusinessData(selectedBusiness);
       } else {
-        // אין ברידקס, נטען מה-API
         loadBusiness(id);
       }
-    } else {
-      // אין ID, אתחל לעסק חדש (כמו שהייתה ההגדרה ההתחלתית)
-      setBusinessData({
-        name: '',
-        address: '',
-        phone: '',
-        email: '',
-        categoryId: '',
-        description: '',
-        logo: null,
-        services: [],
-        openingHours: []
-      });
     }
   }, [id, selectedBusiness, dispatch]);
 
@@ -112,7 +244,6 @@ const EditBusinessPage = () => {
       console.error("Error fetching categories:", error);
     }
   };
-
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -139,7 +270,7 @@ const EditBusinessPage = () => {
     const missingFields = requiredFields.filter(field => !businessData[field] || String(businessData[field]).trim() === "");
     if (missingFields.length > 0) {
       setIsLoading(false);
-      setMessage({ type: 'error', text: `Please fill in the required fields: ${missingFields.join(", ")}` });
+      setMessage({ type: 'error', text: `נא למלא את השדות הנדרשים: ${missingFields.join(", ")}` });
       return;
     }
 
@@ -167,9 +298,9 @@ const EditBusinessPage = () => {
     try {
       const token = getToken();
       await uploadBusiness(token, formData);
-      setMessage({ type: 'success', text: `Business ${selectedBusiness ? 'updated' : 'created'} successfully!` });
+      setMessage({ type: 'success', text: `העסק ${selectedBusiness ? 'עודכן' : 'נוצר'} בהצלחה!` });
     } catch (error) {
-      setMessage({ type: 'error', text: 'An error occurred while processing the business' });
+      setMessage({ type: 'error', text: 'אירעה שגיאה בעת שמירת העסק' });
     } finally {
       setIsLoading(false);
     }
@@ -194,7 +325,7 @@ const EditBusinessPage = () => {
       <div className='step-page-container'>
         {isLoading && (
           <div className="loading-overlay">
-            <div className="loading-animation">🕺💃 Loading... Please dance with me! 🎵</div>
+            <div className="loading-animation">🕺💃 טוען... רוקדים רגע! 🎵</div>
           </div>
         )}
 
@@ -209,52 +340,17 @@ const EditBusinessPage = () => {
           <div className="header-line"></div>
         </div>
 
-        <MultiStep
-          showNavigation={true}
-          prevButton={{
-            title: '→',
-            style: {
-              border: 'none',
-              borderRadius: '8px',
-              padding: '10px 24px',
-              fontSize: '22px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-              marginInlineStart: '10px',
-              marginTop: '14px',
-              marginBottom: '24px'
-            }
-          }}
-          nextButton={{
-            title: '←',
-            style: {
-              border: 'none',
-              borderRadius: '8px',
-              padding: '10px 24px',
-              fontSize: '22px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-              marginInlineStart: '10px',
-              marginTop: '14px',
-              marginBottom: '24px'
-            }
-          }}
-        >
-          <StepBusinessDetails title='פרטים כלליים' businessData={businessData} setBusinessData={setBusinessData} categories={categories} />
-          <StepBusinessServices title='שירותי העסק' businessData={businessData} setBusinessData={setBusinessData} categories={categories} />
-          <StepBusinessHours title='שעות פעילות' businessData={businessData} setBusinessData={setBusinessData} categories={categories} />
-        </MultiStep>
+        <StepsProvider>
+          <MySteps
+            businessData={businessData}
+            setBusinessData={setBusinessData}
+            categories={categories}
+            handleSubmit={handleSubmit}
+            selectedBusiness={selectedBusiness}
+          />
+        </StepsProvider>
 
-        <button
-          onClick={handleSubmit}
-          disabled={isLoading}
-          className="save-button"
-        >
-          {selectedBusiness ? <FaEdit /> : <FaPlus />}
-          {selectedBusiness ? 'עדכן פרטי עסק' : 'צור עסק חדש'}
-        </button>
+        <ToastContainer />
       </div>
     </div>
   );
