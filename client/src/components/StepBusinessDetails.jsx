@@ -75,11 +75,11 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
     : null;
 
   // כוכבית אדומה לשדות חובה
-  const RequiredMark = () => <span style={{ color: 'red', marginLeft: 4 }}>*</span>;
+  const RequiredMark = () => <span style={{ color: 'red', marginLeft: 4 }}> * </span>;
 
   return (
     <div className="step-business-details">
-      <h1 className="step-title">פרטי העסק</h1>
+      {/* <h1 className="step-title">פרטי העסק</h1> */}
 
       <div className="form-group">
         <label htmlFor="name" className="form-label">

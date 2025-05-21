@@ -84,10 +84,10 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
 
   return (
     <div className="step-business-details">
-      <h2 className="step-title">
+      {/* <h2 className="step-title">
         <FaClock className="icon" />
         שעות פעילות
-      </h2>
+      </h2> */}
 
       {hours.map((day, dayIndex) => {
         const hebDay = DAYS.find(d => d.day === day.day)?.heb || `יום ${day.day}`;

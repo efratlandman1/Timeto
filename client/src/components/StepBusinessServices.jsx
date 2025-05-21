@@ -40,9 +40,9 @@ const StepBusinessServices = ({ businessData, setBusinessData }) => {
 
   return (
     <div className="step-business-details">
-      <h2 className="step-title">
+      {/* <h2 className="step-title">
         <FaTags style={{ color: '#e63946' }} /> שירותים שהעסק מספק
-      </h2>
+      </h2> */}
       <div className="tags-container">
         {availableServices.map(service => (
           <div
