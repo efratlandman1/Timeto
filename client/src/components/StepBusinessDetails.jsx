@@ -1,63 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { FaSave, FaEdit, FaUpload } from 'react-icons/fa';
+import React from 'react';
+import { FaUpload } from 'react-icons/fa';
 import '../styles/StepsStyle.css';
 
+const phonePrefixes = [
+  '050', '052', '053', '054', '055', '057', '058',
+  '02', '03', '04', '08', '09',
+  '072', '073', '074', '076',
+];
+
 const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
-  const [errors, setErrors] = useState({
-    phone: '',
-    email: '',
-  });
-
-  // בדיקת תקינות טלפון (כמו בדף הרישום)
-  const validatePhone = (phone) => {
-    const phoneRegex = /^05[0-9]{1}-?[0-9]{7}$/;
-    return phoneRegex.test(phone);
-  };
-
-  // בדיקת תקינות אימייל סטנדרטית
-  const validateEmail = (email) => {
-    // שימוש ב-HTML5 דיפולטיבי דרך onInvalid הוא אפשרות, אבל פה עושים בדיקה ידנית
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+
     if (name === 'logo') {
       setBusinessData(prev => ({
         ...prev,
         [name]: files && files[0] ? files[0] : null
       }));
-      // ניקוי שגיאות במקרה ונבחר לוגו חדש
-      setErrors(prev => ({ ...prev, logo: '' }));
-    } else {
-      setBusinessData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-      // אם המשתמש משנה טלפון או אימייל, מנקים שגיאה קודם
-      if (name === 'phone' || name === 'email') {
-        setErrors(prev => ({ ...prev, [name]: '' }));
-      }
+      return;
     }
-  };
 
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    if (name === 'phone' && value) {
-      if (!validatePhone(value)) {
-        setErrors(prev => ({ ...prev, phone: 'נא להזין טלפון תקין בפורמט 05X-XXXXXXX' }));
-      } else {
-        setErrors(prev => ({ ...prev, phone: '' }));
-      }
-    }
-    if (name === 'email' && value) {
-      if (!validateEmail(value)) {
-        setErrors(prev => ({ ...prev, email: 'נא להזין כתובת אימייל תקינה' }));
-      } else {
-        setErrors(prev => ({ ...prev, email: '' }));
-      }
-    }
+    setBusinessData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const removeLogo = () => {
@@ -67,19 +33,16 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
     }));
   };
 
-  // יצירת URL זמני לתצוגת הלוגו (קובץ חדש)
   const logoPreviewUrl = businessData.logo
     ? (typeof businessData.logo === 'string'
         ? `${process.env.REACT_APP_API_DOMAIN}${businessData.logo.replace('/app/config', '')}`
         : URL.createObjectURL(businessData.logo))
     : null;
 
-  // כוכבית אדומה לשדות חובה
   const RequiredMark = () => <span style={{ color: 'red', marginLeft: 4 }}> * </span>;
 
   return (
     <div className="step-business-details">
-      {/* <h1 className="step-title">פרטי העסק</h1> */}
 
       <div className="form-group">
         <label htmlFor="name" className="form-label">
@@ -89,7 +52,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
           type="text"
           id="name"
           name="name"
-          value={businessData.name}
+          value={businessData.name || ''}
           onChange={handleChange}
           className="form-input"
           required
@@ -104,29 +67,46 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
           type="text"
           id="address"
           name="address"
-          value={businessData.address}
+          value={businessData.address || ''}
           onChange={handleChange}
           className="form-input"
           required
         />
       </div>
 
-      <div className="form-group">
-        <label htmlFor="phone" className="form-label">
+      <div className="form-group" style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+        <label htmlFor="phonePrefix" className="form-label" style={{ flexShrink: 0, marginTop: '6px' }}>
           טלפון<RequiredMark />
         </label>
-        <input
-          type="tel"
-          id="phone"
-          name="phone"
-          value={businessData.phone}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          className="form-input"
-          required
-          placeholder="051-234567"
-        />
-        {errors.phone && <div className="input-error">{errors.phone}</div>}
+
+        <div style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: "ltr" }}>
+          <select
+            id="phonePrefix"
+            name="prefix"
+            value={businessData.prefix || ''}
+            onChange={handleChange}
+            className="form-input"
+            style={{ width: '80px', textAlign: 'center' }}
+            required
+          >
+            <option value="">בחר קידומת</option>
+            {phonePrefixes.map(prefix => (
+              <option key={prefix} value={prefix}>{prefix}</option>
+            ))}
+          </select>
+
+          <input
+            type="text"
+            id="phone"
+            name="phone"
+            value={businessData.phone || ''}
+            onChange={handleChange}
+            className="form-input"
+            style={{ flexGrow: 1 }}
+            inputMode="numeric"
+            maxLength={7}
+          />
+        </div>
       </div>
 
       <div className="form-group">
@@ -137,14 +117,11 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
           type="email"
           id="email"
           name="email"
-          value={businessData.email}
+          value={businessData.email || ''}
           onChange={handleChange}
-          onBlur={handleBlur}
           className="form-input"
           required
-          placeholder="example@mail.com"
         />
-        {errors.email && <div className="input-error">{errors.email}</div>}
       </div>
 
       <div className="form-group">
@@ -154,16 +131,14 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
         <select
           id="categoryId"
           name="categoryId"
-          value={businessData.categoryId}
+          value={businessData.categoryId || ''}
           onChange={handleChange}
           className="form-select"
           required
         >
           <option value="">בחר תחום</option>
-          {categories.map((cat) => (
-            <option key={cat._id} value={cat._id}>
-              {cat.name}
-            </option>
+          {categories.map(cat => (
+            <option key={cat._id} value={cat._id}>{cat.name}</option>
           ))}
         </select>
       </div>
@@ -174,7 +149,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
           type="text"
           id="description"
           name="description"
-          value={businessData.description}
+          value={businessData.description || ''}
           onChange={handleChange}
           className="form-input"
         />
@@ -182,43 +157,40 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
 
       <div className="form-group-logo">
         <label htmlFor="logo" className="button file-upload">
-            <FaUpload className="icon" />
-            {'בחירת לוגו'}
-            <input
+          <FaUpload className="icon" />
+          {'בחירת לוגו'}
+          <input
             type="file"
             id="logo"
             name="logo"
             onChange={handleChange}
             style={{ display: 'none' }}
             accept="image/*"
-            />
+          />
         </label>
 
         {logoPreviewUrl && (
-            <div className="logo-preview-wrapper">
-                <img
-                src={logoPreviewUrl}
-                alt="תצוגת לוגו"
-                className="business-logo-preview"
-                onLoad={() => {
-                    if (typeof businessData.logo !== 'string') {
-                    URL.revokeObjectURL(logoPreviewUrl);
-                    }
-                }}
-                />
-                <button
-                className="remove-logo-button"
-                onClick={removeLogo}
-                title="הסר לוגו"
-                >
-                &times;
-                </button>
-            </div>
-            )}
-
-        </div>
-
-
+          <div className="logo-preview-wrapper">
+            <img
+              src={logoPreviewUrl}
+              alt="תצוגת לוגו"
+              className="business-logo-preview"
+              onLoad={() => {
+                if (typeof businessData.logo !== 'string') {
+                  URL.revokeObjectURL(logoPreviewUrl);
+                }
+              }}
+            />
+            <button
+              className="remove-logo-button"
+              onClick={removeLogo}
+              title="הסר לוגו"
+            >
+              &times;
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
