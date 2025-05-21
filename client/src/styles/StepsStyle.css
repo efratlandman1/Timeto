@@ -181,6 +181,7 @@
     gap: 10px;
     margin-bottom: 6px;
     margin-right: 10px;
+    direction: ltr;
   }
   
   .time-range input[type="time"] {
