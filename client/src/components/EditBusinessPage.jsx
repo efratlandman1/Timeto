@@ -13,13 +13,34 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Steps, StepsProvider, useSteps } from 'react-step-builder';
 
-const requiredFields = ["name", "categoryId", "address", "phone", "email"];
+const requiredFields = ["name", "categoryId", "address", "phone", "prefix", "email"];
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 const isValidPhone = (phone) => {
   const cleaned = phone.replace(/[-\s]/g, '');
   return /^\d{6,7}$/.test(cleaned); 
 };
+
+const isValidOpeningHours = (openingHours = []) => {
+  return openingHours.every(day => {
+    if (day.closed) return true; // סגור = תקין
+
+    if (!Array.isArray(day.ranges) || day.ranges.length === 0) return false;
+
+    return day.ranges.every(range => {
+      if (!range.open || !range.close) return false;
+
+      const [openHour, openMinute] = range.open.split(':').map(Number);
+      const [closeHour, closeMinute] = range.close.split(':').map(Number);
+
+      const openTotalMinutes = openHour * 60 + openMinute;
+      const closeTotalMinutes = closeHour * 60 + closeMinute;
+
+      return closeTotalMinutes > openTotalMinutes;
+    });
+  });
+};
+
 
 
 // ProgressBar
@@ -136,7 +157,8 @@ const MySteps = ({
         <StepBusinessHours {...{ businessData, setBusinessData, categories }} />
       </Steps>
       <NavigationButtons businessData={businessData} />
-      {current === 3 && (
+      {/* {current === 3 && isValidOpeningHours(businessData.openingHours) &&  ( */}
+      {current === 3  &&  (
         <button onClick={handleSubmit} className="save-button">
           {selectedBusiness ? <FaEdit /> : <FaPlus />}
           {selectedBusiness ? 'עדכן פרטי עסק' : 'צור עסק חדש'}
@@ -273,6 +295,12 @@ const EditBusinessPage = () => {
       toast.error('מספר הטלפון אינו תקין');
       return;
     }
+
+    if (!isValidOpeningHours(businessData.openingHours)) {
+      setIsLoading(false);
+      toast.error('יש להשלים שעות פתיחה ו/או סגירה עבור ימים פתוחים');
+      return;
+}
 
     const formData = new FormData();
     formData.append('name', businessData.name);
