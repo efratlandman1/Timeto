@@ -338,3 +338,6 @@
   border: 1px solid #ddd;
   display: block;
 }
+.input-error-border {
+  border: 2px solid red !important;
+}
