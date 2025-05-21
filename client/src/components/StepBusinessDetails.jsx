@@ -70,7 +70,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
   // יצירת URL זמני לתצוגת הלוגו (קובץ חדש)
   const logoPreviewUrl = businessData.logo
     ? (typeof businessData.logo === 'string'
-        ? `${process.env.REACT_APP_API_DOMAIN}/uploads/${businessData.logo}`
+        ? `${process.env.REACT_APP_API_DOMAIN}${businessData.logo.replace('/app/config', '')}`
         : URL.createObjectURL(businessData.logo))
     : null;
 
