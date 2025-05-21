@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams,useNavigate  } from 'react-router-dom';
 import axios from 'axios';
 import { FaSave, FaPlus, FaEdit } from 'react-icons/fa';
 import StepBusinessDetails from './StepBusinessDetails';
@@ -227,6 +227,8 @@ const EditBusinessPage = () => {
 
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadBusiness = async (businessId) => {
@@ -348,7 +350,15 @@ const EditBusinessPage = () => {
     try {
       const token = getToken();
       await uploadBusiness(token, formData);
-      toast.success(`העסק ${selectedBusiness ? 'עודכן' : 'נוצר'} בהצלחה!`);
+      // toast.success(`העסק ${selectedBusiness ? 'עודכן' : 'נוצר'} בהצלחה!`);
+      toast.success(`העסק ${selectedBusiness ? 'עודכן' : 'נוצר'} בהצלחה!`, {
+        position: 'top-center',
+        className: 'custom-toast',
+      });
+      setTimeout(() => {
+        navigate('/user-businesses'); 
+      }, 1500); 
+
     } catch (error) {
       toast.error('אירעה שגיאה בעת שמירת העסק');
     } finally {
