@@ -8,34 +8,52 @@ import StepBusinessServices from './StepBusinessServices';
 import StepBusinessHours from './StepBusinessHours';
 import '../styles/EditBusinessPage.css';
 import { setSelectedBusiness } from '../redux/businessSlice';
-import { ToastContainer,toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Steps, StepsProvider, useSteps } from 'react-step-builder';
 
-const ProgressBar = () => {
+const requiredFields = ["name", "categoryId", "address", "phone", "email"];
+
+const ProgressBar = ({ businessData }) => {
   const { current, total, jump } = useSteps();
 
+  const canJumpForward = requiredFields.every(
+    (field) => businessData[field] && String(businessData[field]).trim() !== ''
+  );
+
+  const handleJump = (stepNumber) => {
+    if (stepNumber > current && !canJumpForward) {
+      toast.error('נא למלא את כל השדות החובה לפני המעבר לשלב הבא');
+      return;
+    }
+    jump(stepNumber);
+  };
+
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      position: 'relative',
-      marginBottom: 20,
-      marginTop: 10,
-      padding: '0 20px',
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        position: 'relative',
+        marginBottom: 20,
+        marginTop: 10,
+        padding: '0 20px',
+      }}
+    >
       {/* פס רקע */}
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: 0,
-        right: 0,
-        height: 4,
-        backgroundColor: '#eee',
-        zIndex: 0,
-        transform: 'translateY(-50%)',
-      }} />
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: 0,
+          right: 0,
+          height: 4,
+          backgroundColor: '#eee',
+          zIndex: 0,
+          transform: 'translateY(-50%)',
+        }}
+      />
 
       {/* עיגולים */}
       {[...Array(total)].map((_, index) => {
@@ -44,7 +62,7 @@ const ProgressBar = () => {
         return (
           <div
             key={index}
-            onClick={() => jump(stepNumber)}
+            onClick={() => handleJump(stepNumber)}
             style={{
               width: 20,
               height: 20,
@@ -62,18 +80,31 @@ const ProgressBar = () => {
   );
 };
 
-
-const NavigationButtons = () => {
+const NavigationButtons = ({ businessData }) => {
   const { next, prev, current, total } = useSteps();
 
+  const canGoNext = requiredFields.every(
+    (field) => businessData[field] && String(businessData[field]).trim() !== ''
+  );
+
+  const handleNext = () => {
+    if (!canGoNext) {
+      toast.error('נא למלא את כל השדות החובה לפני המעבר לשלב הבא');
+      return;
+    }
+    next();
+  };
+
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',  // יישור החיצים לצדדים (ימין ושמאל)
-      marginTop: 24,
-      marginBottom: 24,
-      padding: '0 10px'
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center', // יישור החיצים לצדדים (ימין ושמאל)
+        marginTop: 24,
+        marginBottom: 24,
+        padding: '0 10px',
+      }}
+    >
       {/* חץ שמאלי - חזרה */}
       {current > 1 ? (
         <button
@@ -90,14 +121,16 @@ const NavigationButtons = () => {
           }}
           aria-label="Previous step"
         >
-         → 
+          →
         </button>
-      ) : <div style={{ width: '100px' }} />} {/* לשמור רווח שווה */}
+      ) : (
+        <div style={{ width: '100px' }} />
+      ) /* לשמור רווח שווה */}
 
       {/* חץ ימני - קדימה */}
       {current < total ? (
         <button
-          onClick={next}
+          onClick={handleNext}
           style={{
             border: 'none',
             borderRadius: '8px',
@@ -112,40 +145,48 @@ const NavigationButtons = () => {
         >
           ←
         </button>
-      ) : <div style={{ width: '100px' }} />} {/* לשמור רווח שווה */}
+      ) : (
+        <div style={{ width: '100px' }} />
+      ) /* לשמור רווח שווה */}
     </div>
   );
 };
 
-const MySteps = ({ businessData, setBusinessData, categories, handleSubmit, selectedBusiness }) => {
+const MySteps = ({
+  businessData,
+  setBusinessData,
+  categories,
+  handleSubmit,
+  selectedBusiness,
+}) => {
   const { current } = useSteps();
 
   return (
     <>
-      <ProgressBar />
+      <ProgressBar businessData={businessData} />
 
       <Steps>
         <StepBusinessDetails
-          title='פרטים כלליים'
+          title="פרטים כלליים"
           businessData={businessData}
           setBusinessData={setBusinessData}
           categories={categories}
         />
         <StepBusinessServices
-          title='שירותי העסק'
+          title="שירותי העסק"
           businessData={businessData}
           setBusinessData={setBusinessData}
           categories={categories}
         />
         <StepBusinessHours
-          title='שעות פעילות'
+          title="שעות פעילות"
           businessData={businessData}
           setBusinessData={setBusinessData}
           categories={categories}
         />
       </Steps>
 
-      <NavigationButtons />
+      <NavigationButtons businessData={businessData} />
 
       {current === 3 && (
         <button
@@ -165,10 +206,11 @@ const EditBusinessPage = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
 
-  const selectedBusiness = useSelector(state =>
-    state.business.selectedBusiness && state.business.selectedBusiness._id === id
-      ? state.business.selectedBusiness
-      : null
+  const selectedBusiness = useSelector(
+    (state) =>
+      state.business.selectedBusiness && state.business.selectedBusiness._id === id
+        ? state.business.selectedBusiness
+        : null
   );
 
   const [businessData, setBusinessData] = useState({
@@ -180,7 +222,7 @@ const EditBusinessPage = () => {
     description: '',
     logo: null,
     services: [],
-    openingHours: []
+    openingHours: [],
   });
 
   const [categories, setCategories] = useState([]);
@@ -188,16 +230,22 @@ const EditBusinessPage = () => {
 
   useEffect(() => {
     const loadBusiness = async (businessId) => {
-      const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+      const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1];
       if (!token) {
         window.location.href = '/login';
         return;
       }
       setIsLoading(true);
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${businessId}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${businessId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const biz = response.data;
         dispatch(setSelectedBusiness(biz));
         initializeBusinessData(biz);
@@ -216,11 +264,12 @@ const EditBusinessPage = () => {
         address: biz.address,
         phone: biz.phone,
         email: biz.email,
-        categoryId: biz.categoryId,
+        // categoryId: biz.categoryId,
+        categoryId: biz.categoryId && typeof biz.categoryId === 'object' ? biz.categoryId._id : biz.categoryId,
         description: biz.description,
         logo: biz.logo || null,
         services: biz.services || [],
-        openingHours: deepCopiedHours
+        openingHours: deepCopiedHours,
       });
     };
 
@@ -228,7 +277,7 @@ const EditBusinessPage = () => {
 
     if (id) {
       if (selectedBusiness) {
-        initializeBusinessData(selectedBusiness); 
+        initializeBusinessData(selectedBusiness);
       } else {
         loadBusiness(id);
       }
@@ -237,24 +286,26 @@ const EditBusinessPage = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`
+      );
       setCategories(response.data);
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error('Error fetching categories:', error);
     }
   };
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'logo') {
-      setBusinessData(prev => ({
+      setBusinessData((prev) => ({
         ...prev,
-        [name]: files && files[0] ? files[0] : null
+        [name]: files && files[0] ? files[0] : null,
       }));
     } else {
-      setBusinessData(prev => ({
+      setBusinessData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -264,11 +315,12 @@ const EditBusinessPage = () => {
 
     setIsLoading(true);
 
-    const requiredFields = ["name", "categoryId", "address", "phone", "email"];
-    const missingFields = requiredFields.filter(field => !businessData[field] || String(businessData[field]).trim() === "");
+    const missingFields = requiredFields.filter(
+      (field) => !businessData[field] || String(businessData[field]).trim() === ''
+    );
     if (missingFields.length > 0) {
       setIsLoading(false);
-      toast.error(`נא למלא את השדות הנדרשים: ${missingFields.join(", ")}`);
+      toast.error(`נא למלא את השדות הנדרשים: ${missingFields.join(', ')}`);
       return;
     }
 
@@ -305,29 +357,28 @@ const EditBusinessPage = () => {
   };
 
   const getToken = () => {
-    const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+    const tokenCookie = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('token='));
     return tokenCookie ? tokenCookie.split('=')[1] : null;
   };
 
   const uploadBusiness = async (token, formData) => {
-    return await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, formData, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data'
+    return await axios.post(
+      `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
       }
-    });
+    );
   };
 
   return (
     <div className={`page-container ${isLoading ? 'disabled' : ''}`}>
-      <div className='step-page-container'>
-        {/* {isLoading && (
-          <div className="loading-overlay">
-            <div className="edit-business-spinner" />
-          </div>
-        )} */}
-
-
+      <div className="step-page-container">
         <div className="page-header">
           <h1>{selectedBusiness ? 'עדכון פרטי עסק' : 'הוספת עסק'}</h1>
           <div className="header-line"></div>
