@@ -8,7 +8,7 @@ import StepBusinessServices from './StepBusinessServices';
 import StepBusinessHours from './StepBusinessHours';
 import '../styles/EditBusinessPage.css';
 import { setSelectedBusiness } from '../redux/businessSlice';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer,toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Steps, StepsProvider, useSteps } from 'react-step-builder';
 
@@ -185,7 +185,6 @@ const EditBusinessPage = () => {
 
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     const loadBusiness = async (businessId) => {
@@ -229,7 +228,7 @@ const EditBusinessPage = () => {
 
     if (id) {
       if (selectedBusiness) {
-        initializeBusinessData(selectedBusiness);
+        initializeBusinessData(selectedBusiness); 
       } else {
         loadBusiness(id);
       }
@@ -264,13 +263,12 @@ const EditBusinessPage = () => {
     if (e) e.preventDefault();
 
     setIsLoading(true);
-    setMessage(null);
 
     const requiredFields = ["name", "categoryId", "address", "phone", "email"];
     const missingFields = requiredFields.filter(field => !businessData[field] || String(businessData[field]).trim() === "");
     if (missingFields.length > 0) {
       setIsLoading(false);
-      setMessage({ type: 'error', text: `נא למלא את השדות הנדרשים: ${missingFields.join(", ")}` });
+      toast.error(`נא למלא את השדות הנדרשים: ${missingFields.join(", ")}`);
       return;
     }
 
@@ -298,9 +296,9 @@ const EditBusinessPage = () => {
     try {
       const token = getToken();
       await uploadBusiness(token, formData);
-      setMessage({ type: 'success', text: `העסק ${selectedBusiness ? 'עודכן' : 'נוצר'} בהצלחה!` });
+      toast.success(`העסק ${selectedBusiness ? 'עודכן' : 'נוצר'} בהצלחה!`);
     } catch (error) {
-      setMessage({ type: 'error', text: 'אירעה שגיאה בעת שמירת העסק' });
+      toast.error('אירעה שגיאה בעת שמירת העסק');
     } finally {
       setIsLoading(false);
     }
@@ -323,17 +321,12 @@ const EditBusinessPage = () => {
   return (
     <div className={`page-container ${isLoading ? 'disabled' : ''}`}>
       <div className='step-page-container'>
-        {isLoading && (
+        {/* {isLoading && (
           <div className="loading-overlay">
-            <div className="loading-animation">🕺💃 טוען... רוקדים רגע! 🎵</div>
+            <div className="edit-business-spinner" />
           </div>
-        )}
+        )} */}
 
-        {message && (
-          <div className={`message-box ${message.type === 'success' ? 'success' : 'error'}`}>
-            {message.text}
-          </div>
-        )}
 
         <div className="page-header">
           <h1>{selectedBusiness ? 'עדכון פרטי עסק' : 'הוספת עסק'}</h1>
