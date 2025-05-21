@@ -94,9 +94,10 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
 
             {!day.closed &&
               day.ranges.map((range, rangeIndex) => (
-                <div key={rangeIndex} className="time-range">
+                <div key={rangeIndex} className="time-range" >
                   <input
                     type="time"
+                    id='open'
                     value={range.open}
                     onChange={(e) =>
                       handleRangeChange(dayIndex, rangeIndex, 'open', e.target.value)
@@ -105,6 +106,7 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
                   <span className="dash">-</span>
                   <input
                     type="time"
+                    id='close'
                     value={range.close}
                     onChange={(e) =>
                       handleRangeChange(dayIndex, rangeIndex, 'close', e.target.value)
