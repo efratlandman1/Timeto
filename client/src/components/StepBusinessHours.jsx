@@ -18,19 +18,30 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
   useEffect(() => {
     const initial = DAYS.map(({ day }) => {
       const existing = businessData.openingHours?.find(d => d.day === day);
+      let closed = false;
+      let ranges = [{ open: '08:00', close: '16:00' }];
+
+      if (day === 5) {
+        ranges = [{ open: '08:00', close: '12:00' }];
+      } else if (day === 6) {
+        closed = true;
+        ranges = [];
+      }
+
       return {
         day,
-        closed: existing?.closed || false,
-        ranges: existing?.ranges?.length ? existing.ranges : [{ open: '', close: '' }]
+        closed: existing?.closed ?? closed,
+        ranges: existing?.ranges?.length ? existing.ranges : ranges,
       };
     });
 
     setHours(initial);
     setBusinessData(prev => ({
       ...prev,
-      openingHours: initial
+      openingHours: initial,
     }));
   }, []);
+
 
 
   useEffect(() => {
@@ -88,8 +99,9 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
                 className={`closed-button ${day.closed ? 'active' : ''}`}
                 onClick={() => toggleClosed(dayIndex)}
               >
-                סגור
+                {day.closed ? 'סגור' : 'פתוח'}
               </button>
+
             </div>
 
             {!day.closed &&

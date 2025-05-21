@@ -159,7 +159,7 @@
     color: #333;
   }
   
-  .closed-button {
+  /* .closed-button {
     font-size: 14px;
     padding: 4px 12px;
     border: 2px solid #e63946;
@@ -173,7 +173,7 @@
   .closed-button.active {
     background-color: #e63946;
     color: #fff;
-  }
+  } */
   
   .time-range {
     display: flex;
@@ -342,4 +342,20 @@
 }
 .input-error-border {
   border: 2px solid red !important;
+}
+.closed-button {
+  border: 1px solid #888;
+  background-color: #f8f8f8;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-radius: 4px;
+}
+.closed-button:hover {
+  background-color: #e0e0e0;
+}
+.closed-button.active {
+  background-color: #ffdede;
+  border-color: #d33;
+  color: #d33;
 }
