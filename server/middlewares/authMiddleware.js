@@ -14,6 +14,7 @@ const jwtAuthMiddleware = (req, res, next) => {
         '/api/v1/register',
         '/api/v1/businesses',
         '/api/v1/categories',
+        '/api/v1/businesses/:id',
         '/api/v1/services/byCategory/:categoryId'
     ];
 
@@ -25,6 +26,7 @@ const jwtAuthMiddleware = (req, res, next) => {
     if (isOpen) {
         return next(); // פתוח – לא צריך טוקן
     }
+
 
     const token = req.header('Authorization')?.split(' ')[1]; // Expect "Bearer <token>"
 

@@ -1,6 +1,7 @@
 const Business = require("../models/business");
 const AuthUtils = require('../utils/authUtils');
 const Category = require('../models/category');
+const mongoose = require('mongoose');
 const Service = require('../models/service');
 
 exports.uploadBusinesses = async (req, res) => {
@@ -91,6 +92,7 @@ const updateBusiness = async (req, res, userId) => {
 //         res.status(500).json({message: err.message});
 //     }
 // };
+const DEFAULT_ITEMS_PER_PAGE = 8; // הגדרת ברירת מחדל
 
 
 exports.getUserBusinesses = async (req, res) => {
@@ -106,7 +108,6 @@ exports.getUserBusinesses = async (req, res) => {
     }
 };
 
-const mongoose = require('mongoose'); 
 
 exports.getItems = async (req, res) => {
   try {
@@ -265,3 +266,4 @@ exports.getBusinessById = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch business' });
   }
 };
+
