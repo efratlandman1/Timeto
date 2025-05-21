@@ -16,7 +16,11 @@ import { Steps, StepsProvider, useSteps } from 'react-step-builder';
 const requiredFields = ["name", "categoryId", "address", "phone", "email"];
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-const isValidPhone = (phone) => /^0\d{1,2}-?\d{7}$/.test(phone);
+const isValidPhone = (phone) => {
+  const cleaned = phone.replace(/[-\s]/g, '');
+  return /^\d{6,7}$/.test(cleaned); 
+};
+
 
 // ProgressBar
 const ProgressBar = ({ businessData }) => {
@@ -157,6 +161,7 @@ const EditBusinessPage = () => {
   const [businessData, setBusinessData] = useState({
     name: '',
     address: '',
+    prefix: '',
     phone: '',
     email: '',
     categoryId: '',
@@ -197,6 +202,7 @@ const EditBusinessPage = () => {
         id: biz._id,
         name: biz.name,
         address: biz.address,
+        prefix: biz.prefix,
         phone: biz.phone,
         email: biz.email,
         categoryId: biz.categoryId && typeof biz.categoryId === 'object' ? biz.categoryId._id : biz.categoryId,
@@ -273,6 +279,7 @@ const EditBusinessPage = () => {
     formData.append('categoryId', businessData.categoryId);
     formData.append('description', businessData.description);
     formData.append('address', businessData.address);
+    formData.append('prefix', businessData.prefix);
     formData.append('phone', businessData.phone);
     formData.append('email', businessData.email);
     if (businessData.services && businessData.services.length > 0) {

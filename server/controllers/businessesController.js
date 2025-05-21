@@ -29,6 +29,7 @@ const createBusiness = async (req, res, userId) => {
     const newBusiness = new Business({
       name: req.body.name,
       email: req.body.email,
+      prefix: req.body.prefix,
       phone: req.body.phone,
       categoryId: req.body.categoryId,
       description: req.body.description || '',
@@ -62,6 +63,7 @@ const updateBusiness = async (req, res, userId) => {
 
     existingBusiness.name = req.body.name || existingBusiness.name;
     existingBusiness.email = req.body.email || existingBusiness.email;
+    existingBusiness.prefix = req.body.prefix || existingBusiness.prefix;
     existingBusiness.phone = req.body.phone || existingBusiness.phone;
     existingBusiness.categoryId = req.body.categoryId || existingBusiness.categoryId;
     // existingBusiness.services = req.body.services || existingBusiness.services; // עדכון שירותים
