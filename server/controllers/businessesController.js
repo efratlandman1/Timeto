@@ -268,3 +268,52 @@ exports.getBusinessById = async (req, res) => {
   }
 };
 
+exports.deleteBusiness = async (req, res) => {
+  try {
+    const token = req.headers['authorization']?.split(' ')[1];
+    const userId = AuthUtils.extractUserId(token);
+    const businessId = req.params.id;
+
+    const business = await Business.findById(businessId);
+    if (!business) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    if (business.userId.toString() !== userId) {
+      return res.status(403).json({ error: 'Unauthorized to delete this business' });
+    }
+
+    business.active = false;
+    await business.save();
+
+    res.status(200).json({ message: 'Business marked as inactive' });
+  } catch (error) {
+    console.error('Error deleting business:', error);
+    res.status(500).json({ error: 'Failed to delete business' });
+  }
+};
+
+exports.restoreBusiness = async (req, res) => {
+  try {
+    const token = req.headers['authorization']?.split(' ')[1];
+    const userId = AuthUtils.extractUserId(token);
+    const businessId = req.params.id;
+
+    const business = await Business.findById(businessId);
+    if (!business) {
+      return res.status(404).json({ error: 'Business not found' });
+    }
+
+    if (business.userId.toString() !== userId) {
+      return res.status(403).json({ error: 'Unauthorized to restore this business' });
+    }
+
+    business.active = true;
+    await business.save();
+
+    res.status(200).json({ message: 'Business restored successfully', business });
+  } catch (error) {
+    console.error('Error restoring business:', error);
+    res.status(500).json({ error: 'Failed to restore business' });
+  }
+};

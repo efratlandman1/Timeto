@@ -14,6 +14,7 @@ const businessSchema = new mongoose.Schema({
     // subCategoryIds: [String],
     // // active: { type: Boolean, required: true },
     // userId: String
+    active: {  type: Boolean,  default: true},
     categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'categories', required: true },
     services: [{ type: mongoose.Schema.Types.ObjectId, ref: 'services' }],
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
