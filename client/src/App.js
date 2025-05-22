@@ -13,7 +13,8 @@ import FeedbackPage from './components/FeedbackPage' ;
 import BusinessProfilePage from './components/BusinessProfilePage';
 import { useDispatch } from 'react-redux';
 import { setUser } from './redux/userSlice';
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
     const dispatch = useDispatch();
@@ -27,6 +28,15 @@ function App() {
         <Router>
             <GlobalStyles />
             <Header />
+            <ToastContainer
+                position="top-center"
+                rtl={true}
+                autoClose={3000}
+                hideProgressBar={false}
+                closeOnClick
+                pauseOnHover
+                draggable
+            />
             <Routes>
                 <Route path="/" element={<MainPage />} />
                 <Route path="/edit" element={<EditBusinessPage />} />
