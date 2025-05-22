@@ -79,31 +79,86 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
   return (
     <div className="business-card">
       <div className="business-card-left">
-        {fromUserBusinesses ? (
-          <>
-            <button className="business-card-action-button edit" onClick={handleEdit}><FaPencilAlt /></button>
+            {fromUserBusinesses ? (
+            <>
+                <button
+                className="business-card-action-button edit"
+                onClick={handleEdit}
+                title="עריכת העסק"
+                >
+                <FaPencilAlt />
+                </button>
 
-            {localActive ? (
-              confirmDelete ? (
-                <>
-                  <button className="business-card-action-button delete" onClick={handleDeleteConfirmed}>✔</button>
-                  <button className="business-card-action-button delete" onClick={() => setConfirmDelete(false)}>✖</button>
-                </>
-              ) : (
-                <button className="business-card-action-button delete" onClick={() => setConfirmDelete(true)}><FaTrash /></button>
-              )
+                {localActive ? (
+                confirmDelete ? (
+                    <>
+                    <button
+                        className="business-card-action-button delete"
+                        onClick={handleDeleteConfirmed}
+                        title="אישור מחיקה"
+                    >
+                        ✔
+                    </button>
+                    <button
+                        className="business-card-action-button delete"
+                        onClick={() => setConfirmDelete(false)}
+                        title="ביטול מחיקה"
+                    >
+                        ✖
+                    </button>
+                    </>
+                ) : (
+                    <button
+                    className="business-card-action-button delete"
+                    onClick={() => setConfirmDelete(true)}
+                    title="מחיקת עסק"
+                    >
+                    <FaTrash />
+                    </button>
+                )
+                ) : (
+                <button
+                    className="business-card-action-button restore"
+                    onClick={handleRestore}
+                    title="שחזור עסק"
+                >
+                    <FaRecycle />
+                </button>
+                )}
+            </>
             ) : (
-              <button className="business-card-action-button restore" onClick={handleRestore}><FaRecycle /></button>
+            <>
+                <a
+                href={`mailto:${business.email}`}
+                className="business-card-action-button email"
+                title="שליחת אימייל"
+                >
+                <FaEnvelope />
+                </a>
+                <a
+                href={`https://wa.me/${business.phone}`}
+                className="business-card-action-button whatsapp"
+                title="שליחת הודעת וואטסאפ"
+                >
+                <FaWhatsapp />
+                </a>
+                <a
+                href={`tel:${business.phone}`}
+                className="business-card-action-button phone"
+                title="התקשרות טלפונית"
+                >
+                <FaPhone />
+                </a>
+                <button
+                className="business-card-action-button feedback"
+                onClick={handleFeedback}
+                title="השארת ביקורת"
+                >
+                <FaRegStar />
+                </button>
+            </>
             )}
-          </>
-        ) : (
-          <>
-            <a href={`mailto:${business.email}`} className="business-card-action-button email"><FaEnvelope /></a>
-            <a href={`https://wa.me/${business.phone}`} className="business-card-action-button whatsapp"><FaWhatsapp /></a>
-            <a href={`tel:${business.phone}`} className="business-card-action-button phone"><FaPhone /></a>
-            <button className="business-card-action-button feedback" onClick={handleFeedback}><FaRegStar /></button>
-          </>
-        )}
+
       </div>
 
       <div className="business-card-right" onClick={handleCardClick}>
