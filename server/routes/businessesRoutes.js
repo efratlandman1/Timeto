@@ -17,8 +17,12 @@ router
 
 router
   .route('/:id')
-  .get(businessesController.getBusinessById);
+  .get(businessesController.getBusinessById)
+  .delete(businessesController.deleteBusiness);
+
+router
+  .patch('/restore/:id', businessesController.restoreBusiness);
+
   
 module.exports = router;
-
 
