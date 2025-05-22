@@ -77,91 +77,99 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
   };
 
   return (
-    <div className="business-card">
+    <div className={`business-card ${!localActive ? 'inactive' : ''}`}>
       <div className="business-card-left">
-            {fromUserBusinesses ? (
-            <>
-                <button
+        {fromUserBusinesses ? (
+          <>
+            <button
                 className="business-card-action-button edit"
-                onClick={handleEdit}
+                onClick={localActive ? handleEdit : undefined}
                 title="עריכת העסק"
+                disabled={!localActive}
                 >
                 <FaPencilAlt />
-                </button>
+            </button>
 
-                {localActive ? (
-                confirmDelete ? (
-                    <>
-                    <button
-                        className="business-card-action-button delete"
-                        onClick={handleDeleteConfirmed}
-                        title="אישור מחיקה"
-                    >
-                        ✔
-                    </button>
-                    <button
-                        className="business-card-action-button delete"
-                        onClick={() => setConfirmDelete(false)}
-                        title="ביטול מחיקה"
-                    >
-                        ✖
-                    </button>
-                    </>
-                ) : (
-                    <button
+            {localActive ? (
+              confirmDelete ? (
+                <>
+                  <button
                     className="business-card-action-button delete"
-                    onClick={() => setConfirmDelete(true)}
-                    title="מחיקת עסק"
-                    >
-                    <FaTrash />
-                    </button>
-                )
-                ) : (
+                    onClick={handleDeleteConfirmed}
+                    title="אישור מחיקה"
+                  >
+                    ✔
+                  </button>
+                  <button
+                    className="business-card-action-button delete"
+                    onClick={() => setConfirmDelete(false)}
+                    title="ביטול מחיקה"
+                  >
+                    ✖
+                  </button>
+                </>
+              ) : (
                 <button
-                    className="business-card-action-button restore"
-                    onClick={handleRestore}
-                    title="שחזור עסק"
+                  className="business-card-action-button delete"
+                  onClick={() => setConfirmDelete(true)}
+                  title="מחיקת עסק"
                 >
-                    <FaRecycle />
+                  <FaTrash />
                 </button>
-                )}
-            </>
+              )
             ) : (
-            <>
-                <a
-                href={`mailto:${business.email}`}
-                className="business-card-action-button email"
-                title="שליחת אימייל"
-                >
-                <FaEnvelope />
-                </a>
-                <a
-                href={`https://wa.me/${business.phone}`}
-                className="business-card-action-button whatsapp"
-                title="שליחת הודעת וואטסאפ"
-                >
-                <FaWhatsapp />
-                </a>
-                <a
-                href={`tel:${business.phone}`}
-                className="business-card-action-button phone"
-                title="התקשרות טלפונית"
-                >
-                <FaPhone />
-                </a>
-                <button
-                className="business-card-action-button feedback"
-                onClick={handleFeedback}
-                title="השארת ביקורת"
-                >
-                <FaRegStar />
-                </button>
-            </>
+              <button
+                className="business-card-action-button restore"
+                onClick={handleRestore}
+                title="שחזור עסק"
+              >
+                <FaRecycle />
+              </button>
             )}
-
+          </>
+        ) : (
+          <>
+            <a
+              href={`mailto:${business.email}`}
+              className="business-card-action-button email"
+              title="שליחת אימייל"
+            >
+              <FaEnvelope />
+            </a>
+            <a
+              href={`https://wa.me/${business.phone}`}
+              className="business-card-action-button whatsapp"
+              title="שליחת הודעת וואטסאפ"
+            >
+              <FaWhatsapp />
+            </a>
+            <a
+              href={`tel:${business.phone}`}
+              className="business-card-action-button phone"
+              title="התקשרות טלפונית"
+            >
+              <FaPhone />
+            </a>
+            <button
+              className="business-card-action-button feedback"
+              onClick={handleFeedback}
+              title="השארת ביקורת"
+            >
+              <FaRegStar />
+            </button>
+          </>
+        )}
       </div>
 
-      <div className="business-card-right" onClick={handleCardClick}>
+      <div
+        className="business-card-right"
+        onClick={localActive ? handleCardClick : undefined}
+      >
+        {!localActive && (
+          <div className="business-card-status-badge">
+             לא פעיל
+          </div>
+        )}
         <img
           className="business-card-image"
           src={
