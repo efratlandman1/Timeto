@@ -186,21 +186,21 @@ exports.getItems = async (req, res) => {
 
     if (services) {
       let serviceList = Array.isArray(services) ? services : [services];
-      console.log("serviceList:",serviceList)
+      // console.log("serviceList:",serviceList)
       // נבדוק אם זה מזהים או מחרוזות
       const objectIds = serviceList.filter(id => mongoose.Types.ObjectId.isValid(id));
-      console.log("objectIds:",objectIds)
+      // console.log("objectIds:",objectIds)
 
       if (objectIds.length === serviceList.length) {
-         console.log("Services from redux:")
+        //  console.log("Services from redux:")
         query.services = { $in: objectIds.map(id => new mongoose.Types.ObjectId(id)) };
       } else {
         // המרה מ-name ל-ID
-        console.log("Services from db:")
+        // console.log("Services from db:")
         const serviceDocs = await Service.find({ name: { $in: serviceList } });
-        console.log("serviceDocs:",serviceDocs)
+        // console.log("serviceDocs:",serviceDocs)
         const ids = serviceDocs.map(s => s._id);
-        console.log("ids:",ids)
+        // console.log("ids:",ids)
         if (ids.length > 0) query.services = { $in : ids };
       }
     }
@@ -270,10 +270,11 @@ exports.getBusinessById = async (req, res) => {
 
 exports.deleteBusiness = async (req, res) => {
   try {
+    console.log("deleteBusiness :");
     const token = req.headers['authorization']?.split(' ')[1];
     const userId = AuthUtils.extractUserId(token);
     const businessId = req.params.id;
-
+    console.log("deleteBusiness businessId:",businessId);
     const business = await Business.findById(businessId);
     if (!business) {
       return res.status(404).json({ error: 'Business not found' });

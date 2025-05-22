@@ -25,15 +25,78 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     const handleCardClick = () => {
         navigate(`/business-profile/${business._id}`);
     };
+
+    const token = document.cookie.split('; ').find((row) => row.startsWith('token='))?.split('=')[1];
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+
+    const handleDelete = async () => {
+        if (window.confirm("האם אתה בטוח שברצונך להסיר את העסק?")) {
+            try {
+            const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${business._id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (res.ok) {
+                alert('העסק הוסר בהצלחה');
+                // רענון רשימה: כאן אפשר לשגר action, למשוך מחדש, או להשתמש ב-setState
+            } else {
+                const err = await res.json();
+                alert(err.message || 'שגיאה במחיקת העסק');
+            }
+            } catch (error) {
+            console.error('שגיאה במחיקה:', error);
+            alert('שגיאה במחיקה');
+            }
+        }
+        };
+
+        const handleRestore = async () => {
+        try {
+            const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${business._id}/restore`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+            });
+
+            if (res.ok) {
+            alert('העסק שוחזר בהצלחה');
+            // רענון רשימה: אותו רעיון
+            } else {
+            const err = await res.json();
+            alert(err.message || 'שגיאה בשחזור');
+            }
+        } catch (error) {
+            console.error('שגיאה בשחזור:', error);
+            alert('שגיאה בשחזור');
+        }
+        };
+
     return (
         <div className="business-card" >
             {/* Left side of the card (action buttons) */}
             <div className="business-card-left">
                 {fromUserBusinesses ? (
-                    <button className="business-card-action-button edit" onClick={handleEdit}>
+                    <>
+                        <button className="business-card-action-button edit" onClick={handleEdit}>
                         <FaPencilAlt />
-                    </button>
-                ) : (
+                        </button>
+                        {business.active ? (
+                        <button className="business-card-action-button delete" onClick={handleDelete}>
+                            ❌
+                        </button>
+                        ) : (
+                        <button className="business-card-action-button restore" onClick={handleRestore}>
+                            ♻️
+                        </button>
+                        )}
+                    </>
+                    ) : (
                     <>
                         <a href={`mailto:${business.email}`} className="business-card-action-button email" aria-label="Email">
                             <FaEnvelope />

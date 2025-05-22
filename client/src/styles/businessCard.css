@@ -191,6 +191,13 @@
     direction: rtl;
     margin-bottom: 0.5rem;
 }
+.business-card-action-button.delete {
+  background-color: white;
+}
+
+.business-card-action-button.restore {
+  background-color: #4caf50;
+}
 
 /* רספונסיביות */
 @media (max-width: 768px) {
