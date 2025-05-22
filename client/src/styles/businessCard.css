@@ -198,6 +198,55 @@
 .business-card-action-button.restore {
   background-color: #4caf50;
 }
+.custom-confirm-alert {
+  direction: rtl;
+  text-align: right;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 400px;
+  margin: auto;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.custom-confirm-alert h2 {
+  margin-top: 0;
+  font-size: 1.4rem;
+  margin-bottom: 12px;
+}
+
+.custom-confirm-alert p {
+  font-size: 1rem;
+  margin-bottom: 24px;
+}
+
+.custom-confirm-alert .buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.custom-confirm-alert button {
+  padding: 8px 16px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.custom-confirm-alert button:hover {
+  background-color: #f0f0f0;
+}
+
+.custom-confirm-alert .danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.custom-confirm-alert .danger:hover {
+  background-color: #c82333;
+}
 
 /* רספונסיביות */
 @media (max-width: 768px) {
