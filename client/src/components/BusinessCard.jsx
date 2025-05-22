@@ -1,18 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { confirmAlert } from 'react-confirm-alert';
 import {
   FaPencilAlt, FaPhone, FaWhatsapp, FaEnvelope,
   FaStar, FaRegStar, FaTrash, FaRecycle
 } from "react-icons/fa";
 import { setSelectedBusiness } from '../redux/businessSlice';
-import 'react-confirm-alert/src/react-confirm-alert.css';
 import '../styles/businessCard.css';
 
 const BusinessCard = ({ business, fromUserBusinesses }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [localActive, setLocalActive] = useState(business.active);
 
   const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
   if (!token) {
@@ -20,69 +21,24 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     return null;
   }
 
-  const showDialog = ({ title, message, isError = false, onCloseCallback = () => {} }) => {
-    confirmAlert({
-      customUI: ({ onClose }) => {
-        const handleClose = () => {
-          onClose();
-          onCloseCallback();
-        };
-        return (
-          <div className='custom-confirm-alert'>
-            <h2 style={{ color: isError ? '#dc3545' : '#28a745' }}>{title}</h2>
-            <p>{message}</p>
-            <div className="buttons">
-              <button onClick={handleClose}>סגור</button>
-            </div>
-          </div>
-        );
-      }
-    });
-  };
+  const handleDeleteConfirmed = async () => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${business._id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-  const handleDelete = () => {
-    confirmAlert({
-      customUI: ({ onClose }) => (
-        <div className="custom-confirm-alert">
-          <h2>מחיקת עסק</h2>
-          <p>האם אתה בטוח שברצונך למחוק את העסק?</p>
-          <div className="buttons">
-            <button onClick={onClose}>ביטול</button>
-            <button
-              className="danger"
-              onClick={async () => {
-                try {
-                  const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${business._id}`, {
-                    method: 'DELETE',
-                    headers: { Authorization: `Bearer ${token}` }
-                  });
-                  onClose();
-                  if (res.ok) {
-                    showDialog({
-                      title: 'הצלחה',
-                      message: 'העסק נמחק בהצלחה',
-                      onCloseCallback: () => navigate(0)
-                    });
-                  } else {
-                    const err = await res.json();
-                    showDialog({
-                      title: 'שגיאה',
-                      message: err.message || 'שגיאה במחיקה',
-                      isError: true
-                    });
-                  }
-                } catch (error) {
-                  onClose();
-                  showDialog({ title: 'שגיאה', message: 'שגיאה במחיקה', isError: true });
-                }
-              }}
-            >
-              מחיקה
-            </button>
-          </div>
-        </div>
-      )
-    });
+      if (res.ok) {
+        setLocalActive(false);
+        setConfirmDelete(false);
+        showToast('✅ העסק נמחק');
+      } else {
+        const err = await res.json();
+        showToast(`שגיאה: ${err.message || 'מחיקה נכשלה'}`, true);
+      }
+    } catch {
+      showToast('❌ שגיאה במחיקה', true);
+    }
   };
 
   const handleRestore = async () => {
@@ -96,21 +52,14 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
       });
 
       if (res.ok) {
-        showDialog({
-          title: 'הצלחה',
-          message: 'העסק שוחזר בהצלחה',
-          onCloseCallback: () => navigate(0)
-        });
+        setLocalActive(true);
+        showToast('✅ העסק שוחזר בהצלחה');
       } else {
         const err = await res.json();
-        showDialog({
-          title: 'שגיאה',
-          message: err.message || 'שגיאה בשחזור',
-          isError: true
-        });
+        showToast(`שגיאה: ${err.message || 'שחזור נכשל'}`, true);
       }
-    } catch (error) {
-      showDialog({ title: 'שגיאה', message: 'שגיאה בשחזור', isError: true });
+    } catch {
+      showToast('❌ שגיאה בשחזור', true);
     }
   };
 
@@ -133,8 +82,16 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
         {fromUserBusinesses ? (
           <>
             <button className="business-card-action-button edit" onClick={handleEdit}><FaPencilAlt /></button>
-            {business.active ? (
-              <button className="business-card-action-button delete" onClick={handleDelete}><FaTrash /></button>
+
+            {localActive ? (
+              confirmDelete ? (
+                <>
+                  <button className="business-card-action-button delete" onClick={handleDeleteConfirmed}>✔</button>
+                  <button className="business-card-action-button delete" onClick={() => setConfirmDelete(false)}>✖</button>
+                </>
+              ) : (
+                <button className="business-card-action-button delete" onClick={() => setConfirmDelete(true)}><FaTrash /></button>
+              )
             ) : (
               <button className="business-card-action-button restore" onClick={handleRestore}><FaRecycle /></button>
             )}
@@ -174,5 +131,14 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     </div>
   );
 };
+
+// Toast helper
+function showToast(message, isError = false) {
+  const toast = document.createElement('div');
+  toast.className = `business-card-toast ${isError ? 'error' : 'success'}`;
+  toast.innerText = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
 
 export default BusinessCard;
