@@ -223,9 +223,7 @@
   background-color: #c82333;
 }
 .business-card.inactive {
-  opacity: 0.6;
   background-color: #f8f8f8;
-  pointer-events: none;
   position: relative;
 }
 
@@ -233,7 +231,13 @@
 .business-card.inactive .business-card-left .restore {
   pointer-events: auto;
 }
-
+.business-card.inactive .business-card-right {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.business-card.inactive .edit {
+  opacity: 0.4;
+}
 .business-card-status-badge {
   position: absolute;
     top: 124px;
