@@ -11,11 +11,25 @@ const Toast = ({ message, isError, onClose }) => {
   }, [onClose]);
 
   return (
-    <div className={`business-card-toast ${isError ? 'error' : 'success'}`}>
+    <div
+      role="alert"
+      aria-live="assertive"
+      className={`business-card-toast ${isError ? 'error' : 'success'}`}
+      style={{
+        borderLeft: `5px solid ${isError ? 'red' : 'green'}`,
+        padding: '10px 15px',
+        backgroundColor: isError ? '#ffe6e6' : '#e6ffe6',
+        color: isError ? '#900' : '#060',
+        fontWeight: 'bold',
+        margin: '10px 0',
+        borderRadius: 4,
+      }}
+    >
       {message}
     </div>
   );
 };
+
 
 const FeedbackPage = ({ businessId, onClose }) => {
   const [rating, setRating] = useState(0);
@@ -46,40 +60,39 @@ const FeedbackPage = ({ businessId, onClose }) => {
     setToast({ message, isError });
   };
 
-  const handleSubmit = async () => {
+    const handleSubmit = async () => {
     try {
-      const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
 
-      if (!token) {
+        if (!token) {
         showToast('לא נמצאה הרשאת התחברות. התחברי מחדש.', true);
         setTimeout(() => window.location.href = '/login', 3000);
         return;
-      }
+        }
 
-      if (rating === 0) {
-        showToast('אנא בחר דירוג לפני השליחה', true);
+        if (rating === 0) {
+        showToast('אנא בחר דירוג לפני השליחה.', true);
         return;
-      }
+        }
 
-      await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/feedbacks`, {
+        await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/feedbacks`, {
         business_id: businessId,
         rating,
         comment
-      }, {
+        }, {
         headers: { Authorization: `Bearer ${token}` }
-      });
+        });
 
-      showToast('✅ הפידבק נשלח בהצלחה!');
-      // אפשר גם לרענן את הפידבקים או פשוט לסגור את המודאל אחרי דיליי קטן
-      setTimeout(() => {
-        onClose();
-      }, 1500);
+        showToast('✅ הפידבק נשלח בהצלחה!');
+        setTimeout(onClose, 1500);
 
     } catch (error) {
-      console.error('Failed to submit feedback:', error.response?.data || error.message);
-      showToast('שגיאה בשליחת הפידבק: ' + (error.response?.data?.message || error.message), true);
+        const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'שגיאה לא ידועה';
+        console.error('Failed to submit feedback:', errorMessage);
+        showToast(`שגיאה בשליחת הפידבק: ${errorMessage}`, true);
     }
-  };
+    };
+
 
   const modalRoot = document.getElementById('modal-root');
   if (!modalRoot) return null;
