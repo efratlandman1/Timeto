@@ -1,49 +1,246 @@
-@import './AdvancedSearchPage.css';
+/* FeedbackPage.css */
 
-/* עיצוב לטקסטאראה */
-.textarea-input {
+.feedback-page-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.feedback-page-modal-content {
+  background: #fff;
+  border-radius: 15px;
+  width: 600px;
+  max-width: 100%;
+  max-height: 90vh;
+  padding: 30px 40px 40px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  direction: rtl;
+  text-align: right;
+}
+
+.feedback-page-close-button {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  background: transparent;
+  border: none;
+  font-size: 32px;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.feedback-page-close-button:hover {
+  color: #444;
+}
+
+.feedback-page-title {
+  margin-bottom: 25px;
+  font-weight: 700;
+  font-size: 28px;
+  text-align: center;
+  color: #2c3e50;
+}
+
+/* Star Rating */
+.star-rating {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  cursor: pointer;
+  justify-content: center;
+}
+
+/* Star color yellow theme + RTL support */
+
+.star {
+  color: #ccc;
+  transition: color 0.3s ease;
+}
+
+.star.filled {
+  color: #f1c40f;
+  filter: drop-shadow(0 0 4px #f1c40f);
+}
+
+.star.empty:hover,
+.star.filled:hover {
+  color: #f39c12;
+  filter: drop-shadow(0 0 6px #f39c12);
+}
+
+
+
+
+/* Form */
+.form-group {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 8px;
+  text-align: right;
+  color: #34495e;
+}
+
+/* Textarea */
+.feedback-page-textarea-input {
+  font-size: 16px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1.8px solid #ddd;
+  resize: vertical;
+  min-height: 110px;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+}
+
+.feedback-page-textarea-input:focus {
+  border-color: #27ae60;
+  outline: none;
+  box-shadow: 0 0 6px #27ae60aa;
+}
+
+/* Submit button */
+.confirm-button {
+  background-color: #f1c40f;
+  color: #fff;
+  font-weight: 600;
+  font-size: 18px;
+  border: none;
+  padding: 14px 0;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-bottom: 35px;
+  transition: background-color 0.25s ease;
+  width: 100%;
+}
+
+.confirm-button:hover {
+  background-color: #f39c12;
+}
+
+/* Feedback List */
+.feedback-page-feedback-list {
+  overflow-y: auto;
+  max-height: 320px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.feedback-page-feedback-list h3 {
+  font-size: 20px;
+  margin-bottom: 18px;
+  text-align: center;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.no-feedbacks {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  margin-top: 15px;
+}
+
+/* Each Feedback Item */
+.feedback-page-feedback-item {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 15px 0;
+}
+
+.feedback-page-feedback-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 15px;
+  color: #2c3e50;
+  margin-bottom: 6px;
+}
+
+.feedback-name {
+  color: #27ae60;
+}
+
+.feedback-date {
+  font-size: 14px;
+  color: #999;
+}
+
+.feedback-page-feedback-stars {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.feedback-page-feedback-comment {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #444;
+  white-space: pre-line;
+}
+
+/* אייקונים כוכבים קטנים ברשימה */
+.feedback-page-feedback-stars .star {
+  font-size: 18px;
+}
+
+/* ביטול */
+.buttons-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.cancel-button {
+  background: #eee;
+  border: none;
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+  color: #666;
+}
+
+.cancel-button:hover {
+  background-color: #ddd;
+}
+.feedback-date {
+  font-size: 14px;
+  color: #999;
+  margin-bottom: 4px; /* מוסיף רווח קטן לפני הרשימה */
+}
+
+/* התאמה למסכים קטנים */
+@media (max-width: 650px) {
+  .feedback-page-modal-content {
+    padding: 20px;
     width: 100%;
-    padding: 12px;
+    max-height: 95vh;
+  }
+
+  .star-rating {
+    justify-content: flex-start;
+  }
+
+  .confirm-button {
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    resize: vertical;
-}
-/* הרחבה לעיצוב של feedback list */
-.feedback-list {
-    margin-top: 40px;
-    /* border-top: 1px solid #ddd; */
-    padding-top: 20px;
-}
-
-.feedback-list h3 {
-    margin-bottom: 16px;
-    font-size: 18px;
-    text-align: right;
-    color: #333;
-}
-
-.feedback-item {
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-}
-
-.feedback-header {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #444;
-}
-
-.feedback-stars {
-    margin-bottom: 8px;
-    display: flex;
-}
-
-.feedback-comment {
-    margin: 0;
-    font-size: 15px;
-    color: #222;
+  }
 }
