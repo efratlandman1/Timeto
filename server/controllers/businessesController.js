@@ -101,7 +101,8 @@ exports.getUserBusinesses = async (req, res) => {
          console.log(token);
         let userId = AuthUtils.extractUserId(token);
         console.log(userId);
-        const business = await Business.find({userId: userId});
+        // const business = await Business.find({userId: userId});
+        const businesses = await Business.find({ userId: userId }).sort({ active: -1 });
         res.status(200).json(business);
     } catch (err) {
         res.status(500).json({message: err.message});
@@ -113,6 +114,7 @@ exports.getItems = async (req, res) => {
   try {
     const { q, categoryName, services, rating } = req.query;
     const query = {};
+    query.active = true;
     const SORT_FIELDS = {
             rating: { rating: -1 },
             name: { name: 1 },
@@ -132,15 +134,20 @@ exports.getItems = async (req, res) => {
             const matchingServiceIds = matchingServices.map(service => service._id);
 
             const searchConditions = {
-                $or: [
-                    { name: regex },
-                    { address: regex },
-                    { email: regex },
-                    { phone: { $regex: q } },
-                    { categoryId: { $in: categoryIds } },
-                    { services: { $in: matchingServiceIds } } 
-                ]
-            };
+            $and: [
+                { active: true }, 
+                {
+                    $or: [
+                        { name: regex },
+                        { address: regex },
+                        { email: regex },
+                        { phone: { $regex: q } },
+                        { categoryId: { $in: categoryIds } },
+                        { services: { $in: matchingServiceIds } }
+                    ]
+                }
+            ]
+        };
 
             const page = Number(req.query.page) || 1;
             const limit = Number(req.query.limit) || DEFAULT_ITEMS_PER_PAGE;
