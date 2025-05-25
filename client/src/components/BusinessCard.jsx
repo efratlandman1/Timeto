@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import FeedbackPage from './FeedbackPage';
 import {
   FaPencilAlt, FaPhone, FaWhatsapp, FaEnvelope,
   FaStar, FaRegStar, FaTrash, FaRecycle
@@ -11,23 +12,27 @@ import '../styles/businessCard.css';
 const BusinessCard = ({ business, fromUserBusinesses }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [localActive, setLocalActive] = useState(business.active);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
-  const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-  if (!token) {
-    window.location.href = '/login';
-    return null;
-  }
+  // const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+  // if (!token) {
+  //   window.location.href = '/login';
+  //   return null;
+  // }
 
   const handleDeleteConfirmed = async () => {
     try {
+      const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+      if (!token) {
+        window.location.href = '/login';
+        return null;
+      }
       const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${business._id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
-
       if (res.ok) {
         setLocalActive(false);
         setConfirmDelete(false);
@@ -43,6 +48,11 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
 
   const handleRestore = async () => {
     try {
+      const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+      if (!token) {
+        window.location.href = '/login';
+        return null;
+      }
       const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/restore/${business._id}`, {
         method: 'PATCH',
         headers: {
@@ -68,10 +78,6 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     navigate(`/edit/${business._id}`);
   };
 
-  const handleFeedback = () => {
-    navigate(`/feedback-page`);
-  };
-
   const handleCardClick = () => {
     navigate(`/business-profile/${business._id}`);
   };
@@ -82,14 +88,13 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
         {fromUserBusinesses ? (
           <>
             <button
-                className="business-card-action-button edit"
-                onClick={localActive ? handleEdit : undefined}
-                title="עריכת העסק"
-                disabled={!localActive}
-                >
-                <FaPencilAlt />
+              className="business-card-action-button edit"
+              onClick={localActive ? handleEdit : undefined}
+              title="עריכת העסק"
+              disabled={!localActive}
+            >
+              <FaPencilAlt />
             </button>
-
             {localActive ? (
               confirmDelete ? (
                 <>
@@ -97,16 +102,12 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                     className="business-card-action-button delete"
                     onClick={handleDeleteConfirmed}
                     title="אישור מחיקה"
-                  >
-                    ✔
-                  </button>
+                  >✔</button>
                   <button
                     className="business-card-action-button delete"
                     onClick={() => setConfirmDelete(false)}
                     title="ביטול מחיקה"
-                  >
-                    ✖
-                  </button>
+                  >✖</button>
                 </>
               ) : (
                 <button
@@ -129,30 +130,18 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
           </>
         ) : (
           <>
-            <a
-              href={`mailto:${business.email}`}
-              className="business-card-action-button email"
-              title="שליחת אימייל"
-            >
+            <a href={`mailto:${business.email}`} className="business-card-action-button email" title="שליחת אימייל">
               <FaEnvelope />
             </a>
-            <a
-              href={`https://wa.me/${business.phone}`}
-              className="business-card-action-button whatsapp"
-              title="שליחת הודעת וואטסאפ"
-            >
+            <a href={`https://wa.me/${business.phone}`} className="business-card-action-button whatsapp" title="שליחת וואטסאפ">
               <FaWhatsapp />
             </a>
-            <a
-              href={`tel:${business.phone}`}
-              className="business-card-action-button phone"
-              title="התקשרות טלפונית"
-            >
+            <a href={`tel:${business.phone}`} className="business-card-action-button phone" title="התקשרות טלפונית">
               <FaPhone />
             </a>
             <button
               className="business-card-action-button feedback"
-              onClick={handleFeedback}
+              onClick={() => setShowFeedbackModal(true)}
               title="השארת ביקורת"
             >
               <FaRegStar />
@@ -166,9 +155,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
         onClick={localActive ? handleCardClick : undefined}
       >
         {!localActive && (
-          <div className="business-card-status-badge">
-             לא פעיל
-          </div>
+          <div className="business-card-status-badge">לא פעיל</div>
         )}
         <img
           className="business-card-image"
@@ -191,11 +178,17 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
           </div>
         </div>
       </div>
+
+      {showFeedbackModal && (
+        <FeedbackPage
+          businessId={business._id}
+          onClose={() => setShowFeedbackModal(false)}
+        />
+      )}
     </div>
   );
 };
 
-// Toast helper
 function showToast(message, isError = false) {
   const toast = document.createElement('div');
   toast.className = `business-card-toast ${isError ? 'error' : 'success'}`;
