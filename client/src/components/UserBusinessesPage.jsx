@@ -7,7 +7,12 @@ const UserBusinessesPage = () => {
     const [myBusiness, setMyBusinesses] = useState([]);
 
     useEffect(() => {
-        const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
+        const getToken = () => {
+            const tokenCookie = document.cookie.split('; ').find((row) => row.startsWith('token='));
+            return tokenCookie ? tokenCookie.split('=')[1] : null;
+        };
+
+        const token = getToken();
         if (!token) {
             window.location.href = '/login';
             return;
@@ -17,7 +22,7 @@ const UserBusinessesPage = () => {
             const response = await fetch(process.env.REACT_APP_API_DOMAIN + '/api/v1/businesses/user-businesses', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (response.status === 401 || response.status === 403) {
+            if (response.status !== 200) {
                 window.location.href = '/login';
                 return;
             }
