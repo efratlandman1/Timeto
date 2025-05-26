@@ -16,35 +16,71 @@ const BusinessProfilePage = () => {
   const [error, setError] = useState(null);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
-  useEffect(() => {
-    const fetchBusiness = async () => {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${id}`);
-        if (!response.ok) throw new Error('בעיה בטעינת פרטי העסק');
+  const fetchBusiness = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${id}`);
+      if (!response.ok) throw new Error('בעיה בטעינת פרטי העסק');
+      const data = await response.json();
+      setBusiness(data);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const fetchFeedbacks = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/feedbacks/business/${id}`);
+      if (response.ok) {
         const data = await response.json();
-        setBusiness(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        setFeedbacks(data);
       }
-    };
-
-    const fetchFeedbacks = async () => {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/feedbacks/business/${id}`);
-        if (response.ok) {
-          const data = await response.json();
-          setFeedbacks(data);
-        }
-      } catch (err) {
-        console.error('שגיאה בשליפת פידבקים:', err);
-      }
-    };
-
-    fetchBusiness();
-    fetchFeedbacks();
+    } catch (err) {
+      console.error('שגיאה בשליפת פידבקים:', err);
+    }
+  };
+  
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([fetchBusiness(), fetchFeedbacks()])
+      .finally(() => setLoading(false));
   }, [id]);
+
+  const handleFeedbackClose = () => {
+    setShowFeedbackModal(false);
+    fetchFeedbacks();  // רענון פידבקים
+    fetchBusiness();   // רענון דירוג כולל
+  };
+
+
+  // useEffect(() => {
+  //   const fetchBusiness = async () => {
+  //     try {
+  //       const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${id}`);
+  //       if (!response.ok) throw new Error('בעיה בטעינת פרטי העסק');
+  //       const data = await response.json();
+  //       setBusiness(data);
+  //     } catch (err) {
+  //       setError(err.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   const fetchFeedbacks = async () => {
+  //     try {
+  //       const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/feedbacks/business/${id}`);
+  //       if (response.ok) {
+  //         const data = await response.json();
+  //         setFeedbacks(data);
+  //       }
+  //     } catch (err) {
+  //       console.error('שגיאה בשליפת פידבקים:', err);
+  //     }
+  //   };
+
+  //   fetchBusiness();
+  //   fetchFeedbacks();
+  // }, [id]);
 
   if (loading) return <div>טוען פרטי עסק...</div>;
   if (error) return <div>שגיאה: {error}</div>;
@@ -162,7 +198,8 @@ const BusinessProfilePage = () => {
           <div className="modal-content">
             <FeedbackPage
               businessId={business._id}
-              onClose={() => setShowFeedbackModal(false)}
+              // onClose={() => setShowFeedbackModal(false)}
+              onClose={handleFeedbackClose}
             />
           </div>
         </div>
