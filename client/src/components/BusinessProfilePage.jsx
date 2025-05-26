@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import {
+  FaMapMarkerAlt, FaPhoneAlt, FaTags, FaClock, FaStar, FaRegStar
+} from 'react-icons/fa';
+import FeedbackPage from './FeedbackPage';
 import '../styles/BusinessProfilePage.css';
-import { FaMapMarkerAlt, FaPhoneAlt, FaTags, FaClock, FaStar } from 'react-icons/fa';
 
 const daysMap = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
@@ -11,6 +14,7 @@ const BusinessProfilePage = () => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   useEffect(() => {
     const fetchBusiness = async () => {
@@ -47,7 +51,7 @@ const BusinessProfilePage = () => {
   if (!business) return <div>לא נמצאו נתונים לעסק</div>;
 
   return (
-    <div className="page-container">
+    <div className="page-container" dir="rtl">
       <div className="page-header">
         <h1>פרופיל העסק</h1>
         <div className="header-line"></div>
@@ -72,7 +76,6 @@ const BusinessProfilePage = () => {
         </div>
       </div>
 
-
       <div className="hours-section">
         <h3><FaClock className="icon" /> שעות פעילות</h3>
         <table className="hours-table">
@@ -95,8 +98,7 @@ const BusinessProfilePage = () => {
                         <div key={i}>
                           {range.open} - {range.close}
                         </div>
-                      ))
-                  }
+                      ))}
                 </td>
               </tr>
             ))}
@@ -109,20 +111,62 @@ const BusinessProfilePage = () => {
         <p className="rating">
           <strong>דירוג ממוצע:</strong> {business.rating?.toFixed(1) || 'אין דירוג'}
         </p>
+
+        <button
+          className="add-feedback-button"
+          onClick={() => setShowFeedbackModal(true)}
+        >
+          <FaRegStar style={{ marginLeft: '6px' }} />
+          הוסף פידבק
+        </button>
+
         <div className="feedback-list">
           {feedbacks.length > 0 ? (
-            feedbacks.map((feedback, index) => (
-              <div key={index} className="feedback-item">
-                <p><strong>{feedback.userName || 'משתמש אנונימי'}:</strong></p>
-                <p>⭐ {feedback.rating}</p>
-                <p>{feedback.comment}</p>
-              </div>
-            ))
+            feedbacks.map((feedback, index) => {
+              const rating = feedback.rating || 0;
+              const nickname = feedback.user_id?.nickname || 'אננימי';
+              const comment = feedback.comment || '-';
+              const createdAt = new Date(feedback.created_at).toLocaleDateString('he-IL', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              });
+
+              let ratingClass = 'low-rating';
+              if (rating >= 4) ratingClass = 'high-rating';
+              else if (rating >= 2.5) ratingClass = 'mid-rating';
+
+              return (
+                <div key={index} className={`feedback-item ${ratingClass}`}>
+                  <div className="feedback-header">
+                    <strong>{nickname}</strong>
+                    <span className="feedback-date">{createdAt}</span>
+                  </div>
+                  <div className="stars">
+                    {[...Array(5)].map((_, i) => (
+                      <span key={i} className={i < rating ? 'filled-star' : 'empty-star'}>★</span>
+                    ))}
+                  </div>
+                  <div className="comment">{comment}</div>
+                </div>
+              );
+            })
           ) : (
             <p>אין פידבקים להצגה</p>
           )}
         </div>
       </div>
+
+      {showFeedbackModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <FeedbackPage
+              businessId={business._id}
+              onClose={() => setShowFeedbackModal(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
