@@ -227,6 +227,19 @@ label {
   color: #999;
   margin-bottom: 4px; /* מוסיף רווח קטן לפני הרשימה */
 }
+.feedback-page-loader {
+  text-align: center;
+  font-size: 18px;
+  color: #2c3e50;
+  padding: 30px 0;
+  font-weight: bold;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
 /* התאמה למסכים קטנים */
 @media (max-width: 650px) {
