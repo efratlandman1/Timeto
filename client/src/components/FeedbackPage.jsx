@@ -3,6 +3,7 @@ import axios from 'axios';
 import { FaStar } from 'react-icons/fa';
 import ReactDOM from 'react-dom';
 import '../styles/FeedbackPage.css';
+import {getToken} from "../utils/auth";
 
 const Toast = ({ message, isError, onClose }) => {
   useEffect(() => {
@@ -66,7 +67,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
 
     const handleSubmit = async () => {
     try {
-        const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        const token = getToken();
 
         if (!token) {
         showToast('לא נמצאה הרשאת התחברות. התחברי מחדש.', true);

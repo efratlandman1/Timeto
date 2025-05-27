@@ -12,6 +12,7 @@ import { setSelectedBusiness } from '../redux/businessSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Steps, StepsProvider, useSteps } from 'react-step-builder';
+import {getToken} from "../utils/auth";
 
 const requiredFields = ["name", "categoryId", "address", "phone", "prefix", "email"];
 
@@ -198,7 +199,7 @@ const EditBusinessPage = () => {
 
   useEffect(() => {
     const loadBusiness = async (businessId) => {
-      const token = document.cookie.split('; ').find((row) => row.startsWith('token='))?.split('=')[1];
+      const token = getToken();
       if (!token) {
         window.location.href = '/login';
         return;
@@ -337,11 +338,6 @@ const EditBusinessPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const getToken = () => {
-    const tokenCookie = document.cookie.split('; ').find((row) => row.startsWith('token='));
-    return tokenCookie ? tokenCookie.split('=')[1] : null;
   };
 
   const uploadBusiness = async (token, formData) => {

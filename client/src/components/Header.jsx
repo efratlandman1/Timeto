@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaSignOutAlt, FaSignInAlt, FaUserPlus } from "react-icons/fa";
 import "../styles/Header.css";
 import { useSelector } from 'react-redux';
+import {getToken} from "../utils/auth";
 
 
 const Header = () => {
@@ -20,7 +21,7 @@ const Header = () => {
     };
 
     useEffect(() => {
-        const token = document.cookie.split("; ").find(row => row.startsWith("token="))?.split("=")[1];
+        const token = getToken();
         if (token && loginUser) {
             setUsername(loginUser.firstName);
         } else {
