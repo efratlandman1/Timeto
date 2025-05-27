@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa";
 import { setSelectedBusiness } from '../redux/businessSlice';
 import '../styles/businessCard.css';
+import {getToken} from "../utils/auth";
 
 const BusinessCard = ({ business, fromUserBusinesses }) => {
   const dispatch = useDispatch();
@@ -24,7 +25,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
 
   const handleDeleteConfirmed = async () => {
     try {
-      const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+      const token = getToken();
       if (!token) {
         window.location.href = '/login';
         return null;
@@ -48,7 +49,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
 
   const handleRestore = async () => {
     try {
-      const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+      const token = getToken();
       if (!token) {
         window.location.href = '/login';
         return null;

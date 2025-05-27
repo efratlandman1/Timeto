@@ -98,12 +98,9 @@ const DEFAULT_ITEMS_PER_PAGE = 8; // הגדרת ברירת מחדל
 exports.getUserBusinesses = async (req, res) => {
     try {
          const token = req.headers['authorization']?.split(' ')[1];
-         console.log(token);
         let userId = AuthUtils.extractUserId(token);
-        console.log(userId);
-        // const business = await Business.find({userId: userId});
         const businesses = await Business.find({ userId: userId }).sort({ active: -1 });
-        res.status(200).json(business);
+        res.status(200).json(businesses);
     } catch (err) {
         res.status(500).json({message: err.message});
     }

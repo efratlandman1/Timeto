@@ -2,15 +2,12 @@ import React, { useState, useEffect } from 'react';
 import BusinessCard from './BusinessCard';
 import '../styles/userBusinesses.css';
 import { FaPlus } from "react-icons/fa";
+import {getToken} from "../utils/auth";
 
 const UserBusinessesPage = () => {
     const [myBusiness, setMyBusinesses] = useState([]);
 
     useEffect(() => {
-        const getToken = () => {
-            const tokenCookie = document.cookie.split('; ').find((row) => row.startsWith('token='));
-            return tokenCookie ? tokenCookie.split('=')[1] : null;
-        };
 
         const token = getToken();
         if (!token) {
