@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaStar } from 'react-icons/fa';
+import { FaRegStar, FaStar } from 'react-icons/fa';
 import ReactDOM from 'react-dom';
 import '../styles/FeedbackPage.css';
 import {getToken} from "../utils/auth";
@@ -58,7 +58,8 @@ const FeedbackPage = ({ businessId, onClose }) => {
 
 
   const handleStarClick = (value) => {
-    setRating(prev => (prev === value ? 0 : value));
+    setRating(value);
+    setHover(0);
   };
 
   const showToast = (message, isError = false) => {
@@ -122,17 +123,22 @@ const FeedbackPage = ({ businessId, onClose }) => {
                     <div className="form-group rating-group">
                         <label>דרג את העסק</label>
                         <div className="star-rating">
-                        {[1, 2, 3, 4, 5].map(star => (
-                            <FaStar
-                            key={star}
-                            size={36}
-                            className={`star ${star <= (hover || rating) ? "filled" : "empty"}`}
-                            onClick={() => handleStarClick(star)}
-                            onMouseEnter={() => setHover(star)}
-                            onMouseLeave={() => setHover(0)}
-                            />
-                        ))}
+                            {[1, 2, 3, 4, 5].map(star => (
+                                <FaStar
+                                    key={star}
+                                    size={36}
+                                    className={`star ${star <= rating ? "filled" : ""}`}
+                                    onClick={() => handleStarClick(star)}
+                                    onMouseEnter={() => setHover(star)}
+                                    onMouseLeave={() => setHover(0)}
+                                />
+                            ))}
                         </div>
+                        {rating > 0 && (
+                            <div className="rating-text">
+                                {rating} כוכבים
+                            </div>
+                        )}
                     </div>
 
                     <div className="form-group">
@@ -158,13 +164,13 @@ const FeedbackPage = ({ businessId, onClose }) => {
                             <span className="feedback-date">{new Date(fb.created_at).toLocaleDateString()}</span>
                             </div>
                             <div className="feedback-page-feedback-stars">
-                            {[1, 2, 3, 4, 5].map(i => (
-                                <FaStar
-                                key={i}
-                                size={18}
-                                className={fb.rating >= i ? "star filled" : "star empty"}
-                                />
-                            ))}
+                                {[1, 2, 3, 4, 5].map(i => (
+                                    <FaStar
+                                        key={i}
+                                        size={20}
+                                        className={`star ${i <= fb.rating ? "filled" : ""}`}
+                                    />
+                                ))}
                             </div>
                             <p className="feedback-page-feedback-comment">{fb.comment}</p>
                         </div>

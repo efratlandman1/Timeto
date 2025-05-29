@@ -247,7 +247,7 @@ const MainPage = () => {
                 <div className="bottom-banner-content">
                     <h2>הצטרף לקהילת זמן</h2>
                     <p>הוסף את העסק שלך והתחיל לקבל לקוחות חדשים עוד היום</p>
-                    <button className="banner-button" onClick={() => navigate('/new-business')}>
+                    <button className="banner-button" onClick={() => navigate('/edit')}>
                         הוסף עסק חינם
                     </button>
                 </div>

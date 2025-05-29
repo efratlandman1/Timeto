@@ -56,32 +56,35 @@
 /* Star Rating */
 .star-rating {
   display: flex;
+  flex-direction: row-reverse;
   gap: 10px;
   margin-top: 8px;
   cursor: pointer;
   justify-content: center;
 }
 
-/* Star color yellow theme + RTL support */
-
 .star {
-  color: #ccc;
-  transition: color 0.3s ease;
+  color: #ddd;
+  transition: all 0.3s ease;
+  font-size: 36px;
 }
 
 .star.filled {
-  color: #f1c40f;
-  filter: drop-shadow(0 0 4px #f1c40f);
+  color: #ff4d4d;
 }
 
-.star.empty:hover,
-.star.filled:hover {
-  color: #f39c12;
-  filter: drop-shadow(0 0 6px #f39c12);
+.star:hover,
+.star:hover ~ .star {
+  color: #ff4d4d;
 }
 
+.star-rating:hover .star {
+  color: #ddd;
+}
 
-
+.star-rating .star:hover ~ .star {
+  color: #ff4d4d;
+}
 
 /* Form */
 .form-group {
@@ -111,28 +114,35 @@ label {
 }
 
 .feedback-page-textarea-input:focus {
-  border-color: #27ae60;
+  border-color: #333;
   outline: none;
-  box-shadow: 0 0 6px #27ae60aa;
+  box-shadow: 0 0 6px rgba(51, 51, 51, 0.2);
 }
 
 /* Submit button */
 .confirm-button {
-  background-color: #f1c40f;
-  color: #fff;
+  background: white;
+  color: #ff4d4d;
   font-weight: 600;
   font-size: 18px;
-  border: none;
+  border: 2px solid #ff4d4d;
   padding: 14px 0;
   border-radius: 12px;
   cursor: pointer;
   margin-bottom: 35px;
-  transition: background-color 0.25s ease;
+  transition: all 0.3s ease;
   width: 100%;
 }
 
 .confirm-button:hover {
-  background-color: #f39c12;
+  background: #ff4d4d;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(255, 77, 77, 0.1);
+}
+
+.confirm-button:active {
+  transform: translateY(0);
 }
 
 /* Feedback List */
@@ -174,7 +184,8 @@ label {
 }
 
 .feedback-name {
-  color: #27ae60;
+  color: #333;
+  font-weight: 600;
 }
 
 .feedback-date {
@@ -182,10 +193,21 @@ label {
   color: #999;
 }
 
+/* Previous feedback stars */
 .feedback-page-feedback-stars {
   display: flex;
+  flex-direction: row-reverse;
   gap: 4px;
   margin-bottom: 10px;
+}
+
+.feedback-page-feedback-stars .star {
+  font-size: 20px;
+  color: #ddd;
+}
+
+.feedback-page-feedback-stars .star.filled {
+  color: #ff4d4d;
 }
 
 .feedback-page-feedback-comment {
@@ -193,11 +215,6 @@ label {
   line-height: 1.5;
   color: #444;
   white-space: pre-line;
-}
-
-/* אייקונים כוכבים קטנים ברשימה */
-.feedback-page-feedback-stars .star {
-  font-size: 18px;
 }
 
 /* ביטול */
