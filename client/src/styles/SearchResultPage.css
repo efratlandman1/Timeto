@@ -1,100 +1,71 @@
-/* מיכל ראשי */
+/* Main Container */
 .search-result-page-container {
     max-width: 1200px;
+    width: 100%;
     margin: 0 auto;
     padding: 6rem 1rem 1rem;
 }
 
-
-/* עיצוב תוויות הפילטרים */
-.active-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 20px;
-    font-size: 14px;
-}
-
-.filter-label {
-    background-color: #f0f0f0;
-    padding: 5px 10px;
-    border-radius: 15px;
-    border: 1px solid #ccc;
-}
-
+/* Filters Section */
 .filters-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
     flex-wrap: wrap;
-    margin-top: 20px;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    width: 100%;
 }
 
 .filter-tag {
-    background-color: #e0e0e0;
-    color: #333;
-    padding: 5px 12px;
+    background: #f8f9fa;
+    color: #2d3436;
+    padding: 0.5rem 1rem;
     border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 0.9rem;
+    font-weight: 500;
     display: flex;
     align-items: center;
+    gap: 8px;
+    border: 1px solid #eee;
+    transition: all 0.2s ease;
 }
 
-.filter-tag .remove-filter {
-    margin-left: 10px;
-    font-size: 16px;
+.filter-tag:hover {
+    background: #f0f0f0;
+}
+
+.remove-filter {
+    color: #ff4d4d;
     cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
 }
 
 .remove-filter:hover {
-    color: #e60000;
+    color: #ff3333;
 }
 
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 30px;
-    gap: 8px;
-  }
-  
-  .pagination-button {
-    padding: 8px 14px;
-    border: none;
-    background-color: #eee;
-    color: #333;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s;
-  }
-  
-  .pagination-button:hover {
-    background-color: #ccc;
-  }
-  
-  .pagination-button.active {
-    background-color: #333;
-    color: #fff;
-  }
-  .sort-container {
-    position: relative;
-    display: inline-block;
-    margin: 1rem 0;
-    cursor: pointer;
-    direction: rtl;
+/* Sort Section */
+.sort-container {
+    margin-bottom: 1.5rem;
+    width: 100%;
 }
 
 .sort-label {
-    font-weight: bold;
     display: flex;
     align-items: center;
-    color: #333;
+    gap: 8px;
+    font-size: 1rem;
+    color: #2d3436;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.5rem 0;
 }
 
 .sort-arrow {
-    transition: transform 0.3s ease;
+    color: #ff4d4d;
+    transition: transform 0.2s ease;
 }
 
 .sort-arrow.open {
@@ -103,30 +74,58 @@
 
 .sort-options {
     position: absolute;
-    top: 100%;
-    right: 0;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    z-index: 10;
-    width: max-content;
-    min-width: 150px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 0;
+    min-width: 180px;
+    z-index: 100;
 }
 
 .sort-option {
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
     cursor: pointer;
-    text-align: right;
+    transition: background 0.2s ease;
 }
 
 .sort-option:hover {
-    background-color: #f1f1f1;
+    background: #f8f9fa;
+    color: #ff4d4d;
 }
-  
-@media (max-width: 600px) {
 
+/* Pagination */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 2rem 0;
+    padding: 1rem;
+    width: 100%;
+}
+
+.pagination-button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: #f8f9fa;
+    color: #2d3436;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pagination-button:hover {
+    background: #f0f0f0;
+}
+
+.pagination-button.active {
+    background: #ff4d4d;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
     .search-result-page-container {
-        padding: 4rem 1rem 1rem;
+        padding: 4rem 0.5rem 1rem;
     }
 }

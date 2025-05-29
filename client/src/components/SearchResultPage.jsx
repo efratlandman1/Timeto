@@ -106,7 +106,7 @@ const SearchResultPage = () => {
     }, []);
 
     return (
-        <div className='main-page-container'>
+        <div className='search-result-page-container'>
             <SearchBar />
 
             {Object.keys(filters).length > 0 && (
@@ -154,7 +154,7 @@ const SearchResultPage = () => {
                 )}
             </div>
 
-            <div className="card-slider">
+            <div className="business-cards-container">
                 {businesses.map((business) => (
                     <BusinessCard key={business._id} business={business} />
                 ))}
