@@ -96,7 +96,7 @@ const Header = () => {
                             <FaHeart />
                             המועדפים שלי
                         </button>
-                        <button className="nav-button" onClick={() => navigate("/my-businesses")}>
+                        <button className="nav-button" onClick={() => navigate("/user-businesses")}>
                             <FaStore />
                             העסקים שלי
                         </button>

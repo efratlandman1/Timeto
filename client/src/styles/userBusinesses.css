@@ -1,65 +1,114 @@
+/* Main Container */
 .container {
-    max-width: min(80%, 1400px);
+    max-width: 1200px;
     width: 100%;
-    margin: 0 auto; /* Centers the container */
-    padding: 6rem 1rem 1rem; /* padding to account for the fixed header */
+    margin: 0 auto;
+    padding: 6rem 1rem 1rem;
 }
 
-.businessCard {
-    display: inline-block;
-    margin: 18px;
+/* Business Cards Grid */
+.business-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 24px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
+/* Add Business Button */
 .add-business-container {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 32px;
+    right: 32px;
+    z-index: 100;
 }
 
 .add-business-button {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    border: 2px solid #d32f2f; /* אדום כהה */
-    background-color: #fff;
+    border: none;
+    background-color: #ff4d4d;
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    position: relative;
+    box-shadow: 0 4px 20px rgba(255, 77, 77, 0.3);
 }
 
 .add-business-button:hover {
-    background-color: #ffe5e5;
+    transform: translateY(-2px);
+    background-color: #ff3333;
+    box-shadow: 0 6px 24px rgba(255, 77, 77, 0.4);
 }
 
-/* אייקון הפלוס */
 .add-business-icon {
-    color: #d32f2f;
     font-size: 24px;
 }
 
-/* טולטיפ */
 .tooltip {
-    visibility: hidden;
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 5px 10px;
-    border-radius: 5px;
     position: absolute;
     right: 70px;
     top: 50%;
     transform: translateY(-50%);
+    background: #333;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
     white-space: nowrap;
-    font-size: 14px;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    visibility: hidden;
+    transition: all 0.2s ease;
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 6px 0 6px 6px;
+    border-style: solid;
+    border-color: transparent transparent transparent #333;
 }
 
 .add-business-button:hover .tooltip {
-    visibility: visible;
     opacity: 1;
+    visibility: visible;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .business-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .business-cards-grid {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+
+    .container {
+        padding: 4rem 0.5rem 1rem;
+    }
+
+    .add-business-container {
+        bottom: 24px;
+        right: 24px;
+    }
+
+    .add-business-button {
+        width: 50px;
+        height: 50px;
+    }
+
+    .add-business-icon {
+        font-size: 20px;
+    }
 }
