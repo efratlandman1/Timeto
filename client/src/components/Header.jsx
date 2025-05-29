@@ -88,7 +88,7 @@ const Header = () => {
 
                 <div className="nav-center">
                     <div className="nav-links">
-                        <button className="nav-button primary" onClick={() => navigate("/new-business")}>
+                        <button className="nav-button primary" onClick={() => navigate("/edit")}>
                             <FaPlusCircle />
                             עסק חדש
                         </button>
