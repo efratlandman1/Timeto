@@ -1,270 +1,300 @@
-/* קונטיינר לכל הכרטיסים */
+/* Modern Business Card Styles */
 .business-cards-container {
-  width: 80%;
+  max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
-  gap: 24px;
-  justify-content: center;
-  padding: 24px 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  padding: 0 24px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* כרטיס בודד */
 .business-card {
-  display: flex;
-  direction: rtl;
-  /* width: 100%; */
-  height: 280px;
-  width: 380px;
-  border-radius: 12px;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  background: white;
+  border-radius: 8px;
   overflow: hidden;
-  background-color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  height: 280px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
 }
 
 .business-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-/* עמודת כפתורים */
-.business-card-left {
-  flex: 0 0 60px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  background: linear-gradient(to bottom, #f2f2f2, #e9e9e9);
-  padding: 10px 4px;
-  gap: 8px;
+.business-card-image-container {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
 }
 
-/* כפתורים עם צבעים מקוריים */
-.business-card-action-button {
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
-  color: white;
+.business-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
-.business-card-action-button:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+.business-card:hover .business-card-image {
   transform: scale(1.05);
 }
 
-.business-card-action-button.email {
-  background-color: #007bff;
+.business-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.2));
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.business-card-action-button.whatsapp {
-  background-color: #25d366;
+.business-card:hover .business-card-overlay {
+  opacity: 1;
 }
 
-.business-card-action-button.phone {
-  background-color: #4caf50;
-}
-
-.business-card-action-button.feedback {
-  background-color: #f1c40f;
-  color: black;
-}
-
-.business-card-action-button.edit {
-  background-color: #1976d2;
-}
-
-.business-card-action-button.delete {
-  background-color: #d32f2f;
-}
-
-.business-card-action-button.restore {
-  background-color: #4caf50;
-}
-.business-card-toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #28a745;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-  font-size: 16px;
-  z-index: 9999;
-  direction: rtl;
-}
-
-.business-card-toast.error {
-  background: #dc3545;
-}
-
-/* צד ימין של הכרטיס */
-.business-card-right {
+.business-card-content {
+  padding: 12px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  cursor: pointer;
-  overflow: hidden;
-  justify-content: space-between;
 }
 
-/* תמונה קבועה */
-.business-card-image {
-  width: calc(100% - 20px);
-  height: 160px;
-  margin: 10px auto 0;
-  border: 2px solid #d32f2f;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-/* טקסט – בתחתית הכרטיס */
-.business-card-text {
-  height: 100px;
-  padding: 8px 10px 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 6px;
+.business-card-header {
+  margin-bottom: 8px;
 }
 
 .business-card-name {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #202125;
+  margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .business-card-category {
-  font-size: 14px;
-  color: #666;
-}
-
-.business-card-description-rating {
+  font-size: 0.85rem;
+  color: #737373;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   gap: 6px;
 }
 
-.business-card-description {
-  font-size: 14px;
-  flex: 1;
-  color: #444;
+.business-card-category svg {
+  font-size: 0.75rem;
+  min-width: 12px;
+  color: #ff385c;
 }
 
-.business-card-rating {
-  font-size: 14px;
-  color: #f39c12;
-  font-weight: bold;
+.business-card-address {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 20px);
+}
+
+.business-card-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: #737373;
+}
+
+.price-range {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-/* תצוגת כרטיסים של המשתמש */
-.business-card.business-card-user .business-card-left {
-  justify-content: flex-start;
+.delivery-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.business-card-footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.business-card-rating {
+  display: flex;
+  align-items: center;
   gap: 6px;
 }
 
-/* דיאלוג מותאם אישית */
-.custom-confirm-alert {
-  direction: rtl;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 400px;
-  margin: auto;
-  font-family: 'Segoe UI', sans-serif;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  text-align: right;
-}
-
-.custom-confirm-alert h2 {
-  margin: 0 0 12px;
-}
-
-.custom-confirm-alert p {
-  margin-bottom: 24px;
-}
-
-.custom-confirm-alert .buttons {
+.rating-stars {
+  color: #ffd700;
   display: flex;
-  justify-content: space-between;
+  gap: 1px;
+  font-size: 0.85rem;
 }
 
-.custom-confirm-alert button {
-  padding: 8px 16px;
-  font-size: 1rem;
+.rating-number {
+  font-size: 0.85rem;
+  color: #737373;
+}
+
+.business-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-button {
+  width: 28px;
+  height: 28px;
   border: none;
-  border-radius: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
 }
 
-.custom-confirm-alert .danger {
-  background-color: #dc3545;
+/* Colored action buttons */
+.action-button.email {
+  background: #ea4335;
+}
+
+.action-button.whatsapp {
+  background: #25d366;
+}
+
+.action-button.phone {
+  background: #0088cc;
+}
+
+.action-button.email svg,
+.action-button.whatsapp svg,
+.action-button.phone svg {
   color: white;
 }
 
-.custom-confirm-alert .danger:hover {
-  background-color: #c82333;
-}
-.business-card.inactive {
-  background-color: #f8f8f8;
-  position: relative;
+.action-button.email:hover {
+  background: #d93126;
 }
 
-.business-card.inactive .business-card-left,
-.business-card.inactive .business-card-left .restore {
-  pointer-events: auto;
+.action-button.whatsapp:hover {
+  background: #20bd5a;
 }
-.business-card.inactive .business-card-right {
-  opacity: 0.5;
+
+.action-button.phone:hover {
+  background: #0077b3;
+}
+
+/* Admin action buttons */
+.action-button.admin {
+  background: #f5f5f5;
+}
+
+.action-button.admin:hover {
+  background: #e8e8e8;
+}
+
+.action-button.admin svg {
+  color: #737373;
+}
+
+.business-card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+
+.badge-open {
+  color: #4caf50;
+}
+
+.badge-closed {
+  color: #f44336;
+}
+
+.business-card.inactive {
+  opacity: 0.7;
+  background: #f8f8f8;
   pointer-events: none;
 }
-.business-card.inactive .edit {
-  opacity: 0.4;
-}
-.business-card-status-badge {
+
+.business-card.inactive::after {
+  content: 'לא פעיל';
   position: absolute;
-    top: 124px;
-    right: 0;
-    background-color: #dc3545;
-    color: white;
-    padding: 4px 7px;
-    font-size: 14px;
-    font-weight: bold;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  background: #f44336;
+  color: white;
+  padding: 6px 24px;
+  font-weight: 500;
+  font-size: 1rem;
+  z-index: 2;
 }
 
-/* רספונסיביות */
+/* Tooltip */
+.action-button .tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  margin-bottom: 6px;
+}
+
+.action-button:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .business-cards-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
+  .business-cards-container {
+    grid-template-columns: 1fr;
+    padding: 0 16px;
+  }
+
   .business-card {
-    flex-direction: column;
     height: auto;
-  }
-
-  .business-card-left {
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-around;
-    padding: 10px;
-  }
-
-  .business-card-image {
-    width: 100%;
-    height: 200px;
+    min-height: 280px;
   }
 }
