@@ -110,7 +110,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
       if (onSearch) {
         onSearch(searchQuery);
       } else {
-        navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+        navigate(`/search-results?q=${encodeURIComponent(searchQuery)}`);
       }
     }
   };
@@ -194,7 +194,6 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
   return (
     <div className={`search-bar-container ${isMainPage ? 'main-page' : 'results-page'}`}>
       <form onSubmit={handleSubmit} className="search-bar-wrapper">
-        <FaSearch className="search-icon" onClick={handleSubmit} />
         <input
           type="text"
           className="search-input"
@@ -221,10 +220,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
               : undefined
           }
         />
-        <button type="button" className="filter-button">
-          <FaFilter className="icon" />
-          סינון
-        </button>
+        <FaSearch className="search-icon" onClick={handleSubmit} />
       </form>
 
       {showDropdown && (

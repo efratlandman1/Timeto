@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import BusinessCard from './BusinessCard';
+import AdvancedSearchModal from './AdvancedSearchModal';
 import axios from 'axios';
 import '../styles/SearchResultPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchBar from './SearchBar';
-import { FaChevronDown } from 'react-icons/fa'; // 👈 הוספת אייקון
+import { FaFilter, FaTimes, FaChevronDown } from 'react-icons/fa';
 
 const ITEMS_PER_PAGE = 8;
 
 const SORT_OPTIONS = {
-    rating: 'דירוג',
-    name: 'שם העסק',
+    rating: 'דירוג גבוה',
+    name: 'לפי א-ב',
     distance: 'מרחק'
 };
 
@@ -18,39 +19,48 @@ const SearchResultPage = () => {
     const [businesses, setBusinesses] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [showSortOptions, setShowSortOptions] = useState(false);
+    const [showFilters, setShowFilters] = useState(false);
+    const [activeFilters, setActiveFilters] = useState({});
+    const [sortOption, setSortOption] = useState('rating');
+    const [showSortDropdown, setShowSortDropdown] = useState(false);
 
     const navigate = useNavigate();
     const location = useLocation();
-    const sortRef = useRef(null);
 
-    const urlParams = new URLSearchParams(location.search);
-    const filters = {};
-    for (const [key, value] of urlParams.entries()) {
-        if (key in filters) {
-            if (Array.isArray(filters[key])) {
-                filters[key].push(value);
-            } else {
-                filters[key] = [filters[key], value];
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const filters = {};
+        const sort = params.get('sort') || 'rating';
+
+        for (const [key, value] of params.entries()) {
+            if (key !== 'sort') {
+                if (key in filters) {
+                    if (Array.isArray(filters[key])) {
+                        filters[key].push(value);
+                    } else {
+                        filters[key] = [filters[key], value];
+                    }
+                } else {
+                    filters[key] = value;
+                }
             }
-        } else {
-            filters[key] = value;
         }
-    }
 
-    const currentSort = urlParams.get("sort") || "rating";
+        setActiveFilters(filters);
+        setSortOption(sort);
+    }, [location.search]);
 
     useEffect(() => {
         const fetchBusinesses = async () => {
             try {
+                const params = new URLSearchParams(location.search);
+                params.set('page', currentPage.toString());
+                params.set('limit', ITEMS_PER_PAGE.toString());
+                
                 const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
-                    params: {
-                        ...filters,
-                        page: currentPage,
-                        limit: ITEMS_PER_PAGE,
-                        sort: currentSort
-                    }
+                    params: Object.fromEntries(params)
                 });
+                
                 setBusinesses(res.data.data || []);
                 setTotalPages(res.data.pagination?.totalPages || 1);
             } catch (error) {
@@ -61,103 +71,152 @@ const SearchResultPage = () => {
         fetchBusinesses();
     }, [location.search, currentPage]);
 
-    const removeFilter = (keyToRemove, valueToRemove = null) => {
+    const handleFilterChange = (key, value) => {
         const newParams = new URLSearchParams(location.search);
-        if (valueToRemove !== null) {
-            const values = newParams.getAll(keyToRemove).filter(val => val !== valueToRemove);
-            newParams.delete(keyToRemove);
-            values.forEach(val => newParams.append(keyToRemove, val));
+        
+        if (Array.isArray(value)) {
+            newParams.delete(key);
+            value.forEach(v => newParams.append(key, v));
         } else {
-            newParams.delete(keyToRemove);
+            newParams.set(key, value);
+        }
+        
+        navigate({ pathname: location.pathname, search: newParams.toString() });
+    };
+
+    const handleRemoveFilter = (key, value = null) => {
+        const newParams = new URLSearchParams(location.search);
+        
+        if (value !== null && Array.isArray(activeFilters[key])) {
+            const values = activeFilters[key].filter(v => v !== value);
+            newParams.delete(key);
+            values.forEach(v => newParams.append(key, v));
+        } else {
+            newParams.delete(key);
         }
 
         navigate({ pathname: location.pathname, search: newParams.toString() });
     };
 
-    const createLabel = (key, value) => {
-        switch (key) {
-            case 'categoryName': return `קטגוריה: ${value}`;
-            case 'services': return `שירות: ${value}`;
-            case 'distance': return `עד ${value} ק"מ`;
-            case 'rating': return `${value} כוכבים ומעלה`;
-            default: return `${key}: ${value}`;
+    const handleClearFilters = () => {
+        const newParams = new URLSearchParams();
+        navigate({ pathname: location.pathname });
+    };
+
+    const handleSortChange = (newSort) => {
+        const newParams = new URLSearchParams(location.search);
+        if (newSort === 'rating') {
+            newParams.delete('sort');
+        } else {
+            newParams.set('sort', newSort);
         }
+        navigate({ pathname: location.pathname, search: newParams.toString() });
     };
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
     };
 
-    const handleSortSelect = (sortKey) => {
-        const newParams = new URLSearchParams(location.search);
-        newParams.set("sort", sortKey);
-        setShowSortOptions(false);
-        navigate({ pathname: location.pathname, search: newParams.toString() });
-    };
-
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (sortRef.current && !sortRef.current.contains(e.target)) {
-                setShowSortOptions(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
     return (
-        <div className='search-result-page-container'>
-            <SearchBar />
+        <div className='search-page-container'>
+            <div className="search-controls-wrapper">
+                <div className="search-area">
+                    <SearchBar />
+                </div>
+                <div className="controls-area">
+                    <button 
+                        className="filter-button"
+                        onClick={() => setShowFilters(true)}
+                    >
+                        <FaFilter />
+                    </button>
+                    <div className="sort-area">
+                        <div 
+                            className="sort-button"
+                            onClick={() => setShowSortDropdown(!showSortDropdown)}
+                        >
+                            <span className="sort-label">מיון:</span>
+                            <span className="selected-sort">{SORT_OPTIONS[sortOption]}</span>
+                            <FaChevronDown className={`sort-chevron ${showSortDropdown ? 'open' : ''}`} />
+                        </div>
+                        {showSortDropdown && (
+                            <div className="sort-dropdown">
+                                {Object.entries(SORT_OPTIONS).map(([value, label]) => (
+                                    <div
+                                        key={value}
+                                        className={`sort-option ${sortOption === value ? 'selected' : ''}`}
+                                        onClick={() => {
+                                            handleSortChange(value);
+                                            setShowSortDropdown(false);
+                                        }}
+                                    >
+                                        {label}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
 
-            {Object.keys(filters).length > 0 && (
-                <div className="filters-container">
-                    {Object.entries(filters).map(([key, value]) => (
-                        key === 'q' || key === 'sort' || !value ? null : (
+            {Object.keys(activeFilters).length > 0 && (
+                <div className="filters-area">
+                    <div className="filters-header">
+                        <div className="filters-title">סינונים פעילים:</div>
+                        <button 
+                            className="clear-all-filters"
+                            onClick={handleClearFilters}
+                        >
+                            נקה הכל
+                            <FaTimes />
+                        </button>
+                    </div>
+
+                    <div className="active-filters-container">
+                        {Object.entries(activeFilters).map(([key, value]) => (
                             Array.isArray(value) ? (
-                                value.map((val, idx) => (
+                                value.map((v, idx) => (
                                     <div key={`${key}-${idx}`} className="filter-tag">
-                                        {createLabel(key, val)}
-                                        <span className="remove-filter" onClick={() => removeFilter(key, val)}>×</span>
+                                        {key === 'categoryName' ? `קטגוריה: ${v}` :
+                                         key === 'rating' ? `${v} כוכבים ומעלה` :
+                                         key === 'services' ? `שירות: ${v}` : v}
+                                        <button onClick={() => handleRemoveFilter(key, v)}>
+                                            <FaTimes />
+                                        </button>
                                     </div>
                                 ))
                             ) : (
                                 <div key={key} className="filter-tag">
-                                    {createLabel(key, value)}
-                                    <span className="remove-filter" onClick={() => removeFilter(key)}>×</span>
+                                    {key === 'categoryName' ? `קטגוריה: ${value}` :
+                                     key === 'rating' ? `${value} כוכבים ומעלה` :
+                                     key === 'services' ? `שירות: ${value}` : value}
+                                    <button onClick={() => handleRemoveFilter(key)}>
+                                        <FaTimes />
+                                    </button>
                                 </div>
                             )
-                        )
-                    ))}
+                        ))}
+                    </div>
                 </div>
             )}
 
-            <div className="sort-container" ref={sortRef}>
-                <div className="sort-label" onClick={() => setShowSortOptions(prev => !prev)}>
-                    ממויין לפי {SORT_OPTIONS[currentSort] || "דירוג"}
-                    <FaChevronDown
-                        className={`sort-arrow ${showSortOptions ? 'open' : ''}`}
-                        style={{ marginRight: '8px', color: 'red' }}
-                    />
+            <div className="search-results-layout">
+                <div className="business-cards-grid">
+                    {businesses.map((business) => (
+                        <BusinessCard key={business._id} business={business} />
+                    ))}
                 </div>
-                {showSortOptions && (
-                    <div className="sort-options">
-                        {Object.entries(SORT_OPTIONS).map(([key, label]) => (
-                            <div
-                                key={key}
-                                className="sort-option"
-                                onClick={() => handleSortSelect(key)}
-                            >
-                                {label}
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
 
-            <div className="business-cards-container">
-                {businesses.map((business) => (
-                    <BusinessCard key={business._id} business={business} />
-                ))}
+                <AdvancedSearchModal
+                    isOpen={showFilters}
+                    onClose={() => setShowFilters(false)}
+                    filters={activeFilters}
+                    onFilterChange={handleFilterChange}
+                    onClearFilters={handleClearFilters}
+                    onRemoveFilter={handleRemoveFilter}
+                    sortOption={sortOption}
+                    onSortChange={handleSortChange}
+                />
             </div>
 
             {totalPages > 1 && (
