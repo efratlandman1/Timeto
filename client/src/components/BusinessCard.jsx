@@ -4,11 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import FeedbackPage from './FeedbackPage';
 import {
   FaPencilAlt, FaPhone, FaWhatsapp, FaEnvelope,
-  FaStar, FaRegStar, FaTrash, FaRecycle
+  FaStar, FaRegStar, FaTrash, FaRecycle, FaMapMarkerAlt,
+  FaClock, FaShekelSign
 } from "react-icons/fa";
 import { setSelectedBusiness } from '../redux/businessSlice';
 import '../styles/businessCard.css';
-import {getToken} from "../utils/auth";
+import { getToken } from "../utils/auth";
 
 const BusinessCard = ({ business, fromUserBusinesses }) => {
   const dispatch = useDispatch();
@@ -23,7 +24,8 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
   //   return null;
   // }
 
-  const handleDeleteConfirmed = async () => {
+  const handleDeleteConfirmed = async (e) => {
+    e.stopPropagation(); // Prevent card navigation
     try {
       const token = getToken();
       if (!token) {
@@ -47,7 +49,8 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     }
   };
 
-  const handleRestore = async () => {
+  const handleRestore = async (e) => {
+    e.stopPropagation(); // Prevent card navigation
     try {
       const token = getToken();
       if (!token) {
@@ -74,90 +77,46 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     }
   };
 
-  const handleEdit = () => {
+  const handleEdit = (e) => {
+    e.stopPropagation(); // Prevent card navigation
     dispatch(setSelectedBusiness(business));
     navigate(`/edit/${business._id}`);
   };
 
   const handleCardClick = () => {
-    navigate(`/business-profile/${business._id}`);
+    if (localActive) {
+      navigate(`/business-profile/${business._id}`);
+    }
+  };
+
+  const handleActionClick = (e, action) => {
+    e.stopPropagation(); // Prevent card navigation
+    action();
+  };
+
+  const renderRatingStars = (rating) => {
+    const stars = [];
+    for (let i = 0; i < 5; i++) {
+      stars.push(
+        <span key={i}>
+          {i < Math.floor(rating) ? <FaStar /> : <FaRegStar />}
+        </span>
+      );
+    }
+    return stars;
+  };
+
+  const isBusinessOpen = () => {
+    // Add your business hours logic here
+    return true; // Placeholder
   };
 
   return (
-    <div className={`business-card ${!localActive ? 'inactive' : ''}`}>
-      <div className="business-card-left">
-        {fromUserBusinesses ? (
-          <>
-            <button
-              className="business-card-action-button edit"
-              onClick={localActive ? handleEdit : undefined}
-              title="עריכת העסק"
-              disabled={!localActive}
-            >
-              <FaPencilAlt />
-            </button>
-            {localActive ? (
-              confirmDelete ? (
-                <>
-                  <button
-                    className="business-card-action-button delete"
-                    onClick={handleDeleteConfirmed}
-                    title="אישור מחיקה"
-                  >✔</button>
-                  <button
-                    className="business-card-action-button delete"
-                    onClick={() => setConfirmDelete(false)}
-                    title="ביטול מחיקה"
-                  >✖</button>
-                </>
-              ) : (
-                <button
-                  className="business-card-action-button delete"
-                  onClick={() => setConfirmDelete(true)}
-                  title="מחיקת עסק"
-                >
-                  <FaTrash />
-                </button>
-              )
-            ) : (
-              <button
-                className="business-card-action-button restore"
-                onClick={handleRestore}
-                title="שחזור עסק"
-              >
-                <FaRecycle />
-              </button>
-            )}
-          </>
-        ) : (
-          <>
-            <a href={`mailto:${business.email}`} className="business-card-action-button email" title="שליחת אימייל">
-              <FaEnvelope />
-            </a>
-            <a href={`https://wa.me/${business.phone}`} className="business-card-action-button whatsapp" title="שליחת וואטסאפ">
-              <FaWhatsapp />
-            </a>
-            <a href={`tel:${business.phone}`} className="business-card-action-button phone" title="התקשרות טלפונית">
-              <FaPhone />
-            </a>
-            <button
-              className="business-card-action-button feedback"
-              onClick={() => setShowFeedbackModal(true)}
-              title="השארת ביקורת"
-            >
-              <FaRegStar />
-            </button>
-          </>
-        )}
-      </div>
-
-      <div
-        className="business-card-right"
-        onClick={localActive ? handleCardClick : undefined}
-      >
-        {!localActive && (
-          <div className="business-card-status-badge">לא פעיל</div>
-        )}
+    <div 
+      className={`business-card ${!localActive ? 'inactive' : ''}`}
+      onClick={handleCardClick}
+    >
+      <div className="business-card-image-container">
         <img
           className="business-card-image"
           src={
@@ -167,15 +126,124 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
           }
           alt={business.name}
         />
-        <div className="business-card-text">
+        <div className="business-card-overlay" />
+        {localActive && (
+          <div className={`business-card-badge ${isBusinessOpen() ? 'badge-open' : 'badge-closed'}`}>
+            {isBusinessOpen() ? 'פתוח' : 'סגור'}
+          </div>
+        )}
+      </div>
+
+      <div className="business-card-content">
+        <div className="business-card-header">
           <h3 className="business-card-name">{business.name}</h3>
-          <p className="business-card-category">{business.category}</p>
-          <div className="business-card-description-rating">
-            <div className="business-card-description">{business.description}</div>
-            <div className="business-card-rating">
-              <FaStar />
-              <span>{business.rating ? `${business.rating}/5` : '0/5'}</span>
+          <div className="business-card-category">
+            <FaMapMarkerAlt />
+            <span className="business-card-address">{business.address}</span>
+          </div>
+        </div>
+
+        {/* <div className="business-card-info"> */}
+          {/* <div className="price-range">
+            <FaShekelSign />
+            <span>{getPriceRange()}</span>
+          </div>
+          <div className="delivery-time">
+            <FaClock />
+            <span>{getDeliveryTime()} דקות</span>
+          </div> */}
+        {/* </div> */}
+
+        <div className="business-card-footer">
+          <div className="business-card-rating">
+            <div className="rating-stars">
+              {renderRatingStars(business.rating || 0)}
             </div>
+            <span className="rating-number">
+              {business.rating ? business.rating.toFixed(1) : 'חדש'}
+            </span>
+          </div>
+
+          <div className="business-card-actions">
+            {fromUserBusinesses ? (
+              <>
+                {localActive && (
+                  <button
+                    className="action-button admin"
+                    onClick={(e) => handleEdit(e)}
+                  >
+                    <FaPencilAlt />
+                    <span className="tooltip">עריכה</span>
+                  </button>
+                )}
+                {localActive ? (
+                  confirmDelete ? (
+                    <>
+                      <button
+                        className="action-button admin"
+                        onClick={(e) => handleDeleteConfirmed(e)}
+                      >
+                        <span>✔</span>
+                        <span className="tooltip">אישור מחיקה</span>
+                      </button>
+                      <button
+                        className="action-button admin"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setConfirmDelete(false);
+                        }}
+                      >
+                        <span>✖</span>
+                        <span className="tooltip">ביטול</span>
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      className="action-button admin"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setConfirmDelete(true);
+                      }}
+                    >
+                      <FaTrash />
+                      <span className="tooltip">מחיקה</span>
+                    </button>
+                  )
+                ) : (
+                  <button
+                    className="action-button admin"
+                    onClick={(e) => handleRestore(e)}
+                  >
+                    <FaRecycle />
+                    <span className="tooltip">שחזור</span>
+                  </button>
+                )}
+              </>
+            ) : (
+              <>
+                <button 
+                  className="action-button email"
+                  onClick={(e) => handleActionClick(e, () => window.location.href = `mailto:${business.email}`)}
+                >
+                  <FaEnvelope />
+                  <span className="tooltip">שליחת אימייל</span>
+                </button>
+                <button 
+                  className="action-button whatsapp"
+                  onClick={(e) => handleActionClick(e, () => window.location.href = `https://wa.me/${business.phone}`)}
+                >
+                  <FaWhatsapp />
+                  <span className="tooltip">וואטסאפ</span>
+                </button>
+                <button 
+                  className="action-button phone"
+                  onClick={(e) => handleActionClick(e, () => window.location.href = `tel:${business.phone}`)}
+                >
+                  <FaPhone />
+                  <span className="tooltip">התקשרות</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -192,7 +260,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
 
 function showToast(message, isError = false) {
   const toast = document.createElement('div');
-  toast.className = `business-card-toast ${isError ? 'error' : 'success'}`;
+  toast.className = `toast ${isError ? 'error' : 'success'}`;
   toast.innerText = message;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);

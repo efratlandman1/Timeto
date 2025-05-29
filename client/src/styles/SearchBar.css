@@ -1,67 +1,67 @@
 .search-bar {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.625rem;
-  margin-bottom: 1.25rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
   position: relative;
-  z-index: 10;
 }
 
 .search-input-wrapper {
   position: relative;
-  width: 80%;
-  max-width: 40rem;
+  width: 100%;
 }
 
 .search-input-wrapper input {
   width: 100%;
-  padding: 0.5rem 1.875rem 0.5rem 0.625rem;
-  font-size: 1.25rem;
-  border-radius: 1.5625rem;
-  border: 1px solid #ccc;
+  padding: 1rem 3rem 1rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #242f3d;
+  color: white;
   direction: rtl;
-  transition: border 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.search-input-wrapper input::placeholder {
+  color: #a0aec0;
 }
 
 .search-input-wrapper input:focus {
-  border-color: #ff4d4d;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.2);
+  border-color: #ff4d4d;
+  box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.2);
 }
 
 .search-icon {
   position: absolute;
-  left: 0.625rem;
+  right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.125rem;
-  color: #888;
+  font-size: 1.25rem;
+  color: #a0aec0;
   pointer-events: none;
 }
 
-.filter-button-wrapper {
-  display: flex;
-  align-items: center;
-}
-
 .filter-button {
-  padding: 0.5rem 0.75rem;
-  background-color: transparent;
-  color: #333;
-  border: 2px solid #333;
-  border-radius: 0.25rem;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 1rem;
   cursor: pointer;
-  font-size: 1.125rem;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  transition: all 0.3s ease;
+  justify-content: center;
 }
 
 .filter-button:hover {
-  background-color: #ff4d4d;
-  color: white;
-  border-color: #ff4d4d;
+  background-color: #ff3333;
+  transform: translateY(-2px);
 }
 
 .filter-button svg {
@@ -71,32 +71,28 @@
 /* Dropdown styles */
 .search-results-dropdown {
   position: absolute;
-  top: calc(100% + 0.25rem);
+  top: calc(100% + 0.5rem);
   left: 0;
-  width: 100%;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 0.75rem;
-  max-height: 300px;
+  right: 0;
+  background-color: #242f3d;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  max-height: 400px;
   overflow-y: auto;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-  z-index: 10;
-  padding: 0.25rem 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
 }
 
 .search-result-item {
-  border-bottom: 1px solid #f1f1f1;
-  padding: 0.85rem 1rem;
+  padding: 1rem;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  transition: background 0.2s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background-color 0.2s ease;
 }
 
 .search-result-item:hover,
 .search-result-item.highlighted {
-  background-color: #fff6f6;
+  background-color: rgba(255, 77, 77, 0.1);
 }
 
 .search-result-item:last-child {
@@ -105,81 +101,75 @@
 
 .search-result-top-row {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
-.business-name,
+.business-name {
+  font-size: 1rem;
+  color: white;
+  font-weight: 500;
+}
+
 .business-category {
-  font-size: 16px;
-  margin-inline-end: 10px;
+  font-size: 0.875rem;
+  color: #a0aec0;
 }
 
-.business-address,
-.business-description {
-  font-size: 0.9rem;
-  color: #555;
+.business-address {
+  font-size: 0.875rem;
+  color: #a0aec0;
 }
 
-/* תגיות */
+/* Tags */
 .tags-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 6px;
-  margin-inline-start: auto;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .search-tag {
-  border: 1px solid #ff4d4d;
-  background-color: white;
-  color: black;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  white-space: nowrap;
-  margin-inline-start: 4px;
-}
-
-.search-tag strong {
+  background-color: rgba(255, 77, 77, 0.1);
   color: #ff4d4d;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
 }
 
 .search-tag.extra-tag {
-  background-color: #fff0f0;
-  border-color: darkred;
-  font-weight: bold;
+  background-color: rgba(255, 77, 77, 0.2);
+  font-weight: 500;
 }
 
-/* Highlighting */
-.search-results-dropdown strong {
-  color: #ff4d4d;
-  font-weight: bold;
+/* No Results */
+.no-results {
+  padding: 2rem;
+  text-align: center;
+  color: #a0aec0;
 }
 
-.serach-business-header {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.no-results-icon {
+  color: #a0aec0;
+  margin-bottom: 1rem;
 }
 
-.serach-business-name {
-  font-weight: 600;
-  font-size: 1rem;
-  color: #222;
-}
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .search-bar {
+    flex-direction: column;
+    gap: 1rem;
+  }
 
-.serach-business-category-pill {
-  background-color: #f2f2f2;
-  color: #666;
-  padding: 3px 10px;
-  font-size: 0.8rem;
-  border-radius: 12px;
-  white-space: nowrap;
+  .search-input-wrapper input {
+    padding: 0.875rem 2.5rem 0.875rem 0.875rem;
+  }
+
+  .filter-button {
+    width: 100%;
+    padding: 0.875rem;
+  }
 }
 
 /* אפקט טשטוש */
@@ -198,69 +188,6 @@ body.blurred::before {
   background: #fff0f0;
 }
 
-/* שורת אין תוצאות */
-.no-results {
-  padding: 2rem 1rem;
-  text-align: center;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #999;
-  background-color: #fafafa;
-  border-top: 1px solid #eee;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  user-select: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
-.no-results-icon {
-  width: 48px;
-  height: 48px;
-  color: #ccc;
-}
-
-
-/* מובייל */
-@media (max-width: 767px) {
-  .search-bar {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 30px;
-    margin-bottom: 5px;
-  }
-
-  .search-input-wrapper {
-    width: 100%;
-  }
-
-  .search-input-wrapper input {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-  }
-
-  .search-icon {
-    left: 0.5rem;
-    font-size: 1rem;
-  }
-
-  .filter-button-wrapper {
-    flex-shrink: 0;
-  }
-
-  .filter-button {
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-  }
-
-  .search-results-dropdown {
-    max-height: 50vh;
-  }
-}
 /* לא נחוץ יותר - רק אם רוצים להשאיר את האנימציה */
 .load-more-item {
   padding: 10px;
