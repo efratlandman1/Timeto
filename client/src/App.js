@@ -7,9 +7,8 @@ import LoginPage from './components/LoginPage';
 import Header from './components/Header';
 import RegistrationPage from "./components/RegistrationPage";
 import GlobalStyles from './GlobalStyles';
-import AdvancedSearchPage from './components/AdvancedSearchPage';
 import SearchResultPage from './components/SearchResultPage';
-import FeedbackPage from './components/FeedbackPage' ;
+import FeedbackPage from './components/FeedbackPage';
 import BusinessProfilePage from './components/BusinessProfilePage';
 import { useDispatch } from 'react-redux';
 import { setUser } from './redux/userSlice';
@@ -44,10 +43,8 @@ function App() {
                 <Route path="/user-businesses" element={<UserBusinessPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegistrationPage />} />
-                <Route path="/advanced-search-page" element={<AdvancedSearchPage />} />
                 <Route path="/search-results" element={<SearchResultPage />} />
                 <Route path="/feedback-page" element={<FeedbackPage />} />
-                {/* <Route path="/business-profile" element={<BusinessProfilePage />} />  */}
                 <Route path="/business-profile/:id" element={<BusinessProfilePage />} />
             </Routes>
         </Router>
