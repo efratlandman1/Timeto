@@ -71,11 +71,14 @@ const ProgressBar = ({ businessData }) => {
     '--total-steps': total,
   };
 
+  const steps = ['פרטי עסק', 'שירותי העסק', 'שעות פעילות'].reverse();
+
   return (
     <div className="edit-business-progress-bar" style={progressBarStyle}>
       <div className="edit-business-progress-bar-line" />
-      {['פרטי עסק', 'שירותי העסק', 'שעות פעילות'].map((label, index) => {
-        const stepNumber = index + 1;
+      {steps.map((label, index) => {
+        const actualIndex = steps.length - 1 - index;
+        const stepNumber = actualIndex + 1;
         const isActive = stepNumber === current;
         const isCompleted = stepNumber < current;
         return (

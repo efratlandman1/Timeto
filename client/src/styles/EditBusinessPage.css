@@ -87,6 +87,7 @@
     margin: 40px auto;
     padding: 0 40px;
     max-width: 600px;
+    direction: ltr;
 }
 
 .edit-business-progress-bar-line {
@@ -105,7 +106,7 @@
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
+    right: 0;
     height: 100%;
     width: calc((var(--current-step) - 1) / (var(--total-steps) - 1) * 100%);
     background: linear-gradient(90deg, #d32f2f, #ff4444);
@@ -332,4 +333,40 @@
 .form-group select:focus {
     border-color: #d32f2f !important;
     box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15) !important;
+}
+
+/* Update logo upload button */
+.button.file-upload {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: white;
+    color: #666;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    width: auto;
+    min-width: 200px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.button.file-upload:hover {
+    background: #f8f8f8;
+    color: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
+}
+
+.button.file-upload:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(211, 47, 47, 0.1);
+}
+
+.button.file-upload .icon {
+    font-size: 20px;
+    color: inherit;
 }

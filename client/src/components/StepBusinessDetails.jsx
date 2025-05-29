@@ -90,7 +90,6 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
             style={{ width: '80px', textAlign: 'center' }}
             required
           >
-            <option value="">בחר קידומת</option>
             {phonePrefixes.map(prefix => (
               <option key={prefix} value={prefix}>{prefix}</option>
             ))}
