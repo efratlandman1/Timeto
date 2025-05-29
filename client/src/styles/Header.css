@@ -4,7 +4,7 @@
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 1000;
+    z-index: 100;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -13,7 +13,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 2rem;
+    padding: 0.5rem 2rem;
     max-width: 1200px;
     margin: 0 auto;
     direction: rtl;
@@ -21,12 +21,13 @@
 
 .nav-right {
     flex: 0 0 auto;
+    margin-left: 3rem;
 }
 
 .nav-center {
     flex: 1;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .nav-left {
@@ -34,17 +35,17 @@
     display: flex;
     align-items: center;
     gap: 1.5rem;
+    margin-right: 3rem;
 }
 
+/* Logo styling */
 .logo {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 1.75rem;
-    font-weight: bold;
-    color: #ff4d4d;
+    gap: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    padding: 0.5rem;
 }
 
 .logo:hover {
@@ -52,51 +53,170 @@
 }
 
 .logo-icon {
-    font-size: 2rem;
+    font-size: 2.5rem;
+    color: #ff4d4d;
 }
 
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.logo-text-main {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.logo-text-sub {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+/* Navigation buttons */
 .nav-links {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
 
-.nav-button {
+.nav-button, .auth-button {
     background: none;
     border: none;
     color: #333;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
 }
 
-.nav-button:hover {
+.nav-button svg, .auth-button svg {
+    font-size: 1.1rem;
+    order: -1;
+}
+
+.nav-button:hover, .auth-button:hover {
+    color: #ff4d4d;
+    background-color: rgba(255, 77, 77, 0.1);
+}
+
+.nav-button:hover svg, .auth-button:hover svg {
     color: #ff4d4d;
 }
 
-.nav-button svg {
-    font-size: 1.1rem;
+.nav-button.with-hover:hover, .auth-button:hover {
+    background-color: #f8f8f8;
 }
 
 .nav-button.primary {
     background-color: #ff4d4d;
     color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    transition: all 0.3s ease;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
 }
 
 .nav-button.primary:hover {
     background-color: #ff3333;
     color: white;
-    transform: translateY(-2px);
 }
 
-/* Language Menu */
+.nav-button.primary svg {
+    color: white;
+}
+
+.nav-button.active {
+    background-color: rgba(255, 77, 77, 0.1);
+    color: #ff4d4d;
+}
+
+.nav-button.active svg {
+    color: #ff4d4d;
+}
+
+.username {
+    font-weight: 700;
+}
+
+/* Common dropdown styles */
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
+    border: 1px solid #eee;
+    z-index: 101;
+    margin-top: 0.5rem;
+}
+
+.dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 1rem;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-right: 1px solid #eee;
+    border-top: 1px solid #eee;
+    transform: rotate(-45deg);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #333;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.dropdown-item:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f8f8;
+    color: #ff4d4d;
+}
+
+.dropdown-item svg {
+    color: #666;
+    font-size: 1rem;
+}
+
+.dropdown-item:hover svg {
+    color: #ff4d4d;
+}
+
+.dropdown-item.active {
+    color: #ff4d4d;
+    font-weight: 500;
+}
+
+/* User menu specific */
+.user-menu {
+    position: relative;
+}
+
+.user-menu .dropdown-menu {
+    right: 0;
+    min-width: 200px;
+}
+
+/* Language menu specific */
 .lang-menu {
     position: relative;
 }
@@ -107,10 +227,10 @@
     padding: 0.5rem;
     color: #333;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
 }
 
 .lang-button:hover {
@@ -118,86 +238,50 @@
 }
 
 .lang-dropdown {
-    position: absolute;
-    left: 0;
-    top: 100%;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    padding: 0.5rem;
     min-width: 120px;
-    animation: fadeIn 0.2s ease-in-out;
-    border: 1px solid #eee;
 }
 
-.lang-option {
-    background: none;
-    border: none;
-    width: 100%;
-    padding: 0.5rem 1rem;
-    text-align: right;
+/* Auth section */
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-icon {
+    color: #666;
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+}
+
+.user-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #333;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.3s ease;
-    color: #333;
     border-radius: 4px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
-.lang-option:hover {
+.user-menu-item:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.user-menu-item:hover {
     background-color: #f8f8f8;
     color: #ff4d4d;
 }
 
-.lang-option.active {
-    color: #ff4d4d;
-    font-weight: 500;
-}
-
-/* Auth Section */
-.auth-section {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.auth-buttons {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.user-greeting {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.greeting-text {
+.user-menu-item svg {
     color: #666;
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
-.username-text {
-    color: #333;
-    font-weight: 500;
-}
-
-.auth-button {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: none;
-    border: 1px solid #eee;
-    color: #333;
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.auth-button:hover {
-    border-color: #ff4d4d;
+.user-menu-item:hover svg {
     color: #ff4d4d;
 }
 
@@ -244,6 +328,19 @@
     }
 
     .logo-icon {
-        font-size: 1.75rem;
+        font-size: 2rem;
     }
+
+    .logo span {
+        font-size: 0.875rem;
+    }
+
+    .logo-text-sub {
+        font-size: 0.75rem;
+    }
+}
+
+/* Main content padding to prevent header overlap */
+main {
+    padding-top: 80px;
 }
