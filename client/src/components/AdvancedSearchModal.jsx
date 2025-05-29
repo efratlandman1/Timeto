@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { FaStar } from 'react-icons/fa';
+import { FaStar, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import '../styles/AdvancedSearchPage.css';
 
-const AdvancedSearchModal = ({ isOpen, onClose }) => {
+const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedServices, setSelectedServices] = useState([]);
   const [services, setServices] = useState([]);
   const [rating, setRating] = useState(0);
+  const [hoveredRating, setHoveredRating] = useState(0);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -41,6 +42,21 @@ const AdvancedSearchModal = ({ isOpen, onClose }) => {
       setServices([]);
     }
   }, [selectedCategory, categories]);
+
+  useEffect(() => {
+    // Initialize filters from URL params
+    if (filters) {
+      if (filters.categoryName) {
+        setSelectedCategory(filters.categoryName);
+      }
+      if (filters.services) {
+        setSelectedServices(Array.isArray(filters.services) ? filters.services : [filters.services]);
+      }
+      if (filters.rating) {
+        setRating(parseInt(filters.rating));
+      }
+    }
+  }, [filters]);
 
   const handleServiceClick = (serviceName) => {
     setSelectedServices(prev => {
@@ -82,12 +98,40 @@ const AdvancedSearchModal = ({ isOpen, onClose }) => {
     onClose();
   };
 
+  const renderStarRating = () => {
+    return (
+      <div className="rating-selector">
+        <div className="rating-stars-row">
+          <div className="stars-wrapper">
+            {[5, 4, 3, 2, 1].map((star) => (
+              <FaStar
+                key={star}
+                className={`rating-star ${star <= (hoveredRating || rating) ? 'active' : ''}`}
+                onClick={() => setRating(star === rating ? 0 : star)}
+                onMouseEnter={() => setHoveredRating(star)}
+                onMouseLeave={() => setHoveredRating(0)}
+              />
+            ))}
+          </div>
+          <span className="rating-display">
+            {hoveredRating || rating ? `${hoveredRating || rating} כוכבים ומעלה` : 'לא נבחר דירוג'}
+          </span>
+        </div>
+        <div className="rating-hint">
+          לחץ על הכוכבים כדי לבחור דירוג מינימלי
+        </div>
+      </div>
+    );
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <button className="close-button" onClick={onClose}>×</button>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <button className="close-button" onClick={onClose}>
+          <FaTimes />
+        </button>
         <h2>חיפוש מורחב</h2>
 
         <div className="form-group">
@@ -120,23 +164,16 @@ const AdvancedSearchModal = ({ isOpen, onClose }) => {
           </div>
         )}
 
-        <div className="form-group rating-group">
-          <label>דירוג (החל מ)</label>
-          <div className="star-rating">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <FaStar
-                key={star}
-                size={30}
-                onClick={() => setRating(star)}
-                className={rating >= star ? "star filled" : "star empty"}
-              />
-            ))}
-          </div>
+        <div className="form-group">
+          <label>דירוג מינימלי</label>
+          {renderStarRating()}
         </div>
 
         <div className="buttons-container">
-          <button className="cancel-button" onClick={onClose}>ביטול</button>
-          <button className="confirm-button" onClick={handleSubmit}>אישור</button>
+          <button className="modal-button secondary" onClick={onClose}>ביטול</button>
+          <button className="modal-button primary" onClick={handleSubmit}>
+            {selectedCategory || selectedServices.length > 0 || rating > 0 ? 'החל סינון' : 'סגור'}
+          </button>
         </div>
       </div>
     </div>
