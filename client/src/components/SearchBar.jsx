@@ -4,7 +4,7 @@ import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/SearchBar.css';
 
-const SearchBar = () => {
+const SearchBar = ({ onSearch, isMainPage = false }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -104,11 +104,15 @@ const SearchBar = () => {
     }
   }, []);
 
-  const triggerSearch = () => {
-    const query = searchQuery.trim();
-    navigate(query ? `/search-results?q=${encodeURIComponent(query)}` : `/search-results`);
-    document.body.classList.remove('blurred');
-    setShowDropdown(false);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      if (onSearch) {
+        onSearch(searchQuery);
+      } else {
+        navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      }
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -131,7 +135,7 @@ const SearchBar = () => {
         if (highlightedIndex >= 0 && results[highlightedIndex]) {
           handleSelectResult(results[highlightedIndex]);
         } else {
-          triggerSearch();
+          handleSubmit(e);
         }
         break;
       }
@@ -188,12 +192,13 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="search-bar" ref={wrapperRef}>
-      <div className="search-input-wrapper">
-        <FaSearch className="search-icon" />
+    <div className={`search-bar-container ${isMainPage ? 'main-page' : 'results-page'}`}>
+      <form onSubmit={handleSubmit} className="search-bar-wrapper">
+        <FaSearch className="search-icon" onClick={handleSubmit} />
         <input
           type="text"
-          placeholder="חיפוש חופשי"
+          className="search-input"
+          placeholder="חפש עסק או שירות..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => {
@@ -202,7 +207,7 @@ const SearchBar = () => {
           onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
           onKeyDown={(e) => {
             if (e.key === 'Tab') {
-              triggerSearch();
+              handleSubmit(e);
             } else {
               handleKeyDown(e);
             }
@@ -216,60 +221,58 @@ const SearchBar = () => {
               : undefined
           }
         />
-
-        {showDropdown && (
-          <ul className="search-results-dropdown" id="search-dropdown" role="listbox" ref={listRef}>
-            {results.length === 0 ? (
-              <li className="no-results">
-                <svg className="no-results-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M9.5 3a6.5 6.5 0 0 1 5.2 10.4l5.15 5.15a1 1 0 0 1-1.42 1.42l-5.15-5.15A6.5 6.5 0 1 1 9.5 3Zm0 2a4.5 4.5 0 1 0 0 9a4.5 4.5 0 0 0 0-9Z"/>
-                </svg>
-                <div>לא נמצאו תוצאות תואמות</div>
-              </li>
-            ) : (
-              <>
-                {results.map((business, index) => (
-                  <li
-                    id={`result-${business._id}`}
-                    key={business._id}
-                    role="option"
-                    aria-selected={index === highlightedIndex}
-                    className={`search-result-item ${index === highlightedIndex ? 'highlighted' : ''}`}
-                    ref={(el) => itemRefs.current[index] = el}
-                    onClick={() => handleSelectResult(business)}
-                  >
-                    <div className="search-result-top-row">
-                      <div className="serach-business-header">
-                        <span className="serach-business-name">{highlightMatch(business.name)}</span>
-                        {business.categoryName && (
-                          <span className="serach-business-category-pill">
-                            {highlightMatch(business.categoryName)}
-                          </span>
-                        )}
-                      </div>
-                      {renderTags(business.subCategoryIds)}
-                    </div>
-                    <div className="business-address">{highlightMatch(business.address)}</div>
-                  </li>
-                ))}
-                {isLoadingMore && (
-                  <li className="load-more-item">
-                    <div className="loading-spinner red">
-                      <AiOutlineLoading3Quarters className="spinner-icon spin" />
-                    </div>
-                  </li>
-                )}
-              </>
-            )}
-          </ul>
-        )}
-      </div>
-
-      <div className="filter-button-wrapper">
-        <button onClick={handleAdvancedSearchClick} className="filter-button" title="חיפוש מורחב">
-          <FaFilter />
+        <button type="button" className="filter-button">
+          <FaFilter className="icon" />
+          סינון
         </button>
-      </div>
+      </form>
+
+      {showDropdown && (
+        <ul className="search-results-dropdown" id="search-dropdown" role="listbox" ref={listRef}>
+          {results.length === 0 ? (
+            <li className="no-results">
+              <svg className="no-results-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M9.5 3a6.5 6.5 0 0 1 5.2 10.4l5.15 5.15a1 1 0 0 1-1.42 1.42l-5.15-5.15A6.5 6.5 0 1 1 9.5 3Zm0 2a4.5 4.5 0 1 0 0 9a4.5 4.5 0 0 0 0-9Z"/>
+              </svg>
+              <div>לא נמצאו תוצאות תואמות</div>
+            </li>
+          ) : (
+            <>
+              {results.map((business, index) => (
+                <li
+                  id={`result-${business._id}`}
+                  key={business._id}
+                  role="option"
+                  aria-selected={index === highlightedIndex}
+                  className={`search-result-item ${index === highlightedIndex ? 'highlighted' : ''}`}
+                  ref={(el) => itemRefs.current[index] = el}
+                  onClick={() => handleSelectResult(business)}
+                >
+                  <div className="search-result-top-row">
+                    <div className="serach-business-header">
+                      <span className="serach-business-name">{highlightMatch(business.name)}</span>
+                      {business.categoryName && (
+                        <span className="serach-business-category-pill">
+                          {highlightMatch(business.categoryName)}
+                        </span>
+                      )}
+                    </div>
+                    {renderTags(business.subCategoryIds)}
+                  </div>
+                  <div className="business-address">{highlightMatch(business.address)}</div>
+                </li>
+              ))}
+              {isLoadingMore && (
+                <li className="load-more-item">
+                  <div className="loading-spinner red">
+                    <AiOutlineLoading3Quarters className="spinner-icon spin" />
+                  </div>
+                </li>
+              )}
+            </>
+          )}
+        </ul>
+      )}
     </div>
   );
 };
