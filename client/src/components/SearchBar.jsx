@@ -167,27 +167,92 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
     document.body.classList.remove('blurred');
   };
 
-  const highlightMatch = (text) => {
-    if (!text) return null;
-    const escapedQuery = escapeRegExp(searchQuery);
-    const parts = text.split(new RegExp(`(${escapedQuery})`, 'gi'));
-    return parts.map((part, i) =>
-      part.toLowerCase() === searchQuery.toLowerCase() ? <strong key={i}>{part}</strong> : part
+  const renderHighlightedText = (text) => {
+    if (!text || !searchQuery.trim()) return text;
+    try {
+      const parts = String(text).split(new RegExp(`(${escapeRegExp(searchQuery)})`, 'gi'));
+      return parts.map((part, i) => 
+        part.toLowerCase() === searchQuery.toLowerCase() ? 
+          <strong key={i}>{part}</strong> : 
+          part
+      );
+    } catch (error) {
+      return text;
+    }
+  };
+
+  const renderServices = (business) => {
+    if (!business.services?.length) return null;
+    const displayServices = business.services.slice(0, 3);
+    const extraCount = business.services.length - displayServices.length;
+
+    return (
+      <div className="business-services">
+        {displayServices.map((service) => (
+          <span key={service._id} className="service-tag">
+            {renderHighlightedText(service.name)}
+          </span>
+        ))}
+        {extraCount > 0 && (
+          <span className="service-tag">+{extraCount}</span>
+        )}
+      </div>
     );
   };
 
-  const renderTags = (subcategories) => {
-    if (!subcategories?.length) return null;
-    const displayTags = subcategories.slice(0, 4);
-    const extraCount = subcategories.length - displayTags.length;
+  const renderSearchResults = () => {
+    if (!showDropdown) return null;
 
     return (
-      <div className="tags-container">
-        {displayTags.map((tag, i) => (
-          <span key={tag + i} className="search-tag">{highlightMatch(tag)}</span>
-        ))}
-        {extraCount > 0 && <span className="search-tag extra-tag">+{extraCount}</span>}
-      </div>
+      <ul className="search-results-dropdown" id="search-dropdown" role="listbox" ref={listRef}>
+        {results.length === 0 ? (
+          <li className="no-results">
+            <svg className="no-results-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M9.5 3a6.5 6.5 0 0 1 5.2 10.4l5.15 5.15a1 1 0 0 1-1.42 1.42l-5.15-5.15A6.5 6.5 0 1 1 9.5 3Zm0 2a4.5 4.5 0 1 0 0 9a4.5 4.5 0 0 0 0-9Z"/>
+            </svg>
+            <div className="no-results-message">לא נמצאו תוצאות תואמות</div>
+            <div className="no-results-suggestion">נסה לחפש במילים אחרות או הסר מסננים</div>
+          </li>
+        ) : (
+          <>
+            {results.map((business, index) => (
+              <li
+                id={`result-${business._id}`}
+                key={business._id}
+                role="option"
+                aria-selected={index === highlightedIndex}
+                className={`search-result-item ${index === highlightedIndex ? 'highlighted' : ''}`}
+                ref={(el) => itemRefs.current[index] = el}
+                onClick={() => handleSelectResult(business)}
+              >
+                <div className="search-result-header">
+                  <div>
+                    <div className="business-name">
+                      {renderHighlightedText(business.name)}
+                    </div>
+                    {business.categoryName && (
+                      <div className="business-category">
+                        {renderHighlightedText(business.categoryName)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {renderServices(business)}
+                <div className="business-address">
+                  {renderHighlightedText(business.address)}
+                </div>
+              </li>
+            ))}
+            {isLoadingMore && (
+              <li className="load-more-item">
+                <div className="loading-spinner red">
+                  <AiOutlineLoading3Quarters className="spinner-icon spin" />
+                </div>
+              </li>
+            )}
+          </>
+        )}
+      </ul>
     );
   };
 
@@ -204,13 +269,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
             if (searchQuery.trim() && results.length > 0) setShowDropdown(true);
           }}
           onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
-          onKeyDown={(e) => {
-            if (e.key === 'Tab') {
-              handleSubmit(e);
-            } else {
-              handleKeyDown(e);
-            }
-          }}
+          onKeyDown={handleKeyDown}
           aria-haspopup="listbox"
           aria-expanded={showDropdown}
           aria-controls="search-dropdown"
@@ -222,53 +281,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
         />
         <FaSearch className="search-icon" onClick={handleSubmit} />
       </form>
-
-      {showDropdown && (
-        <ul className="search-results-dropdown" id="search-dropdown" role="listbox" ref={listRef}>
-          {results.length === 0 ? (
-            <li className="no-results">
-              <svg className="no-results-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M9.5 3a6.5 6.5 0 0 1 5.2 10.4l5.15 5.15a1 1 0 0 1-1.42 1.42l-5.15-5.15A6.5 6.5 0 1 1 9.5 3Zm0 2a4.5 4.5 0 1 0 0 9a4.5 4.5 0 0 0 0-9Z"/>
-              </svg>
-              <div>לא נמצאו תוצאות תואמות</div>
-            </li>
-          ) : (
-            <>
-              {results.map((business, index) => (
-                <li
-                  id={`result-${business._id}`}
-                  key={business._id}
-                  role="option"
-                  aria-selected={index === highlightedIndex}
-                  className={`search-result-item ${index === highlightedIndex ? 'highlighted' : ''}`}
-                  ref={(el) => itemRefs.current[index] = el}
-                  onClick={() => handleSelectResult(business)}
-                >
-                  <div className="search-result-top-row">
-                    <div className="serach-business-header">
-                      <span className="serach-business-name">{highlightMatch(business.name)}</span>
-                      {business.categoryName && (
-                        <span className="serach-business-category-pill">
-                          {highlightMatch(business.categoryName)}
-                        </span>
-                      )}
-                    </div>
-                    {renderTags(business.subCategoryIds)}
-                  </div>
-                  <div className="business-address">{highlightMatch(business.address)}</div>
-                </li>
-              ))}
-              {isLoadingMore && (
-                <li className="load-more-item">
-                  <div className="loading-spinner red">
-                    <AiOutlineLoading3Quarters className="spinner-icon spin" />
-                  </div>
-                </li>
-              )}
-            </>
-          )}
-        </ul>
-      )}
+      {renderSearchResults()}
     </div>
   );
 };
