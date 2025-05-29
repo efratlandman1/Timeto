@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaSearch, FaFilter } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaFolder, FaMapMarkerAlt } from 'react-icons/fa';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/SearchBar.css';
@@ -226,20 +226,24 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
                 onClick={() => handleSelectResult(business)}
               >
                 <div className="search-result-header">
-                  <div>
-                    <div className="business-name">
-                      {renderHighlightedText(business.name)}
-                    </div>
-                    {business.categoryName && (
-                      <div className="business-category">
-                        {renderHighlightedText(business.categoryName)}
+                  <div className="business-info">
+                    <div className="business-main-info">
+                      <div className="business-name">
+                        {renderHighlightedText(business.name)}
                       </div>
-                    )}
+                      {business.categoryName && (
+                        <div className="business-category">
+                          <FaFolder className="category-icon" />
+                          {renderHighlightedText(business.categoryName)}
+                        </div>
+                      )}
+                      <div className="business-address">
+                        <FaMapMarkerAlt size={12} />
+                        {renderHighlightedText(business.address)}
+                      </div>
+                    </div>
+                    {renderServices(business)}
                   </div>
-                </div>
-                {renderServices(business)}
-                <div className="business-address">
-                  {renderHighlightedText(business.address)}
                 </div>
               </li>
             ))}
