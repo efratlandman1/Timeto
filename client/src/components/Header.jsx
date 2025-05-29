@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { 
     FaUserCircle, 
     FaSignOutAlt, 
@@ -10,7 +10,9 @@ import {
     FaStore,
     FaLightbulb,
     FaMapMarkerAlt,
-    FaChevronDown
+    FaChevronDown,
+    FaSearch,
+    FaHome
 } from "react-icons/fa";
 import "../styles/Header.css";
 import { useSelector } from 'react-redux';
@@ -18,12 +20,15 @@ import { getToken } from "../utils/auth";
 
 const Header = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [showLangMenu, setShowLangMenu] = useState(false);
+    const [showUserMenu, setShowUserMenu] = useState(false);
     const [username, setUsername] = useState(null);
     const [greeting, setGreeting] = useState("");
     const [currentLang, setCurrentLang] = useState("he");
     const menuRef = useRef(null);
     const langMenuRef = useRef(null);
+    const userMenuRef = useRef(null);
     const loginUser = useSelector(state => state.user.user);
     
     const getGreeting = () => {
@@ -35,18 +40,19 @@ const Header = () => {
         return "לילה טוב";
     };
 
-    const handleLogout = () => {
-        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        setUsername(null);
-        localStorage.removeItem('user');
-        navigate("/login");
-    };
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (langMenuRef.current && !langMenuRef.current.contains(event.target)) {
+                setShowLangMenu(false);
+            }
+            if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+                setShowUserMenu(false);
+            }
+        };
 
-    const handleLanguageChange = (lang) => {
-        setCurrentLang(lang);
-        setShowLangMenu(false);
-        // Future language change logic here
-    };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     useEffect(() => {
         const token = getToken();
@@ -57,7 +63,6 @@ const Header = () => {
             setUsername(null);
         }
 
-        // Update greeting every minute
         const intervalId = setInterval(() => {
             if (loginUser) setGreeting(getGreeting());
         }, 60000);
@@ -65,16 +70,21 @@ const Header = () => {
         return () => clearInterval(intervalId);
     }, [loginUser]);
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (langMenuRef.current && !langMenuRef.current.contains(event.target)) {
-                setShowLangMenu(false);
-            }
-        };
+    const handleLogout = () => {
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        setUsername(null);
+        localStorage.removeItem('user');
+        navigate("/login");
+    };
 
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+    const handleLanguageChange = (lang) => {
+        setCurrentLang(lang);
+        setShowLangMenu(false);
+    };
+
+    const isActive = (path) => {
+        return location.pathname === path;
+    };
 
     return (
         <div className="header-container">
@@ -82,25 +92,40 @@ const Header = () => {
                 <div className="nav-right">
                     <div className="logo" onClick={() => navigate("/")}>
                         <FaMapMarkerAlt className="logo-icon" />
-                        <span>זמן</span>
+                        <div className="logo-text">
+                            <span className="logo-text-main">זמן</span>
+                            <span className="logo-text-sub">מדריך העסקים</span>
+                        </div>
                     </div>
                 </div>
 
                 <div className="nav-center">
                     <div className="nav-links">
-                        <button className="nav-button primary" onClick={() => navigate("/edit")}>
+                        <button 
+                            className={`nav-button ${isActive("/") ? "active" : ""}`} 
+                            onClick={() => navigate("/")}
+                        >
+                            <FaHome />
+                            בית
+                        </button>
+                        <button 
+                            className={`nav-button ${isActive("/search-results") ? "active" : ""}`} 
+                            onClick={() => navigate("/search-results")}
+                        >
+                            <FaSearch />
+                            חיפוש
+                        </button>
+                        <button 
+                            className={`nav-button ${isActive("/edit") ? "active" : ""}`} 
+                            onClick={() => navigate("/edit")}
+                        >
                             <FaPlusCircle />
-                            עסק חדש
+                            הוסף עסק
                         </button>
-                        <button className="nav-button" onClick={() => navigate("/my-favorites")}>
-                            <FaHeart />
-                            המועדפים שלי
-                        </button>
-                        <button className="nav-button" onClick={() => navigate("/user-businesses")}>
-                            <FaStore />
-                            העסקים שלי
-                        </button>
-                        <button className="nav-button" onClick={() => navigate("/suggest")}>
+                        <button 
+                            className={`nav-button ${isActive("/suggest") ? "active" : ""}`} 
+                            onClick={() => navigate("/suggest")}
+                        >
                             <FaLightbulb />
                             הצע קטגוריה
                         </button>
@@ -108,47 +133,64 @@ const Header = () => {
                 </div>
 
                 <div className="nav-left">
+                    {username ? (
+                        <div className="user-menu" ref={userMenuRef}>
+                            <div 
+                                className="nav-button with-hover" 
+                                onClick={() => setShowUserMenu(!showUserMenu)}
+                            >
+                                <FaUserCircle />
+                                <span>{greeting} <span className="username">{username}</span></span>
+                                <FaChevronDown style={{ fontSize: '12px', marginRight: '4px' }} />
+                            </div>
+                            {showUserMenu && (
+                                <div className="dropdown-menu">
+                                    <div className="dropdown-item" onClick={() => navigate("/user-businesses")}>
+                                        <FaStore />
+                                        העסקים שלי
+                                    </div>
+                                    <div className="dropdown-item" onClick={() => navigate("/my-favorites")}>
+                                        <FaHeart />
+                                        המועדפים שלי
+                                    </div>
+                                    <div className="dropdown-item" onClick={handleLogout}>
+                                        <FaSignOutAlt />
+                                        יציאה
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="auth-buttons">
+                            <button className="auth-button" onClick={() => navigate("/register")}>
+                                הרשמה
+                                <FaUserCircle />
+                            </button>
+                            <button className="auth-button" onClick={() => navigate("/login")}>
+                                כניסה
+                                <FaSignInAlt />
+                            </button>
+                        </div>
+                    )}
+
                     <div className="lang-menu" ref={langMenuRef}>
-                        <button className="lang-button" onClick={() => setShowLangMenu(!showLangMenu)}>
+                        <button className="nav-button with-hover" onClick={() => setShowLangMenu(!showLangMenu)}>
                             <FaGlobe />
                         </button>
                         {showLangMenu && (
-                            <div className="lang-dropdown">
-                                <button 
-                                    className={`lang-option ${currentLang === 'he' ? 'active' : ''}`}
+                            <div className="dropdown-menu lang-dropdown">
+                                <div 
+                                    className={`dropdown-item ${currentLang === 'he' ? 'active' : ''}`}
                                     onClick={() => handleLanguageChange('he')}
                                 >
                                     עברית
-                                </button>
-                                <button 
-                                    className={`lang-option ${currentLang === 'en' ? 'active' : ''}`}
+                                </div>
+                                <div 
+                                    className={`dropdown-item ${currentLang === 'en' ? 'active' : ''}`}
                                     onClick={() => handleLanguageChange('en')}
                                 >
                                     English
-                                </button>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="auth-section">
-                        {username ? (
-                            <div className="user-greeting">
-                                <span className="greeting-text">{greeting}</span>
-                                <span className="username-text">{username}</span>
-                                <button className="auth-button" onClick={handleLogout}>
-                                    <FaSignOutAlt />
-                                    יציאה
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="auth-buttons">
-                                <button className="auth-button" onClick={() => navigate("/register")}>
-                                    הרשמה
-                                </button>
-                                <button className="auth-button" onClick={() => navigate("/login")}>
-                                    <FaSignInAlt />
-                                    כניסה
-                                </button>
+                                </div>
                             </div>
                         )}
                     </div>
