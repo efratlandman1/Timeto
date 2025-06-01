@@ -127,7 +127,7 @@ const Header = () => {
                             onClick={() => navigate("/suggest")}
                         >
                             <FaLightbulb />
-                            הצע קטגוריה
+                            הצע פריט
                         </button>
                     </div>
                 </div>

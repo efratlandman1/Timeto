@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaPaperPlane } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/SuggestItemPage.css';
 
 const SuggestItemPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     type: 'category',
     name_he: '',
@@ -14,11 +16,36 @@ const SuggestItemPage = () => {
     reason: ''
   });
 
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
+        if (response.data && Array.isArray(response.data)) {
+          setCategories(response.data);
+        } else if (response.data && Array.isArray(response.data.data)) {
+          setCategories(response.data.data);
+        } else {
+          console.error('Unexpected categories data structure:', response.data);
+          setCategories([]);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        toast.error('שגיאה בטעינת הקטגוריות');
+        setCategories([]);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
       ...prevState,
-      [name]: value
+      [name]: value,
+      // Reset parent_category_id when switching from service to category
+      ...(name === 'type' && value === 'category' ? { parent_category_id: '' } : {})
     }));
   };
 
@@ -31,47 +58,44 @@ const SuggestItemPage = () => {
         formData
       );
       
-      if (response.status === 201) {
-        toast.success('ההצעה נשלחה בהצלחה!', {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-        
-        // Reset form
-        setFormData({
-          type: 'category',
-          name_he: '',
-          name_en: '',
-          parent_category_id: '',
-          reason: ''
-        });
-      }
-    } catch (error) {
-      toast.error('אירעה שגיאה בשליחת ההצעה. אנא נסה שוב מאוחר יותר.', {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
+      toast.success('ההצעה נשלחה בהצלחה!', {
+        onClose: () => {
+          navigate('/');
+        }
       });
+
+      setFormData({
+        type: 'category',
+        name_he: '',
+        name_en: '',
+        parent_category_id: '',
+        reason: ''
+      });
+
+      // Navigate to home page after 2 seconds
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
+      
+    } catch (error) {
       console.error('Error submitting suggestion:', error);
+      toast.error('שגיאה בשליחת ההצעה');
     }
   };
+
+  const RequiredMark = () => <span style={{ color: '#d32f2f', marginRight: '4px' }}>*</span>;
 
   return (
     <div className="suggest-item-container">
       <div className="suggest-item-content">
-        <h1>הצע פריט חדש</h1>
-        <p className="subtitle">יש לך רעיון לקטגוריה או שירות שחסרים? ספר לנו!</p>
-        
-        <form onSubmit={handleSubmit} className="suggest-form">
+        <h1>הצע פריט</h1>
+        <p className="subtitle">הצע קטגוריה או שירות חדש למערכת</p>
+
+        <form className="suggest-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>סוג הצעה</label>
+            <label className="form-label">
+              סוג הצעה<RequiredMark />
+            </label>
             <div className="radio-group">
               <label className="radio-label">
                 <input
@@ -97,7 +121,9 @@ const SuggestItemPage = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="name_he">שם בעברית *</label>
+            <label htmlFor="name_he" className="form-label">
+              שם בעברית<RequiredMark />
+            </label>
             <input
               type="text"
               id="name_he"
@@ -110,7 +136,9 @@ const SuggestItemPage = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="name_en">שם באנגלית *</label>
+            <label htmlFor="name_en" className="form-label">
+              שם באנגלית<RequiredMark />
+            </label>
             <input
               type="text"
               id="name_en"
@@ -122,29 +150,39 @@ const SuggestItemPage = () => {
             />
           </div>
 
-          {formData.type === 'service' && (
+          {formData.type === 'service' && categories.length > 0 && (
             <div className="form-group">
-              <label htmlFor="parent_category_id">קטגוריית אב</label>
-              <input
-                type="text"
+              <label htmlFor="parent_category_id" className="form-label">
+                קטגוריית אב<RequiredMark />
+              </label>
+              <select
                 id="parent_category_id"
                 name="parent_category_id"
                 value={formData.parent_category_id}
                 onChange={handleChange}
-                placeholder="הזן את מזהה קטגוריית האב"
-              />
+                required
+              >
+                <option value="">בחר קטגוריה</option>
+                {categories.map(category => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
 
           <div className="form-group">
-            <label htmlFor="reason">סיבה או תיאור קצר</label>
+            <label htmlFor="reason" className="form-label">
+              סיבה או תיאור קצר
+            </label>
             <textarea
               id="reason"
               name="reason"
               value={formData.reason}
               onChange={handleChange}
               placeholder="מדוע אתה חושב שפריט זה נחוץ?"
-              rows={4}
+              rows={3}
             />
           </div>
 
