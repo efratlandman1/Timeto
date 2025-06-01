@@ -1,10 +1,8 @@
-const Suggestion = require('../models/Suggestion');
-const Category = require('../models/Category');
-const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+const Suggestion = require('../models/suggestion');
+const Category = require('../models/category');
 
 // Create a new suggestion
-const createSuggestion = catchAsync(async (req, res, next) => {
+const createSuggestion = async (req, res, next) => {
   const { type, name_he, name_en, parent_category_id, reason } = req.body;
 
   // If type is service, verify that parent_category_id exists
@@ -29,10 +27,10 @@ const createSuggestion = catchAsync(async (req, res, next) => {
     status: 'success',
     data: suggestion
   });
-});
+};
 
 // Get all suggestions (admin only)
-const getAllSuggestions = catchAsync(async (req, res, next) => {
+const getAllSuggestions = async (req, res, next) => {
   const suggestions = await Suggestion.find()
     .populate('user', 'firstName lastName email')
     .populate('parent_category_id', 'name_he name_en');
@@ -42,10 +40,10 @@ const getAllSuggestions = catchAsync(async (req, res, next) => {
     results: suggestions.length,
     data: suggestions
   });
-});
+};
 
 // Get suggestion by ID (admin only)
-const getSuggestion = catchAsync(async (req, res, next) => {
+const getSuggestion = async (req, res, next) => {
   const suggestion = await Suggestion.findById(req.params.id)
     .populate('user', 'firstName lastName email')
     .populate('parent_category_id', 'name_he name_en');
@@ -58,10 +56,10 @@ const getSuggestion = catchAsync(async (req, res, next) => {
     status: 'success',
     data: suggestion
   });
-});
+};
 
 // Update suggestion status (admin only)
-const updateSuggestionStatus = catchAsync(async (req, res, next) => {
+const updateSuggestionStatus = async (req, res, next) => {
   const { status } = req.body;
 
   if (!['pending', 'approved', 'rejected'].includes(status)) {
@@ -85,10 +83,10 @@ const updateSuggestionStatus = catchAsync(async (req, res, next) => {
     status: 'success',
     data: suggestion
   });
-});
+};
 
 // Delete suggestion (admin only)
-const deleteSuggestion = catchAsync(async (req, res, next) => {
+const deleteSuggestion = async (req, res, next) => {
   const suggestion = await Suggestion.findByIdAndDelete(req.params.id);
 
   if (!suggestion) {
@@ -99,10 +97,10 @@ const deleteSuggestion = catchAsync(async (req, res, next) => {
     status: 'success',
     data: null
   });
-});
+};
 
 // Get user's suggestions
-const getUserSuggestions = catchAsync(async (req, res, next) => {
+const getUserSuggestions = async (req, res, next) => {
   const suggestions = await Suggestion.find({ user: req.user._id })
     .populate('parent_category_id', 'name_he name_en');
 
@@ -111,7 +109,7 @@ const getUserSuggestions = catchAsync(async (req, res, next) => {
     results: suggestions.length,
     data: suggestions
   });
-});
+};
 
 module.exports = {
   createSuggestion,
