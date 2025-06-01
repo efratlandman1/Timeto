@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const suggestionSchema = new mongoose.Schema({
+const SuggestionSchema = new mongoose.Schema({
   type: {
     type: String,
     required: [true, 'Type is required'],
@@ -49,9 +49,9 @@ const suggestionSchema = new mongoose.Schema({
 });
 
 // Update the updated_at timestamp before saving
-suggestionSchema.pre('save', function(next) {
+SuggestionSchema.pre('save', function(next) {
   this.updated_at = Date.now();
   next();
 });
 
-module.exports = mongoose.model('suggestions', suggestionSchema); 
+module.exports = mongoose.model('suggestions', SuggestionSchema); 
