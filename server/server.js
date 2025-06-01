@@ -13,6 +13,7 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const serviceRoutes = require('./routes/serviceRoutes');
 const feedbackRoutes  = require('./routes/feedbacksRoutes');
 const jwtAuthMiddleware = require("./middlewares/authMiddleware");
+const suggestionRouter = require('./routes/suggestionRoutes');
 
 app.use(cors());
 app.use(express.json());
@@ -33,6 +34,7 @@ app.use('/api/v1/businesses', businessesRouter);
 app.use("/api/v1/categories", categoryRoutes);
 app.use('/api/v1/services', serviceRoutes);
 app.use('/api/v1/feedbacks', feedbackRoutes);
+app.use('/api/v1/suggestions', suggestionRouter);
 app.use('/api/v1', authRouter);
 
 app.listen(PORT, () => {

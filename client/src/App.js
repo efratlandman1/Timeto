@@ -10,6 +10,7 @@ import GlobalStyles from './GlobalStyles';
 import SearchResultPage from './components/SearchResultPage';
 import FeedbackPage from './components/FeedbackPage';
 import BusinessProfilePage from './components/BusinessProfilePage';
+import SuggestItemPage from './components/SuggestItemPage';
 import { useDispatch } from 'react-redux';
 import { setUser } from './redux/userSlice';
 import { ToastContainer } from 'react-toastify';
@@ -46,6 +47,7 @@ function App() {
                 <Route path="/search-results" element={<SearchResultPage />} />
                 <Route path="/feedback-page" element={<FeedbackPage />} />
                 <Route path="/business-profile/:id" element={<BusinessProfilePage />} />
+                <Route path="/suggest" element={<SuggestItemPage />} />
             </Routes>
         </Router>
     );
