@@ -1,10 +1,11 @@
 /* Main Container */
-.search-result-page-container {
+/* Unused class - can be removed */
+/* .search-result-page-container {
     max-width: 1200px;
     width: 100%;
     margin: 0 auto;
     padding: 6rem 1rem 1rem;
-}
+} */
 
 /* Results Layout */
 .search-results-layout {
@@ -97,8 +98,8 @@
     font-size: 12px;
 }
 
-/* Mobile Filter Button */
-.mobile-filter-button {
+/* Unused class - can be removed */
+/* .mobile-filter-button {
     display: none;
     align-items: center;
     gap: 8px;
@@ -110,57 +111,44 @@
     font-weight: 500;
     cursor: pointer;
     margin-bottom: 16px;
-}
+} */
 
-.mobile-filter-button svg {
+/* Unused class - can be removed */
+/* .mobile-filter-button svg {
     color: #ff4d4d;
-}
+} */
 
 /* Filters Section */
-.filters-container {
+/* Unused class - can be removed */
+/* .filters-container {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 1.5rem;
     width: 100%;
-}
+} */
 
-.filter-tag {
-    background: #f8f9fa;
-    color: #2d3436;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border: 1px solid #eee;
-    transition: all 0.2s ease;
-}
-
-.filter-tag:hover {
-    background: #f0f0f0;
-}
-
-.remove-filter {
+/* Unused class - can be removed */
+/* .remove-filter {
     color: #ff4d4d;
     cursor: pointer;
     font-size: 1.2rem;
     line-height: 1;
     display: flex;
     align-items: center;
-}
+} */
 
-.remove-filter:hover {
+/* Unused class - can be removed */
+/* .remove-filter:hover {
     color: #ff3333;
-}
+} */
 
 /* Sort Section */
-.sort-container {
+/* Unused class - can be removed */
+/* .sort-container {
     margin-bottom: 1.5rem;
     width: 100%;
-}
+} */
 
 .sort-label {
     display: flex;
@@ -173,16 +161,19 @@
     padding: 0.5rem 0;
 }
 
-.sort-arrow {
+/* Unused class - can be removed */
+/* .sort-arrow {
     color: #ff4d4d;
     transition: transform 0.2s ease;
-}
+} */
 
-.sort-arrow.open {
+/* Unused class - can be removed */
+/* .sort-arrow.open {
     transform: rotate(180deg);
-}
+} */
 
-.sort-options {
+/* Unused class - can be removed */
+/* .sort-options {
     position: absolute;
     background: white;
     border-radius: 12px;
@@ -190,7 +181,7 @@
     padding: 0.5rem 0;
     min-width: 180px;
     z-index: 100;
-}
+} */
 
 .sort-option {
     padding: 0.75rem 1rem;
@@ -205,13 +196,13 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .search-result-page-container {
+    /* .search-result-page-container {
         padding: 4rem 0.5rem 1rem;
-    }
+    } */
 
-    .mobile-filter-button {
+    /* .mobile-filter-button {
         display: flex;
-    }
+    } */
 
     .advanced-search-panel:not(.mobile) {
         display: none;

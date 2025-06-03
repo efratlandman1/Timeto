@@ -105,7 +105,8 @@
   max-width: calc(100% - 20px);
 }
 
-.business-card-info {
+/* Unused classes - can be removed */
+/* .business-card-info {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -124,7 +125,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-}
+} */
 
 .business-card-footer {
   margin-top: auto;
@@ -202,17 +203,17 @@
   background: #0077b3;
 }
 
-/* Admin action buttons */
 .action-button.admin {
-  background: #f5f5f5;
+  background: #f0f0f0;
+  color: #666;
 }
 
 .action-button.admin:hover {
-  background: #e8e8e8;
+  background: #e0e0e0;
 }
 
 .action-button.admin svg {
-  color: #737373;
+  font-size: 0.9rem;
 }
 
 .business-card-badge {
@@ -220,26 +221,26 @@
   top: 12px;
   right: 12px;
   padding: 4px 8px;
-  border-radius: 12px;
+  border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 500;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 2;
+  z-index: 1;
 }
 
 .badge-open {
-  color: #4caf50;
+  background: #4caf50;
+  color: white;
 }
 
 .badge-closed {
-  color: #f44336;
+  background: #f44336;
+  color: white;
 }
 
 .business-card.inactive {
   opacity: 0.7;
-  background: #f8f8f8;
   pointer-events: none;
+  position: relative;
 }
 
 .business-card.inactive::after {
@@ -248,21 +249,20 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) rotate(-45deg);
-  background: #f44336;
+  background: rgba(244, 67, 54, 0.9);
   color: white;
-  padding: 6px 24px;
+  padding: 8px 40px;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 1.2rem;
   z-index: 2;
 }
 
-/* Tooltip */
 .action-button .tooltip {
   position: absolute;
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
-  background: #333;
+  background: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 4px 8px;
   border-radius: 4px;
@@ -271,16 +271,15 @@
   opacity: 0;
   visibility: hidden;
   transition: all 0.2s ease;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .action-button:hover .tooltip {
   opacity: 1;
   visibility: visible;
-  transform: translateX(-50%) translateY(-4px);
 }
 
-/* Responsive */
+/* Responsive Design */
 @media (max-width: 1200px) {
   .business-cards-container {
     grid-template-columns: repeat(2, 1fr);
@@ -294,7 +293,6 @@
   }
 
   .business-card {
-    height: auto;
-    min-height: 280px;
+    height: 260px;
   }
 }

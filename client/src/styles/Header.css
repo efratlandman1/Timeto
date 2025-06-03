@@ -167,7 +167,8 @@
     position: relative;
 }
 
-.lang-button {
+/* Unused class - can be removed */
+/* .lang-button {
     background: none;
     border: none;
     padding: 0.5rem;
@@ -177,11 +178,12 @@
     display: flex;
     align-items: center;
     font-size: 1.25rem;
-}
+} */
 
-.lang-button:hover {
+/* Unused class - can be removed */
+/* .lang-button:hover {
     color: #ff4d4d;
-}
+} */
 
 .lang-dropdown {
     min-width: 120px;
@@ -194,13 +196,15 @@
     gap: 1rem;
 }
 
-.user-icon {
+/* Unused class - can be removed */
+/* .user-icon {
     color: #666;
     font-size: 1.2rem;
     margin-left: 0.5rem;
-}
+} */
 
-.user-menu-item {
+/* Unused class - can be removed */
+/* .user-menu-item {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -211,25 +215,29 @@
     border-radius: 4px;
     transition: all 0.2s ease;
     white-space: nowrap;
-}
+} */
 
-.user-menu-item:not(:last-child) {
+/* Unused class - can be removed */
+/* .user-menu-item:not(:last-child) {
     border-bottom: 1px solid #f0f0f0;
-}
+} */
 
-.user-menu-item:hover {
+/* Unused class - can be removed */
+/* .user-menu-item:hover {
     background-color: #f8f8f8;
     color: #ff4d4d;
-}
+} */
 
-.user-menu-item svg {
+/* Unused class - can be removed */
+/* .user-menu-item svg {
     color: #666;
     font-size: 1rem;
-}
+} */
 
-.user-menu-item:hover svg {
+/* Unused class - can be removed */
+/* .user-menu-item:hover svg {
     color: #ff4d4d;
-}
+} */
 
 @keyframes fadeIn {
     from {
@@ -248,45 +256,46 @@
     }
 
     .navbar {
-        padding: 0.5rem 1rem;
-    }
-
-    .auth-section {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .auth-buttons {
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 0.5rem;
-    }
-
-    .user-greeting {
-        flex-direction: column;
-        align-items: flex-end;
+        padding: 0.25rem 1rem;
     }
 }
+
+/* Unused class - can be removed */
+/* .auth-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+} */
+
+.auth-buttons {
+    gap: 0.5rem;
+}
+
+/* Unused class - can be removed */
+/* .user-greeting {
+    font-size: 0.9rem;
+    color: #666;
+} */
 
 @media (max-width: 768px) {
     .logo {
-        font-size: 1.5rem;
+        gap: 0.5rem;
     }
 
     .logo-icon {
-        font-size: 2rem;
+        font-size: 1.5rem;
     }
 
     .logo span {
-        font-size: 0.875rem;
+        font-size: 0.9rem;
     }
 
     .logo-text-sub {
-        font-size: 0.75rem;
+        display: none;
     }
 }
 
-/* Main content padding to prevent header overlap */
-main {
-    padding-top: 70px;
-}
+/* Unused class - can be removed */
+/* main {
+    margin-top: 60px;
+} */
