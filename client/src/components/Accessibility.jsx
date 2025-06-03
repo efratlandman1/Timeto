@@ -74,135 +74,137 @@ const Accessibility = () => {
   };
 
   return (
-    <>
-      <button 
-        className="accessibility-button"
-        onClick={() => setIsOpen(true)}
-        aria-label="פתח הגדרות נגישות"
-      >
-        <FaUniversalAccess />
-      </button>
+    <div className="narrow-page-container">
+      <div className="narrow-page-content">
+        <button 
+          className="accessibility-button"
+          onClick={() => setIsOpen(true)}
+          aria-label="פתח הגדרות נגישות"
+        >
+          <FaUniversalAccess />
+        </button>
 
-      {isOpen && (
-        <div className="accessibility-modal-overlay" onClick={() => setIsOpen(false)}>
-          <div className="accessibility-modal" onClick={e => e.stopPropagation()}>
-            <button 
-              className="close-button"
-              onClick={() => setIsOpen(false)}
-              aria-label="סגור הגדרות נגישות"
-            >
-              <FaTimes />
-            </button>
-
-            <h2 className="accessibility-title">
-              <FaUniversalAccess /> הגדרות נגישות
-            </h2>
-
-            <div className="accessibility-options">
-              <div className="option-group">
-                <h3><FaFont /> גודל טקסט</h3>
-                <div className="button-group">
-                  <button 
-                    className={settings.fontSize === 'normal' ? 'active' : ''}
-                    onClick={() => updateSetting('fontSize', 'normal')}
-                  >
-                    רגיל
-                  </button>
-                  <button 
-                    className={settings.fontSize === 'large' ? 'active' : ''}
-                    onClick={() => updateSetting('fontSize', 'large')}
-                  >
-                    גדול
-                  </button>
-                  <button 
-                    className={settings.fontSize === 'larger' ? 'active' : ''}
-                    onClick={() => updateSetting('fontSize', 'larger')}
-                  >
-                    גדול מאוד
-                  </button>
-                </div>
-              </div>
-
-              <div className="option-group">
-                <h3><FaAdjust /> ניגודיות</h3>
-                <div className="button-group">
-                  <button 
-                    className={settings.contrast === 'normal' ? 'active' : ''}
-                    onClick={() => updateSetting('contrast', 'normal')}
-                  >
-                    רגיל
-                  </button>
-                  <button 
-                    className={settings.contrast === 'high' ? 'active' : ''}
-                    onClick={() => updateSetting('contrast', 'high')}
-                  >
-                    ניגודיות גבוהה
-                  </button>
-                </div>
-              </div>
-
-              <div className="option-group">
-                <h3><FaMousePointer /> גודל סמן</h3>
-                <div className="button-group">
-                  <button 
-                    className={settings.cursorSize === 'normal' ? 'active' : ''}
-                    onClick={() => updateSetting('cursorSize', 'normal')}
-                  >
-                    רגיל
-                  </button>
-                  <button 
-                    className={settings.cursorSize === 'large' ? 'active' : ''}
-                    onClick={() => updateSetting('cursorSize', 'large')}
-                  >
-                    גדול
-                  </button>
-                </div>
-              </div>
-
-              <div className="option-group">
-                <h3><FaAlignRight /> יישור טקסט</h3>
-                <div className="button-group">
-                  <button 
-                    className={settings.textAlign === 'right' ? 'active' : ''}
-                    onClick={() => updateSetting('textAlign', 'right')}
-                  >
-                    ימין
-                  </button>
-                  <button 
-                    className={settings.textAlign === 'center' ? 'active' : ''}
-                    onClick={() => updateSetting('textAlign', 'center')}
-                  >
-                    מרכז
-                  </button>
-                  <button 
-                    className={settings.textAlign === 'left' ? 'active' : ''}
-                    onClick={() => updateSetting('textAlign', 'left')}
-                  >
-                    שמאל
-                  </button>
-                </div>
-              </div>
-
-              <div className="option-group">
-                <h3><FaKeyboard /> ניווט מקלדת</h3>
-                <div className="button-group">
-                  <button 
-                    className={settings.keyboardNav ? 'active' : ''}
-                    onClick={() => updateSetting('keyboardNav', !settings.keyboardNav)}
-                  >
-                    {settings.keyboardNav ? 'פעיל' : 'כבוי'}
-                  </button>
-                </div>
-              </div>
-
-              <button className="reset-button" onClick={resetSettings}>
-                אפס הגדרות
+        {isOpen && (
+          <div className="accessibility-modal-overlay" onClick={() => setIsOpen(false)}>
+            <div className="accessibility-modal" onClick={e => e.stopPropagation()}>
+              <button 
+                className="close-button"
+                onClick={() => setIsOpen(false)}
+                aria-label="סגור הגדרות נגישות"
+              >
+                <FaTimes />
               </button>
+
+              <h2 className="accessibility-title">
+                <FaUniversalAccess /> הגדרות נגישות
+              </h2>
+
+              <div className="accessibility-options">
+                <div className="option-group">
+                  <h3><FaFont /> גודל טקסט</h3>
+                  <div className="button-group">
+                    <button 
+                      className={settings.fontSize === 'normal' ? 'active' : ''}
+                      onClick={() => updateSetting('fontSize', 'normal')}
+                    >
+                      רגיל
+                    </button>
+                    <button 
+                      className={settings.fontSize === 'large' ? 'active' : ''}
+                      onClick={() => updateSetting('fontSize', 'large')}
+                    >
+                      גדול
+                    </button>
+                    <button 
+                      className={settings.fontSize === 'larger' ? 'active' : ''}
+                      onClick={() => updateSetting('fontSize', 'larger')}
+                    >
+                      גדול מאוד
+                    </button>
+                  </div>
+                </div>
+
+                <div className="option-group">
+                  <h3><FaAdjust /> ניגודיות</h3>
+                  <div className="button-group">
+                    <button 
+                      className={settings.contrast === 'normal' ? 'active' : ''}
+                      onClick={() => updateSetting('contrast', 'normal')}
+                    >
+                      רגיל
+                    </button>
+                    <button 
+                      className={settings.contrast === 'high' ? 'active' : ''}
+                      onClick={() => updateSetting('contrast', 'high')}
+                    >
+                      ניגודיות גבוהה
+                    </button>
+                  </div>
+                </div>
+
+                <div className="option-group">
+                  <h3><FaMousePointer /> גודל סמן</h3>
+                  <div className="button-group">
+                    <button 
+                      className={settings.cursorSize === 'normal' ? 'active' : ''}
+                      onClick={() => updateSetting('cursorSize', 'normal')}
+                    >
+                      רגיל
+                    </button>
+                    <button 
+                      className={settings.cursorSize === 'large' ? 'active' : ''}
+                      onClick={() => updateSetting('cursorSize', 'large')}
+                    >
+                      גדול
+                    </button>
+                  </div>
+                </div>
+
+                <div className="option-group">
+                  <h3><FaAlignRight /> יישור טקסט</h3>
+                  <div className="button-group">
+                    <button 
+                      className={settings.textAlign === 'right' ? 'active' : ''}
+                      onClick={() => updateSetting('textAlign', 'right')}
+                    >
+                      ימין
+                    </button>
+                    <button 
+                      className={settings.textAlign === 'center' ? 'active' : ''}
+                      onClick={() => updateSetting('textAlign', 'center')}
+                    >
+                      מרכז
+                    </button>
+                    <button 
+                      className={settings.textAlign === 'left' ? 'active' : ''}
+                      onClick={() => updateSetting('textAlign', 'left')}
+                    >
+                      שמאל
+                    </button>
+                  </div>
+                </div>
+
+                <div className="option-group">
+                  <h3><FaKeyboard /> ניווט מקלדת</h3>
+                  <div className="button-group">
+                    <button 
+                      className={settings.keyboardNav ? 'active' : ''}
+                      onClick={() => updateSetting('keyboardNav', !settings.keyboardNav)}
+                    >
+                      {settings.keyboardNav ? 'פעיל' : 'כבוי'}
+                    </button>
+                  </div>
+                </div>
+
+                <button className="reset-button" onClick={resetSettings}>
+                  אפס הגדרות
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </>
+        )}
+      </div>
+    </div>
   );
 };
 
