@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams,useNavigate  } from 'react-router-dom';
 import axios from 'axios';
-import { FaSave, FaPlus, FaEdit } from 'react-icons/fa';
+import { FaSave, FaPlus, FaEdit, FaArrowRight } from 'react-icons/fa';
 import StepBusinessDetails from './StepBusinessDetails';
 import StepBusinessServices from './StepBusinessServices';
 import StepBusinessHours from './StepBusinessHours';
@@ -353,12 +353,18 @@ const EditBusinessPage = () => {
   };
 
   return (
-    <div className={`page-container ${isLoading ? 'disabled' : ''}`}>
-      <div className="step-page-container">
+    <div className="edit-business-container">
+      <div className="edit-business-content">
+        <button className="nav-button above-header" onClick={() => navigate('/user-businesses')}>
+          <FaArrowRight className="icon" />
+          חזרה לעסקים שלי
+        </button>
+        
         <div className="page-header">
-          <h1>{selectedBusiness ? 'עדכון פרטי עסק' : 'הוספת עסק חדש'}</h1>
-          <p>מלא את הפרטים להלן כדי להוסיף או לעדכן עסק במדריך</p>
-          {/* <div className="header-line"></div> */}
+          <div className="page-header__content vertical">
+            <h1>{selectedBusiness ? 'עריכת עסק' : 'הוספת עסק חדש'}</h1>
+            <p>מלא את הפרטים הבאים כדי {selectedBusiness ? 'לערוך' : 'להוסיף'} את העסק שלך</p>
+          </div>
         </div>
 
         <StepsProvider>
@@ -370,8 +376,7 @@ const EditBusinessPage = () => {
             selectedBusiness={selectedBusiness}
           />
         </StepsProvider>
-
-        <ToastContainer />
+        <ToastContainer position="bottom-center" rtl={true} />
       </div>
     </div>
   );

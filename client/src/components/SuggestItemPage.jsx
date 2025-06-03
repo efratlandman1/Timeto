@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { FaPaperPlane } from 'react-icons/fa';
+import { FaPaperPlane, FaArrowRight } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/SuggestItemPage.css';
+import '../styles/global/components/buttons.css';
 
 const SuggestItemPage = () => {
   const navigate = useNavigate();
@@ -88,8 +89,17 @@ const SuggestItemPage = () => {
   return (
     <div className="suggest-item-container">
       <div className="suggest-item-content">
-        <h1>הצע פריט חדש</h1>
-        <p className="subtitle">יש לך רעיון לקטגוריה או שירות שחסרים? ספר לנו!</p>
+        <button className="nav-button above-header" onClick={() => navigate('/')}>
+          <FaArrowRight className="icon" />
+          חזרה לדף הבית
+        </button>
+
+        <div className="page-header">
+          <div className="page-header__content">
+            <h1>הצע פריט חדש</h1>
+            <p>יש לך רעיון לקטגוריה או שירות שחסרים? ספר לנו!</p>
+          </div>
+        </div>
 
         <form className="suggest-form" onSubmit={handleSubmit}>
           <div className="form-group">
