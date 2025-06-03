@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainPage from './components/MainPage';
 import EditBusinessPage from './components/EditBusinessPage';
 import UserBusinessPage from './components/UserBusinessesPage';
@@ -17,23 +17,34 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Accessibility from './components/Accessibility';
 import './styles/global/index.css';
+import './i18n';
+import { useTranslation } from 'react-i18next';
 
 function App() {
     const dispatch = useDispatch();
-    // Handle represh
+    const { i18n } = useTranslation();
+    
+    // Handle refresh
     let user = JSON.parse(localStorage.getItem('user'));
     if (user) {
-         dispatch(setUser({user: user}));
+        dispatch(setUser({user: user}));
     }
+
+    // Update document direction when language changes
+    useEffect(() => {
+        document.documentElement.dir = i18n.dir();
+        document.documentElement.lang = i18n.language;
+        document.body.style.direction = i18n.dir();
+    }, [i18n.language]);
 
     return (
         <Router>
             <GlobalStyles />
-            <div className="app">
+            <div className="app" style={{ direction: i18n.dir() }}>
                 <Header />
                 <ToastContainer
                     position="top-center"
-                    rtl={true}
+                    rtl={i18n.dir() === 'rtl'}
                     autoClose={3000}
                     hideProgressBar={false}
                     closeOnClick

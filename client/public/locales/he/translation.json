@@ -1,0 +1,32 @@
+{
+  "header": {
+    "home": "בית",
+    "search": "חיפוש",
+    "addBusiness": "הוסף עסק",
+    "suggest": "הצע פריט",
+    "register": "הרשמה",
+    "login": "כניסה",
+    "myBusinesses": "העסקים שלי",
+    "myFavorites": "המועדפים שלי",
+    "logout": "יציאה",
+    "languages": {
+      "he": "עברית",
+      "en": "English"
+    },
+    "logo": {
+      "main": "זמן",
+      "sub": "מדריך העסקים"
+    }
+  },
+  "greetings": {
+    "morning": "בוקר טוב",
+    "afternoon": "צהריים טובים",
+    "evening": "ערב טוב",
+    "night": "לילה טוב"
+  },
+  "mainPage": {
+    "title": "מדריך העסקים המוביל בישראל",
+    "subtitle": "מצא את העסק הנכון בקרבתך"
+  },
+  "direction": "rtl"
+} 

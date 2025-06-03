@@ -17,34 +17,28 @@ import {
 import "../styles/Header.css";
 import { useSelector } from 'react-redux';
 import { getToken } from "../utils/auth";
+import { useTranslation } from 'react-i18next';
 
 const Header = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [showLangMenu, setShowLangMenu] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [username, setUsername] = useState(null);
     const [greeting, setGreeting] = useState("");
-    const [currentLang, setCurrentLang] = useState("he");
-    const menuRef = useRef(null);
-    const langMenuRef = useRef(null);
     const userMenuRef = useRef(null);
     const loginUser = useSelector(state => state.user.user);
-    
+    const { t, i18n } = useTranslation();
+
     const getGreeting = () => {
         const hour = new Date().getHours();
-        if (hour >= 5 && hour < 12) return "בוקר טוב";
-        if (hour >= 12 && hour < 17) return "צהריים טובים";
-        if (hour >= 17 && hour < 20) return "אחר הצהריים טובים";
-        if (hour >= 20 && hour < 24) return "ערב טוב";
-        return "לילה טוב";
+        if (hour >= 5 && hour < 12) return t('greetings.morning');
+        if (hour >= 12 && hour < 17) return t('greetings.afternoon');
+        if (hour >= 17 && hour < 20) return t('greetings.evening');
+        return t('greetings.night');
     };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (langMenuRef.current && !langMenuRef.current.contains(event.target)) {
-                setShowLangMenu(false);
-            }
             if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
                 setShowUserMenu(false);
             }
@@ -68,7 +62,7 @@ const Header = () => {
         }, 60000);
 
         return () => clearInterval(intervalId);
-    }, [loginUser]);
+    }, [loginUser, t]);
 
     const handleLogout = () => {
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -77,9 +71,9 @@ const Header = () => {
         navigate("/login");
     };
 
-    const handleLanguageChange = (lang) => {
-        setCurrentLang(lang);
-        setShowLangMenu(false);
+    const handleLanguageToggle = () => {
+        const newLang = i18n.language === 'he' ? 'en' : 'he';
+        i18n.changeLanguage(newLang);
     };
 
     const isActive = (path) => {
@@ -93,8 +87,8 @@ const Header = () => {
                     <div className="logo" onClick={() => navigate("/")}>
                         <FaMapMarkerAlt className="logo-icon" />
                         <div className="logo-text">
-                            <span className="logo-text-main">זמן</span>
-                            <span className="logo-text-sub">מדריך העסקים</span>
+                            <span className="logo-text-main">{t('header.logo.main')}</span>
+                            <span className="logo-text-sub">{t('header.logo.sub')}</span>
                         </div>
                     </div>
                 </div>
@@ -106,33 +100,47 @@ const Header = () => {
                             onClick={() => navigate("/")}
                         >
                             <FaHome />
-                            בית
+                            {t('header.home')}
                         </button>
                         <button 
                             className={`nav-button ${isActive("/search-results") ? "active" : ""}`} 
                             onClick={() => navigate("/search-results")}
                         >
                             <FaSearch />
-                            חיפוש
+                            {t('header.search')}
                         </button>
                         <button 
                             className={`nav-button ${isActive("/edit") ? "active" : ""}`} 
                             onClick={() => navigate("/edit")}
                         >
                             <FaPlusCircle />
-                            הוסף עסק
+                            {t('header.addBusiness')}
                         </button>
                         <button 
                             className={`nav-button ${isActive("/suggest") ? "active" : ""}`} 
                             onClick={() => navigate("/suggest")}
                         >
                             <FaLightbulb />
-                            הצע פריט
+                            {t('header.suggest')}
                         </button>
                     </div>
                 </div>
 
                 <div className="nav-left">
+                    <div className="lang-switch">
+                        <label className="switch">
+                            <input
+                                type="checkbox"
+                                checked={i18n.language === 'en'}
+                                onChange={handleLanguageToggle}
+                            />
+                            <span className="slider">
+                                <span className="lang-label he">עב</span>
+                                <span className="lang-label en">EN</span>
+                            </span>
+                        </label>
+                    </div>
+
                     {username ? (
                         <div className="user-menu" ref={userMenuRef}>
                             <div 
@@ -147,15 +155,15 @@ const Header = () => {
                                 <div className="dropdown-menu">
                                     <div className="dropdown-item" onClick={() => navigate("/user-businesses")}>
                                         <FaStore />
-                                        העסקים שלי
+                                        {t('header.myBusinesses')}
                                     </div>
                                     <div className="dropdown-item" onClick={() => navigate("/my-favorites")}>
                                         <FaHeart />
-                                        המועדפים שלי
+                                        {t('header.myFavorites')}
                                     </div>
                                     <div className="dropdown-item" onClick={handleLogout}>
                                         <FaSignOutAlt />
-                                        יציאה
+                                        {t('header.logout')}
                                     </div>
                                 </div>
                             )}
@@ -163,39 +171,15 @@ const Header = () => {
                     ) : (
                         <div className="auth-buttons">
                             <button className="auth-button" onClick={() => navigate("/register")}>
-                            <FaUserCircle />
-                                הרשמה
-                                
+                                <FaUserCircle />
+                                {t('header.register')}
                             </button>
                             <button className="auth-button" onClick={() => navigate("/login")}>
-                            <FaSignInAlt />
-                                כניסה
-                                
+                                <FaSignInAlt />
+                                {t('header.login')}
                             </button>
                         </div>
                     )}
-
-                    <div className="lang-menu" ref={langMenuRef}>
-                        <button className="nav-button with-hover" onClick={() => setShowLangMenu(!showLangMenu)}>
-                            <FaGlobe />
-                        </button>
-                        {showLangMenu && (
-                            <div className="dropdown-menu lang-dropdown">
-                                <div 
-                                    className={`dropdown-item ${currentLang === 'he' ? 'active' : ''}`}
-                                    onClick={() => handleLanguageChange('he')}
-                                >
-                                    עברית
-                                </div>
-                                <div 
-                                    className={`dropdown-item ${currentLang === 'en' ? 'active' : ''}`}
-                                    onClick={() => handleLanguageChange('en')}
-                                >
-                                    English
-                                </div>
-                            </div>
-                        )}
-                    </div>
                 </div>
             </nav>
         </div>
