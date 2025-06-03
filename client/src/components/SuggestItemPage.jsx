@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/SuggestItemPage.css';
-import '../styles/global/components/buttons.css';
 
 const SuggestItemPage = () => {
   const navigate = useNavigate();
@@ -87,17 +86,17 @@ const SuggestItemPage = () => {
   const RequiredMark = () => <span style={{ color: '#d32f2f', marginRight: '4px' }}>*</span>;
 
   return (
-    <div className="suggest-item-container">
-      <div className="suggest-item-content">
+    <div className="narrow-page-container">
+      <div className="narrow-page-content">
         <button className="nav-button above-header" onClick={() => navigate('/')}>
           <FaArrowRight className="icon" />
           חזרה לדף הבית
         </button>
 
         <div className="page-header">
-          <div className="page-header__content">
-            <h1>הצע פריט חדש</h1>
-            <p>יש לך רעיון לקטגוריה או שירות שחסרים? ספר לנו!</p>
+          <div className="page-header__content vertical">
+            <h1>הצעת עסק חדש</h1>
+            <p>מלא את הפרטים הבאים כדי להציע עסק חדש</p>
           </div>
         </div>
 

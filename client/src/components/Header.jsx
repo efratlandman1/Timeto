@@ -163,12 +163,14 @@ const Header = () => {
                     ) : (
                         <div className="auth-buttons">
                             <button className="auth-button" onClick={() => navigate("/register")}>
+                            <FaUserCircle />
                                 הרשמה
-                                <FaUserCircle />
+                                
                             </button>
                             <button className="auth-button" onClick={() => navigate("/login")}>
+                            <FaSignInAlt />
                                 כניסה
-                                <FaSignInAlt />
+                                
                             </button>
                         </div>
                     )}

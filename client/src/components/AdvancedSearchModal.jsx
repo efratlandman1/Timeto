@@ -128,52 +128,54 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <button className="close-button" onClick={onClose}>
-          <FaTimes />
-        </button>
-        <h2>חיפוש מורחב</h2>
-
-        <div className="form-group">
-          <label>קטגוריה</label>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <option value="">בחר קטגוריה</option>
-            {categories.map((cat) => (
-              <option key={cat._id} value={cat.name}>{cat.name}</option>
-            ))}
-          </select>
-        </div>
-
-        {services.length > 0 && (
-          <div className="form-group tags-section">
-            <label>שירותים</label>
-            <div className="tags-container">
-              {services.map((service) => (
-                <div
-                  key={service._id}
-                  className={`tag selectable ${selectedServices.includes(service.name) ? 'selected' : ''}`}
-                  onClick={() => handleServiceClick(service.name)}
-                >
-                  {service.name}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="form-group">
-          <label>דירוג מינימלי</label>
-          {renderStarRating()}
-        </div>
-
-        <div className="buttons-container">
-          <button className="modal-button secondary" onClick={onClose}>ביטול</button>
-          <button className="modal-button primary" onClick={handleSubmit}>
-            {selectedCategory || selectedServices.length > 0 || rating > 0 ? 'החל סינון' : 'סגור'}
+      <div className="narrow-page-container">
+        <div className="narrow-page-content">
+          <button className="close-button" onClick={onClose}>
+            <FaTimes />
           </button>
+          <h2>חיפוש מורחב</h2>
+
+          <div className="form-group">
+            <label>קטגוריה</label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              <option value="">בחר קטגוריה</option>
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat.name}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {services.length > 0 && (
+            <div className="form-group tags-section">
+              <label>שירותים</label>
+              <div className="tags-container">
+                {services.map((service) => (
+                  <div
+                    key={service._id}
+                    className={`tag selectable ${selectedServices.includes(service.name) ? 'selected' : ''}`}
+                    onClick={() => handleServiceClick(service.name)}
+                  >
+                    {service.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="form-group">
+            <label>דירוג מינימלי</label>
+            {renderStarRating()}
+          </div>
+
+          <div className="buttons-container">
+            <button className="modal-button secondary" onClick={onClose}>ביטול</button>
+            <button className="modal-button primary" onClick={handleSubmit}>
+              {selectedCategory || selectedServices.length > 0 || rating > 0 ? 'החל סינון' : 'סגור'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

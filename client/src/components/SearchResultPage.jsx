@@ -118,127 +118,129 @@ const SearchResultPage = () => {
     };
 
     return (
-        <div className='search-page-container'>
-            <div className="page-header">
-                <div className="page-header__content">
-                    <h1>חיפוש עסקים</h1>
-                    <p>מצא את העסק המתאים לך</p>
-                </div>
-            </div>
-            
-            <div className="search-controls-wrapper">
-                <div className="search-area">
-                    <SearchBar />
-                </div>
-                <div className="controls-area">
-                    <button 
-                        className="filter-button"
-                        onClick={() => setShowFilters(true)}
-                    >
-                        <FaFilter />
-                    </button>
-                    <div className="sort-area">
-                        <div 
-                            className="sort-button"
-                            onClick={() => setShowSortDropdown(!showSortDropdown)}
-                        >
-                            <span className="sort-label">מיון:</span>
-                            <span className="selected-sort">{SORT_OPTIONS[sortOption]}</span>
-                            <FaChevronDown className={`sort-chevron ${showSortDropdown ? 'open' : ''}`} />
-                        </div>
-                        {showSortDropdown && (
-                            <div className="sort-dropdown">
-                                {Object.entries(SORT_OPTIONS).map(([value, label]) => (
-                                    <div
-                                        key={value}
-                                        className={`sort-option ${sortOption === value ? 'selected' : ''}`}
-                                        onClick={() => {
-                                            handleSortChange(value);
-                                            setShowSortDropdown(false);
-                                        }}
-                                    >
-                                        {label}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+        <div className='wide-page-container'>
+            <div className='wide-page-content'>
+                <div className="page-header">
+                    <div className="page-header__content">
+                        <h1>חיפוש עסקים</h1>
+                        <p>מצא את העסק המתאים לך</p>
                     </div>
                 </div>
-            </div>
-
-            {Object.keys(activeFilters).length > 0 && (
-                <div className="filters-area">
-                    <div className="filters-header">
-                        <div className="filters-title">סינונים פעילים:</div>
+                
+                <div className="search-controls-wrapper">
+                    <div className="search-area">
+                        <SearchBar />
+                    </div>
+                    <div className="controls-area">
                         <button 
-                            className="clear-all-filters"
-                            onClick={handleClearFilters}
+                            className="filter-button"
+                            onClick={() => setShowFilters(true)}
                         >
-                            נקה הכל
-                            <FaTimes />
+                            <FaFilter />
                         </button>
+                        <div className="sort-area">
+                            <div 
+                                className="sort-button"
+                                onClick={() => setShowSortDropdown(!showSortDropdown)}
+                            >
+                                <span className="sort-label">מיון:</span>
+                                <span className="selected-sort">{SORT_OPTIONS[sortOption]}</span>
+                                <FaChevronDown className={`sort-chevron ${showSortDropdown ? 'open' : ''}`} />
+                            </div>
+                            {showSortDropdown && (
+                                <div className="sort-dropdown">
+                                    {Object.entries(SORT_OPTIONS).map(([value, label]) => (
+                                        <div
+                                            key={value}
+                                            className={`sort-option ${sortOption === value ? 'selected' : ''}`}
+                                            onClick={() => {
+                                                handleSortChange(value);
+                                                setShowSortDropdown(false);
+                                            }}
+                                        >
+                                            {label}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
+                </div>
 
-                    <div className="active-filters-container">
-                        {Object.entries(activeFilters).map(([key, value]) => (
-                            Array.isArray(value) ? (
-                                value.map((v, idx) => (
-                                    <div key={`${key}-${idx}`} className="filter-tag">
-                                        {key === 'categoryName' ? `קטגוריה: ${v}` :
-                                         key === 'rating' ? `${v} כוכבים ומעלה` :
-                                         key === 'services' ? `שירות: ${v}` : v}
-                                        <button onClick={() => handleRemoveFilter(key, v)}>
+                {Object.keys(activeFilters).length > 0 && (
+                    <div className="filters-area">
+                        <div className="filters-header">
+                            <div className="filters-title">סינונים פעילים:</div>
+                            <button 
+                                className="clear-all-filters"
+                                onClick={handleClearFilters}
+                            >
+                                נקה הכל
+                                <FaTimes />
+                            </button>
+                        </div>
+
+                        <div className="active-filters-container">
+                            {Object.entries(activeFilters).map(([key, value]) => (
+                                Array.isArray(value) ? (
+                                    value.map((v, idx) => (
+                                        <div key={`${key}-${idx}`} className="filter-tag">
+                                            {key === 'categoryName' ? `קטגוריה: ${v}` :
+                                             key === 'rating' ? `${v} כוכבים ומעלה` :
+                                             key === 'services' ? `שירות: ${v}` : v}
+                                            <button onClick={() => handleRemoveFilter(key, v)}>
+                                                <FaTimes />
+                                            </button>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div key={key} className="filter-tag">
+                                        {key === 'categoryName' ? `קטגוריה: ${value}` :
+                                         key === 'rating' ? `${value} כוכבים ומעלה` :
+                                         key === 'services' ? `שירות: ${value}` : value}
+                                        <button onClick={() => handleRemoveFilter(key)}>
                                             <FaTimes />
                                         </button>
                                     </div>
-                                ))
-                            ) : (
-                                <div key={key} className="filter-tag">
-                                    {key === 'categoryName' ? `קטגוריה: ${value}` :
-                                     key === 'rating' ? `${value} כוכבים ומעלה` :
-                                     key === 'services' ? `שירות: ${value}` : value}
-                                    <button onClick={() => handleRemoveFilter(key)}>
-                                        <FaTimes />
-                                    </button>
-                                </div>
-                            )
+                                )
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                <div className="search-results-layout">
+                    <div className="business-cards-grid">
+                        {businesses.map((business) => (
+                            <BusinessCard key={business._id} business={business} />
                         ))}
                     </div>
-                </div>
-            )}
 
-            <div className="search-results-layout">
-                <div className="business-cards-grid">
-                    {businesses.map((business) => (
-                        <BusinessCard key={business._id} business={business} />
-                    ))}
+                    <AdvancedSearchModal
+                        isOpen={showFilters}
+                        onClose={() => setShowFilters(false)}
+                        filters={activeFilters}
+                        onFilterChange={handleFilterChange}
+                        onClearFilters={handleClearFilters}
+                        onRemoveFilter={handleRemoveFilter}
+                        sortOption={sortOption}
+                        onSortChange={handleSortChange}
+                    />
                 </div>
 
-                <AdvancedSearchModal
-                    isOpen={showFilters}
-                    onClose={() => setShowFilters(false)}
-                    filters={activeFilters}
-                    onFilterChange={handleFilterChange}
-                    onClearFilters={handleClearFilters}
-                    onRemoveFilter={handleRemoveFilter}
-                    sortOption={sortOption}
-                    onSortChange={handleSortChange}
-                />
+                {totalPages > 1 && (
+                    <div className="pagination-container">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                            <button
+                                key={page}
+                                onClick={() => handlePageChange(page)}
+                                className={`pagination-button ${currentPage === page ? 'active' : ''}`}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
-
-            {totalPages > 1 && (
-                <div className="pagination-container">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <button
-                            key={page}
-                            onClick={() => handlePageChange(page)}
-                            className={`pagination-button ${currentPage === page ? 'active' : ''}`}
-                        >
-                            {page}
-                        </button>
-                    ))}
-                </div>
-            )}
         </div>
     );
 };

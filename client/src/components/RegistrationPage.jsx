@@ -56,129 +56,131 @@ const RegistrationPage = () => {
       
 
   return (
-    <div className="login-container">
-      <form className="login-form" onSubmit={handleRegister}>
-        <FaClock className="login-logo" />
-        <h1 className="login-title">זה הזמן</h1>
+    <div className="narrow-page-container">
+      <div className="narrow-page-content">
+        <form className="login-form" onSubmit={handleRegister}>
+          <FaClock className="login-logo" />
+          <h1 className="login-title">הרשמה </h1>
 
-        {/* שם פרטי */}
-        <div className="login-input-wrapper">
-          <FaUser className="login-input-icon" />
-          <input
-            className="login-input"
-            type="text"
-            name="firstName"
-            placeholder="שם פרטי"
-            value={formData.firstName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* שם משפחה */}
-        <div className="login-input-wrapper">
-          <FaUser className="login-input-icon" />
-          <input
-            className="login-input"
-            type="text"
-            name="lastName"
-            placeholder="שם משפחה"
-            value={formData.lastName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* טלפון */}
-        <div className="login-input-wrapper">
-          <FaPhone className="login-input-icon" />
-          <input
-            className="login-input"
-            type="tel"
-            name="phone"
-            placeholder="טלפון (050-1234567)"
-            pattern="05[0-9]{1}-?[0-9]{7}"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* אימייל */}
-        <div className="login-input-wrapper">
-          <FaEnvelope className="login-input-icon" />
-          <input
-            className="login-input"
-            type="email"
-            name="email"
-            placeholder="דואר אלקטרוני"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            onInvalid={(e) => e.target.setCustomValidity('אנא הזן כתובת אימייל חוקית')}
-            onInput={(e) => e.target.setCustomValidity('')}
-          />
-        </div>
-
-        {/* כינוי באפליקציה */}
-        <div className="login-input-wrapper">
-          <FaUser className="login-input-icon" />
-          <input
-            className="login-input"
-            type="text"
-            name="username"
-            placeholder="כינוי באפליקציה"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* סיסמה */}
-        <div className="login-input-wrapper">
-          <FaLock className="login-input-icon" />
-          <input
-            className="login-input"
-            type={showPassword ? "text" : "password"}
-            name="password"
-            placeholder="סיסמה"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-          <span className="login-password-toggle" onClick={() => setShowPassword(!showPassword)}>
-            {showPassword ? <FaEyeSlash /> : <FaEye />}
-          </span>
-        </div>
-
-        {/* אישור סיסמה */}
-        <div className="login-input-wrapper">
-          <FaLock className="login-input-icon" />
-          <input
-            className="login-input"
-            type={showPassword ? "text" : "password"}
-            name="confirmPassword"
-            placeholder="אישור סיסמה"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* תנאי שימוש */}
-        <div className="login-checkbox">
-          <label>
+          {/* שם פרטי */}
+          <div className="login-input-wrapper">
+            <FaUser className="login-input-icon" />
             <input
-              type="checkbox"
-              checked={agreeTerms}
-              onChange={() => setAgreeTerms(!agreeTerms)}
+              className="login-input"
+              type="text"
+              name="firstName"
+              placeholder="שם פרטי"
+              value={formData.firstName}
+              onChange={handleChange}
+              required
             />
-            אני מאשר/ת את תנאי השימוש
-          </label>
-        </div>
+          </div>
 
-        <button className="login-button" type="submit">הרשמה</button>
-      </form>
+          {/* שם משפחה */}
+          <div className="login-input-wrapper">
+            <FaUser className="login-input-icon" />
+            <input
+              className="login-input"
+              type="text"
+              name="lastName"
+              placeholder="שם משפחה"
+              value={formData.lastName}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* טלפון */}
+          <div className="login-input-wrapper">
+            <FaPhone className="login-input-icon" />
+            <input
+              className="login-input"
+              type="tel"
+              name="phone"
+              placeholder="טלפון (050-1234567)"
+              pattern="05[0-9]{1}-?[0-9]{7}"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* אימייל */}
+          <div className="login-input-wrapper">
+            <FaEnvelope className="login-input-icon" />
+            <input
+              className="login-input"
+              type="email"
+              name="email"
+              placeholder="דואר אלקטרוני"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              onInvalid={(e) => e.target.setCustomValidity('אנא הזן כתובת אימייל חוקית')}
+              onInput={(e) => e.target.setCustomValidity('')}
+            />
+          </div>
+
+          {/* כינוי באפליקציה */}
+          <div className="login-input-wrapper">
+            <FaUser className="login-input-icon" />
+            <input
+              className="login-input"
+              type="text"
+              name="username"
+              placeholder="כינוי באפליקציה"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* סיסמה */}
+          <div className="login-input-wrapper">
+            <FaLock className="login-input-icon" />
+            <input
+              className="login-input"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="סיסמה"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+            <span className="login-password-toggle" onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
+
+          {/* אישור סיסמה */}
+          <div className="login-input-wrapper">
+            <FaLock className="login-input-icon" />
+            <input
+              className="login-input"
+              type={showPassword ? "text" : "password"}
+              name="confirmPassword"
+              placeholder="אישור סיסמה"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* תנאי שימוש */}
+          <div className="login-checkbox">
+            <label>
+              <input
+                type="checkbox"
+                checked={agreeTerms}
+                onChange={() => setAgreeTerms(!agreeTerms)}
+              />
+              אני מאשר/ת את תנאי השימוש
+            </label>
+          </div>
+
+          <button className="login-button" type="submit">הרשמה</button>
+        </form>
+      </div>
     </div>
   );
 };

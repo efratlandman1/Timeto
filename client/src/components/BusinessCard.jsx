@@ -249,10 +249,14 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
       </div>
 
       {showFeedbackModal && (
-        <FeedbackPage
-          businessId={business._id}
-          onClose={() => setShowFeedbackModal(false)}
-        />
+        <div className="modal-overlay" onClick={() => setShowFeedbackModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <FeedbackPage
+              businessId={business._id}
+              onClose={() => setShowFeedbackModal(false)}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

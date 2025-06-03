@@ -6,6 +6,7 @@
     padding: 2rem 1rem 1rem;
 }
 
+/* Container styles moved to global/containers.css (.wide-page-container) */
 
 /* Business Cards Grid */
 .business-cards-grid {
