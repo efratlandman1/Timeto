@@ -1,8 +1,14 @@
 /* Page Header Component */
 .page-header {
-    text-align: right;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     padding: 3rem 3rem 2rem;
     position: relative;
+}
+
+.page-header__content {
+    text-align: right;
 }
 
 .page-header h1 {
@@ -20,6 +26,9 @@
     line-height: var(--line-height-normal);
 }
 
+.page-header__action {
+    margin-right: var(--spacing-lg);
+}
 
 /* Card Header Component */
 .card-header {
@@ -40,11 +49,19 @@
     text-align: center;
 }
 
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .page-header {
         padding: 2rem 1.5rem 1.5rem;
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-md);
+    }
+
+    .page-header__action {
+        margin-right: 0;
+        display: flex;
+        justify-content: flex-start;
     }
 
     .page-header h1 {

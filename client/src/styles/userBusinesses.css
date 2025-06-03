@@ -25,28 +25,31 @@
 }
 
 .add-business-button {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: none;
-    background-color: #ff4d4d;
-    color: white;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: white;
+    color: var(--text-primary);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(255, 77, 77, 0.3);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .add-business-button:hover {
-    transform: translateY(-2px);
-    background-color: #ff3333;
-    box-shadow: 0 6px 24px rgba(255, 77, 77, 0.4);
+    background-color: var(--background-light);
+    border-color: var(--border-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 
 .add-business-icon {
-    font-size: 24px;
+    font-size: 0.9rem;
+    color: var(--primary-color);
 }
 
 .tooltip {
@@ -104,8 +107,8 @@
     }
 
     .add-business-button {
-        width: 50px;
-        height: 50px;
+        width: 100%;
+        justify-content: center;
     }
 
     .add-business-icon {
