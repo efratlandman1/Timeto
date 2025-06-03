@@ -88,7 +88,7 @@ const BusinessProfilePage = () => {
   const currentDayIndex = getCurrentDayIndex();
 
   return (
-    <div className="page-container">
+    <div className="wide-page-container">
       <div className="business-hero">
         <img
           className="business-hero-image"

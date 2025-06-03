@@ -1,55 +1,75 @@
 /* FeedbackPage.css */
 
-.feedback-container {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: relative;
-  direction: rtl;
+.feedback-page-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
-.modal-close-button {
+.feedback-page-modal {
+  width: 90%;
+  max-width: 500px;
+  margin: 2rem auto;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+.feedback-page-content {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+
+.feedback-page-close-button {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 1rem;
+  right: 1rem;
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 24px;
   color: #666;
   cursor: pointer;
-  padding: 5px;
+  padding: 0.5rem;
   line-height: 1;
+  transition: all 0.2s ease;
   z-index: 2;
 }
 
-.modal-close-button:hover {
+.feedback-page-close-button:hover {
   color: #333;
+  transform: scale(1.1);
 }
 
-.feedback-content {
+.feedback-page-title {
+  font-size: 1.5rem;
+  color: var(--text-color);
+  margin-bottom: 1.5rem;
   text-align: center;
+  padding: 0 2rem;
 }
 
-.feedback-content h2 {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.subtitle {
-  color: #666;
-  margin-bottom: 2rem;
+/* Rating Stars */
+.rating-group {
+  text-align: center;
+  margin-bottom: 1.5rem;
 }
 
 .star-rating {
   display: flex;
   gap: 0.5rem;
   justify-content: center;
-  margin-bottom: 2rem;
+  margin: 0.75rem 0;
 }
 
 .star {
@@ -62,129 +82,153 @@
   color: #ff4d4d;
 }
 
-.feedback-textarea {
+.rating-text {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.feedback-page-textarea-input {
   width: 100%;
-  padding: 1rem;
-  border: 1px solid #ddd;
+  padding: 0.875rem;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   resize: vertical;
-  min-height: 120px;
-  margin-bottom: 1.5rem;
-  transition: all 0.2s ease;
+  min-height: 100px;
   font-family: inherit;
+  transition: all 0.2s ease;
 }
 
-.feedback-textarea:focus {
+.feedback-page-textarea-input:focus {
   outline: none;
-  border-color: #ff4d4d;
-  box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.1);
 }
 
-.submit-button {
+/* Submit Button */
+.confirm-button {
   width: 100%;
-  padding: 1rem;
-  background: #ff4d4d;
+  padding: 0.875rem;
+  background: var(--primary-color);
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.submit-button:hover {
-  background: #ff3333;
-  transform: translateY(-1px);
+.confirm-button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(255, 77, 77, 0.15);
 }
 
-.submit-button:active {
+.confirm-button:active {
   transform: translateY(0);
 }
 
 /* Previous Feedbacks */
-.previous-feedbacks {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid #eee;
-  text-align: right;
+.feedback-page-feedback-list {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
 }
 
-.previous-feedbacks h3 {
-  font-size: 1.2rem;
-  color: #333;
+.feedback-page-feedback-list h3 {
+  font-size: 1.1rem;
+  color: var(--text-color);
   margin-bottom: 1rem;
 }
 
 .no-feedbacks {
   text-align: center;
-  color: #888;
+  color: var(--text-light);
   font-style: italic;
+  padding: 0.875rem;
+  font-size: 0.9rem;
 }
 
-.feedback-item {
-  background: #f8f9fa;
+.feedback-page-feedback-item {
+  background: var(--background-color);
   border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
+  padding: 0.875rem;
+  margin-bottom: 0.875rem;
 }
 
-.feedback-header {
+.feedback-page-feedback-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
 }
 
-.feedback-author {
+.feedback-name {
   font-weight: 500;
-  color: #333;
+  color: var(--text-color);
+  font-size: 0.85rem;
 }
 
 .feedback-date {
-  font-size: 0.85rem;
-  color: #888;
+  font-size: 0.8rem;
+  color: var(--text-light);
 }
 
-.feedback-stars {
+.feedback-page-feedback-stars {
   margin-bottom: 0.5rem;
 }
 
-.feedback-stars .star {
-  font-size: 0.9rem;
+.feedback-page-feedback-stars .star {
+  font-size: 0.85rem;
   cursor: default;
 }
 
-.feedback-comment {
-  color: #555;
-  line-height: 1.5;
+.feedback-page-feedback-comment {
+  color: var(--text-color);
+  line-height: 1.4;
   margin: 0;
   white-space: pre-line;
+  font-size: 0.85rem;
 }
 
 /* Toast */
-.feedback-toast {
+.business-card-toast {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 12px 24px;
+  padding: 10px 20px;
   border-radius: 8px;
   font-weight: 500;
   z-index: 1000;
   animation: slideDown 0.3s ease;
+  font-size: 0.9rem;
 }
 
-.feedback-toast.success {
-  background: #4caf50;
-  color: white;
-}
-
-.feedback-toast.error {
-  background: #f44336;
-  color: white;
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideDown {
@@ -199,27 +243,40 @@
 }
 
 /* Loader */
-.feedback-loader {
+.feedback-page-loader {
   text-align: center;
-  padding: 20px;
-  color: #666;
+  padding: 2rem;
+  color: var(--text-light);
+  font-size: 0.9rem;
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 600px) {
-  .feedback-container {
-    padding: 1.5rem;
+@media (max-width: 480px) {
+  .feedback-page-modal {
+    width: 95%;
+    margin: 1rem auto;
   }
 
-  .feedback-content h2 {
-    font-size: 1.75rem;
+  .feedback-page-content {
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .feedback-page-title {
+    font-size: 1.25rem;
+    padding: 0 1.5rem;
+    margin-bottom: 1.25rem;
   }
 
   .star {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
 
-  .submit-button {
-    padding: 0.875rem;
+  .confirm-button {
+    padding: 0.75rem;
+  }
+
+  .feedback-page-feedback-item {
+    padding: 0.75rem;
   }
 }

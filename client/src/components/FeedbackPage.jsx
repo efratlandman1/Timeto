@@ -109,9 +109,9 @@ const FeedbackPage = ({ businessId, onClose }) => {
         <div className="feedback-page-loader">טוען חוות דעת...</div>
         ) : (
         <>
-                <div className="feedback-page-modal-overlay" onClick={onClose}>
-                    <div
-                    className="feedback-page-modal-content"
+            <div className="feedback-page-modal-overlay" onClick={onClose}>
+                <div className="feedback-page-modal">
+                    <div className="feedback-page-content"
                     dir="rtl"
                     onClick={(e) => e.stopPropagation()}
                     >
@@ -178,13 +178,14 @@ const FeedbackPage = ({ businessId, onClose }) => {
                     </div>
                     </div>
                 </div>
-                {toast && (
-                    <Toast
-                    message={toast.message}
-                    isError={toast.isError}
-                    onClose={() => setToast(null)}
-                    />
-                )}
+            </div>
+            {toast && (
+                <Toast
+                message={toast.message}
+                isError={toast.isError}
+                onClose={() => setToast(null)}
+                />
+            )}
         </>
     )}
     </>,
