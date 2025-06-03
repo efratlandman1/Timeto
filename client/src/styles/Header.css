@@ -6,6 +6,7 @@
     width: 100%;
     z-index: 100;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 60px;
 }
 
 /* עיצוב הניווט */
@@ -13,10 +14,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 2rem;
+    padding: 0.25rem 2rem;
     max-width: 1200px;
     margin: 0 auto;
     direction: rtl;
+    height: 100%;
 }
 
 .nav-right {
@@ -27,7 +29,8 @@
 .nav-center {
     flex: 1;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
+    align-items: center;
 }
 
 .nav-left {
@@ -53,7 +56,7 @@
 }
 
 .logo-icon {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: #ff4d4d;
 }
 
@@ -64,13 +67,13 @@
 }
 
 .logo-text-main {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: #333;
 }
 
 .logo-text-sub {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: #666;
 }
 
@@ -342,5 +345,5 @@
 
 /* Main content padding to prevent header overlap */
 main {
-    padding-top: 80px;
+    padding-top: 70px;
 }
