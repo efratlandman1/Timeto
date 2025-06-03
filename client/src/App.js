@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux';
 import { setUser } from './redux/userSlice';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Accessibility from './components/Accessibility';
 
 function App() {
     const dispatch = useDispatch();
@@ -27,28 +28,31 @@ function App() {
     return (
         <Router>
             <GlobalStyles />
-            <Header />
-            <ToastContainer
-                position="top-center"
-                rtl={true}
-                autoClose={3000}
-                hideProgressBar={false}
-                closeOnClick
-                pauseOnHover
-                draggable
-            />
-            <Routes>
-                <Route path="/" element={<MainPage />} />
-                <Route path="/edit" element={<EditBusinessPage />} />
-                <Route path="/edit/:id" element={<EditBusinessPage />} />
-                <Route path="/user-businesses" element={<UserBusinessPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegistrationPage />} />
-                <Route path="/search-results" element={<SearchResultPage />} />
-                <Route path="/feedback-page" element={<FeedbackPage />} />
-                <Route path="/business-profile/:id" element={<BusinessProfilePage />} />
-                <Route path="/suggest" element={<SuggestItemPage />} />
-            </Routes>
+            <div className="app">
+                <Header />
+                <ToastContainer
+                    position="top-center"
+                    rtl={true}
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    closeOnClick
+                    pauseOnHover
+                    draggable
+                />
+                <Routes>
+                    <Route path="/" element={<MainPage />} />
+                    <Route path="/edit" element={<EditBusinessPage />} />
+                    <Route path="/edit/:id" element={<EditBusinessPage />} />
+                    <Route path="/user-businesses" element={<UserBusinessPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegistrationPage />} />
+                    <Route path="/search-results" element={<SearchResultPage />} />
+                    <Route path="/feedback-page" element={<FeedbackPage />} />
+                    <Route path="/business-profile/:id" element={<BusinessProfilePage />} />
+                    <Route path="/suggest" element={<SuggestItemPage />} />
+                </Routes>
+                <Accessibility />
+            </div>
         </Router>
     );
 }

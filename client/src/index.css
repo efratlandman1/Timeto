@@ -1,0 +1,60 @@
+:root {
+  --base-font-size: 16px;
+  --cursor-size: 16px;
+  --text-align: right;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--base-font-size);
+  text-align: var(--text-align);
+}
+
+/* Cursor Size */
+* {
+  cursor: default;
+}
+
+a, button, [role="button"], input[type="submit"], input[type="button"], input[type="reset"] {
+  cursor: pointer;
+}
+
+input[type="text"], input[type="password"], input[type="email"], input[type="tel"],
+textarea, select {
+  cursor: text;
+}
+
+/* Custom cursor sizes */
+.large-cursor * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="black"/></svg>') 16 16, auto !important;
+}
+
+/* Keyboard Navigation Focus Styles */
+*:focus {
+  outline: none;
+}
+
+.keyboard-nav *:focus {
+  outline: 3px solid #2196F3;
+  outline-offset: 2px;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  background-color: black;
+  color: white;
+}
+
+.high-contrast img {
+  filter: invert(1);
+}
