@@ -1,0 +1,197 @@
+/* Accessibility Button */
+.accessibility-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #2196F3;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.accessibility-button:hover {
+  transform: scale(1.1);
+  background: #1976D2;
+}
+
+.accessibility-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.5);
+}
+
+/* Modal */
+.accessibility-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  direction: rtl;
+}
+
+.accessibility-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.close-button {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #666;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.close-button:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.accessibility-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+/* Options */
+.accessibility-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.option-group {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1.5rem;
+}
+
+.option-group:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.option-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.button-group button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button-group button:hover {
+  background: #f5f5f5;
+}
+
+.button-group button.active {
+  background: #2196F3;
+  color: white;
+  border-color: #2196F3;
+}
+
+.reset-button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.reset-button:hover {
+  background: #d32f2f;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  background: black !important;
+  color: white !important;
+}
+
+.high-contrast * {
+  background: black !important;
+  color: white !important;
+  border-color: white !important;
+}
+
+.high-contrast a,
+.high-contrast button {
+  background: white !important;
+  color: black !important;
+}
+
+/* Keyboard Navigation */
+.keyboard-nav *:focus {
+  outline: 3px solid #2196F3 !important;
+  outline-offset: 2px !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .accessibility-modal {
+    width: 95%;
+    padding: 1.5rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .button-group button {
+    width: 100%;
+    text-align: center;
+  }
+} 
