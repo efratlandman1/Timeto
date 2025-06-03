@@ -4,6 +4,8 @@
 
 /* Import Component Styles */
 @import './components/headers.css';
+@import './components/buttons.css';
+@import './components/containers.css';
 
 /* Reset and Base Styles */
 * {

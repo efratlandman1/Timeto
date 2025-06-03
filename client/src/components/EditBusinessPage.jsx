@@ -353,8 +353,8 @@ const EditBusinessPage = () => {
   };
 
   return (
-    <div className="edit-business-container">
-      <div className="edit-business-content">
+    <div className="narrow-page-container">
+      <div className="narrow-page-content">
         <button className="nav-button above-header" onClick={() => navigate('/user-businesses')}>
           <FaArrowRight className="icon" />
           חזרה לעסקים שלי

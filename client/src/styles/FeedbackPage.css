@@ -1,279 +1,225 @@
 /* FeedbackPage.css */
 
-.feedback-page-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  padding: 10px;
-  overflow-y: auto;
-}
-
-.feedback-page-modal-content {
-  background: #fff;
-  border-radius: 15px;
-  width: 600px;
-  max-width: 100%;
-  max-height: 90vh;
-  padding: 30px 40px 40px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-  display: flex;
-  flex-direction: column;
+.feedback-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
   direction: rtl;
-  text-align: right;
 }
 
-.feedback-page-close-button {
+.modal-close-button {
   position: absolute;
-  top: 20px;
-  right: 25px;
-  background: transparent;
+  top: 10px;
+  right: 10px;
+  background: none;
   border: none;
-  font-size: 32px;
-  color: #888;
+  font-size: 20px;
+  color: #666;
   cursor: pointer;
-  transition: color 0.3s ease;
+  padding: 5px;
+  line-height: 1;
+  z-index: 2;
 }
 
-.feedback-page-close-button:hover {
-  color: #444;
+.modal-close-button:hover {
+  color: #333;
 }
 
-.feedback-page-title {
-  margin-bottom: 25px;
-  font-weight: 700;
-  font-size: 28px;
+.feedback-content {
   text-align: center;
-  color: #2c3e50;
 }
 
-/* Star Rating */
+.feedback-content h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
 .star-rating {
   display: flex;
-  flex-direction: row-reverse;
-  gap: 10px;
-  margin-top: 8px;
-  cursor: pointer;
+  gap: 0.5rem;
   justify-content: center;
+  margin-bottom: 2rem;
 }
 
 .star {
+  cursor: pointer;
   color: #ddd;
-  transition: all 0.3s ease;
-  font-size: 36px;
+  transition: color 0.2s ease;
 }
 
 .star.filled {
   color: #ff4d4d;
 }
 
-.star:hover,
-.star:hover ~ .star {
-  color: #ff4d4d;
-}
-
-.star-rating:hover .star {
-  color: #ddd;
-}
-
-.star-rating .star:hover ~ .star {
-  color: #ff4d4d;
-}
-
-/* Form */
-.form-group {
-  margin-bottom: 24px;
-  display: flex;
-  flex-direction: column;
-}
-
-label {
-  font-weight: 600;
-  font-size: 16px;
-  margin-bottom: 8px;
-  text-align: right;
-  color: #34495e;
-}
-
-/* Textarea */
-.feedback-page-textarea-input {
-  font-size: 16px;
-  padding: 14px 16px;
-  border-radius: 10px;
-  border: 1.8px solid #ddd;
-  resize: vertical;
-  min-height: 110px;
-  font-family: inherit;
-  transition: border-color 0.3s ease;
-}
-
-.feedback-page-textarea-input:focus {
-  border-color: #333;
-  outline: none;
-  box-shadow: 0 0 6px rgba(51, 51, 51, 0.2);
-}
-
-/* Submit button */
-.confirm-button {
-  background: white;
-  color: #ff4d4d;
-  font-weight: 600;
-  font-size: 18px;
-  border: 2px solid #ff4d4d;
-  padding: 14px 0;
-  border-radius: 12px;
-  cursor: pointer;
-  margin-bottom: 35px;
-  transition: all 0.3s ease;
+.feedback-textarea {
   width: 100%;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 120px;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
 }
 
-.confirm-button:hover {
+.feedback-textarea:focus {
+  outline: none;
+  border-color: #ff4d4d;
+  box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.1);
+}
+
+.submit-button {
+  width: 100%;
+  padding: 1rem;
   background: #ff4d4d;
   color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 5px 15px rgba(255, 77, 77, 0.1);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.confirm-button:active {
+.submit-button:hover {
+  background: #ff3333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 77, 77, 0.15);
+}
+
+.submit-button:active {
   transform: translateY(0);
 }
 
-/* Feedback List */
-.feedback-page-feedback-list {
-  overflow-y: auto;
-  max-height: 320px;
+/* Previous Feedbacks */
+.previous-feedbacks {
+  margin-top: 2rem;
+  padding-top: 2rem;
   border-top: 1px solid #eee;
-  padding-top: 20px;
+  text-align: right;
 }
 
-.feedback-page-feedback-list h3 {
-  font-size: 20px;
-  margin-bottom: 18px;
-  text-align: center;
-  color: #2c3e50;
-  font-weight: 700;
+.previous-feedbacks h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 1rem;
 }
 
 .no-feedbacks {
   text-align: center;
-  color: #999;
+  color: #888;
   font-style: italic;
-  margin-top: 15px;
 }
 
-/* Each Feedback Item */
-.feedback-page-feedback-item {
-  border-bottom: 1px solid #f0f0f0;
-  padding: 15px 0;
+.feedback-item {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
 }
 
-.feedback-page-feedback-header {
+.feedback-header {
   display: flex;
   justify-content: space-between;
-  font-weight: 700;
-  font-size: 15px;
-  color: #2c3e50;
-  margin-bottom: 6px;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
-.feedback-name {
+.feedback-author {
+  font-weight: 500;
   color: #333;
-  font-weight: 600;
 }
 
 .feedback-date {
-  font-size: 14px;
-  color: #999;
+  font-size: 0.85rem;
+  color: #888;
 }
 
-/* Previous feedback stars */
-.feedback-page-feedback-stars {
-  display: flex;
-  flex-direction: row-reverse;
-  gap: 4px;
-  margin-bottom: 10px;
+.feedback-stars {
+  margin-bottom: 0.5rem;
 }
 
-.feedback-page-feedback-stars .star {
-  font-size: 20px;
-  color: #ddd;
+.feedback-stars .star {
+  font-size: 0.9rem;
+  cursor: default;
 }
 
-.feedback-page-feedback-stars .star.filled {
-  color: #ff4d4d;
-}
-
-.feedback-page-feedback-comment {
-  font-size: 15px;
+.feedback-comment {
+  color: #555;
   line-height: 1.5;
-  color: #444;
+  margin: 0;
   white-space: pre-line;
 }
 
-/* ביטול */
-/* .buttons-container {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 35px;
+/* Toast */
+.feedback-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  z-index: 1000;
+  animation: slideDown 0.3s ease;
 }
 
-.cancel-button {
-    background: white;
-    color: #666;
-    font-weight: 600;
-    font-size: 18px;
-    border: 2px solid #ddd;
-    padding: 14px 0;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 100%;
+.feedback-toast.success {
+  background: #4caf50;
+  color: white;
 }
 
-.cancel-button:hover {
-    background: #f5f5f5;
-} */
-
-.feedback-date {
-  font-size: 14px;
-  color: #999;
-  margin-bottom: 4px; /* מוסיף רווח קטן לפני הרשימה */
+.feedback-toast.error {
+  background: #f44336;
+  color: white;
 }
 
-.feedback-page-loader {
+@keyframes slideDown {
+  from {
+    transform: translate(-50%, -100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+/* Loader */
+.feedback-loader {
   text-align: center;
-  font-size: 18px;
-  color: #2c3e50;
-  padding: 30px 0;
-  font-weight: bold;
-  animation: fadeIn 0.4s ease-in-out;
+  padding: 20px;
+  color: #666;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* התאמה למסכים קטנים */
-@media (max-width: 650px) {
-  .feedback-page-modal-content {
-    padding: 20px;
-    width: 100%;
-    max-height: 95vh;
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+  .feedback-container {
+    padding: 1.5rem;
   }
 
-  .star-rating {
-    justify-content: flex-start;
+  .feedback-content h2 {
+    font-size: 1.75rem;
   }
 
-  .confirm-button {
-    font-size: 16px;
+  .star {
+    font-size: 2rem;
+  }
+
+  .submit-button {
+    padding: 0.875rem;
   }
 }
