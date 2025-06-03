@@ -16,6 +16,7 @@ import { setUser } from './redux/userSlice';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Accessibility from './components/Accessibility';
+import './styles/global/index.css';
 
 function App() {
     const dispatch = useDispatch();

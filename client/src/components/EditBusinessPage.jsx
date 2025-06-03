@@ -356,8 +356,9 @@ const EditBusinessPage = () => {
     <div className={`page-container ${isLoading ? 'disabled' : ''}`}>
       <div className="step-page-container">
         <div className="page-header">
-          <h1>{selectedBusiness ? 'עדכון פרטי עסק' : 'הוספת עסק'}</h1>
-          <div className="header-line"></div>
+          <h1>{selectedBusiness ? 'עדכון פרטי עסק' : 'הוספת עסק חדש'}</h1>
+          <p>מלא את הפרטים להלן כדי להוסיף או לעדכן עסק במדריך</p>
+          {/* <div className="header-line"></div> */}
         </div>
 
         <StepsProvider>

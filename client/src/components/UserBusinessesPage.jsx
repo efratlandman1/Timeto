@@ -40,6 +40,10 @@ const UserBusinessesPage = () => {
 
     return (
         <div className='container'>
+            <div className="page-header">
+                <h1>העסקים שלי</h1>
+                <p>נהל את העסקים שהוספת למדריך</p>
+            </div>
             <div className="business-cards-grid">
                 {loading ? (
                     <div>טוען...</div>
