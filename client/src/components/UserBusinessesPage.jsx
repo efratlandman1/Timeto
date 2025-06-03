@@ -41,8 +41,19 @@ const UserBusinessesPage = () => {
     return (
         <div className='container'>
             <div className="page-header">
-                <h1>העסקים שלי</h1>
-                <p>נהל את העסקים שהוספת למדריך</p>
+                <div className="page-header__content">
+                    <h1>העסקים שלי</h1>
+                    <p>נהל את העסקים שהוספת למדריך</p>
+                </div>
+                <div className="page-header__action">
+                    <button 
+                        className="add-business-button"
+                        onClick={() => window.location.href = '/edit'}
+                    >
+                        <FaPlus className="add-business-icon" />
+                        הוספת עסק חדש
+                    </button>
+                </div>
             </div>
             <div className="business-cards-grid">
                 {loading ? (
@@ -58,16 +69,6 @@ const UserBusinessesPage = () => {
                         />
                     ))
                 )}
-            </div>
-            
-            <div className="add-business-container">
-                <button 
-                    className="add-business-button"
-                    onClick={() => window.location.href = '/edit'}
-                >
-                    <FaPlus className="add-business-icon" />
-                    <span className="tooltip">הוספת עסק חדש</span>
-                </button>
             </div>
         </div>
     );
