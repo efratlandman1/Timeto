@@ -1,12 +1,7 @@
 /* BusinessProfilePage.css */
 
 /* Modern Business Profile Page Styles */
-.page-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-  direction: rtl;
-}
+/* Container styles moved to global/containers.css */
 
 .header-line {
   width: 60px;
@@ -19,8 +14,8 @@
 /* Hero Section */
 .business-hero {
   position: relative;
-  height: 250px;
-  border-radius: 12px;
+  height: 300px;
+  border-radius: 20px;
   overflow: hidden;
   margin-bottom: 2rem;
   width: 100%;
@@ -43,14 +38,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: 2rem;
 }
 
 .business-hero-content {
   background: rgba(255, 255, 255, 0.92);
-  padding: 1.5rem 2rem;
-  border-radius: 12px;
+  padding: 2rem 3rem;
+  border-radius: 16px;
   backdrop-filter: blur(10px);
+  max-width: 800px;
   width: 90%;
   text-align: center;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -60,9 +56,9 @@
 
 .business-hero-title {
   color: #2d3436;
-  font-size: 2.4rem;
+  font-size: 3.2rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   background: linear-gradient(45deg, #ff4d4d, #ff8080);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -72,7 +68,7 @@
 
 .business-hero-category {
   color: #636e72;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -133,10 +129,13 @@
 
 /* Service Tags */
 .service-tag {
-  background: white;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  background: #f8f9fa;
+  color: #2d3436;
+  padding: 0.75rem 1.25rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -150,32 +149,41 @@
 
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
   margin-top: 1rem;
 }
 
 /* Contact Section */
 .contact-section {
-  margin-bottom: 2rem;
+  width: 100%;
+  margin-bottom: 3rem;
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .contact-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
 }
 
 .contact-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem;
   background: #f8f9fa;
-  padding: 1rem;
   border-radius: 12px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .contact-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  background: #fff0f0;
 }
 
 .contact-card a {
@@ -218,15 +226,17 @@
 /* Two Column Section */
 .two-column-section {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-bottom: 3rem;
 }
 
 .column-card {
-  background: #f8f9fa;
+  background: white;
+  border-radius: 16px;
   padding: 1.5rem;
-  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  height: 100%;
 }
 
 /* Hours Section */
@@ -269,7 +279,11 @@
 
 /* Feedback Section */
 .feedback-section {
-  margin-top: 2rem;
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .feedback-header {
@@ -300,8 +314,8 @@
 
 .feedback-stats {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
@@ -469,13 +483,40 @@
 }
 
 /* Responsive Design */
-@media (min-width: 768px) {
+@media (max-width: 1024px) {
   .contact-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+@media (max-width: 768px) {
+  .two-column-section {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .business-hero {
+    height: 250px;
+  }
+
+  .business-hero-content {
+    padding: 1.5rem 2rem;
+    width: 95%;
+  }
+
+  .business-hero-title {
+    font-size: 2.2rem;
+  }
+
+  .business-hero-category {
+    font-size: 1.1rem;
+  }
 
   .feedback-stats {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
 }
 
@@ -486,7 +527,6 @@
 
   .business-hero-content {
     padding: 1rem 1.5rem;
-    width: 95%;
   }
 
   .business-hero-title {
