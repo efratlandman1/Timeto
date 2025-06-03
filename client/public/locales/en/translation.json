@@ -1,0 +1,32 @@
+{
+  "header": {
+    "home": "Home",
+    "search": "Search",
+    "addBusiness": "Add Business",
+    "suggest": "Suggest Item",
+    "register": "Register",
+    "login": "Login",
+    "myBusinesses": "My Businesses",
+    "myFavorites": "My Favorites",
+    "logout": "Logout",
+    "languages": {
+      "he": "עברית",
+      "en": "English"
+    },
+    "logo": {
+      "main": "Time",
+      "sub": "Business Directory"
+    }
+  },
+  "greetings": {
+    "morning": "Good Morning",
+    "afternoon": "Good Afternoon",
+    "evening": "Good Evening",
+    "night": "Good Night"
+  },
+  "mainPage": {
+    "title": "Israel's Leading Business Directory",
+    "subtitle": "Find the right business near you"
+  },
+  "direction": "ltr"
+} 
