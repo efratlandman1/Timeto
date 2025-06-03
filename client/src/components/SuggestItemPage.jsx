@@ -88,8 +88,8 @@ const SuggestItemPage = () => {
   return (
     <div className="suggest-item-container">
       <div className="suggest-item-content">
-        <h1>הצע פריט</h1>
-        <p className="subtitle">הצע קטגוריה או שירות חדש למערכת</p>
+        <h1>הצע פריט חדש</h1>
+        <p className="subtitle">יש לך רעיון לקטגוריה או שירות שחסרים? ספר לנו!</p>
 
         <form className="suggest-form" onSubmit={handleSubmit}>
           <div className="form-group">

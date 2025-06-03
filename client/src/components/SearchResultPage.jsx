@@ -119,6 +119,10 @@ const SearchResultPage = () => {
 
     return (
         <div className='search-page-container'>
+            <div className="page-header">
+                <h1>חיפוש עסקים</h1>
+                <p>מצא את העסק המתאים לך</p>
+            </div>
             <div className="search-controls-wrapper">
                 <div className="search-area">
                     <SearchBar />
