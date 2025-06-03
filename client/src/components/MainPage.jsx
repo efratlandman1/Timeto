@@ -161,16 +161,31 @@ const MainPage = () => {
                     {/* Stats */}
                     <div className="stats-container">
                         <div className="stat-box">
-                            <div className="stat-number">+1</div>
-                            <div className="stat-label">משתמשים חדשים</div>
+                            <div className="stat-icon-wrapper">
+                                <FaUserFriends className="stat-icon" />
+                            </div>
+                            <div className="stat-content">
+                                <div className="stat-number">+1</div>
+                                <div className="stat-label">משתמשים חדשים</div>
+                            </div>
                         </div>
                         <div className="stat-box">
-                            <div className="stat-number">+1</div>
-                            <div className="stat-label">ביקורות מאומתות</div>
+                            <div className="stat-icon-wrapper">
+                                <FaStar className="stat-icon" />
+                            </div>
+                            <div className="stat-content">
+                                <div className="stat-number">+1</div>
+                                <div className="stat-label">ביקורות מאומתות</div>
+                            </div>
                         </div>
                         <div className="stat-box">
-                            <div className="stat-number">+8</div>
-                            <div className="stat-label">עסקים רשומים</div>
+                            <div className="stat-icon-wrapper">
+                                <FaCalendarCheck className="stat-icon" />
+                            </div>
+                            <div className="stat-content">
+                                <div className="stat-number">+8</div>
+                                <div className="stat-label">עסקים רשומים</div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -12,6 +12,8 @@
 .search-input-wrapper {
   position: relative;
   width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .search-input-wrapper input {
@@ -24,6 +26,7 @@
   color: white;
   direction: rtl;
   transition: all 0.3s ease;
+  text-indent: 2.5rem;
 }
 
 .search-input-wrapper input::placeholder {
@@ -44,6 +47,7 @@
   font-size: 1.25rem;
   color: #a0aec0;
   pointer-events: none;
+  z-index: 2;
 }
 
 .filter-button {
@@ -370,6 +374,7 @@ body.blurred::before {
   gap: 1rem;
   flex: 1;
   margin-left: 1.5rem;
+  position: relative;
 }
 
 .search-input {
@@ -380,10 +385,12 @@ body.blurred::before {
   background: transparent;
   padding: 0.5rem;
   direction: rtl;
+  text-indent: 2.5rem;
 }
 
 .main-page .search-input {
   font-size: 1.2rem;
+  text-indent: 2.5rem;
 }
 
 .search-input:focus {
@@ -395,11 +402,15 @@ body.blurred::before {
 }
 
 .search-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 1.4rem;
   color: #d32f2f;
   cursor: pointer;
   transition: transform 0.3s ease;
-  margin-left: 0.5rem;
+  z-index: 2;
 }
 
 .search-icon:hover {
@@ -408,6 +419,7 @@ body.blurred::before {
 
 .main-page .search-icon {
   font-size: 1.6rem;
+  right: 1rem;
 }
 
 .filter-button {
