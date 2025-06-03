@@ -56,6 +56,7 @@
   accent-color: #d32f2f;
 }
 
+/* These selectors are used implicitly for form elements */
 .form-group input,
 .form-group select,
 .form-group textarea {
@@ -98,7 +99,7 @@
   box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
 }
 
-/* RTL Support */
+/* RTL Support - these are used implicitly */
 .suggest-item-container {
   direction: rtl;
 }

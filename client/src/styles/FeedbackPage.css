@@ -218,32 +218,35 @@ label {
 }
 
 /* ביטול */
-.buttons-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  margin-top: 20px;
+/* .buttons-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 35px;
 }
 
 .cancel-button {
-  background: #eee;
-  border: none;
-  padding: 12px 25px;
-  font-size: 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background-color 0.25s ease;
-  color: #666;
+    background: white;
+    color: #666;
+    font-weight: 600;
+    font-size: 18px;
+    border: 2px solid #ddd;
+    padding: 14px 0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
 }
 
 .cancel-button:hover {
-  background-color: #ddd;
-}
+    background: #f5f5f5;
+} */
+
 .feedback-date {
   font-size: 14px;
   color: #999;
   margin-bottom: 4px; /* מוסיף רווח קטן לפני הרשימה */
 }
+
 .feedback-page-loader {
   text-align: center;
   font-size: 18px;
