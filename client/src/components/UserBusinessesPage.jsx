@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import BusinessCard from './BusinessCard';
 import '../styles/userBusinesses.css';
-import { FaPlus } from "react-icons/fa";
+import '../styles/global/components/buttons.css';
+import { FaPlus, FaArrowRight } from "react-icons/fa";
 import { getToken } from "../utils/auth";
 
 const UserBusinessesPage = () => {
     const [myBusinesses, setMyBusinesses] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const token = getToken();
         if (!token) {
-            window.location.href = '/login';
+            navigate('/login');
             return;
         }
 
@@ -22,7 +25,7 @@ const UserBusinessesPage = () => {
                 });
                 
                 if (response.status !== 200) {
-                    window.location.href = '/login';
+                    navigate('/login');
                     return;
                 }
                 
@@ -36,10 +39,15 @@ const UserBusinessesPage = () => {
         };
 
         fetchUserBusinesses();
-    }, []);
+    }, [navigate]);
 
     return (
-        <div className='container'>
+        <div className='user-business-container '>
+            <button className="nav-button above-header" onClick={() => navigate('/')}>
+                <FaArrowRight className="icon" />
+                חזרה לדף הבית
+            </button>
+            
             <div className="page-header">
                 <div className="page-header__content">
                     <h1>העסקים שלי</h1>
@@ -48,13 +56,14 @@ const UserBusinessesPage = () => {
                 <div className="page-header__action">
                     <button 
                         className="add-business-button"
-                        onClick={() => window.location.href = '/edit'}
+                        onClick={() => navigate('/edit')}
                     >
                         <FaPlus className="add-business-icon" />
                         הוספת עסק חדש
                     </button>
                 </div>
             </div>
+
             <div className="business-cards-grid">
                 {loading ? (
                     <div>טוען...</div>
