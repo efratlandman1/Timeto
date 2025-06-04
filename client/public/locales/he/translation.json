@@ -26,7 +26,497 @@
   },
   "mainPage": {
     "title": "מדריך העסקים המוביל בישראל",
-    "subtitle": "מצא את העסק הנכון בקרבתך"
+    "subtitle": "מצא את העסק הנכון בקרבתך",
+    "search": {
+      "title": "מצא את העסק המושלם",
+      "subtitle": "בקרבתך ובכל הארץ"
+    },
+    "stats": {
+      "newUsers": "משתמשים חדשים",
+      "verifiedReviews": "ביקורות מאומתות",
+      "registeredBusinesses": "עסקים רשומים"
+    },
+    "categories": {
+      "title": "קטגוריות פופולריות"
+    },
+    "sections": {
+      "popular": "עסקים פופולריים",
+      "new": "עסקים חדשים",
+      "recommended": "מומלצים עבורך"
+    },
+    "joinBanner": {
+      "title": "הצטרף לקהילת זמן",
+      "description": "הוסף את העסק שלך והתחל לקבל לקוחות חדשים עוד היום",
+      "button": "הוסף עסק חינם"
+    }
   },
-  "direction": "rtl"
+  "businessForm": {
+    "title": {
+      "new": "הוספת עסק חדש",
+      "edit": "עריכת עסק"
+    },
+    "steps": {
+      "details": "פרטי העסק",
+      "services": "שירותי העסק",
+      "hours": "שעות פעילות"
+    },
+    "fields": {
+      "name": "שם העסק",
+      "description": "תיאור העסק",
+      "address": "כתובת",
+      "phone": "טלפון",
+      "email": "דואר אלקטרוני",
+      "website": "אתר אינטרנט",
+      "category": "קטגוריה"
+    },
+    "validation": {
+      "required": "שדה חובה",
+      "email": "כתובת אימייל לא תקינה",
+      "phone": "מספר טלפון לא תקין"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "התחברות",
+      "email": "אימייל",
+      "password": "סיסמה",
+      "submit": "התחברות",
+      "loading": "טוען...",
+      "errors": {
+        "loginFailed": "התחברות נכשלה",
+        "invalidCredentials": "אימייל או סיסמה לא נכונים",
+        "invalidEmail": "אנא הזן כתובת אימייל חוקית"
+      }
+    },
+    "register": {
+      "title": "הרשמה",
+      "fields": {
+        "firstName": "שם פרטי",
+        "lastName": "שם משפחה",
+        "phone": "טלפון (050-1234567)",
+        "email": "דואר אלקטרוני",
+        "username": "כינוי באפליקציה",
+        "password": "סיסמה",
+        "confirmPassword": "אישור סיסמה"
+      },
+      "terms": "אני מאשר/ת את תנאי השימוש",
+      "submit": "הרשמה",
+      "errors": {
+        "termsRequired": "יש לאשר את תנאי השימוש כדי להמשיך",
+        "passwordMismatch": "הסיסמאות אינן תואמות",
+        "registrationFailed": "הרשמה נכשלה, נסה שוב",
+        "invalidEmail": "אנא הזן כתובת אימייל חוקית"
+      }
+    }
+  },
+  "accessibility": {
+    "title": "הגדרות נגישות",
+    "options": {
+      "fontSize": {
+        "title": "גודל טקסט",
+        "normal": "רגיל",
+        "large": "גדול",
+        "larger": "גדול מאוד"
+      },
+      "contrast": {
+        "title": "ניגודיות",
+        "normal": "רגילה",
+        "high": "גבוהה"
+      },
+      "animations": {
+        "title": "אנימציות",
+        "on": "מופעל",
+        "off": "כבוי"
+      },
+      "screenReader": {
+        "title": "קורא מסך",
+        "instructions": "הוראות לשימוש בקורא מסך"
+      },
+      "readableFont": "פונט קריא"
+    },
+    "values": {
+      "normal": "רגיל",
+      "large": "גדול",
+      "larger": "גדול מאוד",
+      "high": "גבוה",
+      "low": "נמוך",
+      "off": "כבוי",
+      "on": "פעיל"
+    },
+    "apply": "החל שינויים",
+    "reset": "אפס הגדרות"
+  },
+  "common": {
+    "loading": "טוען...",
+    "error": "שגיאה",
+    "success": "הצלחה",
+    "save": "שמור",
+    "cancel": "ביטול",
+    "back": "חזור",
+    "next": "הבא",
+    "required": "שדה חובה",
+    "more": "הצג הכל",
+    "less": "הצג פחות",
+    "showMore": "הצג עוד",
+    "backToHome": "חזרה לדף הבית",
+    "backToBusinesses": "חזרה לעסקים שלי"
+  },
+  "search": {
+    "placeholder": "חפש עסק לפי שם, קטגוריה או שירות",
+    "advancedSearch": "חיפוש מתקדם",
+    "noResults": "לא נמצאו תוצאות",
+    "errors": {
+      "loading": "שגיאה בטעינת תוצאות החיפוש"
+    },
+    "results": {
+      "category": "קטגוריה",
+      "address": "כתובת",
+      "services": "שירותים",
+      "more": "+{{count}}"
+    }
+  },
+  "direction": "rtl",
+  "businessCard": {
+    "status": {
+      "open": "פתוח",
+      "closed": "סגור",
+      "new": "חדש"
+    },
+    "actions": {
+      "edit": "עריכה",
+      "delete": {
+        "confirm": "אישור מחיקה",
+        "cancel": "ביטול",
+        "delete": "מחיקה"
+      },
+      "restore": "שחזור",
+      "email": "שליחת אימייל",
+      "whatsapp": "וואטסאפ",
+      "phone": "התקשרות"
+    },
+    "messages": {
+      "deleted": "✅ העסק נמחק",
+      "deleteError": "❌ שגיאה במחיקה",
+      "restored": "✅ העסק שוחזר בהצלחה",
+      "restoreError": "❌ שגיאה בשחזור",
+      "error": "שגיאה: {{message}}"
+    }
+  },
+  "editBusiness": {
+    "steps": {
+      "details": "פרטי העסק",
+      "services": "שירותי העסק",
+      "hours": "שעות פעילות"
+    },
+    "validation": {
+      "required": "נא למלא את כל שדות החובה",
+      "email": "כתובת האימייל אינה תקינה",
+      "phone": "מספר הטלפון אינו תקין",
+      "hours": "יש להשלים שעות פתיחה וסגירה"
+    },
+    "buttons": {
+      "update": "עדכן עסק",
+      "create": "צור עסק חדש",
+      "next": "הבא",
+      "back": "חזור",
+      "save": "שמור"
+    },
+    "fields": {
+      "name": "שם העסק",
+      "category": "קטגוריה",
+      "description": "תיאור העסק",
+      "address": "כתובת",
+      "phone": {
+        "prefix": "קידומת",
+        "number": "מספר טלפון"
+      },
+      "email": "דואר אלקטרוני"
+    },
+    "services": {
+      "title": "בחר שירותים",
+      "noServices": "לא נמצאו שירותים לקטגוריה זו",
+      "selected": "נבחרו {{count}} שירותים"
+    },
+    "hours": {
+      "title": "שעות פעילות",
+      "days": {
+        "sunday": "ראשון",
+        "monday": "שני",
+        "tuesday": "שלישי",
+        "wednesday": "רביעי",
+        "thursday": "חמישי",
+        "friday": "שישי",
+        "saturday": "שבת"
+      },
+      "options": {
+        "closed": "סגור",
+        "24hours": "פתוח 24/7",
+        "custom": "שעות מותאמות"
+      },
+      "from": "משעה",
+      "to": "עד שעה"
+    }
+  },
+  "feedback": {
+    "title": "חוות דעת על {{businessName}}",
+    "loading": "טוען חוות דעת...",
+    "form": {
+      "rating": {
+        "label": "דרג את העסק",
+        "stars": "{{count}} כוכבים"
+      },
+      "comment": {
+        "label": "כתוב את חוות דעתך",
+        "placeholder": "הסבר בקצרה את החוויה שלך..."
+      },
+      "submit": "שלח פידבק"
+    },
+    "previousFeedbacks": {
+      "title": "חוות דעת קודמות",
+      "noFeedbacks": "עדיין אין חוות דעת, תהיה הראשון!",
+      "anonymous": "אנונימי"
+    },
+    "errors": {
+      "unauthorized": "לא נמצאה הרשאת התחברות. התחברי מחדש.",
+      "noRating": "אנא בחר דירוג לפני השליחה.",
+      "submitError": "שגיאה בשליחת הפידבק: {{message}}",
+      "unknown": "שגיאה לא ידועה"
+    },
+    "success": "✅ הפידבק נשלח בהצלחה!"
+  },
+  "footer": {
+    "contact": {
+      "title": "צור קשר",
+      "email": "info@zezman.app"
+    },
+    "quickLinks": {
+      "title": "קישורים מהירים",
+      "search": "חיפוש",
+      "showItem": "הצג פריט",
+      "terms": "תנאי שימוש"
+    },
+    "about": {
+      "title": "זה הזמן",
+      "description": "מדריך העסקים המוביל בישראל. תמצא את העסק הנכון בקרבתך."
+    },
+    "copyright": "© Zezman 2023 כל הזכויות שמורות."
+  },
+  "joinBanner": {
+    "title": "הצטרף לקהילת זמן",
+    "subtitle": "הוסף את העסק שלך והתחיל לקבל לקוחות חדשים עוד היום",
+    "button": "הוסף עסק חינם"
+  },
+  "businessProfile": {
+    "title": "פרופיל עסק",
+    "about": "אודות העסק",
+    "services": "שירותים",
+    "openingHours": "שעות פעילות",
+    "location": "מיקום",
+    "contact": "יצירת קשר",
+    "reviews": "דירוגים ופידבקים",
+    "writeReview": "הוסף פידבק",
+    "share": "שתף",
+    "report": "דווח",
+    "days": {
+      "sunday": "ראשון",
+      "monday": "שני",
+      "tuesday": "שלישי",
+      "wednesday": "רביעי",
+      "thursday": "חמישי",
+      "friday": "שישי",
+      "saturday": "שבת"
+    },
+    "status": {
+      "open": "פתוח",
+      "closed": "סגור",
+      "openNow": "פתוח עכשיו",
+      "closedNow": "סגור עכשיו"
+    },
+    "errors": {
+      "loading": "בעיה בטעינת פרטי העסק",
+      "notFound": "לא נמצאו נתונים לעסק"
+    }
+  },
+  "searchResults": {
+    "title": "תוצאות חיפוש",
+    "noResults": "לא נמצאו תוצאות",
+    "filters": {
+      "title": "סינון תוצאות",
+      "category": "קטגוריה",
+      "rating": "דירוג",
+      "services": "שירותים",
+      "clear": "נקה סינון",
+      "apply": "החל סינון"
+    },
+    "sort": {
+      "title": "מיון לפי",
+      "rating": "דירוג גבוה",
+      "name": "לפי א-ב",
+      "distance": "מרחק"
+    }
+  },
+  "businessSteps": {
+    "details": {
+      "title": "פרטי העסק",
+      "fields": {
+        "name": "שם העסק",
+        "category": "קטגוריה",
+        "description": "תיאור העסק",
+        "address": "כתובת",
+        "phone": {
+          "prefix": "קידומת",
+          "number": "מספר טלפון"
+        },
+        "email": "דואר אלקטרוני"
+      },
+      "validation": {
+        "required": "שדה חובה",
+        "email": "כתובת דואר אלקטרוני לא תקינה",
+        "phone": "מספר טלפון לא תקין"
+      }
+    },
+    "services": {
+      "title": "שירותי העסק",
+      "noServices": "לא נמצאו שירותים לקטגוריה זו",
+      "selected": "נבחרו {{count}} שירותים"
+    },
+    "hours": {
+      "title": "שעות פעילות",
+      "days": {
+        "sunday": "ראשון",
+        "monday": "שני",
+        "tuesday": "שלישי",
+        "wednesday": "רביעי",
+        "thursday": "חמישי",
+        "friday": "שישי",
+        "saturday": "שבת"
+      },
+      "closed": "סגור",
+      "24hours": "פתוח 24/7",
+      "custom": "שעות מותאמות",
+      "from": "משעה",
+      "to": "עד שעה"
+    }
+  },
+  "editSteps": {
+    "title": {
+      "edit": "עריכת עסק",
+      "add": "הוספת עסק חדש"
+    },
+    "description": "מלא את הפרטים הבאים כדי {{action}} את העסק שלך",
+    "details": {
+      "title": "פרטי העסק",
+      "description": "הזן את הפרטים הבסיסיים של העסק",
+      "fields": {
+        "name": "שם העסק",
+        "category": "קטגוריה",
+        "description": "תיאור העסק",
+        "address": "כתובת",
+        "phone": {
+          "prefix": "קידומת",
+          "number": "מספר טלפון"
+        },
+        "email": "דואר אלקטרוני",
+        "logo": "לוגו העסק",
+        "logoUpload": "העלה לוגו"
+      },
+      "validation": {
+        "required": "שדה חובה",
+        "email": "כתובת דואר אלקטרוני לא תקינה",
+        "phone": "מספר טלפון לא תקין"
+      }
+    },
+    "services": {
+      "title": "שירותים",
+      "description": "בחר את השירותים שהעסק שלך מציע",
+      "noServices": "לא נמצאו שירותים לקטגוריה זו",
+      "selected": "נבחרו {{count}} שירותים"
+    },
+    "hours": {
+      "title": "שעות פעילות",
+      "description": "הגדר את שעות הפעילות של העסק",
+      "days": {
+        "sunday": "ראשון",
+        "monday": "שני",
+        "tuesday": "שלישי",
+        "wednesday": "רביעי",
+        "thursday": "חמישי",
+        "friday": "שישי",
+        "saturday": "שבת"
+      },
+      "closed": "סגור",
+      "24hours": "פתוח 24/7",
+      "custom": "שעות מותאמות",
+      "from": "משעה",
+      "to": "עד שעה",
+      "addRange": "הוסף טווח שעות"
+    },
+    "errors": {
+      "loading": "שגיאה בטעינת העסק",
+      "categories": "שגיאה בטעינת קטגוריות",
+      "services": "שגיאה בטעינת שירותים"
+    },
+    "messages": {
+      "success": "העסק {{action}} בהצלחה!",
+      "error": "שגיאה בשמירת העסק"
+    }
+  },
+  "advancedSearch": {
+    "title": "חיפוש מתקדם",
+    "filters": {
+      "category": "קטגוריה",
+      "services": "שירותים",
+      "rating": "דירוג מינימלי",
+      "location": "מיקום",
+      "sort": {
+        "title": "מיון לפי",
+        "rating": "דירוג",
+        "name": "שם",
+        "distance": "מרחק"
+      }
+    },
+    "buttons": {
+      "apply": "החל סינון",
+      "clear": "נקה",
+      "close": "סגור"
+    },
+    "noResults": "לא נמצאו תוצאות",
+    "selected": "נבחרו {{count}} פריטים"
+  },
+  "suggestItem": {
+    "title": "הצעת פריט חדש",
+    "description": "מלא את הפרטים הבאים כדי להציע פריט חדש",
+    "form": {
+      "type": {
+        "label": "סוג הצעה",
+        "category": "קטגוריה",
+        "service": "שירות"
+      },
+      "name": {
+        "he": "שם בעברית",
+        "en": "שם באנגלית"
+      },
+      "parentCategory": "קטגוריית אב",
+      "reason": "סיבה או תיאור קצר",
+      "submit": "שלח הצעה"
+    },
+    "messages": {
+      "success": "ההצעה נשלחה בהצלחה!",
+      "error": "שגיאה בשליחת ההצעה"
+    }
+  },
+  "userBusinesses": {
+    "title": "העסקים שלי",
+    "description": "נהל את העסקים שהוספת למדריך",
+    "empty": "אין לך עסקים רשומים עדיין",
+    "addBusiness": "הוסף עסק חדש",
+    "loading": "טוען עסקים...",
+    "error": "שגיאה בטעינת העסקים",
+    "filters": {
+      "all": "כל העסקים",
+      "active": "פעילים",
+      "inactive": "לא פעילים",
+      "deleted": "מחוקים"
+    }
+  }
 } 
