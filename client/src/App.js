@@ -11,6 +11,7 @@ import SearchResultPage from './components/SearchResultPage';
 import FeedbackPage from './components/FeedbackPage';
 import BusinessProfilePage from './components/BusinessProfilePage';
 import SuggestItemPage from './components/SuggestItemPage';
+import MyFavoritesPage from './components/MyFavoritesPage';
 import { useDispatch } from 'react-redux';
 import { setUser } from './redux/userSlice';
 import { ToastContainer } from 'react-toastify';
@@ -55,7 +56,8 @@ function App() {
                     <Route path="/" element={<MainPage />} />
                     <Route path="/edit" element={<EditBusinessPage />} />
                     <Route path="/edit/:id" element={<EditBusinessPage />} />
-                    <Route path="/user-businesses" element={<UserBusinessPage />} />
+                    <Route path="/my-businesses" element={<UserBusinessPage />} />
+                    <Route path="/my-favorites" element={<MyFavoritesPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegistrationPage />} />
                     <Route path="/search-results" element={<SearchResultPage />} />
