@@ -30,7 +30,7 @@ const LoginPage = () => {
                 dispatch(setUser({user: response.data.user}));
                 document.cookie = `token=${response.data.token}`;
                 localStorage.setItem('user', JSON.stringify(response.data.user));
-                navigate('/user-businesses');
+                navigate('/my-businesses');
             } else {
                 setError('ההתחברות נכשלה. נסה שוב');
             }

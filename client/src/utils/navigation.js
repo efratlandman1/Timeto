@@ -3,7 +3,7 @@ const PAGE_NAMES = {
     '/': 'דף הבית',
     '/search': 'חיפוש עסקים',
     '/edit': 'הוספת עסק',
-    '/user-businesses': 'עסקים שלי',
+    '/my-businesses': 'עסקים שלי',
     '/business': 'פרופיל עסק',
     '/suggest': 'הצעת פריט',
     '/feedback': 'משוב',

@@ -153,7 +153,7 @@ const Header = () => {
                             </div>
                             {showUserMenu && (
                                 <div className="dropdown-menu">
-                                    <div className="dropdown-item" onClick={() => navigate("/user-businesses")}>
+                                    <div className="dropdown-item" onClick={() => navigate("/my-businesses")}>
                                         <FaStore />
                                         {t('header.myBusinesses')}
                                     </div>

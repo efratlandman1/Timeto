@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const multer = require('multer');
 const app = express();
 require('dotenv').config();
 const PORT = 5050;
@@ -12,11 +13,13 @@ const authRouter = require('./routes/authRoutes');
 const categoryRoutes = require("./routes/categoryRoutes");
 const serviceRoutes = require('./routes/serviceRoutes');
 const feedbackRoutes  = require('./routes/feedbacksRoutes');
+const favoritesRoutes = require('./routes/favoritesRoutes');
 const jwtAuthMiddleware = require("./middlewares/authMiddleware");
 const suggestionRouter = require('./routes/suggestionRoutes');
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 const path = require('path');
 
 // Serve static files for uploads
@@ -34,6 +37,7 @@ app.use('/api/v1/businesses', businessesRouter);
 app.use("/api/v1/categories", categoryRoutes);
 app.use('/api/v1/services', serviceRoutes);
 app.use('/api/v1/feedbacks', feedbackRoutes);
+app.use('/api/v1/favorites', favoritesRoutes);
 app.use('/api/v1/suggestions', suggestionRouter);
 app.use('/api/v1', authRouter);
 

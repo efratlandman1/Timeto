@@ -334,7 +334,7 @@ const EditBusinessPage = () => {
         className: 'custom-toast',
       });
       setTimeout(() => {
-        navigate('/user-businesses');
+        navigate('/my-businesses');
       }, 1500);
     } catch (error) {
       toast.error('אירעה שגיאה בעת שמירת העסק');
@@ -355,7 +355,7 @@ const EditBusinessPage = () => {
   return (
     <div className="narrow-page-container">
       <div className="narrow-page-content">
-        <button className="nav-button above-header" onClick={() => navigate('/user-businesses')}>
+        <button className="nav-button above-header" onClick={() => navigate('/my-businesses')}>
           <FaArrowRight className="icon" />
           חזרה לעסקים שלי
         </button>

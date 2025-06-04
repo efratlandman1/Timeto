@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import FeedbackPage from './FeedbackPage';
 import {
   FaPencilAlt, FaPhone, FaWhatsapp, FaEnvelope,
   FaStar, FaRegStar, FaTrash, FaRecycle, FaMapMarkerAlt,
-  FaClock, FaShekelSign
+  FaClock, FaShekelSign, FaHeart
 } from "react-icons/fa";
 import { setSelectedBusiness } from '../redux/businessSlice';
 import '../styles/businessCard.css';
@@ -17,6 +17,59 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [localActive, setLocalActive] = useState(business.active);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      try {
+        const token = getToken();
+        if (!token) return;
+
+        const response = await fetch(
+          `${process.env.REACT_APP_API_DOMAIN}/api/v1/favorites/status/${business._id}`,
+          { headers: { 'Authorization': `Bearer ${token}` } }
+        );
+        
+        if (response.ok) {
+          const { isFavorite } = await response.json();
+          setIsFavorite(isFavorite);
+        }
+      } catch (error) {
+        console.error('Error checking favorite status:', error);
+      }
+    };
+
+    checkFavoriteStatus();
+  }, [business._id]);
+
+  const handleToggleFavorite = async (e) => {
+    e.stopPropagation();
+    try {
+      const token = getToken();
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/favorites/toggle`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ business_id: business._id })
+      });
+
+      if (response.ok) {
+        const { active } = await response.json();
+        setIsFavorite(active);
+        showToast(active ? '✅ נוסף למועדפים' : '✅ הוסר מהמועדפים');
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      showToast('❌ שגיאה בעדכון מועדפים', true);
+    }
+  };
 
   // const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
   // if (!token) {
@@ -132,6 +185,13 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
             {isBusinessOpen() ? 'פתוח' : 'סגור'}
           </div>
         )}
+        <button 
+          className={`favorite-button ${isFavorite ? 'active' : ''}`}
+          onClick={handleToggleFavorite}
+          aria-label={isFavorite ? 'הסר ממועדפים' : 'הוסף למועדפים'}
+        >
+          <FaHeart />
+        </button>
       </div>
 
       <div className="business-card-content">

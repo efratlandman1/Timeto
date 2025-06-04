@@ -44,7 +44,7 @@ const RegistrationPage = () => {
             document.cookie = `token=${response.data.token}`;
             localStorage.setItem('user', JSON.stringify(response.data.user));
       
-            navigate('/user-businesses');  // או כל דף אחר שתרצה
+            navigate('/my-businesses');  // או כל דף אחר שתרצה
           } else {
             alert('הרשמה נכשלה, נסה שוב');
           }
