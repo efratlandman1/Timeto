@@ -39,21 +39,6 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-exports.saveUser = async (req, res) => {
-    const newUser = new User({
-        "name": req.body.username,
-        "password": req.body.password
-    });
-
-    try {
-        await newUser.save();
-        const token = jwt.sign({ id: newUser._id }, 'your_jwt_secret_key', { expiresIn: '1h' });
-        res.status(201).json({ token });
-    } catch (e) {
-        res.status(500).json({ error: 'Failed to create user' });
-    }
-};
-
 exports.getAllUsers = async (req, res) => {
     try {
         const users = await User.find({}).select('-password'); // Exclude passwords from the result
@@ -65,8 +50,18 @@ exports.getAllUsers = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     try {
-        // In a real app, you would add logic to hash the password if it's being changed
-        const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('-password');
+        const updateData = { ...req.body };
+
+        // Securely hash the password only if a new one is provided
+        if (updateData.password && updateData.password.length > 0) {
+            updateData.password = await bcrypt.hash(updateData.password, 10);
+        } else {
+            // Ensure the password is not overwritten with an empty value
+            delete updateData.password;
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(req.params.id, updateData, { new: true }).select('-password');
+
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
