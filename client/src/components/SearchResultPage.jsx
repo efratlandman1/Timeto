@@ -3,9 +3,10 @@ import BusinessCard from './BusinessCard';
 import AdvancedSearchModal from './AdvancedSearchModal';
 import axios from 'axios';
 import '../styles/SearchResultPage.css';
+import '../styles/AdvancedSearchPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchBar from './SearchBar';
-import { FaFilter, FaTimes, FaChevronDown } from 'react-icons/fa';
+import { FaFilter, FaTimes, FaChevronDown, FaSort } from 'react-icons/fa';
 
 const ITEMS_PER_PAGE = 8;
 
@@ -26,6 +27,7 @@ const SearchResultPage = () => {
     const [sortOption, setSortOption] = useState('rating');
     const [showSortDropdown, setShowSortDropdown] = useState(false);
     const sortDropdownRef = useRef(null);
+    const advancedSearchRef = useRef(null);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -34,6 +36,9 @@ const SearchResultPage = () => {
         const handleClickOutside = (event) => {
             if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target)) {
                 setShowSortDropdown(false);
+            }
+            if (advancedSearchRef.current && !advancedSearchRef.current.contains(event.target) && !event.target.closest('.filter-button')) {
+                setShowFilters(false);
             }
         };
 
@@ -71,9 +76,13 @@ const SearchResultPage = () => {
                 params.set('page', currentPage.toString());
                 params.set('limit', ITEMS_PER_PAGE.toString());
                 
-                const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
-                    params: Object.fromEntries(params)
+                // Create URL with all parameters, including multiple services
+                const url = new URL(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`);
+                params.forEach((value, key) => {
+                    url.searchParams.append(key, value);
                 });
+                
+                const res = await axios.get(url.toString());
                 
                 setBusinesses(res.data.data || []);
                 setTotalPages(res.data.pagination?.totalPages || 1);
@@ -141,44 +150,61 @@ const SearchResultPage = () => {
                     </div>
                 </div>
                 
-                <div className="search-controls-wrapper">
-                    <div className="search-area">
-                        <SearchBar />
-                    </div>
-                    <div className="controls-area">
-                        <button 
-                            className="filter-button"
-                            onClick={() => setShowFilters(true)}
-                        >
-                            <FaFilter />
-                        </button>
-                        <div className="sort-area" ref={sortDropdownRef}>
-                            <div 
-                                className="sort-button"
-                                onClick={() => setShowSortDropdown(!showSortDropdown)}
+                <div className="search-controls">
+                    <div className="search-controls__main">
+                        <div className="search-bar-container">
+                            <SearchBar />
+                        </div>
+                        <div className="search-controls__actions">
+                            <button 
+                                className="filter-button"
+                                onClick={() => setShowFilters(!showFilters)}
+                                aria-expanded={showFilters}
                             >
-                                <span className="sort-label">מיון:</span>
-                                <span className="selected-sort">{SORT_OPTIONS[sortOption]}</span>
-                                <FaChevronDown className={`sort-chevron ${showSortDropdown ? 'open' : ''}`} />
+                                <FaFilter />
+                                <span>סינון מתקדם</span>
+                            </button>
+                            <div className="sort-control" ref={sortDropdownRef}>
+                                <button 
+                                    className="sort-button"
+                                    onClick={() => setShowSortDropdown(!showSortDropdown)}
+                                    aria-expanded={showSortDropdown}
+                                >
+                                    <span className="sort-text">{SORT_OPTIONS[sortOption]}</span>
+                                    <FaSort className="sort-icon" />
+                                </button>
+                                {showSortDropdown && (
+                                    <div className="sort-dropdown">
+                                        {Object.entries(SORT_OPTIONS).map(([value, label]) => (
+                                            <button
+                                                key={value}
+                                                className={`sort-option ${sortOption === value ? 'selected' : ''}`}
+                                                onClick={() => {
+                                                    handleSortChange(value);
+                                                    setShowSortDropdown(false);
+                                                }}
+                                            >
+                                                {label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
-                            {showSortDropdown && (
-                                <div className="sort-dropdown">
-                                    {Object.entries(SORT_OPTIONS).map(([value, label]) => (
-                                        <div
-                                            key={value}
-                                            className={`sort-option ${sortOption === value ? 'selected' : ''}`}
-                                            onClick={() => {
-                                                handleSortChange(value);
-                                                setShowSortDropdown(false);
-                                            }}
-                                        >
-                                            {label}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
                         </div>
                     </div>
+
+                    {showFilters && (
+                        <div className="modal-overlay">
+                            <AdvancedSearchModal
+                                isOpen={showFilters}
+                                onClose={() => setShowFilters(false)}
+                                filters={activeFilters}
+                                onFilterChange={(key, value) => {
+                                    handleFilterChange(key, value);
+                                }}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {Object.keys(activeFilters).length > 0 && (
@@ -228,17 +254,6 @@ const SearchResultPage = () => {
                             <BusinessCard key={business._id} business={business} />
                         ))}
                     </div>
-
-                    <AdvancedSearchModal
-                        isOpen={showFilters}
-                        onClose={() => setShowFilters(false)}
-                        filters={activeFilters}
-                        onFilterChange={handleFilterChange}
-                        onClearFilters={handleClearFilters}
-                        onRemoveFilter={handleRemoveFilter}
-                        sortOption={sortOption}
-                        onSortChange={handleSortChange}
-                    />
                 </div>
 
                 {totalPages > 1 && (
