@@ -229,7 +229,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
               <>
                 {localActive && (
                   <button
-                    className="action-button admin"
+                    className="action-button admin edit-button"
                     onClick={(e) => handleEdit(e)}
                   >
                     <FaPencilAlt />
@@ -240,14 +240,14 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                   confirmDelete ? (
                     <>
                       <button
-                        className="action-button admin"
+                        className="action-button admin confirm-delete"
                         onClick={(e) => handleDeleteConfirmed(e)}
                       >
                         <span>✔</span>
                         <span className="tooltip">אישור מחיקה</span>
                       </button>
                       <button
-                        className="action-button admin"
+                        className="action-button admin cancel-delete"
                         onClick={(e) => {
                           e.stopPropagation();
                           setConfirmDelete(false);
@@ -259,7 +259,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                     </>
                   ) : (
                     <button
-                      className="action-button admin"
+                      className="action-button admin delete-button"
                       onClick={(e) => {
                         e.stopPropagation();
                         setConfirmDelete(true);
@@ -271,7 +271,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                   )
                 ) : (
                   <button
-                    className="action-button admin"
+                    className="action-button admin restore-button"
                     onClick={(e) => handleRestore(e)}
                   >
                     <FaRecycle />

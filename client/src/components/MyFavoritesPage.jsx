@@ -45,8 +45,8 @@ const MyFavoritesPage = () => {
     }
 
     return (
-        <div className="narrow-page-container">
-            <div className="narrow-page-content">
+        <div className="wide-page-container">
+            <div className="wide-page-content">
                 <button className="nav-button above-header" onClick={() => navigate('/')}>
                     <FaArrowRight className="icon" />
                     חזרה לדף הבית
@@ -67,7 +67,7 @@ const MyFavoritesPage = () => {
                         </button>
                     </div>
                 ) : (
-                    <div className="businesses-grid">
+                    <div className="business-cards-grid">
                         {favorites.map((business) => (
                             <BusinessCard
                                 key={business._id}

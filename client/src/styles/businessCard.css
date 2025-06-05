@@ -204,22 +204,61 @@
 }
 
 .action-button.admin {
-  background: #f0f0f0;
-  color: #666;
+  color: white;
 }
 
-.action-button.admin:hover {
-  background: #e0e0e0;
+.action-button.admin[title*="עריכה"],
+.action-button.admin:has(.tooltip:contains("עריכה")) {
+  background: #4a90e2;
 }
 
-.action-button.admin svg {
+.action-button.admin[title*="עריכה"]:hover,
+.action-button.admin:has(.tooltip:contains("עריכה")):hover {
+  background: #357abd;
+}
+
+.action-button.admin[title*="מחיקה"],
+.action-button.admin:has(.tooltip:contains("מחיקה")),
+.action-button.admin:has(.tooltip:contains("אישור מחיקה")) {
+  background: #e74c3c;
+}
+
+.action-button.admin[title*="מחיקה"]:hover,
+.action-button.admin:has(.tooltip:contains("מחיקה")):hover,
+.action-button.admin:has(.tooltip:contains("אישור מחיקה")):hover {
+  background: #c0392b;
+}
+
+.action-button.admin[title*="ביטול"],
+.action-button.admin:has(.tooltip:contains("ביטול")) {
+  background: #95a5a6;
+}
+
+.action-button.admin[title*="ביטול"]:hover,
+.action-button.admin:has(.tooltip:contains("ביטול")):hover {
+  background: #7f8c8d;
+}
+
+.action-button.admin[title*="שחזור"],
+.action-button.admin:has(.tooltip:contains("שחזור")) {
+  background: #2ecc71;
+}
+
+.action-button.admin[title*="שחזור"]:hover,
+.action-button.admin:has(.tooltip:contains("שחזור")):hover {
+  background: #27ae60;
+}
+
+.action-button.admin svg,
+.action-button.admin span {
+  color: white;
   font-size: 0.9rem;
 }
 
 .business-card-badge {
   position: absolute;
   top: 12px;
-  right: 12px;
+  left: 12px;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -239,8 +278,12 @@
 
 .business-card.inactive {
   opacity: 0.7;
-  pointer-events: none;
   position: relative;
+}
+
+.business-card.inactive .action-button:not(.restore-button) {
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 .business-card.inactive::after {
@@ -255,6 +298,7 @@
   font-weight: 500;
   font-size: 1.2rem;
   z-index: 2;
+  pointer-events: none;
 }
 
 .action-button .tooltip {
@@ -333,4 +377,45 @@
 
 .favorite-button.active svg {
   color: #ff4b4b;
+}
+
+/* Update action button colors */
+.action-button.admin.edit-button {
+  background: #4a90e2;
+}
+
+.action-button.admin.edit-button:hover {
+  background: #357abd;
+}
+
+.action-button.admin.delete-button {
+  background: #e74c3c;
+}
+
+.action-button.admin.delete-button:hover {
+  background: #c0392b;
+}
+
+.action-button.admin.confirm-delete {
+  background: #4a90e2;
+}
+
+.action-button.admin.confirm-delete:hover {
+  background: #357abd;
+}
+
+.action-button.admin.cancel-delete {
+  background: #e74c3c;
+}
+
+.action-button.admin.cancel-delete:hover {
+  background: #c0392b;
+}
+
+.action-button.admin.restore-button {
+  background: #2ecc71;
+}
+
+.action-button.admin.restore-button:hover {
+  background: #27ae60;
 }
