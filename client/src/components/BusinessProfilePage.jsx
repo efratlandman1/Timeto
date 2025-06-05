@@ -6,6 +6,7 @@ import {
 } from 'react-icons/fa';
 import FeedbackPage from './FeedbackPage';
 import '../styles/BusinessProfilePage.css';
+import { roundRating, renderStars } from '../utils/ratingUtils';
 
 const daysMap = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
@@ -55,11 +56,11 @@ const BusinessProfilePage = () => {
   };
 
   const renderRatingStars = (rating) => {
-    return [...Array(5)].map((_, index) => (
-      <span key={index} className="star">
-        {index < Math.floor(rating) ? <FaStar /> : <FaRegStar />}
-      </span>
-    ));
+    return renderStars(
+      rating,
+      <FaStar />,
+      <FaRegStar />
+    );
   };
 
   const getCurrentDayIndex = () => {
@@ -214,9 +215,19 @@ const BusinessProfilePage = () => {
 
         <div className="feedback-stats">
           <div className="stat-card">
-            <div className="stat-number">{averageRating.toFixed(1)}</div>
-            <div className="rating-stars">{renderRatingStars(averageRating)}</div>
-            <div className="stat-label">דירוג ממוצע</div>
+            {averageRating !== null && averageRating !== undefined ? (
+              <>
+                <div className="stat-number">{roundRating(averageRating)}</div>
+                <div className="rating-stars">{renderRatingStars(averageRating)}</div>
+                <div className="stat-label">דירוג ממוצע</div>
+              </>
+            ) : (
+              <>
+                <div className="stat-number">-</div>
+                <div className="rating-stars">{renderRatingStars(0)}</div>
+                <div className="stat-label">אין דירוג עדיין</div>
+              </>
+            )}
           </div>
           <div className="stat-card">
             <div className="stat-number">{totalReviews}</div>
@@ -244,7 +255,7 @@ const BusinessProfilePage = () => {
                 </div>
                 <div className="feedback-rating">
                   <div className="stars">
-                    {renderRatingStars(feedback.rating || 0)}
+                    {renderRatingStars(feedback.rating)}
                   </div>
                 </div>
                 <div className={`feedback-comment ${isExpanded ? 'expanded' : ''}`}>

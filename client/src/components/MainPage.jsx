@@ -15,6 +15,12 @@ const MainPage = () => {
     const [recommendedBusinesses, setRecommendedBusinesses] = useState([]);
     const [categories, setCategories] = useState([]);
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [stats, setStats] = useState({
+        users: null,
+        businesses: null,
+        reviews: null
+    });
+    const [isStatsLoading, setIsStatsLoading] = useState(true);
     const navigate = useNavigate();
 
     const bannerImages = [
@@ -50,6 +56,7 @@ const MainPage = () => {
     useEffect(() => { 
         fetchCategories();
         fetchBusinesses();
+        fetchStats();
     }, []);
 
     const fetchCategories = async () => {
@@ -95,6 +102,18 @@ const MainPage = () => {
 
         } catch (error) {
             console.error("Error fetching businesses:", error);
+        }
+    };
+
+    const fetchStats = async () => {
+        try {
+            setIsStatsLoading(true);
+            const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/stats/home`);
+            setStats(response.data);
+        } catch (error) {
+            console.error('Error fetching stats:', error);
+        } finally {
+            setIsStatsLoading(false);
         }
     };
 
@@ -188,8 +207,12 @@ const MainPage = () => {
                                     <FaUserFriends className="stat-icon" />
                                 </div>
                                 <div className="stat-content">
-                                    <div className="stat-number">+1</div>
-                                    <div className="stat-label">משתמשים חדשים</div>
+                                    <div className="stat-number">
+                                        {!isStatsLoading && stats.users !== null && (
+                                            <>{stats.users > 0 && '+'}{stats.users}</>
+                                        )}
+                                    </div>
+                                    <div className="stat-label">משתמשים רשומים</div>
                                 </div>
                             </div>
                             <div className="stat-box">
@@ -197,7 +220,11 @@ const MainPage = () => {
                                     <FaStar className="stat-icon" />
                                 </div>
                                 <div className="stat-content">
-                                    <div className="stat-number">+1</div>
+                                    <div className="stat-number">
+                                        {!isStatsLoading && stats.reviews !== null && (
+                                            <>{stats.reviews > 0 && '+'}{stats.reviews}</>
+                                        )}
+                                    </div>
                                     <div className="stat-label">ביקורות מאומתות</div>
                                 </div>
                             </div>
@@ -206,7 +233,11 @@ const MainPage = () => {
                                     <FaCalendarCheck className="stat-icon" />
                                 </div>
                                 <div className="stat-content">
-                                    <div className="stat-number">+8</div>
+                                    <div className="stat-number">
+                                        {!isStatsLoading && stats.businesses !== null && (
+                                            <>{stats.businesses > 0 && '+'}{stats.businesses}</>
+                                        )}
+                                    </div>
                                     <div className="stat-label">עסקים רשומים</div>
                                 </div>
                             </div>
