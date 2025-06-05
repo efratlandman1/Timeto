@@ -38,6 +38,8 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
 
     if (!append) {
       setIsSearching(true);
+    } else {
+      setIsLoadingMore(true);
     }
     
     try {
@@ -53,7 +55,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
       const data = await res.json();
       const newResults = data.data || [];
       
-      setHasMore(data.pagination?.hasNextPage || false);
+      setHasMore(data.pagination?.hasNextPage || newResults.length === ITEMS_PER_PAGE);
       
       if (append) {
         setResults(prev => [...prev, ...newResults]);
@@ -118,14 +120,33 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
     }
   }, [location.search]);
 
-  const handleLoadMore = () => {
-    if (!hasMore || isLoadingMore) return;
+  // Handle scroll for infinite loading
+  useEffect(() => {
+    const dropdown = listRef.current;
+    if (!dropdown) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = dropdown;
+      
+      // Check if we're near the bottom (within 50px)
+      if (scrollHeight - scrollTop - clientHeight < 50) {
+        if (hasMore && !isLoadingMore) {
+          handleLoadMore();
+        }
+      }
+    };
+
+    dropdown.addEventListener('scroll', handleScroll);
+    return () => dropdown.removeEventListener('scroll', handleScroll);
+  }, [hasMore, isLoadingMore, page]);
+
+  const handleLoadMore = useCallback(() => {
+    if (!hasMore || isLoadingMore || !searchQuery.trim()) return;
     
     const nextPage = page + 1;
-    setIsLoadingMore(true);
     setPage(nextPage);
     fetchResults(searchQuery.trim(), nextPage, true);
-  };
+  }, [hasMore, isLoadingMore, page, searchQuery, fetchResults]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -279,21 +300,11 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
                 </div>
               </li>
             ))}
-            {hasMore && (
+            {isLoadingMore && (
               <li className="load-more-item">
-                {isLoadingMore ? (
-                  <div className="loading-spinner">
-                    <AiOutlineLoading3Quarters className="spinner-icon" />
-                  </div>
-                ) : (
-                  <button 
-                    className="load-more-button"
-                    onClick={handleLoadMore}
-                    disabled={isLoadingMore}
-                  >
-                    טען עוד תוצאות
-                  </button>
-                )}
+                <div className="loading-spinner">
+                  <AiOutlineLoading3Quarters className="spinner-icon" />
+                </div>
               </li>
             )}
           </>
