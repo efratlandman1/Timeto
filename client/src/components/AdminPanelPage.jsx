@@ -3,7 +3,7 @@ import { FaTags, FaCogs, FaUsers } from 'react-icons/fa';
 import axios from 'axios';
 import '../styles/AdminPanelPage.css';
 import { toast } from 'react-toastify';
-import {getToken} from "../utils/auth";
+import { getToken } from "../utils/auth";
 
 const AdminPanelPage = () => {
     const [activeTab, setActiveTab] = useState('categories');
@@ -20,26 +20,43 @@ const AdminPanelPage = () => {
         fetchData();
     }, [activeTab]);
 
-    // const getToken = () => localStorage.getItem('token');
+    const getContextName = (tab, isPlural = false) => {
+        switch (tab) {
+            case 'categories': return isPlural ? 'קטגוריות' : 'קטגוריה';
+            case 'services': return isPlural ? 'שירותים' : 'שירות';
+            case 'users': return isPlural ? 'משתמשים' : 'משתמש';
+            default: return isPlural ? 'פריטים' : 'פריט';
+        }
+    };
 
     const fetchData = async () => {
         setIsLoading(true);
         try {
             const token = getToken();
-            const config = {
-                headers: { Authorization: `Bearer ${token}` }
-            };
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            
+            let categoriesData = categories;
+            if (categories.length === 0 || activeTab === 'categories' || activeTab === 'services') {
+                const catRes = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`, config);
+                categoriesData = catRes.data.sort((a, b) => a.name.localeCompare(b.name));
+                setCategories(categoriesData);
+            }
+
             switch (activeTab) {
-                case 'categories':
-                    const categoriesResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`, config);
-                    setCategories(categoriesResponse.data);
-                    break;
                 case 'services':
-                     const servicesRes = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/services`, config);
-                    setServices(servicesRes.data);
-                    // Fetch categories as well for the dropdown
-                    const catRes = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`, config);
-                    setCategories(catRes.data);
+                    const servicesRes = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/services`, config);
+                    const categoryMap = categoriesData.reduce((acc, cat) => {
+                        acc[cat._id] = cat.name;
+                        return acc;
+                    }, {});
+                    const sortedServices = servicesRes.data.sort((a, b) => {
+                        const catA = categoryMap[a.categoryId] || '';
+                        const catB = categoryMap[b.categoryId] || '';
+                        if (catA < catB) return -1;
+                        if (catA > catB) return 1;
+                        return a.name.localeCompare(b.name);
+                    });
+                    setServices(sortedServices);
                     break;
                 case 'users':
                     const usersResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/users`, config);
@@ -63,10 +80,7 @@ const AdminPanelPage = () => {
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPreviewUrl(reader.result);
-                setEditingItem(prev => ({
-                    ...prev,
-                    logo: file
-                }));
+                setEditingItem(prev => ({ ...prev, logo: file }));
             };
             reader.readAsDataURL(file);
         }
@@ -79,40 +93,30 @@ const AdminPanelPage = () => {
     };
 
     const handleDelete = async (id) => {
-        const confirmResult = await toast.promise(
-            new Promise((resolve) => {
-                const toastId = toast.info(
-                    <div className="delete-confirmation">
-                        <p>האם אתה בטוח שברצונך למחוק פריט זה?</p>
-                        <div className="confirmation-buttons">
-                            <button onClick={() => { toast.dismiss(toastId); resolve(true); }}>כן, מחק</button>
-                            <button onClick={() => { toast.dismiss(toastId); resolve(false); }}>ביטול</button>
-                        </div>
-                    </div>,
-                    { autoClose: false, closeButton: false }
-                );
-            }),
-            {
-                pending: 'ממתין לאישור...',
-                success: 'הפריט נמחק בהצלחה',
-                error: 'שגיאה במחיקת הפריט'
-            }
+        const contextName = getContextName(activeTab);
+        const toastId = toast.info(
+            <div className="delete-confirmation">
+                <p>{`האם אתה בטוח שברצונך למחוק ${contextName} זה?`}</p>
+                <div className="confirmation-buttons">
+                    <button onClick={async () => {
+                        toast.dismiss(toastId);
+                        try {
+                            const token = getToken();
+                            const config = { headers: { Authorization: `Bearer ${token}` } };
+                            const endpoint = `${process.env.REACT_APP_API_DOMAIN}/api/v1/${activeTab}/${id}`;
+                            await axios.delete(endpoint, config);
+                            toast.success(`${contextName} נמחק בהצלחה`);
+                            fetchData();
+                        } catch (error) {
+                            console.error('Error deleting item:', error);
+                            toast.error(error.response?.data?.message || `שגיאה במחיקת ${contextName}`);
+                        }
+                    }}>כן, מחק</button>
+                    <button onClick={() => toast.dismiss(toastId)}>ביטול</button>
+                </div>
+            </div>,
+            { autoClose: false, closeButton: false, position: "top-center" }
         );
-
-        if (!confirmResult) return;
-
-        try {
-            const token = getToken();
-            const config = {
-                headers: { Authorization: `Bearer ${token}` }
-            };
-            const endpoint = `${process.env.REACT_APP_API_DOMAIN}/api/v1/${activeTab}/${id}`;
-            await axios.delete(endpoint, config);
-            fetchData();
-        } catch (error) {
-            console.error('Error deleting item:', error);
-            toast.error(error.response?.data?.message || 'שגיאה במחיקת הפריט');
-        }
     };
 
     const handleSave = async () => {
@@ -135,19 +139,19 @@ const AdminPanelPage = () => {
             });
             config.headers['Content-Type'] = 'multipart/form-data';
         } else {
-            // For services and users, send as JSON
             payload = { ...editingItem };
             config.headers['Content-Type'] = 'application/json';
         }
 
         try {
+            const contextName = getContextName(activeTab);
             const endpoint = `${process.env.REACT_APP_API_DOMAIN}/api/v1/${activeTab}`;
             if (editingItem._id) {
                 await axios.put(`${endpoint}/${editingItem._id}`, payload, config);
-                toast.success('הפריט עודכן בהצלחה');
+                toast.success(`${contextName} עודכן בהצלחה`);
             } else {
                 await axios.post(endpoint, payload, config);
-                toast.success('הפריט נוסף בהצלחה');
+                toast.success(`${contextName} נוסף בהצלחה`);
             }
             setIsModalOpen(false);
             setEditingItem(null);
@@ -156,16 +160,14 @@ const AdminPanelPage = () => {
             fetchData();
         } catch (error) {
             console.error('Error saving item:', error);
-            toast.error(error.response?.data?.message || 'שגיאה בשמירת הפריט');
+            const contextName = getContextName(activeTab);
+            toast.error(error.response?.data?.message || `שגיאה בשמירת ה${contextName}`);
         }
     };
     
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setEditingItem(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setEditingItem(prev => ({ ...prev, [name]: value }));
     };
 
     const renderCategoriesTab = () => (
@@ -190,19 +192,15 @@ const AdminPanelPage = () => {
                         <tr key={category._id}>
                             <td>
                                 <img 
-                                    src={category.logo || '/placeholder-logo.png'} 
+                                    src={category.logo ? `${process.env.REACT_APP_API_DOMAIN}/${category.logo.replace(/\\/g, '/')}` : '/placeholder-logo.png'} 
                                     alt={category.name}
                                     className="category-logo"
                                 />
                             </td>
                             <td>{category.name}</td>
                             <td className="actions-cell">
-                                <button onClick={() => handleEdit(category)} className="edit-button">
-                                    ✏️
-                                </button>
-                                <button onClick={() => handleDelete(category._id)} className="delete-button">
-                                    🗑️
-                                </button>
+                                <button onClick={() => handleEdit(category)} className="edit-button">✏️</button>
+                                <button onClick={() => handleDelete(category._id)} className="delete-button">🗑️</button>
                             </td>
                         </tr>
                     ))}
@@ -211,44 +209,45 @@ const AdminPanelPage = () => {
         </div>
     );
 
-    const renderServicesTab = () => (
-        <div className="admin-table-container">
-            <button className="add-button" onClick={() => {
-                setEditingItem({});
-                setIsModalOpen(true);
-            }}>
-                + הוסף שירות חדש
-            </button>
-            <table className="admin-table">
-                <thead>
-                    <tr>
-                        <th>שם</th>
-                        <th>קטגוריה</th>
-                        <th>פעולות</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {services.map(service => {
-                        const category = categories.find(c => c._id === service.categoryId);
-                        return (
-                            <tr key={service._id}>
-                                <td>{service.name}</td>
-                                <td>{category?.name || 'לא מוגדר'}</td>
-                                <td className="actions-cell">
-                                    <button onClick={() => handleEdit(service)} className="edit-button">
-                                        ✏️
-                                    </button>
-                                    <button onClick={() => handleDelete(service._id)} className="delete-button">
-                                        🗑️
-                                    </button>
-                                </td>
+    const renderServicesTab = () => {
+        const groupedServices = services.reduce((acc, service) => {
+            const categoryName = categories.find(c => c._id === service.categoryId)?.name || 'ללא קטגוריה';
+            if (!acc[categoryName]) {
+                acc[categoryName] = [];
+            }
+            acc[categoryName].push(service);
+            return acc;
+        }, {});
+
+        return (
+            <div className="admin-table-container">
+                <button className="add-button" onClick={() => {
+                    setEditingItem({});
+                    setIsModalOpen(true);
+                }}>
+                    + הוסף שירות חדש
+                </button>
+                <table className="admin-table">
+                    {Object.entries(groupedServices).map(([categoryName, servicesInCategory], index) => (
+                        <tbody key={categoryName} className={`category-group group-color-${index % 5}`}>
+                            <tr className="category-header-row">
+                                <th colSpan="3">{categoryName}</th>
                             </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
-        </div>
-    );
+                            {servicesInCategory.map(service => (
+                                <tr key={service._id}>
+                                    <td>{service.name}</td>
+                                    <td className="actions-cell">
+                                        <button onClick={() => handleEdit(service)} className="edit-button">✏️</button>
+                                        <button onClick={() => handleDelete(service._id)} className="delete-button">🗑️</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    ))}
+                </table>
+            </div>
+        );
+    };
 
     const renderUsersTab = () => (
         <div className="admin-table-container">
@@ -447,9 +446,7 @@ const AdminPanelPage = () => {
             </div>
 
             <div className="tab-content">
-                {isLoading ? (
-                    <div className="loading-spinner">טוען...</div>
-                ) : (
+                {isLoading ? <div className="loading-spinner">טוען...</div> : (
                     <>
                         {activeTab === 'categories' && renderCategoriesTab()}
                         {activeTab === 'services' && renderServicesTab()}
@@ -462,31 +459,18 @@ const AdminPanelPage = () => {
                 <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h2>{editingItem?._id ? 'עריכת פריט' : 'הוספת פריט חדש'}</h2>
-                            <button 
-                                className="close-button" 
-                                onClick={() => {
-                                    setIsModalOpen(false);
-                                    setEditingItem(null);
-                                    setSelectedFile(null);
-                                    setPreviewUrl('');
-                                }}
-                            >
-                                ✕
-                            </button>
-                        </div>
-                        {renderForm()}
-                        <div className="modal-actions">
-                            <button className="cancel-button" onClick={() => {
+                            <h2>{`${editingItem?._id ? 'עריכת' : 'הוספת'} ${getContextName(activeTab)}`}</h2>
+                            <button className="close-button" onClick={() => {
                                 setIsModalOpen(false);
                                 setEditingItem(null);
                                 setSelectedFile(null);
                                 setPreviewUrl('');
-                            }}>
-                                ביטול
-                            </button>
+                            }}>✕</button>
+                        </div>
+                        {renderForm()}
+                        <div className="modal-actions">
                             <button className="save-button" onClick={handleSave}>
-                                שמור שינויים
+                                {editingItem?._id ? 'שמור שינויים' : `הוסף ${getContextName(activeTab)}`}
                             </button>
                         </div>
                     </div>

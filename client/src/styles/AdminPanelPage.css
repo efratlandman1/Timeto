@@ -307,33 +307,32 @@
 .confirmation-buttons {
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    gap: 10px;
+    margin-top: 15px;
 }
 
 .confirmation-buttons button {
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
+    padding: 8px 16px;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    font-weight: bold;
 }
 
-.confirmation-buttons button:first-child {
-    background: #ff4d4d;
+.confirmation-buttons button:first-of-type {
+    background-color: #d9534f;
     color: white;
 }
 
-.confirmation-buttons button:first-child:hover {
-    background: #ff3333;
+.confirmation-buttons button:last-of-type {
+    background-color: #f0f0f0;
+    color: #333;
 }
 
-.confirmation-buttons button:last-child {
-    background: #f0f0f0;
-    color: #666;
-}
-
-.confirmation-buttons button:last-child:hover {
-    background: #e0e0e0;
+.modal-actions {
+    display: flex;
+    justify-content: center; /* Center the single button */
+    padding: 15px;
 }
 
 /* Responsive Design */
@@ -370,4 +369,20 @@
     .modal-header h2 {
         font-size: 1.25rem;
     }
-} 
+}
+
+.admin-table .category-group .category-header-row th {
+    text-align: right;
+    padding: 12px 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+    border-bottom: 2px solid #ddd;
+    background-color: #f9f9f9;
+}
+
+.admin-table .category-group.group-color-0 { background-color: rgba(227, 242, 253, 0.5); }
+.admin-table .category-group.group-color-1 { background-color: rgba(232, 245, 233, 0.5); }
+.admin-table .category-group.group-color-2 { background-color: rgba(255, 243, 224, 0.5); }
+.admin-table .category-group.group-color-3 { background-color: rgba(252, 228, 236, 0.5); }
+.admin-table .category-group.group-color-4 { background-color: rgba(243, 229, 245, 0.5); } 
