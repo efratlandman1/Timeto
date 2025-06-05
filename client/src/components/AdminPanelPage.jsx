@@ -206,7 +206,7 @@ const AdminPanelPage = () => {
                         <tr key={category._id}>
                             <td>
                                 <img 
-                                    src={category.logo ? `${process.env.REACT_APP_API_DOMAIN}/${category.logo.replace(/\\/g, '/')}` : '/placeholder-logo.png'} 
+                                    src={category.logo ? `${process.env.REACT_APP_API_DOMAIN}${category.logo.replace(/\\/g, '/')}` : '/placeholder-logo.png'} 
                                     alt={category.name}
                                     className="category-logo"
                                 />
