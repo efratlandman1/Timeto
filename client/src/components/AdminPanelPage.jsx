@@ -29,7 +29,7 @@ const AdminPanelPage = () => {
                     break;
                 case 'services':
                     const [servicesRes, categoriesRes] = await Promise.all([
-                        axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/services/`)//,
+                        axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/services`)//,
                         // axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`)
                     ]);
                     setServices(servicesRes.data);
