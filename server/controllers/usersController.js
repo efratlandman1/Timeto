@@ -1,5 +1,43 @@
 const jwt = require('jsonwebtoken');
 const User = require("../models/user");
+const bcrypt = require('bcrypt');
+
+exports.registerUser = async (req, res) => {
+   console.log("registerUser");
+    try {
+        // בדיקה אם קיים משתמש עם אותו אימייל
+        const existingUser = await User.findOne({ email: req.body.email });
+        if (existingUser) {
+            return res.status(400).json({ error: 'Email already exists' });
+        }
+
+        // הצפנת הסיסמה
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+        // יצירת המשתמש
+        const newUser = new User({
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            email: req.body.email,
+            phone: req.body.phone,
+            nickname: req.body.nickname,
+            password: hashedPassword
+        });
+
+        const savedUser = await newUser.save();
+
+        // יצירת JWT
+        const token = jwt.sign({ userId: savedUser._id, email: savedUser.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        // שליחת טוקן + מידע על המשתמש (בלי הסיסמה)
+        const { password, ...userData } = savedUser.toObject();
+        res.status(201).json({ token, user: userData });
+
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: 'Failed to create user' });
+    }
+};
 
 exports.saveUser = async (req, res) => {
     const newUser = new User({

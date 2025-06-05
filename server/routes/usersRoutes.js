@@ -6,7 +6,8 @@ const router = express.Router();
 // and defined in authRoutes.js. This route here can be used
 // for admin purposes if needed, but we will focus on update/delete.
 
-router.post('/register', usersController.saveUser); // This was in the original file
+// router.post('/register', usersController.saveUser); // This was in the original file
+router.post('/register', usersController.registerUser);
 router.get('/', usersController.getAllUsers);
 router.put('/:id', usersController.updateUser);
 router.delete('/:id', usersController.deleteUser);

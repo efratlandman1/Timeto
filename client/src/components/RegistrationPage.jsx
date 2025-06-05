@@ -37,8 +37,8 @@ const RegistrationPage = () => {
         }
       
         try {
-          const response = await axios.post(process.env.REACT_APP_API_DOMAIN + '/api/v1/register', formData);
-      
+          const response = await axios.post(process.env.REACT_APP_API_DOMAIN + '/api/v1/users/register', formData);
+          console.log("response",response);
           if (response.data.token && response.data.user) {
             // שמירה ב-localStorage
             document.cookie = `token=${response.data.token}`;
