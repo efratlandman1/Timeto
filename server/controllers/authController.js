@@ -18,7 +18,7 @@ exports.login = async (req, res) => {
             return res.status(400).json({ error: 'Incorrect password' });
         }
 
-        const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         // בונה את אובייקט המשתמש בלי הסיסמה
         const userData = {
@@ -28,6 +28,7 @@ exports.login = async (req, res) => {
             phone: user.phone,
             email: user.email,
             nickname: user.nickname,
+            role: user.role,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt
         };

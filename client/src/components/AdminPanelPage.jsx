@@ -4,8 +4,10 @@ import axios from 'axios';
 import '../styles/AdminPanelPage.css';
 import { toast } from 'react-toastify';
 import { getToken } from "../utils/auth";
+import { useNavigate } from 'react-router-dom';
 
 const AdminPanelPage = () => {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('categories');
     const [editingItem, setEditingItem] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,7 +18,19 @@ const AdminPanelPage = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
 
+    const roleTranslations = {
+        'admin': 'מנהל',
+        'manager': 'מנהל מערכת',
+        'end-user': 'משתמש'
+    };
+
     useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'admin') {
+            toast.error("אין לך הרשאת גישה לדף זה.");
+            navigate('/');
+            return;
+        }
         fetchData();
     }, [activeTab]);
 
@@ -252,7 +266,7 @@ const AdminPanelPage = () => {
     const renderUsersTab = () => (
         <div className="admin-table-container">
             <button className="add-button" onClick={() => {
-                setEditingItem({});
+                setEditingItem({ role: 'end-user' });
                 setIsModalOpen(true);
             }}>
                 + הוסף משתמש חדש
@@ -269,16 +283,12 @@ const AdminPanelPage = () => {
                 <tbody>
                     {users.map(user => (
                         <tr key={user._id}>
-                            <td>{`${user.firstName} ${user.lastName}`}</td>
+                            <td>{`${user.firstName || ''} ${user.lastName || ''}`}</td>
                             <td>{user.email}</td>
-                            <td>{user.role === 'admin' ? 'מנהל' : 'משתמש רגיל'}</td>
+                            <td>{roleTranslations[user.role] || user.role}</td>
                             <td className="actions-cell">
-                                <button onClick={() => handleEdit(user)} className="edit-button">
-                                    ✏️
-                                </button>
-                                <button onClick={() => handleDelete(user._id)} className="delete-button">
-                                    🗑️
-                                </button>
+                                <button onClick={() => handleEdit(user)} className="edit-button">✏️</button>
+                                <button onClick={() => handleDelete(user._id)} className="delete-button">🗑️</button>
                             </td>
                         </tr>
                     ))}
@@ -392,6 +402,19 @@ const AdminPanelPage = () => {
                                 value={editingItem?.email || ''}
                                 onChange={handleInputChange}
                                 placeholder="הכנס כתובת אימייל"
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="password">סיסמה (אם רוצים לשנות)</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                value={editingItem?.password || ''}
+                                onChange={handleInputChange}
+                                placeholder={editingItem?._id ? "השאר ריק כדי לא לשנות" : "הכנס סיסמה"}
+                                required={!editingItem?._id}
                             />
                         </div>
                         <div className="form-group">
@@ -399,10 +422,11 @@ const AdminPanelPage = () => {
                             <select
                                 id="role"
                                 name="role"
-                                value={editingItem?.role || 'user'}
+                                value={editingItem?.role || 'end-user'}
                                 onChange={handleInputChange}
                             >
-                                <option value="user">משתמש רגיל</option>
+                                <option value="end-user">משתמש</option>
+                                <option value="manager">מנהל מערכת</option>
                                 <option value="admin">מנהל</option>
                             </select>
                         </div>
