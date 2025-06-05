@@ -540,7 +540,7 @@
 /* Search Controls */
 .search-controls {
     position: relative;
-    margin: 2rem 0;
+    /* margin: 2rem 0; */
 }
 
 .search-controls__main {
@@ -551,7 +551,7 @@
     padding: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    background: radial-gradient(black, transparent);
+    /* background: radial-gradient(black, transparent); */
 }
 
 .search-bar-container {
