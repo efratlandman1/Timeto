@@ -69,17 +69,21 @@
   display: flex;
   gap: 0.5rem;
   justify-content: center;
-  margin: 0.75rem 0;
+  margin: 1rem 0;
 }
 
 .star {
   cursor: pointer;
-  color: #ddd;
-  transition: color 0.2s ease;
+  color: #e0e0e0;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.star:hover {
+  transform: scale(1.1);
 }
 
 .star.filled {
-  color: #ff4d4d;
+  color: #ffd700;
 }
 
 .rating-text {
@@ -190,12 +194,17 @@
 }
 
 .feedback-page-feedback-stars {
-  margin-bottom: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  margin: 0.5rem 0;
 }
 
 .feedback-page-feedback-stars .star {
-  font-size: 0.85rem;
   cursor: default;
+}
+
+.feedback-page-feedback-stars .star:hover {
+  transform: none;
 }
 
 .feedback-page-feedback-comment {

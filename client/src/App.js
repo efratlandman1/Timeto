@@ -12,6 +12,7 @@ import FeedbackPage from './components/FeedbackPage';
 import BusinessProfilePage from './components/BusinessProfilePage';
 import SuggestItemPage from './components/SuggestItemPage';
 import MyFavoritesPage from './components/MyFavoritesPage';
+import TermsPage from './components/TermsPage';
 import { useDispatch } from 'react-redux';
 import { setUser } from './redux/userSlice';
 import { ToastContainer } from 'react-toastify';
@@ -64,6 +65,7 @@ function App() {
                     <Route path="/feedback-page" element={<FeedbackPage />} />
                     <Route path="/business-profile/:id" element={<BusinessProfilePage />} />
                     <Route path="/suggest" element={<SuggestItemPage />} />
+                    <Route path="/terms" element={<TermsPage />} />
                 </Routes>
                 <Accessibility />
             </div>
