@@ -12,7 +12,8 @@ import {
     FaMapMarkerAlt,
     FaChevronDown,
     FaSearch,
-    FaHome
+    FaHome,
+    FaCog
 } from "react-icons/fa";
 import "../styles/Header.css";
 import { useSelector } from 'react-redux';
@@ -199,6 +200,14 @@ const Header = () => {
                                     >
                                         <FaHeart />
                                         {t('header.myFavorites')}
+                                    </button>
+                                    <button 
+                                        className="dropdown-item" 
+                                        onClick={() => handleMenuItemClick("/admin")}
+                                        role="menuitem"
+                                    >
+                                        <FaCog />
+                                        {t('header.adminPanel')}
                                     </button>
                                     <button 
                                         className="dropdown-item" 
