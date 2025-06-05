@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaStar, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import '../styles/AdvancedSearchPage.css';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   const [categories, setCategories] = useState([]);
@@ -10,6 +11,18 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   const [services, setServices] = useState([]);
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Reset all selections when modal is opened
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedCategory('');
+      setSelectedServices([]);
+      setRating(0);
+      setHoveredRating(0);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -44,13 +57,16 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   }, [selectedCategory, categories]);
 
   useEffect(() => {
-    // Initialize filters from URL params
     if (filters) {
       if (filters.categoryName) {
         setSelectedCategory(filters.categoryName);
       }
       if (filters.services) {
-        setSelectedServices(Array.isArray(filters.services) ? filters.services : [filters.services]);
+        // Handle both string and array formats from URL
+        const servicesList = Array.isArray(filters.services) 
+          ? filters.services 
+          : filters.services.split(',');
+        setSelectedServices(servicesList);
       }
       if (filters.rating) {
         setRating(parseInt(filters.rating));
@@ -68,33 +84,41 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   };
 
   const handleSubmit = () => {
-    const params = new URLSearchParams(window.location.search);
+    // Get current URL search params
+    const currentParams = new URLSearchParams(location.search);
     
-    // Clear existing filter parameters
-    params.delete('categoryName');
-    params.delete('services');
-    params.delete('rating');
+    // Keep only the search query and sort parameters if they exist
+    const newParams = new URLSearchParams();
+    const searchQuery = currentParams.get('q');
+    const sortParam = currentParams.get('sort');
     
-    // Add new filter parameters
-    if (selectedCategory) {
-      params.set('categoryName', selectedCategory);
+    if (searchQuery) {
+      newParams.set('q', searchQuery);
+    }
+    if (sortParam) {
+      newParams.set('sort', sortParam);
     }
     
+    // Add new filter selections
+    if (selectedCategory) {
+      newParams.set('categoryName', selectedCategory);
+    }
+    
+    // Add all currently selected services (replacing any existing ones)
     selectedServices.forEach(service => {
-      params.append('services', service);
+      newParams.append('services', service);
     });
     
     if (rating > 0) {
-      params.set('rating', rating.toString());
+      newParams.set('rating', rating.toString());
     }
     
-    // Keep the search query if it exists
-    const searchQuery = params.get('q');
-    if (searchQuery) {
-      params.set('q', searchQuery);
-    }
+    // Navigate to new URL with updated parameters
+    navigate({
+      pathname: location.pathname,
+      search: newParams.toString()
+    });
     
-    window.location.search = params.toString();
     onClose();
   };
 
@@ -113,12 +137,6 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
               />
             ))}
           </div>
-          <span className="rating-display">
-            {hoveredRating || rating ? `${hoveredRating || rating} כוכבים ומעלה` : 'לא נבחר דירוג'}
-          </span>
-        </div>
-        <div className="rating-hint">
-          לחץ על הכוכבים כדי לבחור דירוג מינימלי
         </div>
       </div>
     );
@@ -128,54 +146,52 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="narrow-page-container">
-        <div className="narrow-page-content">
-          <button className="close-button" onClick={onClose}>
-            <FaTimes />
-          </button>
-          <h2>חיפוש מורחב</h2>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <button className="close-button" onClick={onClose}>
+          <FaTimes />
+        </button>
+        <h2>חיפוש מורחב</h2>
 
-          <div className="form-group">
-            <label>קטגוריה</label>
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-            >
-              <option value="">בחר קטגוריה</option>
-              {categories.map((cat) => (
-                <option key={cat._id} value={cat.name}>{cat.name}</option>
+        <div className="form-group">
+          <label>קטגוריה</label>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            <option value="">בחר קטגוריה</option>
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat.name}>{cat.name}</option>
+            ))}
+          </select>
+        </div>
+
+        {services.length > 0 && (
+          <div className="form-group tags-section">
+            <label>שירותים</label>
+            <div className="tags-container">
+              {services.map((service) => (
+                <div
+                  key={service._id}
+                  className={`tag selectable ${selectedServices.includes(service.name) ? 'selected' : ''}`}
+                  onClick={() => handleServiceClick(service.name)}
+                >
+                  {service.name}
+                </div>
               ))}
-            </select>
-          </div>
-
-          {services.length > 0 && (
-            <div className="form-group tags-section">
-              <label>שירותים</label>
-              <div className="tags-container">
-                {services.map((service) => (
-                  <div
-                    key={service._id}
-                    className={`tag selectable ${selectedServices.includes(service.name) ? 'selected' : ''}`}
-                    onClick={() => handleServiceClick(service.name)}
-                  >
-                    {service.name}
-                  </div>
-                ))}
-              </div>
             </div>
-          )}
-
-          <div className="form-group">
-            <label>דירוג מינימלי</label>
-            {renderStarRating()}
           </div>
+        )}
 
-          <div className="buttons-container">
-            <button className="modal-button secondary" onClick={onClose}>ביטול</button>
-            <button className="modal-button primary" onClick={handleSubmit}>
-              {selectedCategory || selectedServices.length > 0 || rating > 0 ? 'החל סינון' : 'סגור'}
-            </button>
-          </div>
+        <div className="form-group">
+          <label>דירוג מינימלי</label>
+          {renderStarRating()}
+        </div>
+
+        <div className="buttons-container">
+          <button className="modal-button secondary" onClick={onClose}>ביטול</button>
+          <button className="modal-button primary" onClick={handleSubmit}>
+            {selectedCategory || selectedServices.length > 0 || rating > 0 ? 'החל סינון' : 'סגור'}
+          </button>
         </div>
       </div>
     </div>

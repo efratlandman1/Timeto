@@ -4,7 +4,7 @@
  * @returns {number} - The rounded rating
  */
 export const roundRating = (rating) => {
-    if (!rating && rating !== 0) return 0;
+    if (!rating && rating !== 0) return 0; 
     return Math.round(rating);
 };
 
