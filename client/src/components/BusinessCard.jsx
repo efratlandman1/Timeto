@@ -231,9 +231,9 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                   <button
                     className="action-button admin edit-button"
                     onClick={(e) => handleEdit(e)}
+                    title="עריכה"
                   >
                     <FaPencilAlt />
-                    <span className="tooltip">עריכה</span>
                   </button>
                 )}
                 {localActive ? (
@@ -242,9 +242,9 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                       <button
                         className="action-button admin confirm-delete"
                         onClick={(e) => handleDeleteConfirmed(e)}
+                        title="אישור מחיקה"
                       >
                         <span>✔</span>
-                        <span className="tooltip">אישור מחיקה</span>
                       </button>
                       <button
                         className="action-button admin cancel-delete"
@@ -252,9 +252,9 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                           e.stopPropagation();
                           setConfirmDelete(false);
                         }}
+                        title="ביטול"
                       >
                         <span>✖</span>
-                        <span className="tooltip">ביטול</span>
                       </button>
                     </>
                   ) : (
@@ -264,18 +264,18 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                         e.stopPropagation();
                         setConfirmDelete(true);
                       }}
+                      title="מחיקה"
                     >
                       <FaTrash />
-                      <span className="tooltip">מחיקה</span>
                     </button>
                   )
                 ) : (
                   <button
                     className="action-button admin restore-button"
                     onClick={(e) => handleRestore(e)}
+                    title="שחזור"
                   >
                     <FaRecycle />
-                    <span className="tooltip">שחזור</span>
                   </button>
                 )}
               </>
@@ -284,23 +284,23 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                 <button 
                   className="action-button email"
                   onClick={(e) => handleActionClick(e, () => window.location.href = `mailto:${business.email}`)}
+                  title="שליחת אימייל"
                 >
                   <FaEnvelope />
-                  <span className="tooltip">שליחת אימייל</span>
                 </button>
                 <button 
                   className="action-button whatsapp"
                   onClick={(e) => handleActionClick(e, () => window.location.href = `https://wa.me/${business.phone}`)}
+                  title="וואטסאפ"
                 >
                   <FaWhatsapp />
-                  <span className="tooltip">וואטסאפ</span>
                 </button>
                 <button 
                   className="action-button phone"
                   onClick={(e) => handleActionClick(e, () => window.location.href = `tel:${business.phone}`)}
+                  title="התקשרות"
                 >
                   <FaPhone />
-                  <span className="tooltip">התקשרות</span>
                 </button>
               </>
             )}
