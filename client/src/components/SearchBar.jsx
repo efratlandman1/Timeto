@@ -84,6 +84,20 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Add blur effect when dropdown is shown
+  useEffect(() => {
+    if (showDropdown) {
+      document.body.classList.add('blurred');
+    } else {
+      document.body.classList.remove('blurred');
+    }
+    
+    // Cleanup when component unmounts
+    return () => {
+      document.body.classList.remove('blurred');
+    };
+  }, [showDropdown]);
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const q = params.get('q');
