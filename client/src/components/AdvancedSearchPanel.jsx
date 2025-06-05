@@ -71,7 +71,9 @@ const AdvancedSearchPanel = ({
   const SORT_OPTIONS = [
     { key: 'rating', label: 'דירוג גבוה' },
     { key: 'name', label: 'לפי א-ב' },
-    { key: 'distance', label: 'מרחק' }
+    { key: 'distance', label: 'מרחק' },
+    { key: 'newest', label: 'חדש ביותר' },
+    { key: 'popular_nearby', label: 'פופולרי באזורך' }
   ];
 
   const RATING_OPTIONS = [

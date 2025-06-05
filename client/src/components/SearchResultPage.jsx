@@ -12,7 +12,9 @@ const ITEMS_PER_PAGE = 8;
 const SORT_OPTIONS = {
     rating: 'דירוג גבוה',
     name: 'לפי א-ב',
-    distance: 'מרחק'
+    distance: 'מרחק',
+    newest: 'חדש ביותר',
+    popular_nearby: 'פופולרי באזורך'
 };
 
 const SearchResultPage = () => {

@@ -63,14 +63,36 @@ const MainPage = () => {
 
     const fetchBusinesses = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`);
-            const allBusinesses = response.data;
-            setBusinesses(allBusinesses);
-            setFilteredBusinesses(allBusinesses);
+            // Fetch new businesses
+            const newBusinessesResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
+                params: {
+                    sort: 'newest',
+                    limit: 2
+                }
+            });
+            console.log('New businesses response:', newBusinessesResponse.data);
+            setNewBusinesses(newBusinessesResponse.data.data);
 
-            setPopularBusinesses(getRandomBusinesses(allBusinesses, 8));
-            setNewBusinesses(getRandomBusinesses(allBusinesses, 4));
-            setRecommendedBusinesses(getRandomBusinesses(allBusinesses, 4));
+            // Fetch popular nearby businesses
+            const popularNearbyResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
+                params: {
+                    sort: 'popular_nearby',
+                    limit: 2
+                }
+            });
+            console.log('Popular nearby response:', popularNearbyResponse.data);
+            setPopularBusinesses(popularNearbyResponse.data.data);
+
+            // Fetch recommended businesses (using high rating as criteria)
+            const recommendedResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
+                params: {
+                    sort: 'rating',
+                    limit: 2
+                }
+            });
+            console.log('Recommended response:', recommendedResponse.data);
+            setRecommendedBusinesses(recommendedResponse.data.data);
+
         } catch (error) {
             console.error("Error fetching businesses:", error);
         }
@@ -224,7 +246,7 @@ const MainPage = () => {
                     <div className="business-row">
                         <div className="business-row-header">
                             <h3>עסקים חדשים</h3>
-                            <a href="/search-results?filter=new" className="view-all">הצג הכל</a>
+                            <a href="/search-results?sort=newest" className="view-all">הצג הכל</a>
                         </div>
                         <div className="card-slider">
                             {newBusinesses.map((business) => (
@@ -236,7 +258,7 @@ const MainPage = () => {
                     <div className="business-row">
                         <div className="business-row-header">
                             <h3>פופולרי באזורך</h3>
-                            <a href="/search-results?filter=popular" className="view-all">הצג הכל</a>
+                            <a href="/search-results?sort=popular_nearby" className="view-all">הצג הכל</a>
                         </div>
                         <div className="card-slider">
                             {recommendedBusinesses.map((business) => (
@@ -248,7 +270,7 @@ const MainPage = () => {
                     <div className="business-row">
                         <div className="business-row-header">
                             <h3>עסקים מומלצים</h3>
-                            <a href="/search-results?filter=recommended" className="view-all">הצג הכל</a>
+                            <a href="/search-results?sort=rating" className="view-all">הצג הכל</a>
                         </div>
                         <div className="card-slider">
                             {popularBusinesses.map((business) => (
