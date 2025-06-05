@@ -4,11 +4,14 @@ const Service = require('../models/service');
 exports.getAllServices = async (req, res) => {
   try {
     const services = await Service.find({});
+
+
     res.json(services);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching services', error });
   }
 };
+
 
 // קבלת שירותים לפי קטגוריה
 exports.getServicesByCategory = async (req, res) => {
