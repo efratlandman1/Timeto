@@ -52,7 +52,7 @@ const SearchResultPage = () => {
         const sort = params.get('sort') || 'rating';
 
         for (const [key, value] of params.entries()) {
-            if (key !== 'sort') {
+            if (key !== 'sort' && key !== 'q') {
                 if (key in filters) {
                     if (Array.isArray(filters[key])) {
                         filters[key].push(value);
@@ -153,7 +153,7 @@ const SearchResultPage = () => {
                 <div className="search-controls">
                     <div className="search-controls__main">
                         <div className="search-bar-container">
-                            <SearchBar />
+                            <SearchBar isMainPage={false} />
                         </div>
                         <div className="search-controls__actions">
                             <button 
