@@ -11,7 +11,8 @@ const matchPath = (path, routePattern) => {
 const jwtAuthMiddleware = (req, res, next) => {
     const openRoutes = [
         '/api/v1/login',
-        '/api/v1/register',
+        // '/api/v1/register',
+        '/api/v1/users/register',
         '/api/v1/businesses',
         '/api/v1/categories',
         '/api/v1/services',
@@ -26,10 +27,13 @@ const jwtAuthMiddleware = (req, res, next) => {
     // ) {  //delete!!!!!!!!!!!!!!
     //     return next(); // Allow access to open routes
     // }
+    console.log("req.path",req.path);
     const isOpen = openRoutes.some((route) => matchPath(req.path, route));
+    console.log("isOpen",isOpen);
     if (isOpen) {
         return next(); // פתוח – לא צריך טוקן
     }
+    
 
 
     const token = req.header('Authorization')?.split(' ')[1]; // Expect "Bearer <token>"
