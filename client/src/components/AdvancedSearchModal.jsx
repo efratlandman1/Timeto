@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaStar, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import '../styles/AdvancedSearchPage.css';
@@ -13,6 +13,7 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   const [hoveredRating, setHoveredRating] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+  const prevCategoryRef = useRef('');
 
   // Reset all selections when modal is opened
   useEffect(() => {
@@ -24,6 +25,13 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (selectedCategory && prevCategoryRef.current !== selectedCategory) {
+      setSelectedServices([]);  // מנקה שירותים כשקטגוריה משתנה
+      prevCategoryRef.current = selectedCategory;
+    }
+  }, [selectedCategory]);
+  
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -49,25 +57,38 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
             setServices([]);
           }
         };
+        // setSelectedServices([]);
         fetchServices();
       }
     } else {
       setServices([]);
     }
   }, [selectedCategory, categories]);
-
+ 
+  useEffect(() => {
+    if (services.length > 0 && filters?.services) {
+      const servicesList = Array.isArray(filters.services) 
+        ? filters.services 
+        : filters.services.split(',');
+        
+      // בודקים שרק השירותים שקיימים באמת ב-services יישארו
+      const validServices = servicesList.filter(s => services.some(service => service.name === s));
+      setSelectedServices(validServices);
+    }
+  }, [services, filters]);
+  
   useEffect(() => {
     if (filters) {
       if (filters.categoryName) {
         setSelectedCategory(filters.categoryName);
       }
-      if (filters.services) {
-        // Handle both string and array formats from URL
-        const servicesList = Array.isArray(filters.services) 
-          ? filters.services 
-          : filters.services.split(',');
-        setSelectedServices(servicesList);
-      }
+      // if (filters.services) {
+      //   // Handle both string and array formats from URL
+      //   const servicesList = Array.isArray(filters.services) 
+      //     ? filters.services 
+      //     : filters.services.split(',');
+      //   setSelectedServices(servicesList);
+      // }
       if (filters.rating) {
         setRating(parseInt(filters.rating));
       }
