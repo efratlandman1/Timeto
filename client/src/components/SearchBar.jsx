@@ -85,23 +85,48 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
   }, []);
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get('q');
+    if (q) {
+      setSearchQuery(q);
+      if (isMainPage) {
+        if (searchTimeoutRef.current) {
+          clearTimeout(searchTimeoutRef.current);
+        }
+        searchTimeoutRef.current = setTimeout(() => {
+          setPage(1);
+          fetchResults(q, 1);
+        }, DEBOUNCE_DELAY);
+      }
+    }
+  }, [location.search, isMainPage, fetchResults]);
+
+  useEffect(() => {
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
 
-    searchTimeoutRef.current = setTimeout(() => {
-      if (searchQuery.trim()) {
-        setPage(1);
-        fetchResults(searchQuery, 1);
-      }
-    }, DEBOUNCE_DELAY);
+    const params = new URLSearchParams(location.search);
+    const urlQuery = params.get('q');
+    
+    if (searchQuery !== urlQuery) {
+      searchTimeoutRef.current = setTimeout(() => {
+        if (searchQuery.trim()) {
+          setPage(1);
+          fetchResults(searchQuery, 1);
+        } else {
+          setResults([]);
+          setShowDropdown(false);
+        }
+      }, DEBOUNCE_DELAY);
+    }
 
     return () => {
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [searchQuery, fetchResults]);
+  }, [searchQuery, location.search, fetchResults]);
 
   useEffect(() => {
     if (highlightedIndex >= 0 && itemRefs.current[highlightedIndex]) {
@@ -111,14 +136,6 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
       });
     }
   }, [highlightedIndex]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const q = params.get('q');
-    if (q) {
-      setSearchQuery(q);
-    }
-  }, [location.search]);
 
   // Handle scroll for infinite loading
   useEffect(() => {
@@ -313,6 +330,21 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
     );
   };
 
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    
+    // If we're on the results page and the input is cleared
+    if (!isMainPage && !value.trim()) {
+      const params = new URLSearchParams(location.search);
+      params.delete('q');
+      navigate({ 
+        pathname: location.pathname,
+        search: params.toString()
+      });
+    }
+  };
+
   return (
     <div 
       className={`search-bar-container ${isMainPage ? 'main-page' : 'results-page'}`}
@@ -325,10 +357,10 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
           className="search-input"
           placeholder="חפש עסק או שירות..."
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={handleInputChange}
           onFocus={() => {
-            if (searchQuery.trim() && results.length > 0) {
-              setShowDropdown(true);
+            if (isMainPage || document.activeElement === inputRef.current) {
+              setShowDropdown(results.length > 0);
             }
           }}
           onKeyDown={handleKeyDown}
