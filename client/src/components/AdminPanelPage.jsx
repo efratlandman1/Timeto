@@ -3,6 +3,7 @@ import { FaTags, FaCogs, FaUsers } from 'react-icons/fa';
 import axios from 'axios';
 import '../styles/AdminPanelPage.css';
 import { toast } from 'react-toastify';
+import {getToken} from "../utils/auth";
 
 const AdminPanelPage = () => {
     const [activeTab, setActiveTab] = useState('categories');
@@ -19,23 +20,32 @@ const AdminPanelPage = () => {
         fetchData();
     }, [activeTab]);
 
+    // const getToken = () => localStorage.getItem('token');
+
     const fetchData = async () => {
         setIsLoading(true);
         try {
+            const token = getToken();
+            const config = {
+                headers: { Authorization: `Bearer ${token}` }
+            };
             switch (activeTab) {
                 case 'categories':
-                    const categoriesResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
+                    const categoriesResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`, config);
                     setCategories(categoriesResponse.data);
                     break;
                 case 'services':
-                    const [servicesRes] = await Promise.all([
-                        axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/services`)
-                    ]);
+                     const servicesRes = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/services`, config);
                     setServices(servicesRes.data);
+                    // Fetch categories as well for the dropdown
+                    const catRes = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`, config);
+                    setCategories(catRes.data);
                     break;
                 case 'users':
-                    const usersResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/users`);
+                    const usersResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/users`, config);
                     setUsers(usersResponse.data);
+                    break;
+                default:
                     break;
             }
         } catch (error) {
@@ -62,7 +72,7 @@ const AdminPanelPage = () => {
         }
     };
 
-    const handleEdit = async (item) => {
+    const handleEdit = (item) => {
         setEditingItem(item);
         setPreviewUrl(item.logo || '');
         setIsModalOpen(true);
@@ -75,14 +85,8 @@ const AdminPanelPage = () => {
                     <div className="delete-confirmation">
                         <p>האם אתה בטוח שברצונך למחוק פריט זה?</p>
                         <div className="confirmation-buttons">
-                            <button onClick={() => {
-                                toast.dismiss(toastId);
-                                resolve(true);
-                            }}>כן, מחק</button>
-                            <button onClick={() => {
-                                toast.dismiss(toastId);
-                                resolve(false);
-                            }}>ביטול</button>
+                            <button onClick={() => { toast.dismiss(toastId); resolve(true); }}>כן, מחק</button>
+                            <button onClick={() => { toast.dismiss(toastId); resolve(false); }}>ביטול</button>
                         </div>
                     </div>,
                     { autoClose: false, closeButton: false }
@@ -98,45 +102,51 @@ const AdminPanelPage = () => {
         if (!confirmResult) return;
 
         try {
-            switch (activeTab) {
-                case 'categories':
-                    await axios.delete(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories/${id}`);
-                    break;
-                case 'services':
-                    await axios.delete(`${process.env.REACT_APP_API_DOMAIN}/api/v1/services/${id}`);
-                    break;
-                case 'users':
-                    await axios.delete(`${process.env.REACT_APP_API_DOMAIN}/api/v1/users/${id}`);
-                    break;
-            }
+            const token = getToken();
+            const config = {
+                headers: { Authorization: `Bearer ${token}` }
+            };
+            const endpoint = `${process.env.REACT_APP_API_DOMAIN}/api/v1/${activeTab}/${id}`;
+            await axios.delete(endpoint, config);
             fetchData();
         } catch (error) {
             console.error('Error deleting item:', error);
-            toast.error('שגיאה במחיקת הפריט');
+            toast.error(error.response?.data?.message || 'שגיאה במחיקת הפריט');
         }
     };
 
     const handleSave = async () => {
-        try {
-            const formData = new FormData();
+        const token = getToken();
+        let payload;
+        let config = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        };
+
+        if (activeTab === 'categories') {
+            payload = new FormData();
             Object.keys(editingItem).forEach(key => {
                 if (key === 'logo' && editingItem[key] instanceof File) {
-                    formData.append('logo', editingItem[key]);
-                } else if (key !== 'logo') {
-                    formData.append(key, editingItem[key]);
+                    payload.append('logo', editingItem[key]);
+                } else if (editingItem[key] != null) {
+                    payload.append(key, editingItem[key]);
                 }
             });
+            config.headers['Content-Type'] = 'multipart/form-data';
+        } else {
+            // For services and users, send as JSON
+            payload = { ...editingItem };
+            config.headers['Content-Type'] = 'application/json';
+        }
 
+        try {
             const endpoint = `${process.env.REACT_APP_API_DOMAIN}/api/v1/${activeTab}`;
             if (editingItem._id) {
-                await axios.put(`${endpoint}/${editingItem._id}`, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
+                await axios.put(`${endpoint}/${editingItem._id}`, payload, config);
                 toast.success('הפריט עודכן בהצלחה');
             } else {
-                await axios.post(endpoint, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
+                await axios.post(endpoint, payload, config);
                 toast.success('הפריט נוסף בהצלחה');
             }
             setIsModalOpen(false);
@@ -146,10 +156,10 @@ const AdminPanelPage = () => {
             fetchData();
         } catch (error) {
             console.error('Error saving item:', error);
-            toast.error('שגיאה בשמירת הפריט');
+            toast.error(error.response?.data?.message || 'שגיאה בשמירת הפריט');
         }
     };
-
+    
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setEditingItem(prev => ({
