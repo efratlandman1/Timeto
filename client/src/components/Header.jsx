@@ -13,7 +13,8 @@ import {
     FaChevronDown,
     FaSearch,
     FaHome,
-    FaCog
+    FaCog,
+    FaIdCard
 } from "react-icons/fa";
 import "../styles/Header.css";
 import { useSelector } from 'react-redux';
@@ -177,7 +178,6 @@ const Header = () => {
                             >
                                 <FaUserCircle />
                                 <span>{greeting} <span className="username">{username}</span></span>
-                                {/* <FaChevronDown style={{ fontSize: '12px', marginRight: '4px' }} /> */}
                             </button>
                             {showUserMenu && (
                                 <div 
@@ -185,6 +185,14 @@ const Header = () => {
                                     role="menu"
                                     aria-labelledby="user-menu-button"
                                 >
+                                    <button 
+                                        className="dropdown-item" 
+                                        onClick={() => handleMenuItemClick("/profile")}
+                                        role="menuitem"
+                                    >
+                                        <FaIdCard />
+                                        {"פרופיל אישי"}  
+                                    </button>
                                     <button 
                                         className="dropdown-item" 
                                         onClick={() => handleMenuItemClick("/my-businesses")}
