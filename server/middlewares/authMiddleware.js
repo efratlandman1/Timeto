@@ -17,7 +17,8 @@ const jwtAuthMiddleware = (req, res, next) => {
         '/api/v1/businesses/:id',
         '/api/v1/services/byCategory/:categoryId',
         '/api/v1/feedbacks/business/:businessId',
-        '/api/v1/suggestions' //check how to limit to post only
+        '/api/v1/suggestions', //check how to limit to post only
+        '/api/v1/stats/home'
     ];
 
     // if (openRoutes.includes(req.path) 

@@ -10,6 +10,7 @@ import {
 import { setSelectedBusiness } from '../redux/businessSlice';
 import '../styles/businessCard.css';
 import { getToken } from "../utils/auth";
+import { roundRating, renderStars } from '../utils/ratingUtils';
 
 const BusinessCard = ({ business, fromUserBusinesses }) => {
   const dispatch = useDispatch();
@@ -148,15 +149,11 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
   };
 
   const renderRatingStars = (rating) => {
-    const stars = [];
-    for (let i = 0; i < 5; i++) {
-      stars.push(
-        <span key={i}>
-          {i < Math.floor(rating) ? <FaStar /> : <FaRegStar />}
-        </span>
-      );
-    }
-    return stars;
+    return renderStars(
+      rating,
+      <FaStar />,
+      <FaRegStar />
+    );
   };
 
   const isBusinessOpen = () => {
@@ -217,11 +214,15 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
         <div className="business-card-footer">
           <div className="business-card-rating">
             <div className="rating-stars">
-              {renderRatingStars(business.rating || 0)}
+              {renderRatingStars(business.rating)}
             </div>
-            <span className="rating-number">
-              {business.rating ? business.rating.toFixed(1) : 'חדש'}
-            </span>
+            {business.rating !== null && business.rating !== undefined ? (
+              <span className="rating-number">
+                {roundRating(business.rating)}
+              </span>
+            ) : (
+              <span className="rating-number new">חדש</span>
+            )}
           </div>
 
           <div className="business-card-actions">
