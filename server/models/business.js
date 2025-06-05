@@ -30,6 +30,8 @@ const businessSchema = new mongoose.Schema({
       ]
     }
   ]
+}, {
+    timestamps: true // This will add and manage createdAt and updatedAt fields
 });
 
 const Business = mongoose.model('businesses', businessSchema);

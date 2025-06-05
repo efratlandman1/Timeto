@@ -113,24 +113,31 @@ exports.getItems = async (req, res) => {
     const query = {};
     query.active = true;
     const SORT_FIELDS = {
-            rating: { rating: -1 },
-            name: { name: 1 },
-            distance: { distance: 1 }
-        };
+        rating: { rating: -1 },
+        name: { name: 1 },
+        distance: { distance: 1 },
+        newest: { createdAt: -1 },
+        popular_nearby: [['distance', 1], ['rating', -1]]
+    };
     const sort = req.query.sort || 'rating';
-    const sortOption = SORT_FIELDS[sort] || { rating: -1 };
+    let sortOption = SORT_FIELDS[sort] || { rating: -1 }; // Default to rating if invalid sort option
+
+    // Handle compound sorting for popular_nearby
+    if (sort === 'popular_nearby') {
+        sortOption = Object.fromEntries(SORT_FIELDS[sort]);
+    }
     
-            // === חיפוש חופשי אם קיים q ===
-        if (q && q.trim().length > 0) {
-            const regex = new RegExp(q, 'i'); // Case-insensitive
+    // === חיפוש חופשי אם קיים q ===
+    if (q && q.trim().length > 0) {
+        const regex = new RegExp(q, 'i'); // Case-insensitive
 
-            const matchingCategories = await Category.find({ name: regex });
-            const categoryIds = matchingCategories.map(cat => cat._id);
+        const matchingCategories = await Category.find({ name: regex });
+        const categoryIds = matchingCategories.map(cat => cat._id);
 
-            const matchingServices = await Service.find({ name: regex });
-            const matchingServiceIds = matchingServices.map(service => service._id);
+        const matchingServices = await Service.find({ name: regex });
+        const matchingServiceIds = matchingServices.map(service => service._id);
 
-            const searchConditions = {
+        const searchConditions = {
             $and: [
                 { active: true }, 
                 {
@@ -146,96 +153,92 @@ exports.getItems = async (req, res) => {
             ]
         };
 
-            const page = Number(req.query.page) || 1;
-            const limit = Number(req.query.limit) || DEFAULT_ITEMS_PER_PAGE;
-            const skip = (page - 1) * limit;
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || DEFAULT_ITEMS_PER_PAGE;
+        const skip = (page - 1) * limit;
 
-            const [businesses, total] = await Promise.all([
-                Business.find(searchConditions)
-                    .populate('categoryId')
-                    .populate('services')
-                    .sort(sortOption)
-                    .skip(skip)
-                    .limit(limit)
-                    .populate('categoryId', 'name'),
-                Business.countDocuments(searchConditions)
-            ]);
+        const [businesses, total] = await Promise.all([
+            Business.find(searchConditions)
+                .populate('categoryId')
+                .populate('services')
+                .sort(sortOption)
+                .skip(skip)
+                .limit(limit)
+                .populate('categoryId', 'name'),
+            Business.countDocuments(searchConditions)
+        ]);
 
-            const results = businesses.map(business => {
-                const businessObj = business.toObject();
-                businessObj.categoryName = business.categoryId?.name || '';
-                return businessObj;
-            });
+        const results = businesses.map(business => {
+            const businessObj = business.toObject();
+            businessObj.categoryName = business.categoryId?.name || '';
+            return businessObj;
+        });
 
-            return res.json({
-                    data: results,
-                    pagination: {
-                        total,
-                        page,
-                        limit,
-                        totalPages: Math.ceil(total / limit),
-                        hasMore: page < Math.ceil(total / limit)
-                    }
-                });
-        }
+        return res.json({
+            data: results,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+                hasMore: page < Math.ceil(total / limit)
+            }
+        });
+    }
+
     // === סינון רגיל אם אין q ===
     if (categoryName) {
-      const category = await Category.findOne({ name: categoryName });
-      if (category) {
-        query.categoryId = category._id;
-      } else {
-        return res.status(404).json({ message: "Category not found" });
-      }
+        const category = await Category.findOne({ name: categoryName });
+        if (category) {
+            query.categoryId = category._id;
+        } else {
+            return res.status(404).json({ message: "Category not found" });
+        }
     }
 
     if (services) {
-      let serviceList = Array.isArray(services) ? services : [services];
-      // console.log("serviceList:",serviceList)
-      // נבדוק אם זה מזהים או מחרוזות
-      const objectIds = serviceList.filter(id => mongoose.Types.ObjectId.isValid(id));
-      // console.log("objectIds:",objectIds)
+        let serviceList = Array.isArray(services) ? services : [services];
+        const objectIds = serviceList.filter(id => mongoose.Types.ObjectId.isValid(id));
 
-      if (objectIds.length === serviceList.length) {
-        //  console.log("Services from redux:")
-        query.services = { $in: objectIds.map(id => new mongoose.Types.ObjectId(id)) };
-      } else {
-        // המרה מ-name ל-ID
-        // console.log("Services from db:")
-        const serviceDocs = await Service.find({ name: { $in: serviceList } });
-        // console.log("serviceDocs:",serviceDocs)
-        const ids = serviceDocs.map(s => s._id);
-        // console.log("ids:",ids)
-        if (ids.length > 0) query.services = { $in : ids };
-      }
+        if (objectIds.length === serviceList.length) {
+            query.services = { $in: objectIds.map(id => new mongoose.Types.ObjectId(id)) };
+        } else {
+            const serviceDocs = await Service.find({ name: { $in: serviceList } });
+            const ids = serviceDocs.map(s => s._id);
+            if (ids.length > 0) query.services = { $in: ids };
+        }
     }
 
     if (rating) {
-      query.rating = { $gte: Number(rating) };
+        query.rating = { $gte: Number(rating) };
     }
 
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || DEFAULT_ITEMS_PER_PAGE;
     const skip = (page - 1) * limit;
 
-      console.log("query:",query)
+    console.log("query:", query);
+    console.log("sortOption:", sortOption);
+
     const [businesses, total] = await Promise.all([
-      Business.find(query)
-        .populate('categoryId')
-        .populate('services')
-        .skip(skip)
-        .limit(limit),
-      Business.countDocuments(query),
+        Business.find(query)
+            .populate('categoryId')
+            .populate('services')
+            .sort(sortOption)  // Apply the sort option here
+            .skip(skip)
+            .limit(limit),
+        Business.countDocuments(query),
     ]);
 
     res.json({
-      data: businesses,
-      pagination: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-        hasMore: page < Math.ceil(total / limit)
-      },
+        data: businesses,
+        pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+            hasMore: page < Math.ceil(total / limit)
+        },
     });
 
   } catch (err) {
