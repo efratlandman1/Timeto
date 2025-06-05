@@ -26,8 +26,7 @@ exports.createFeedback = async (req, res) => {
       user_id: new mongoose.Types.ObjectId(userId),
       business_id: new mongoose.Types.ObjectId(business_id),
       rating,
-      comment,
-      created_at: new Date()
+      comment
     });
 
     await feedback.save();
@@ -43,20 +42,19 @@ exports.createFeedback = async (req, res) => {
   }
 };
 
-
-
 exports.getFeedbacksForBusiness = async (req, res) => {
   try {
     const feedbacks = await Feedback.find({ business_id: req.params.businessId })
       .populate("user_id", "nickname")
       .populate("business_id", "name logo")
-      .sort({ created_at: -1 });
+      .sort({ createdAt: -1 });
 
     res.json(feedbacks);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 exports.deleteFeedback = async (req, res) => {
   try {
     const token = req.headers['authorization']?.split(' ')[1];

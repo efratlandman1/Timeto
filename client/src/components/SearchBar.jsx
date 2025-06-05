@@ -46,10 +46,14 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
     const handleClickOutside = (event) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
         setShowDropdown(false);
+        document.body.classList.remove('blurred');
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.classList.remove('blurred');
+    };
   }, []);
 
   useEffect(() => {
@@ -66,6 +70,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
       } else {
         setResults([]);
         setShowDropdown(false);
+        document.body.classList.remove('blurred');
       }
     }, 300);
     return () => clearTimeout(delayDebounce);
@@ -261,7 +266,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
   };
 
   return (
-    <div className={`search-bar-container ${isMainPage ? 'main-page' : 'results-page'}`}>
+    <div className={`search-bar-container ${isMainPage ? 'main-page' : 'results-page'}`} ref={wrapperRef}>
       <form onSubmit={handleSubmit} className="search-bar-wrapper">
         <input
           type="text"
@@ -270,9 +275,11 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => {
-            if (searchQuery.trim() && results.length > 0) setShowDropdown(true);
+            if (searchQuery.trim() && results.length > 0) {
+              setShowDropdown(true);
+              document.body.classList.add('blurred');
+            }
           }}
-          onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
           onKeyDown={handleKeyDown}
           aria-haspopup="listbox"
           aria-expanded={showDropdown}

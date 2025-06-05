@@ -161,7 +161,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
                         <div key={idx} className="feedback-page-feedback-item">
                             <div className="feedback-page-feedback-header">
                             <span className="feedback-name">{fb.user_id?.nickname || 'אנונימי'}</span>
-                            <span className="feedback-date">{new Date(fb.created_at).toLocaleDateString()}</span>
+                            <span className="feedback-date">{new Date(fb.createdAt).toLocaleDateString()}</span>
                             </div>
                             <div className="feedback-page-feedback-stars">
                                 {[1, 2, 3, 4, 5].map(i => (
