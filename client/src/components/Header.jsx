@@ -176,7 +176,7 @@ const Header = () => {
                             >
                                 <FaUserCircle />
                                 <span>{greeting} <span className="username">{username}</span></span>
-                                <FaChevronDown style={{ fontSize: '12px', marginRight: '4px' }} />
+                                {/* <FaChevronDown style={{ fontSize: '12px', marginRight: '4px' }} /> */}
                             </button>
                             {showUserMenu && (
                                 <div 

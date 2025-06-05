@@ -74,7 +74,7 @@ const MainPage = () => {
             const newBusinessesResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
                 params: {
                     sort: 'newest',
-                    limit: 2
+                    limit: 3
                 }
             });
             console.log('New businesses response:', newBusinessesResponse.data);
@@ -84,7 +84,7 @@ const MainPage = () => {
             const popularNearbyResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
                 params: {
                     sort: 'popular_nearby',
-                    limit: 2
+                    limit: 3
                 }
             });
             console.log('Popular nearby response:', popularNearbyResponse.data);
@@ -94,7 +94,7 @@ const MainPage = () => {
             const recommendedResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
                 params: {
                     sort: 'rating',
-                    limit: 2
+                    limit: 3
                 }
             });
             console.log('Recommended response:', recommendedResponse.data);
@@ -210,7 +210,7 @@ const MainPage = () => {
                                     <div className="stat-content">
                                         <div className="stat-number">
                                             {!isStatsLoading && stats.users !== null && (
-                                                <>{stats.users > 0 && '+'}{stats.users}</>
+                                                <>{stats.users > 0 && '+ '}{stats.users}</>
                                             )}
                                         </div>
                                         <div className="stat-label">משתמשים רשומים</div>
@@ -223,7 +223,7 @@ const MainPage = () => {
                                     <div className="stat-content">
                                         <div className="stat-number">
                                             {!isStatsLoading && stats.reviews !== null && (
-                                                <>{stats.reviews > 0 && '+'}{stats.reviews}</>
+                                                <>{stats.reviews > 0 && '+ '}{stats.reviews}</>
                                             )}
                                         </div>
                                         <div className="stat-label">ביקורות מאומתות</div>
@@ -236,7 +236,7 @@ const MainPage = () => {
                                     <div className="stat-content">
                                         <div className="stat-number">
                                             {!isStatsLoading && stats.businesses !== null && (
-                                                <>{stats.businesses > 0 && '+'}{stats.businesses}</>
+                                                <>{stats.businesses > 0 && '+ '}{stats.businesses}</>
                                             )}
                                         </div>
                                         <div className="stat-label">עסקים רשומים</div>

@@ -244,12 +244,16 @@
     font-weight: 700;
     color: #333;
     line-height: 1;
+    text-align: center;
+
 }
 
 .stat-label {
     font-size: 14px;
     color: #666;
     margin-top: 4px;
+      text-align: center;
+
 }
 
 /* Update star colors */
