@@ -30,6 +30,7 @@ const Header = () => {
     const userMenuRef = useRef(null);
     const userButtonRef = useRef(null);
     const loginUser = useSelector(state => state.user.user);
+    const isAdmin = loginUser && loginUser.role === 'admin';
     const { t, i18n } = useTranslation();
 
     const getGreeting = () => {
@@ -209,14 +210,16 @@ const Header = () => {
                                         <FaHeart />
                                         {t('header.myFavorites')}
                                     </button>
-                                    <button 
-                                        className="dropdown-item" 
-                                        onClick={() => handleMenuItemClick("/admin")}
-                                        role="menuitem"
-                                    >
-                                        <FaCog />
-                                        {t('header.adminPanel')}
-                                    </button>
+                                    {isAdmin && (
+                                        <button 
+                                            className="dropdown-item" 
+                                            onClick={() => handleMenuItemClick("/admin")}
+                                            role="menuitem"
+                                        >
+                                            <FaCog />
+                                            {t('header.adminPanel')}
+                                        </button>
+                                    )}
                                     <button 
                                         className="dropdown-item" 
                                         onClick={handleLogout}

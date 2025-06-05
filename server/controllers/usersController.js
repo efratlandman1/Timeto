@@ -21,13 +21,14 @@ exports.registerUser = async (req, res) => {
             email: req.body.email,
             phone: req.body.phone,
             nickname: req.body.nickname,
-            password: hashedPassword
+            password: hashedPassword,
+            role: req.body.role || 'end-user'
         });
 
         const savedUser = await newUser.save();
 
         // יצירת JWT
-        const token = jwt.sign({ userId: savedUser._id, email: savedUser.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: savedUser._id, email: savedUser.email, role: savedUser.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         // שליחת טוקן + מידע על המשתמש (בלי הסיסמה)
         const { password, ...userData } = savedUser.toObject();
