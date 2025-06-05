@@ -149,96 +149,98 @@ const MainPage = () => {
                             <SearchBar />
                         </div>
 
-                        {/* Banner */}
-                        <div className="banner-container" onClick={handleSlideClick}>
-                            {bannerImages.map((src, index) => (
-                                <div key={index} 
-                                    className={`banner-slide ${index === currentSlide ? 'active' : ''}`}>
-                                    <img 
-                                        src={`${process.env.REACT_APP_API_DOMAIN}${src}`} 
-                                        alt={`Banner ${index + 1}`} 
-                                        className="banner-image" 
-                                    />
-                                </div>
-                            ))}
-                            
-                            {/* Story Indicators */}
-                            <div className="story-indicators">
-                                {bannerImages.map((_, index) => (
-                                    <div 
-                                        key={index}
-                                        className={`story-indicator ${index === currentSlide ? 'active' : ''} 
-                                                  ${index < currentSlide ? 'viewed' : ''}`}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleIndicatorClick(index);
-                                        }}
-                                    >
-                                        <div className="indicator-progress"></div>
+                        <div className="banner-stats-container">
+                            {/* Banner */}
+                            <div className="banner-container" onClick={handleSlideClick}>
+                                {bannerImages.map((src, index) => (
+                                    <div key={index} 
+                                        className={`banner-slide ${index === currentSlide ? 'active' : ''}`}>
+                                        <img 
+                                            src={`${process.env.REACT_APP_API_DOMAIN}${src}`} 
+                                            alt={`Banner ${index + 1}`} 
+                                            className="banner-image" 
+                                        />
                                     </div>
                                 ))}
+                                
+                                {/* Story Indicators */}
+                                <div className="story-indicators">
+                                    {bannerImages.map((_, index) => (
+                                        <div 
+                                            key={index}
+                                            className={`story-indicator ${index === currentSlide ? 'active' : ''} 
+                                                      ${index < currentSlide ? 'viewed' : ''}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleIndicatorClick(index);
+                                            }}
+                                        >
+                                            <div className="indicator-progress"></div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Navigation Arrows */}
+                                <button 
+                                    className="banner-nav prev" 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handlePrevSlide();
+                                    }}
+                                >
+                                    <FaChevronRight />
+                                </button>
+                                <button 
+                                    className="banner-nav next" 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleNextSlide();
+                                    }}
+                                >
+                                    <FaChevronLeft />
+                                </button>
                             </div>
 
-                            {/* Navigation Arrows */}
-                            <button 
-                                className="banner-nav prev" 
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handlePrevSlide();
-                                }}
-                            >
-                                <FaChevronRight />
-                            </button>
-                            <button 
-                                className="banner-nav next" 
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleNextSlide();
-                                }}
-                            >
-                                <FaChevronLeft />
-                            </button>
-                        </div>
-
-                        {/* Stats */}
-                        <div className="stats-container">
-                            <div className="stat-box">
-                                <div className="stat-icon-wrapper">
-                                    <FaUserFriends className="stat-icon" />
-                                </div>
-                                <div className="stat-content">
-                                    <div className="stat-number">
-                                        {!isStatsLoading && stats.users !== null && (
-                                            <>{stats.users > 0 && '+'}{stats.users}</>
-                                        )}
+                            {/* Stats */}
+                            <div className="stats-container">
+                                <div className="stat-box">
+                                    <div className="stat-icon-wrapper">
+                                        <FaUserFriends className="stat-icon" />
                                     </div>
-                                    <div className="stat-label">משתמשים רשומים</div>
-                                </div>
-                            </div>
-                            <div className="stat-box">
-                                <div className="stat-icon-wrapper">
-                                    <FaStar className="stat-icon" />
-                                </div>
-                                <div className="stat-content">
-                                    <div className="stat-number">
-                                        {!isStatsLoading && stats.reviews !== null && (
-                                            <>{stats.reviews > 0 && '+'}{stats.reviews}</>
-                                        )}
+                                    <div className="stat-content">
+                                        <div className="stat-number">
+                                            {!isStatsLoading && stats.users !== null && (
+                                                <>{stats.users > 0 && '+'}{stats.users}</>
+                                            )}
+                                        </div>
+                                        <div className="stat-label">משתמשים רשומים</div>
                                     </div>
-                                    <div className="stat-label">ביקורות מאומתות</div>
                                 </div>
-                            </div>
-                            <div className="stat-box">
-                                <div className="stat-icon-wrapper">
-                                    <FaCalendarCheck className="stat-icon" />
-                                </div>
-                                <div className="stat-content">
-                                    <div className="stat-number">
-                                        {!isStatsLoading && stats.businesses !== null && (
-                                            <>{stats.businesses > 0 && '+'}{stats.businesses}</>
-                                        )}
+                                <div className="stat-box">
+                                    <div className="stat-icon-wrapper">
+                                        <FaStar className="stat-icon" />
                                     </div>
-                                    <div className="stat-label">עסקים רשומים</div>
+                                    <div className="stat-content">
+                                        <div className="stat-number">
+                                            {!isStatsLoading && stats.reviews !== null && (
+                                                <>{stats.reviews > 0 && '+'}{stats.reviews}</>
+                                            )}
+                                        </div>
+                                        <div className="stat-label">ביקורות מאומתות</div>
+                                    </div>
+                                </div>
+                                <div className="stat-box">
+                                    <div className="stat-icon-wrapper">
+                                        <FaCalendarCheck className="stat-icon" />
+                                    </div>
+                                    <div className="stat-content">
+                                        <div className="stat-number">
+                                            {!isStatsLoading && stats.businesses !== null && (
+                                                <>{stats.businesses > 0 && '+'}{stats.businesses}</>
+                                            )}
+                                        </div>
+                                        <div className="stat-label">עסקים רשומים</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -336,8 +338,12 @@ const MainPage = () => {
                             <h3>קישורים מהירים</h3>
                             <ul className="quick-links">
                                 <li><a href="/search">חיפוש</a></li>
-                                <li><a href="/search-results">הצג פריט</a></li>
-                                <li><a href="/terms">תנאי שימוש</a></li>
+                                <li><a href="/suggest">הצע פריט</a></li>
+                                <li><a href="/terms" onClick={(e) => {
+                                    e.preventDefault();
+                                    // Show terms modal or navigate to terms page when ready
+                                    alert('תנאי השימוש יהיו זמינים בקרוב');
+                                }}>תנאי שימוש</a></li>
                             </ul>
                         </div>
 

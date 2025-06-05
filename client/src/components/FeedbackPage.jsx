@@ -124,14 +124,15 @@ const FeedbackPage = ({ businessId, onClose }) => {
                         <label>דרג את העסק</label>
                         <div className="star-rating">
                             {[1, 2, 3, 4, 5].map(star => (
-                                <FaStar
+                                <span
                                     key={star}
-                                    size={36}
-                                    className={`star ${star <= rating ? "filled" : ""}`}
+                                    className={`star ${star <= (hover || rating) ? "filled" : ""}`}
                                     onClick={() => handleStarClick(star)}
                                     onMouseEnter={() => setHover(star)}
                                     onMouseLeave={() => setHover(0)}
-                                />
+                                >
+                                    {star <= (hover || rating) ? <FaStar size={36} /> : <FaRegStar size={36} />}
+                                </span>
                             ))}
                         </div>
                         {rating > 0 && (
@@ -165,11 +166,12 @@ const FeedbackPage = ({ businessId, onClose }) => {
                             </div>
                             <div className="feedback-page-feedback-stars">
                                 {[1, 2, 3, 4, 5].map(i => (
-                                    <FaStar
+                                    <span
                                         key={i}
-                                        size={20}
                                         className={`star ${i <= fb.rating ? "filled" : ""}`}
-                                    />
+                                    >
+                                        {i <= fb.rating ? <FaStar size={20} /> : <FaRegStar size={20} />}
+                                    </span>
                                 ))}
                             </div>
                             <p className="feedback-page-feedback-comment">{fb.comment}</p>
