@@ -78,7 +78,7 @@ exports.getUserFavorites = async (req, res) => {
 
     res.json(businesses);
   } catch (err) {
-    console.error('Error fetching favorites:', err);
+    console.error('Error fetching favorites:', err); 
     res.status(500).json({ error: "שגיאה בטעינת המועדפים." });
   }
 };
