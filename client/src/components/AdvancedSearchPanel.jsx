@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaTimes, FaChevronDown, FaStar, FaCheck } from 'react-icons/fa';
 import '../styles/AdvancedSearchPanel.css';
 
@@ -21,6 +21,20 @@ const AdvancedSearchPanel = ({
 
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const panelRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (panelRef.current && !panelRef.current.contains(event.target)) {
+        if (isMobile) {
+          onClose();
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMobile, onClose]);
 
   useEffect(() => {
     // Fetch categories from your API
@@ -95,7 +109,7 @@ const AdvancedSearchPanel = ({
   };
 
   return (
-    <div className={`advanced-search-panel ${isOpen ? 'open' : ''} ${isMobile ? 'mobile' : ''}`}>
+    <div className={`advanced-search-panel ${isOpen ? 'open' : ''} ${isMobile ? 'mobile' : ''}`} ref={panelRef}>
       {isMobile && (
         <div className="panel-header">
           <h2>סינון ומיון</h2>
@@ -120,7 +134,12 @@ const AdvancedSearchPanel = ({
               <select
                 className="sort-select"
                 value={sortOption}
-                onChange={(e) => onSortChange(e.target.value)}
+                onChange={(e) => {
+                  onSortChange(e.target.value);
+                  if (isMobile) {
+                    onClose();
+                  }
+                }}
               >
                 {SORT_OPTIONS.map(({ key, label }) => (
                   <option key={key} value={key}>
@@ -147,7 +166,12 @@ const AdvancedSearchPanel = ({
                 <div
                   key={value}
                   className={`rating-option ${filters.rating === value.toString() ? 'selected' : ''}`}
-                  onClick={() => onFilterChange('rating', value.toString())}
+                  onClick={() => {
+                    onFilterChange('rating', value.toString());
+                    if (isMobile) {
+                      onClose();
+                    }
+                  }}
                 >
                   <div className="rating-stars">
                     {renderStars(value)}
@@ -172,7 +196,12 @@ const AdvancedSearchPanel = ({
             <div className="section-content">
               <select
                 className="category-select"
-                onChange={handleCategoryChange}
+                onChange={(e) => {
+                  handleCategoryChange(e);
+                  if (isMobile) {
+                    onClose();
+                  }
+                }}
                 value=""
               >
                 <option value="">בחר קטגוריה</option>

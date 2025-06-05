@@ -93,73 +93,74 @@
 .dropdown-menu {
     position: absolute;
     top: 100%;
-    right: 0;
-    background: white;
+    left: 0;
+    background-color: white;
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    padding: 0.5rem;
-    border: 1px solid #eee;
-    z-index: 101;
-    margin-top: 0.5rem;
-}
-
-.dropdown-menu::before {
-    content: '';
-    position: absolute;
-    top: -6px;
-    right: 1rem;
-    width: 12px;
-    height: 12px;
-    background: white;
-    border-right: 1px solid #eee;
-    border-top: 1px solid #eee;
-    transform: rotate(-45deg);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    z-index: 1000;
+    padding: 8px 0;
+    margin-top: 4px;
 }
 
 .dropdown-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
+    gap: 8px;
+    padding: 12px 16px;
     color: #333;
-    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background-color 0.2s;
     cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    white-space: nowrap;
+    width: 100%;
+    border: none;
+    background: none;
+    text-align: right;
+    font-size: 14px;
 }
 
-.dropdown-item:not(:last-child) {
-    border-bottom: 1px solid #f0f0f0;
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #f5f5f5;
+    outline: none;
 }
 
-.dropdown-item:hover {
-    background-color: #f8f8f8;
-    color: #ff4d4d;
+.dropdown-item:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
 }
 
 .dropdown-item svg {
+    font-size: 16px;
     color: #666;
-    font-size: 1rem;
 }
 
-.dropdown-item:hover svg {
-    color: #ff4d4d;
+.nav-button.with-hover {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    color: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
 }
 
-.dropdown-item.active {
-    color: #ff4d4d;
-    font-weight: 500;
+.nav-button.with-hover:hover,
+.nav-button.with-hover:focus {
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
-/* User menu specific */
+.nav-button.with-hover:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
 .user-menu {
     position: relative;
-}
-
-.user-menu .dropdown-menu {
-    right: 0;
-    min-width: 200px;
 }
 
 /* Language menu specific */

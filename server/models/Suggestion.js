@@ -15,8 +15,7 @@ const SuggestionSchema = new mongoose.Schema({
     type: String,
     required: [true, 'English name is required'],
     trim: true
-  }
-   ,
+  },
   parent_category_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'categories',
@@ -37,21 +36,9 @@ const SuggestionSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users',
     required: false
-  },
-  created_at: {
-    type: Date,
-    default: Date.now
-  },
-  updated_at: {
-    type: Date,
-    default: Date.now
   }
-});
-
-// Update the updated_at timestamp before saving
-SuggestionSchema.pre('save', function(next) {
-  this.updated_at = Date.now();
-  next();
+}, {
+  timestamps: true
 });
 
 module.exports = mongoose.model('suggestions', SuggestionSchema); 

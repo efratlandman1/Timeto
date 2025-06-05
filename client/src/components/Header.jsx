@@ -26,6 +26,7 @@ const Header = () => {
     const [username, setUsername] = useState(null);
     const [greeting, setGreeting] = useState("");
     const userMenuRef = useRef(null);
+    const userButtonRef = useRef(null);
     const loginUser = useSelector(state => state.user.user);
     const { t, i18n } = useTranslation();
 
@@ -39,13 +40,30 @@ const Header = () => {
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+            // Check if click is outside both the menu and the button
+            if (
+                userMenuRef.current && 
+                !userMenuRef.current.contains(event.target) &&
+                userButtonRef.current &&
+                !userButtonRef.current.contains(event.target)
+            ) {
+                setShowUserMenu(false);
+            }
+        };
+
+        const handleEscape = (event) => {
+            if (event.key === 'Escape') {
                 setShowUserMenu(false);
             }
         };
 
         document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+        document.addEventListener("keydown", handleEscape);
+        
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("keydown", handleEscape);
+        };
     }, []);
 
     useEffect(() => {
@@ -68,12 +86,18 @@ const Header = () => {
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         setUsername(null);
         localStorage.removeItem('user');
+        setShowUserMenu(false);
         navigate("/login");
     };
 
     const handleLanguageToggle = () => {
         const newLang = i18n.language === 'he' ? 'en' : 'he';
         i18n.changeLanguage(newLang);
+    };
+
+    const handleMenuItemClick = (path) => {
+        navigate(path);
+        setShowUserMenu(false);
     };
 
     const isActive = (path) => {
@@ -143,28 +167,47 @@ const Header = () => {
 
                     {username ? (
                         <div className="user-menu" ref={userMenuRef}>
-                            <div 
+                            <button 
                                 className="nav-button with-hover" 
                                 onClick={() => setShowUserMenu(!showUserMenu)}
+                                ref={userButtonRef}
+                                aria-expanded={showUserMenu}
+                                aria-haspopup="true"
                             >
                                 <FaUserCircle />
                                 <span>{greeting} <span className="username">{username}</span></span>
                                 <FaChevronDown style={{ fontSize: '12px', marginRight: '4px' }} />
-                            </div>
+                            </button>
                             {showUserMenu && (
-                                <div className="dropdown-menu">
-                                    <div className="dropdown-item" onClick={() => navigate("/my-businesses")}>
+                                <div 
+                                    className="dropdown-menu"
+                                    role="menu"
+                                    aria-labelledby="user-menu-button"
+                                >
+                                    <button 
+                                        className="dropdown-item" 
+                                        onClick={() => handleMenuItemClick("/my-businesses")}
+                                        role="menuitem"
+                                    >
                                         <FaStore />
                                         {t('header.myBusinesses')}
-                                    </div>
-                                    <div className="dropdown-item" onClick={() => navigate("/my-favorites")}>
+                                    </button>
+                                    <button 
+                                        className="dropdown-item" 
+                                        onClick={() => handleMenuItemClick("/my-favorites")}
+                                        role="menuitem"
+                                    >
                                         <FaHeart />
                                         {t('header.myFavorites')}
-                                    </div>
-                                    <div className="dropdown-item" onClick={handleLogout}>
+                                    </button>
+                                    <button 
+                                        className="dropdown-item" 
+                                        onClick={handleLogout}
+                                        role="menuitem"
+                                    >
                                         <FaSignOutAlt />
                                         {t('header.logout')}
-                                    </div>
+                                    </button>
                                 </div>
                             )}
                         </div>

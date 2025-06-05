@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import BusinessCard from './BusinessCard';
 import AdvancedSearchModal from './AdvancedSearchModal';
 import axios from 'axios';
@@ -25,9 +25,21 @@ const SearchResultPage = () => {
     const [activeFilters, setActiveFilters] = useState({});
     const [sortOption, setSortOption] = useState('rating');
     const [showSortDropdown, setShowSortDropdown] = useState(false);
+    const sortDropdownRef = useRef(null);
 
     const navigate = useNavigate();
     const location = useLocation();
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target)) {
+                setShowSortDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -140,7 +152,7 @@ const SearchResultPage = () => {
                         >
                             <FaFilter />
                         </button>
-                        <div className="sort-area">
+                        <div className="sort-area" ref={sortDropdownRef}>
                             <div 
                                 className="sort-button"
                                 onClick={() => setShowSortDropdown(!showSortDropdown)}

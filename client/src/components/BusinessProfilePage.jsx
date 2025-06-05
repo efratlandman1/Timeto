@@ -235,7 +235,7 @@ const BusinessProfilePage = () => {
                 <div className="feedback-card-header">
                   <span className="feedback-author">{feedback.user_id?.nickname || 'אננימי'}</span>
                   <span className="feedback-date">
-                    {new Date(feedback.created_at).toLocaleDateString('he-IL', {
+                    {new Date(feedback.createdAt).toLocaleDateString('he-IL', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric'

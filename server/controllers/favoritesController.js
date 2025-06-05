@@ -71,7 +71,7 @@ exports.getUserFavorites = async (req, res) => {
         { path: 'services', select: 'name' }
       ]
     })
-    .sort({ created_at: -1 });
+    .sort({ createdAt: -1 });
 
     // Transform the data to match the expected format
     const businesses = favorites.map(fav => fav.business_id);
@@ -106,5 +106,17 @@ exports.checkFavoriteStatus = async (req, res) => {
   } catch (err) {
     console.error('Error checking favorite status:', err);
     res.status(500).json({ error: "שגיאה בבדיקת סטטוס מועדפים." });
+  }
+};
+
+exports.getFavorites = async (req, res) => {
+  try {
+    const favorites = await Favorite.find({ user_id: req.params.userId, active: true })
+      .populate('business_id')
+      .sort({ createdAt: -1 });
+
+    res.json(favorites);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 }; 
