@@ -5,7 +5,7 @@
  */
 export const roundRating = (rating) => {
     if (!rating && rating !== 0) return 0; 
-    return Math.round(rating); 
+    return Math.round(rating);  
 };
 
 /**
