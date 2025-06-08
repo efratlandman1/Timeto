@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require("../models/user");
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 
 exports.registerUser = async (req, res) => {
    console.log("registerUser");
@@ -12,7 +12,7 @@ exports.registerUser = async (req, res) => {
         }
 
         // הצפנת הסיסמה
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        const hashedPassword = await bcryptjs.hash(req.body.password, 10);
 
         // יצירת המשתמש
         const newUser = new User({
@@ -55,7 +55,7 @@ exports.updateUser = async (req, res) => {
 
         // Securely hash the password only if a new one is provided
         if (updateData.password && updateData.password.length > 0) {
-            updateData.password = await bcrypt.hash(updateData.password, 10);
+            updateData.password = await bcryptjs.hash(updateData.password, 10);
         } else {
             // Ensure the password is not overwritten with an empty value
             delete updateData.password;

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
 require('dotenv').config();
 
@@ -62,7 +62,7 @@ exports.login = async (req, res) => {
             return res.status(400).json({ error: 'Email not found' });
         }
 
-        const isMatch = await bcrypt.compare(req.body.password, user.password);
+        const isMatch = await bcryptjs.compare(req.body.password, user.password);
         if (!isMatch) {
             return res.status(400).json({ error: 'Incorrect password' });
         }
