@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTags, FaCogs, FaUsers } from 'react-icons/fa';
+import { FaTags, FaCogs, FaUsers, FaBuilding, FaExpandArrowsAlt, FaCompressArrowsAlt } from 'react-icons/fa';
 import axios from 'axios';
 import '../styles/AdminPanelPage.css';
 import { toast } from 'react-toastify';
@@ -14,9 +14,22 @@ const AdminPanelPage = () => {
     const [categories, setCategories] = useState([]);
     const [services, setServices] = useState([]);
     const [users, setUsers] = useState([]);
+    const [businesses, setBusinesses] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [expandedNodes, setExpandedNodes] = useState({});
+
+    const hebrewWeekdays = {
+        0: 'ראשון',
+        1: 'שני',
+        2: 'שלישי',
+        3: 'רביעי',
+        4: 'חמישי',
+        5: 'שישי',
+        6: 'שבת'
+    };
 
     const roleTranslations = {
         'admin': 'מנהל',
@@ -39,6 +52,7 @@ const AdminPanelPage = () => {
             case 'categories': return isPlural ? 'קטגוריות' : 'קטגוריה';
             case 'services': return isPlural ? 'שירותים' : 'שירות';
             case 'users': return isPlural ? 'משתמשים' : 'משתמש';
+            case 'businesses': return isPlural ? 'עסקים' : 'עסק';
             default: return isPlural ? 'פריטים' : 'פריט';
         }
     };
@@ -75,6 +89,10 @@ const AdminPanelPage = () => {
                 case 'users':
                     const usersResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/users`, config);
                     setUsers(usersResponse.data);
+                    break;
+                case 'businesses':
+                    const businessesResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/all`, config);
+                    setBusinesses(businessesResponse.data);
                     break;
                 default:
                     break;
@@ -184,6 +202,193 @@ const AdminPanelPage = () => {
         setEditingItem(prev => ({ ...prev, [name]: value }));
     };
 
+    const toggleNode = (nodeId) => {
+        setExpandedNodes(prev => ({ ...prev, [nodeId]: !prev[nodeId] }));
+    };
+
+    const expandAll = (nodes, isExpanded) => {
+        let newExpanded = {};
+        const gatherIds = (node) => {
+            if (node && typeof node === 'object') {
+                const id = node._id || node.id || Math.random().toString();
+                newExpanded[id] = isExpanded;
+                if(isExpanded){
+                    Object.values(node).forEach(gatherIds);
+                }
+            } else if (Array.isArray(node)) {
+                node.forEach(gatherIds);
+            }
+        };
+        nodes.forEach(gatherIds);
+        setExpandedNodes(newExpanded);
+    };
+
+    const renderTree = (data, parentKey = 'root') => {
+        if (!data) return null;
+
+        const highlightText = (text) => {
+            if (!searchTerm || typeof text !== 'string') return text;
+            const parts = text.split(new RegExp(`(${searchTerm})`, 'gi'));
+            return (
+                <>
+                    {parts.map((part, index) =>
+                        part.toLowerCase() === searchTerm.toLowerCase() ? (
+                            <span key={index} className="highlight">{part}</span>
+                        ) : (
+                            part
+                        )
+                    )}
+                </>
+            );
+        };
+
+        if (Array.isArray(data)) {
+            return data.map((item, index) => renderTree(item, `${parentKey}.${index}`));
+        }
+
+        if (typeof data === 'object' && data !== null) {
+            const nodeId = data._id || parentKey;
+            const isExpanded = !!expandedNodes[nodeId];
+            
+            const objectToRender = {...data};
+
+            const fieldOrder = [
+                { key: 'name', label: 'שם' },
+                { key: 'description', label: 'תיאור' },
+                { key: 'address', label: 'כתובת' },
+                { key: 'prefix', label: 'קידומת' },
+                { key: 'phone', label: 'טלפון' },
+                { key: 'email', label: 'אימייל' },
+                { key: 'category', label: 'קטגוריה' },
+                { key: 'services', label: 'שירותים' },
+                { key: 'openingHours', label: 'שעות פתיחה' },
+                { key: 'rating', label: 'דירוג' },
+                { key: 'active', label: 'פעיל' },
+                { key: 'logo', label: 'לוגו' },
+                { key: 'userId', label: 'משתמש' },
+                { key: 'feedbacks', label: 'פידבקים' }
+            ];
+
+            const hasChildren = parentKey === 'root' || Object.values(data).some(value => (typeof value === 'object' && value !== null) || (Array.isArray(value) && value.length > 0));
+            const displayName = objectToRender.name || parentKey.split('.').pop();
+
+            return (
+                <div key={nodeId} className="tree-node">
+                    <div className="tree-node-label" onClick={() => hasChildren && toggleNode(nodeId)}>
+                        {hasChildren ? <span className={`arrow ${isExpanded ? 'expanded' : ''}`}>&#9654;</span> : <span className="arrow-placeholder"/>}
+                        {highlightText(displayName)}
+                    </div>
+                    {isExpanded && hasChildren && (
+                        <div className="tree-node-content">
+                            {fieldOrder.map(({ key, label }) => {
+                                const value = objectToRender[key];
+                                if (value === undefined || value === null) return null;
+                                
+                                if (key === 'userId' && typeof value === 'object') {
+                                    return <div key={key} className="tree-leaf"><strong>{highlightText(label)} ({key}):</strong> <span>{value.firstName} {value.lastName} (ID: {value._id})</span></div>;
+                                }
+                                
+                                if (key === 'services' && Array.isArray(value)) {
+                                    return (
+                                        <div key={key} className="tree-node">
+                                            <div className="tree-node-label" onClick={() => toggleNode(`${nodeId}.${key}`)}>
+                                                <span className={`arrow ${expandedNodes[`${nodeId}.${key}`] ? 'expanded' : ''}`}>&#9654;</span>
+                                                <strong>{highlightText(label)} ({key})</strong>
+                                            </div>
+                                            {expandedNodes[`${nodeId}.${key}`] && (
+                                                <div className="tree-node-content">
+                                                    {value.map(service => <div key={service._id} className="tree-leaf"><span>{highlightText(service.name)} (ID: {service._id})</span></div>)}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                }
+                                
+                                if (key === 'openingHours' && Array.isArray(value)) {
+                                     return (
+                                        <div key={key} className="tree-node">
+                                            <div className="tree-node-label" onClick={() => toggleNode(`${nodeId}.${key}`)}>
+                                                <span className={`arrow ${expandedNodes[`${nodeId}.${key}`] ? 'expanded' : ''}`}>&#9654;</span>
+                                                <strong>{highlightText(label)} ({key})</strong>
+                                            </div>
+                                            {expandedNodes[`${nodeId}.${key}`] && (
+                                                <div className="tree-node-content">
+                                                    {value.map(oh => (
+                                                        <div key={oh.day} className="tree-leaf">
+                                                            <strong>{hebrewWeekdays[oh.day]}:</strong>
+                                                            <span>{highlightText(oh.closed ? 'סגור' : oh.ranges.map(r => `${r.open}-${r.close}`).join(', '))}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                }
+
+                                if (key === 'feedbacks' && Array.isArray(value)) {
+                                    return (
+                                        <div key={key} className="tree-node">
+                                            <div className="tree-node-label" onClick={() => toggleNode(`${nodeId}.${key}`)}>
+                                                <span className={`arrow ${expandedNodes[`${nodeId}.${key}`] ? 'expanded' : ''}`}>&#9654;</span>
+                                                <strong>{highlightText(label)} ({key})</strong>
+                                            </div>
+                                            {expandedNodes[`${nodeId}.${key}`] && (
+                                                <div className="tree-node-content">
+                                                    {value.map(fb => (
+                                                        <div key={fb._id} className="tree-node">
+                                                            <div className="tree-node-label" onClick={() => toggleNode(`${nodeId}.feedbacks.${fb._id}`)}>
+                                                                <span className={`arrow ${expandedNodes[`${nodeId}.feedbacks.${fb._id}`] ? 'expanded' : ''}`}>&#9654;</span>
+                                                                <strong>{highlightText(`פידבק מאת ${fb.user_id ? `${fb.user_id.firstName} ${fb.user_id.lastName}`: 'Unknown User'}`)}</strong>
+                                                            </div>
+                                                            {expandedNodes[`${nodeId}.feedbacks.${fb._id}`] && (
+                                                                <div className="tree-node-content">
+                                                                    <div className="tree-leaf"><strong>ID:</strong> <span>{fb._id}</span></div>
+                                                                    {fb.user_id && <div className="tree-leaf"><strong>User ID:</strong> <span>{fb.user_id._id}</span></div>}
+                                                                    <div className="tree-leaf"><strong>Rating:</strong> <span>{highlightText(String(fb.rating))}</span></div>
+                                                                    <div className="tree-leaf"><strong>Comment:</strong> <span>{highlightText(fb.comment || '(No comment)')}</span></div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                }
+                                
+                                return (
+                                    <div key={key} className="tree-leaf">
+                                        <strong>{highlightText(label)} ({key}):</strong> <span>{highlightText(String(value))}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+        return null;
+    };
+
+    const renderBusinessesTab = () => (
+        <div className="admin-table-container">
+            <div className="businesses-toolbar">
+                <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="search-input"
+                />
+                <button onClick={() => expandAll(businesses, true)} className="tree-button"><FaExpandArrowsAlt /> Expand All</button>
+                <button onClick={() => expandAll(businesses, false)} className="tree-button"><FaCompressArrowsAlt/> Collapse All</button>
+            </div>
+            <div className="tree-container">
+                {renderTree(businesses)}
+            </div>
+        </div>
+    );
+
     const renderCategoriesTab = () => (
         <div className="admin-table-container">
             <button className="add-button" onClick={() => {
@@ -262,30 +467,25 @@ const AdminPanelPage = () => {
             </div>
         );
     };
-
     const renderUsersTab = () => (
         <div className="admin-table-container">
-            <button className="add-button" onClick={() => {
-                setEditingItem({ role: 'end-user' });
-                setIsModalOpen(true);
-            }}>
-                + הוסף משתמש חדש
-            </button>
             <table className="admin-table">
                 <thead>
                     <tr>
-                        <th>שם מלא</th>
-                        <th>אימייל</th>
+                        <th>שם</th>
+                        <th>Email</th>
                         <th>תפקיד</th>
+                        <th>פעיל</th>
                         <th>פעולות</th>
                     </tr>
                 </thead>
                 <tbody>
                     {users.map(user => (
                         <tr key={user._id}>
-                            <td>{`${user.firstName || ''} ${user.lastName || ''}`}</td>
+                            <td>{user.firstName} {user.lastName}</td>
                             <td>{user.email}</td>
                             <td>{roleTranslations[user.role] || user.role}</td>
+                            <td>{user.active ? 'כן' : 'לא'}</td>
                             <td className="actions-cell">
                                 <button onClick={() => handleEdit(user)} className="edit-button">✏️</button>
                                 <button onClick={() => handleDelete(user._id)} className="delete-button">🗑️</button>
@@ -298,55 +498,51 @@ const AdminPanelPage = () => {
     );
 
     const renderForm = () => {
-        switch (activeTab) {
-            case 'categories':
-                return (
-                    <form className="admin-form">
+        if (!editingItem) return null;
+
+        const isCategory = activeTab === 'categories';
+        const isService = activeTab === 'services';
+        const isUser = activeTab === 'users';
+
+        return (
+            <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+                {isCategory && (
+                    <>
                         <div className="form-group">
-                            <label htmlFor="name">שם הקטגוריה</label>
+                            <label htmlFor="name">שם קטגוריה</label>
                             <input
-                                type="text"
                                 id="name"
                                 name="name"
-                                value={editingItem?.name || ''}
+                                type="text"
+                                value={editingItem.name || ''}
                                 onChange={handleInputChange}
-                                placeholder="הכנס שם קטגוריה"
+                                required
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="logo">לוגו</label>
-                            <div className="logo-upload">
-                                {previewUrl && (
-                                    <img 
-                                        src={previewUrl} 
-                                        alt="תצוגה מקדימה"
-                                        className="logo-preview"
-                                    />
-                                )}
-                                <input
-                                    type="file"
-                                    id="logo"
-                                    name="logo"
-                                    accept="image/*"
-                                    onChange={handleFileChange}
-                                />
-                            </div>
-                        </div>
-                    </form>
-                );
-
-            case 'services':
-                return (
-                    <form className="admin-form">
-                        <div className="form-group">
-                            <label htmlFor="name">שם השירות</label>
+                            <label htmlFor="logo-upload">לוגו</label>
                             <input
-                                type="text"
+                                id="logo-upload"
+                                name="logo"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                            />
+                            {previewUrl && <img src={previewUrl} alt="Preview" className="logo-preview" />}
+                        </div>
+                    </>
+                )}
+                {isService && (
+                    <>
+                        <div className="form-group">
+                            <label htmlFor="name">שם שירות</label>
+                            <input
                                 id="name"
                                 name="name"
-                                value={editingItem?.name || ''}
+                                type="text"
+                                value={editingItem.name || ''}
                                 onChange={handleInputChange}
-                                placeholder="הכנס שם שירות"
+                                required
                             />
                         </div>
                         <div className="form-group">
@@ -354,89 +550,69 @@ const AdminPanelPage = () => {
                             <select
                                 id="categoryId"
                                 name="categoryId"
-                                value={editingItem?.categoryId || ''}
+                                value={editingItem.categoryId || ''}
                                 onChange={handleInputChange}
+                                required
                             >
                                 <option value="">בחר קטגוריה</option>
-                                {categories.map(category => (
-                                    <option key={category._id} value={category._id}>
-                                        {category.name}
-                                    </option>
+                                {categories.map(cat => (
+                                    <option key={cat._id} value={cat._id}>{cat.name}</option>
                                 ))}
                             </select>
                         </div>
-                    </form>
-                );
-
-            case 'users':
-                return (
-                    <form className="admin-form">
+                    </>
+                )}
+                {isUser && (
+                     <>
                         <div className="form-group">
-                            <label htmlFor="firstName">שם פרטי</label>
-                            <input
-                                type="text"
-                                id="firstName"
-                                name="firstName"
-                                value={editingItem?.firstName || ''}
-                                onChange={handleInputChange}
-                                placeholder="הכנס שם פרטי"
-                            />
+                            <label>שם</label>
+                            <input type="text" value={`${editingItem.firstName || ''} ${editingItem.lastName || ''}`} readOnly />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="lastName">שם משפחה</label>
-                            <input
-                                type="text"
-                                id="lastName"
-                                name="lastName"
-                                value={editingItem?.lastName || ''}
-                                onChange={handleInputChange}
-                                placeholder="הכנס שם משפחה"
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="email">אימייל</label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={editingItem?.email || ''}
-                                onChange={handleInputChange}
-                                placeholder="הכנס כתובת אימייל"
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="password">סיסמה (אם רוצים לשנות)</label>
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                value={editingItem?.password || ''}
-                                onChange={handleInputChange}
-                                placeholder={editingItem?._id ? "השאר ריק כדי לא לשנות" : "הכנס סיסמה"}
-                                required={!editingItem?._id}
-                            />
+                            <label>Email</label>
+                            <input type="email" value={editingItem.email || ''} readOnly />
                         </div>
                         <div className="form-group">
                             <label htmlFor="role">תפקיד</label>
                             <select
                                 id="role"
                                 name="role"
-                                value={editingItem?.role || 'end-user'}
+                                value={editingItem.role || ''}
                                 onChange={handleInputChange}
                             >
-                                <option value="end-user">משתמש</option>
-                                <option value="manager">מנהל מערכת</option>
-                                <option value="admin">מנהל</option>
+                                {Object.entries(roleTranslations).map(([key, value]) => (
+                                    <option key={key} value={key}>{value}</option>
+                                ))}
                             </select>
                         </div>
-                    </form>
-                );
-
-            default:
-                return null;
-        }
+                        <div className="form-group">
+                            <label htmlFor="active">פעיל</label>
+                            <input
+                                type="checkbox"
+                                id="active"
+                                name="active"
+                                checked={editingItem.active || false}
+                                onChange={e => handleInputChange({ target: { name: 'active', value: e.target.checked } })}
+                            />
+                        </div>
+                     </>
+                )}
+                <div className="modal-actions">
+                    <button type="submit" className="save-button">שמור</button>
+                    <button type="button" onClick={() => setIsModalOpen(false)} className="cancel-button">ביטול</button>
+                </div>
+            </form>
+        );
     };
+
+    const renderContent = () => (
+        <>
+            {activeTab === 'categories' && renderCategoriesTab()}
+            {activeTab === 'services' && renderServicesTab()}
+            {activeTab === 'users' && renderUsersTab()}
+            {activeTab === 'businesses' && renderBusinessesTab()}
+        </>
+    );
 
     return (
         <div className="admin-panel">
@@ -467,35 +643,28 @@ const AdminPanelPage = () => {
                     <FaUsers />
                     משתמשים
                 </button>
+                <button 
+                    className={`tab ${activeTab === 'businesses' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('businesses')}
+                >
+                    <FaBuilding />
+                    עסקים
+                </button>
             </div>
 
             <div className="tab-content">
-                {isLoading ? <div className="loading-spinner">טוען...</div> : (
-                    <>
-                        {activeTab === 'categories' && renderCategoriesTab()}
-                        {activeTab === 'services' && renderServicesTab()}
-                        {activeTab === 'users' && renderUsersTab()}
-                    </>
-                )}
+                {isLoading ? <div className="loading-spinner">טוען...</div> : renderContent()}
             </div>
 
             {isModalOpen && (
-                <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+                <div className="modal-backdrop">
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h2>{`${editingItem?._id ? 'עריכת' : 'הוספת'} ${getContextName(activeTab)}`}</h2>
-                            <button className="close-button" onClick={() => {
-                                setIsModalOpen(false);
-                                setEditingItem(null);
-                                setSelectedFile(null);
-                                setPreviewUrl('');
-                            }}>✕</button>
+                            <h2>{editingItem?._id ? `ערוך ${getContextName(activeTab)}` : `הוסף ${getContextName(activeTab)}`}</h2>
+                            <button onClick={() => setIsModalOpen(false)} className="close-button">&times;</button>
                         </div>
-                        {renderForm()}
-                        <div className="modal-actions">
-                            <button className="save-button" onClick={handleSave}>
-                                {editingItem?._id ? 'שמור שינויים' : `הוסף ${getContextName(activeTab)}`}
-                            </button>
+                        <div className="modal-body">
+                            {renderForm()}
                         </div>
                     </div>
                 </div>
