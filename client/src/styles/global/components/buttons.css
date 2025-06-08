@@ -1,0 +1,73 @@
+/* Navigation Buttons */
+.nav-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 400;
+    transition: all 0.2s ease;
+}
+
+.nav-button:hover {
+    color: var(--primary-color);
+    background-color: var(--background-light);
+}
+
+.nav-button .icon,
+.nav-button svg {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    order: -1;
+}
+
+.nav-button:hover .icon,
+.nav-button:hover svg {
+    color: var(--primary-color);
+}
+
+/* Above Header Navigation Button */
+.nav-button.above-header {
+    margin-bottom: 1rem;
+}
+
+.nav-button.primary {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.nav-button.primary:hover {
+    background-color: var(--primary-color-dark);
+    color: white;
+}
+
+.nav-button.primary .icon,
+.nav-button.primary svg {
+    color: white;
+}
+
+.nav-button.active {
+    background-color: var(--primary-color-light);
+    color: var(--primary-color);
+}
+
+.nav-button.active .icon,
+.nav-button.active svg {
+    color: var(--primary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-button {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+} 

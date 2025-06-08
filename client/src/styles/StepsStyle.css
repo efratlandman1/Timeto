@@ -1,0 +1,391 @@
+/* ----- כלליים ----- */
+.step-business-details {
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  height: auto;
+  min-height: 400px;
+  overflow-y: auto;
+  direction: rtl;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.step-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #2d3436;
+  margin-bottom: 2rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+}
+
+.icon {
+  font-size: 24px;
+  color: #d32f2f;
+}
+
+/* ----- כפתורים ----- */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 26px;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 24px;
+  user-select: none;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.07);
+}
+
+.button.file-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: white;
+  color: #666;
+  border: 2px dashed #d32f2f;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  width: auto;
+  min-width: 200px;
+}
+
+.button.file-upload:hover {
+  background-color: #fff0f0;
+  border-style: solid;
+  color: #d32f2f;
+}
+
+.button.file-upload:active {
+  background-color: #d62828;
+  border-color: #d62828;
+  box-shadow: 0 3px 8px rgba(214, 40, 40, 0.28);
+  transform: scale(0.97);
+}
+
+.button.file-upload .icon {
+  font-size: 20px;
+  color: inherit;
+}
+
+.button.delete:hover {
+  background-color: #c82333;
+}
+
+/* ----- שדות קלט ----- */
+.form-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  margin-bottom: 1.5rem;
+}
+
+.form-group-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.form-group label {
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 12px 16px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1rem;
+  width: 100%;
+  background-color: #fff;
+  transition: all 0.3s ease;
+  color: #333;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #d32f2f;
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #999;
+}
+
+/* ----- שעות פעילות ----- */
+.day-row {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1.5px solid #eee;
+  transition: all 0.3s ease;
+}
+
+.day-row:hover {
+  border-color: #d32f2f;
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.1);
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.day-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.closed-button {
+  padding: 8px 16px;
+  border: 1.5px solid #ddd;
+  background: white;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.closed-button:hover {
+  border-color: #d32f2f;
+  color: #d32f2f;
+}
+
+.closed-button.active {
+  background: #d32f2f;
+  color: white;
+  border-color: #d32f2f;
+}
+
+/* זמן טווח */
+.time-range {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0.5rem 0;
+}
+
+.time-range input[type="time"] {
+  padding: 8px 12px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  width: 140px;
+  background: white;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.time-range input[type="time"]:focus {
+  border-color: #d32f2f;
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15);
+}
+
+.dash {
+  color: #666;
+  font-weight: 500;
+  user-select: none;
+}
+
+/* כפתורי הוספה ומחיקה */
+.add-range-btn,
+.delete-range-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+  color: #d32f2f;
+  border: 1.5px solid #d32f2f;
+}
+
+.add-range-btn:hover,
+.delete-range-btn:hover {
+  background: #d32f2f;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* ----- שירותים שהעסק מספק ----- */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 1rem 0;
+}
+
+.tag.selectable {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: white;
+  border: 1.5px solid #d32f2f;
+  color: #d32f2f;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tag.selectable:hover {
+  background: #fff0f0;
+  transform: translateY(-2px);
+}
+
+.tag.selected {
+  background: #d32f2f;
+  color: white;
+}
+
+/* ----- סגנונות נוספים ----- */
+.step-page-container {
+  margin-bottom: 48px;
+}
+
+/* לוגו העלאה והצגה */
+.logo-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.logo-preview-wrapper {
+  position: relative;
+  margin-top: 1rem;
+}
+
+.remove-logo-button {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #d32f2f;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 6px rgba(211, 47, 47, 0.3);
+  transition: all 0.3s ease;
+}
+
+.remove-logo-button:hover {
+  background: #b71c1c;
+  transform: scale(1.1);
+}
+
+.business-logo-preview {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 12px;
+  object-fit: contain;
+  border: 2px solid #eee;
+  padding: 0.5rem;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.input-error-border {
+  border-color: #d32f2f !important;
+  box-shadow: 0 0 0 1px #d32f2f !important;
+}
+
+/* Scrollbar Styling */
+.step-business-details::-webkit-scrollbar {
+  width: 8px;
+}
+
+.step-business-details::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.step-business-details::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 4px;
+}
+
+.step-business-details::-webkit-scrollbar-thumb:hover {
+  background: #d32f2f;
+}
+
+/* Required Field Marker */
+.required-mark {
+  color: #d32f2f;
+  margin-right: 4px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .step-business-details {
+    padding: 1.5rem;
+    min-height: 300px;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+
+  .time-range {
+    flex-wrap: wrap;
+  }
+
+  .time-range input[type="time"] {
+    width: 120px;
+  }
+
+  .tags-container {
+    gap: 8px;
+  }
+
+  .tag.selectable {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+}
+

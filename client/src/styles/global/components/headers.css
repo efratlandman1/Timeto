@@ -1,0 +1,82 @@
+/* Page Header Component */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 2rem 3rem 2rem;
+    position: relative;
+}
+
+.page-header__content {
+    text-align: right;
+}
+
+.page-header h1 {
+    font-size: var(--font-size-2xl);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+}
+
+.page-header p {
+    font-size: var(--font-size-md);
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: var(--line-height-normal);
+}
+
+.page-header__action {
+    margin-right: var(--spacing-lg);
+}
+
+/* Card Header Component */
+.card-header {
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.card-header h3 {
+    font-size: var(--font-size-md);
+    color: var(--text-primary);
+    margin: 0;
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-tight);
+}
+
+/* Header Variants */
+.page-header--center {
+    text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 2rem 1.5rem 1.5rem;
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-md);
+    }
+
+    .page-header__action {
+        margin-right: 0;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .page-header h1 {
+        font-size: var(--font-size-xl);
+    }
+
+    .page-header p {
+        font-size: var(--font-size-sm);
+    }
+}
+
+/* Print Styles */
+@media print {
+    .page-header {
+        padding: 1cm 0;
+        break-inside: avoid;
+    }
+} 

@@ -1,0 +1,2 @@
+docker compose up --build
+doskey /history > history.txt

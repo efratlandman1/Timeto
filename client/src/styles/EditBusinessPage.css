@@ -1,0 +1,304 @@
+/* Container styles moved to global/containers.css (.narrow-page-container) */
+
+.edit-business-container {
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: var(--background-color);
+}
+
+.edit-business-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.step-page-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    border: 1px solid #f0f0f0;
+}
+
+.edit-business-progress-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    margin: 40px auto;
+    padding: 0 40px;
+    max-width: 600px;
+    direction: ltr;
+}
+
+.edit-business-progress-bar-line {
+    position: absolute;
+    top: 50%;
+    left: 40px;
+    right: 40px;
+    height: 3px;
+    background: #f0f0f0;
+    border-radius: 2px;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.edit-business-progress-bar-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: calc((var(--current-step) - 1) / (var(--total-steps) - 1) * 100%);
+    background: linear-gradient(90deg, #d32f2f, #ff4444);
+    transition: width 0.4s ease-in-out;
+}
+
+.edit-business-progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    z-index: 1;
+    flex: 1;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.edit-business-progress-step:hover {
+    transform: translateY(-2px);
+}
+
+.edit-business-progress-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    color: #666;
+}
+
+.edit-business-progress-circle.active {
+    border-color: #d32f2f;
+    color: #d32f2f;
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
+}
+
+.edit-business-step-label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+.edit-business-progress-step.active .edit-business-step-label {
+    color: #d32f2f;
+    font-weight: 600;
+}
+
+.edit-business-navigation-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 30px 0;
+    padding: 0 20px;
+}
+
+.edit-business-arrow-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    color: #666;
+    border: 2px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-business-arrow-button:hover {
+    border-color: #d32f2f;
+    color: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.edit-business-arrow-spacer {
+    width: 40px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Toast Customization */
+.Toastify__toast-container {
+    width: auto !important;
+    min-width: 300px;
+    max-width: 400px;
+}
+
+.Toastify__toast {
+    margin: 8px;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: inherit;
+    background: white;
+    color: #333;
+    border: 1px solid #eee;
+}
+
+.Toastify__toast--success {
+    background: #f6ffed;
+    border: 1px solid #b7eb8f;
+    color: #52c41a;
+}
+
+.Toastify__toast--error {
+    background: #fff2f0;
+    border: 1px solid #ffccc7;
+    color: #ff4d4f;
+}
+
+.Toastify__toast-body {
+    padding: 0;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.Toastify__progress-bar {
+    height: 3px;
+    opacity: 0.8;
+}
+
+.Toastify__progress-bar--success {
+    background: linear-gradient(90deg, #52c41a, #73d13d);
+}
+
+.Toastify__progress-bar--error {
+    background: linear-gradient(90deg, #ff4d4f, #ff7875);
+}
+
+.Toastify__close-button {
+    color: inherit;
+    opacity: 0.6;
+}
+
+.Toastify__close-button:hover {
+    opacity: 1;
+}
+
+/* Save Button */
+.save-button {
+    margin: 24px auto;
+    padding: 14px 32px;
+    font-size: 1rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    border: none;
+    border-radius: 12px;
+    background: white;
+    color: #d32f2f;
+    border: 2px solid #d32f2f;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.save-button:hover {
+    background: #d32f2f;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
+}
+
+.save-button:disabled {
+    background: #f5f5f5;
+    border-color: #ddd;
+    color: #999;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .save-button {
+        padding: 12px 24px;
+        font-size: 0.95rem;
+    }
+
+    .edit-business-navigation-buttons {
+        gap: 20px;
+    }
+
+    .edit-business-arrow-button {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+}
+
+/* Input Focus States */
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #d32f2f !important;
+    box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15) !important;
+}
+
+/* Update logo upload button */
+.button.file-upload {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: white;
+    color: #666;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    width: auto;
+    min-width: 200px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.button.file-upload:hover {
+    background: #f8f8f8;
+    color: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
+}
+
+.button.file-upload:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(211, 47, 47, 0.1);
+}
+
+.button.file-upload .icon {
+    font-size: 20px;
+    color: inherit;
+}

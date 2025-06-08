@@ -1,0 +1,32 @@
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      target: ${NODE_ENV:-dev}_stage
+      args:
+        - NODE_ENV=${NODE_ENV:-dev}
+    ports:
+      - "3030:80"
+    env_file:
+      - ./client/.env.${NODE_ENV:-dev}
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - server
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=${NODE_ENV:-dev}
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./server:/app
+      # - /app/node_modules
+    env_file:
+      - ./server/.env.${NODE_ENV:-dev}
+    user: "1000:1000"

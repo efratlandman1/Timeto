@@ -1,0 +1,528 @@
+{
+  "header": {
+    "home": "Home",
+    "search": "Search",
+    "addBusiness": "Add Business",
+    "suggest": "Suggest Item",
+    "register": "Register",
+    "login": "Login",
+    "myBusinesses": "My Businesses",
+    "myFavorites": "My Favorites",
+    "adminPanel": "Admin panel",
+    "logout": "Logout",
+    "languages": {
+      "he": "עברית",
+      "en": "English"
+    },
+    "logo": {
+      "main": "Time",
+      "sub": "Business Directory"
+    }
+  },
+  "greetings": {
+    "morning": "Good Morning",
+    "afternoon": "Good Afternoon",
+    "evening": "Good Evening",
+    "night": "Good Night"
+  },
+  "mainPage": {
+    "title": "Israel's Leading Business Directory",
+    "subtitle": "Find the right business near you",
+    "search": {
+      "title": "Find the Perfect Business",
+      "subtitle": "Near you and across the country"
+    },
+    "stats": {
+      "newUsers": "New Users",
+      "verifiedReviews": "Verified Reviews",
+      "registeredBusinesses": "Registered Businesses"
+    },
+    "categories": {
+      "title": "Popular Categories"
+    },
+    "sections": {
+      "popular": "Popular Businesses",
+      "new": "New Businesses",
+      "recommended": "Recommended for You"
+    },
+    "joinBanner": {
+      "title": "Join Time Community",
+      "description": "Add your business and start getting new customers today",
+      "button": "Add Business Free"
+    }
+  },
+  "businessForm": {
+    "title": {
+      "new": "Add New Business",
+      "edit": "Edit Business"
+    },
+    "steps": {
+      "details": "Business Details",
+      "services": "Business Services",
+      "hours": "Operating Hours"
+    },
+    "fields": {
+      "name": "Business Name",
+      "description": "Business Description",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "website": "Website",
+      "category": "Category"
+    },
+    "validation": {
+      "required": "Required field",
+      "email": "Invalid email address",
+      "phone": "Invalid phone number"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Login",
+      "forgotPassword": "Forgot Password?",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign Up Now",
+      "loading": "Loading...",
+      "errors": {
+        "loginFailed": "Login failed",
+        "invalidCredentials": "Invalid email or password",
+        "invalidEmail": "Please enter a valid email address"
+      }
+    },
+    "register": {
+      "title": "Register",
+      "fields": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "phone": "Phone (050-1234567)",
+        "email": "Email",
+        "username": "Username",
+        "password": "Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "terms": "I agree to the terms of service",
+      "submit": "Register",
+      "errors": {
+        "termsRequired": "You must agree to the terms of service to continue",
+        "passwordMismatch": "Passwords do not match",
+        "registrationFailed": "Registration failed, please try again",
+        "invalidEmail": "Please enter a valid email address"
+      }
+    }
+  },
+  "accessibility": {
+    "title": "Accessibility Settings",
+    "fontSize": {
+      "title": "Font Size",
+      "normal": "Normal",
+      "large": "Large",
+      "larger": "Extra Large"
+    },
+    "contrast": {
+      "title": "Contrast",
+      "normal": "Normal",
+      "high": "High"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "required": "Required field",
+    "more": "Show More",
+    "less": "Show Less",
+    "showMore": "Show More",
+    "submit": "Submit",
+    "backToHome": "Back to Home",
+    "backToBusinesses": "Back to My Businesses"
+  },
+  "search": {
+    "placeholder": "Search business by name, category or service",
+    "advancedSearch": "Advanced Search",
+    "noResults": "No results found",
+    "errors": {
+      "loading": "Error loading search results"
+    },
+    "results": {
+      "category": "Category",
+      "address": "Address",
+      "services": "Services",
+      "more": "+{{count}}"
+    }
+  },
+  "direction": "ltr",
+  "businessCard": {
+    "status": {
+      "open": "Open",
+      "closed": "Closed",
+      "new": "New"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": {
+        "confirm": "Confirm Delete",
+        "cancel": "Cancel",
+        "delete": "Delete"
+      },
+      "restore": "Restore",
+      "email": "Send Email",
+      "whatsapp": "WhatsApp",
+      "phone": "Call"
+    },
+    "messages": {
+      "deleted": "✅ Business deleted",
+      "deleteError": "❌ Error deleting business",
+      "restored": "✅ Business restored successfully",
+      "restoreError": "❌ Error restoring business",
+      "error": "Error: {{message}}"
+    }
+  },
+  "editBusiness": {
+    "steps": {
+      "details": "Business Details",
+      "services": "Business Services",
+      "hours": "Operating Hours"
+    },
+    "validation": {
+      "required": "Please fill in all required fields",
+      "email": "Invalid email address",
+      "phone": "Invalid phone number",
+      "hours": "Please complete opening and closing hours"
+    },
+    "buttons": {
+      "update": "Update Business",
+      "create": "Create New Business",
+      "next": "Next",
+      "back": "Back",
+      "save": "Save"
+    },
+    "fields": {
+      "name": "Business Name",
+      "category": "Category",
+      "description": "Business Description",
+      "address": "Address",
+      "phone": {
+        "prefix": "Prefix",
+        "number": "Phone Number"
+      },
+      "email": "Email"
+    },
+    "services": {
+      "title": "Select Services",
+      "noServices": "No services found for this category",
+      "selected": "{{count}} services selected"
+    },
+    "hours": {
+      "title": "Operating Hours",
+      "days": {
+        "sunday": "Sunday",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday"
+      },
+      "options": {
+        "closed": "Closed",
+        "24hours": "Open 24/7",
+        "custom": "Custom Hours"
+      },
+      "from": "From",
+      "to": "To"
+    }
+  },
+  "feedback": {
+    "title": "Feedback for {{businessName}}",
+    "loading": "Loading feedback...",
+    "form": {
+      "rating": {
+        "label": "Rate this business",
+        "stars": "{{count}} stars"
+      },
+      "comment": {
+        "label": "Write your feedback",
+        "placeholder": "Briefly describe your experience..."
+      },
+      "submit": "Submit Feedback"
+    },
+    "previousFeedbacks": {
+      "title": "Previous Feedback",
+      "noFeedbacks": "No feedback yet, be the first!",
+      "anonymous": "Anonymous"
+    },
+    "errors": {
+      "unauthorized": "Not authorized. Please log in again.",
+      "noRating": "Please select a rating before submitting.",
+      "submitError": "Error submitting feedback: {{message}}",
+      "unknown": "Unknown error"
+    },
+    "success": "✅ Feedback submitted successfully!"
+  },
+  "footer": {
+    "contact": {
+      "title": "Contact Us",
+      "email": "info@zezman.app"
+    },
+    "quickLinks": {
+      "title": "Quick Links",
+      "search": "Search",
+      "showItem": "Show Item",
+      "terms": "Terms of Use"
+    },
+    "about": {
+      "title": "Time To",
+      "description": "Israel's leading business directory. Find the right business near you."
+    },
+    "copyright": "© Zezman 2023 All rights reserved."
+  },
+  "joinBanner": {
+    "title": "Join Time Community",
+    "subtitle": "Add your business and start getting new customers today",
+    "button": "Add Business Free"
+  },
+  "businessProfile": {
+    "title": "Business Profile",
+    "about": "About",
+    "services": "Services",
+    "openingHours": "Opening Hours",
+    "location": "Location",
+    "contact": "Contact",
+    "reviews": "Ratings & Reviews",
+    "writeReview": "Add Review",
+    "share": "Share",
+    "report": "Report",
+    "days": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday"
+    },
+    "status": {
+      "open": "Open",
+      "closed": "Closed",
+      "openNow": "Open Now",
+      "closedNow": "Closed Now"
+    },
+    "errors": {
+      "loading": "Error loading business details",
+      "notFound": "Business data not found"
+    }
+  },
+  "searchResults": {
+    "title": "Search Results",
+    "noResults": "No results found",
+    "filters": {
+      "title": "Filter Results",
+      "category": "Category",
+      "rating": "Rating",
+      "services": "Services",
+      "clear": "Clear Filters",
+      "apply": "Apply Filters"
+    },
+    "sort": {
+      "title": "Sort By",
+      "rating": "Highest Rating",
+      "name": "A-Z",
+      "distance": "Distance"
+    }
+  },
+  "businessSteps": {
+    "details": {
+      "title": "Business Details",
+      "fields": {
+        "name": "Business Name",
+        "category": "Category",
+        "description": "Business Description",
+        "address": "Address",
+        "phone": {
+          "prefix": "Prefix",
+          "number": "Phone Number"
+        },
+        "email": "Email"
+      },
+      "validation": {
+        "required": "Required field",
+        "email": "Invalid email address",
+        "phone": "Invalid phone number"
+      }
+    },
+    "services": {
+      "title": "Business Services",
+      "noServices": "No services found for this category",
+      "selected": "{{count}} services selected"
+    },
+    "hours": {
+      "title": "Operating Hours",
+      "days": {
+        "sunday": "Sunday",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday"
+      },
+      "closed": "Closed",
+      "24hours": "Open 24/7",
+      "custom": "Custom Hours",
+      "from": "From",
+      "to": "To"
+    }
+  },
+  "editSteps": {
+    "title": {
+      "edit": "Edit Business",
+      "add": "Add New Business"
+    },
+    "description": "Fill in the following details to {{action}} your business",
+    "details": {
+      "title": "Business Details",
+      "description": "Enter the basic details of your business",
+      "fields": {
+        "name": "Business Name",
+        "category": "Category",
+        "description": "Business Description",
+        "address": "Address",
+        "phone": {
+          "prefix": "Prefix",
+          "number": "Phone Number"
+        },
+        "email": "Email"
+      },
+      "validation": {
+        "required": "Required field",
+        "email": "Invalid email address",
+        "phone": "Invalid phone number"
+      }
+    },
+    "services": {
+      "title": "Services",
+      "description": "Select the services your business offers",
+      "noServices": "No services found for this category",
+      "selected": "{{count}} services selected"
+    },
+    "hours": {
+      "title": "Operating Hours",
+      "description": "Set your business operating hours",
+      "days": {
+        "sunday": "Sunday",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday"
+      },
+      "closed": "Closed",
+      "24hours": "24 Hours",
+      "custom": "Custom Hours",
+      "from": "From",
+      "to": "To"
+    },
+    "errors": {
+      "loading": "Error loading business",
+      "categories": "Error loading categories",
+      "services": "Error loading services"
+    },
+    "messages": {
+      "success": "Business {{action}} successfully!",
+      "error": "Error saving business"
+    }
+  },
+  "advancedSearch": {
+    "title": "Advanced Search",
+    "filters": {
+      "category": "Category",
+      "services": "Services",
+      "rating": "Minimum Rating",
+      "location": "Location",
+      "sort": {
+        "title": "Sort By",
+        "rating": "Rating",
+        "name": "Name",
+        "distance": "Distance"
+      }
+    },
+    "buttons": {
+      "apply": "Apply Filters",
+      "clear": "Clear",
+      "close": "Close"
+    },
+    "noResults": "No results found",
+    "selected": "{{count}} items selected"
+  },
+  "accessibility": {
+    "title": "Accessibility Settings",
+    "options": {
+      "fontSize": {
+        "title": "Font Size",
+        "normal": "Normal",
+        "large": "Large",
+        "larger": "Extra Large"
+      },
+      "contrast": {
+        "title": "Contrast",
+        "normal": "Normal",
+        "high": "High"
+      },
+      "animations": {
+        "title": "Animations",
+        "on": "On",
+        "off": "Off"
+      },
+      "screenReader": {
+        "title": "Screen Reader",
+        "instructions": "Screen reader usage instructions"
+      }
+    },
+    "apply": "Apply Changes",
+    "reset": "Reset Settings"
+  },
+  "suggestItem": {
+    "title": "Suggest Item",
+    "description": "Suggest a new category or service",
+    "form": {
+      "type": {
+        "label": "Suggestion Type",
+        "category": "Category",
+        "service": "Service"
+      },
+      "name": {
+        "he": "Hebrew Name",
+        "en": "English Name"
+      },
+      "parentCategory": "Parent Category",
+      "reason": "Reason or Brief Description",
+      "submit": "Submit Suggestion"
+    },
+    "messages": {
+      "success": "Suggestion submitted successfully!",
+      "error": "Error submitting suggestion"
+    }
+  },
+  "userBusinesses": {
+    "title": "My Businesses",
+    "description": "Manage your registered businesses",
+    "empty": "You don't have any registered businesses yet",
+    "addBusiness": "Add New Business",
+    "loading": "Loading businesses...",
+    "error": "Error loading businesses",
+    "filters": {
+      "all": "All Businesses",
+      "active": "Active",
+      "inactive": "Inactive",
+      "deleted": "Deleted"
+    }
+  }
+} 

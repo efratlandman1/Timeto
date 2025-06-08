@@ -1,0 +1,397 @@
+/* עיצוב כללי לכותרת */
+.header-container {
+    background-color: white;
+    /* position: fixed; */
+    position: static;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 60px;
+}
+
+/* עיצוב הניווט */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    direction: rtl;
+    height: 100%;
+}
+
+.nav-right {
+    flex: 0 0 auto;
+    margin-left: 3rem;
+}
+
+.nav-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.nav-left {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-right: 3rem;
+}
+
+/* Logo styling */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0.5rem;
+}
+
+.logo:hover {
+    transform: translateY(-2px);
+}
+
+.logo-icon {
+    font-size: 2rem;
+    color: #ff4d4d;
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.logo-text-main {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.logo-text-sub {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Navigation buttons */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.username {
+    font-weight: 700;
+}
+
+/* Common dropdown styles */
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    z-index: 1000;
+    padding: 8px 0;
+    margin-top: 4px;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    width: 100%;
+    border: none;
+    background: none;
+    text-align: right;
+    font-size: 14px;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #f5f5f5;
+    outline: none;
+}
+
+.dropdown-item:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
+}
+
+.dropdown-item svg {
+    font-size: 16px;
+    color: #666;
+}
+
+.nav-button.with-hover {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    color: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.nav-button.with-hover:hover,
+.nav-button.with-hover:focus {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.nav-button.with-hover:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.user-menu {
+    position: relative;
+}
+
+/* Language menu specific */
+.lang-menu {
+    position: relative;
+}
+
+/* Unused class - can be removed */
+/* .lang-button {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    font-size: 1.25rem;
+} */
+
+/* Unused class - can be removed */
+/* .lang-button:hover {
+    color: #ff4d4d;
+} */
+
+.lang-dropdown {
+    min-width: 120px;
+}
+
+/* Auth section */
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.auth-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 400;
+    transition: all 0.2s ease;
+}
+
+.auth-button:hover {
+    color: var(--primary-color);
+    background-color: var(--background-light);
+}
+
+.auth-button svg {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+.auth-button:hover svg {
+    color: var(--primary-color);
+}
+
+/* Unused class - can be removed */
+/* .user-icon {
+    color: #666;
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+} */
+
+/* Unused class - can be removed */
+/* .user-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #333;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+} */
+
+/* Unused class - can be removed */
+/* .user-menu-item:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+} */
+
+/* Unused class - can be removed */
+/* .user-menu-item:hover {
+    background-color: #f8f8f8;
+    color: #ff4d4d;
+} */
+
+/* Unused class - can be removed */
+/* .user-menu-item svg {
+    color: #666;
+    font-size: 1rem;
+} */
+
+/* Unused class - can be removed */
+/* .user-menu-item:hover svg {
+    color: #ff4d4d;
+} */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 1024px) {
+    .nav-center {
+        display: none;
+    }
+
+    .navbar {
+        padding: 0.25rem 1rem;
+    }
+}
+
+/* Unused class - can be removed */
+/* .auth-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+} */
+
+/* Unused class - can be removed */
+/* .user-greeting {
+    font-size: 0.9rem;
+    color: #666;
+} */
+
+@media (max-width: 768px) {
+    .logo {
+        gap: 0.5rem;
+    }
+
+    .logo-icon {
+        font-size: 1.5rem;
+    }
+
+    .logo span {
+        font-size: 0.9rem;
+    }
+
+    .logo-text-sub {
+        display: none;
+    }
+}
+
+/* Unused class - can be removed */
+/* main {
+    margin-top: 60px;
+} */
+
+/* Language Switch Styles */
+.lang-switch {
+    margin-right: 1rem;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(30px);
+}
+
+.lang-label {
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 0;
+}
+
+.lang-label.he {
+    margin-right: 4px;
+}
+
+.lang-label.en {
+    margin-left: 4px;
+}

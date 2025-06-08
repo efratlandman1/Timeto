@@ -1,0 +1,119 @@
+/* Main Container */
+.user-business-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem 1rem 1rem;
+}
+
+/* Container styles moved to global/containers.css (.wide-page-container) */
+
+/* Business Cards Grid */
+.business-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 24px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Add Business Button */
+.add-business-container {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 100;
+}
+
+.add-business-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: white;
+    color: var(--text-primary);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.add-business-button:hover {
+    background-color: var(--background-light);
+    border-color: var(--border-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.add-business-icon {
+    font-size: 0.9rem;
+    color: var(--primary-color);
+}
+
+.tooltip {
+    position: absolute;
+    right: 70px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #333;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 6px 0 6px 6px;
+    border-style: solid;
+    border-color: transparent transparent transparent #333;
+}
+
+.add-business-button:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .business-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .business-cards-grid {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+
+    .user-business-container  {
+        padding: 4rem 0.5rem 1rem;
+    }
+
+    .add-business-container {
+        bottom: 24px;
+        right: 24px;
+    }
+
+    .add-business-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .add-business-icon {
+        font-size: 20px;
+    }
+}

@@ -1,0 +1,408 @@
+/* Modern Business Card Styles */
+.business-cards-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  padding: 0 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.business-card {
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  height: 280px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.business-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.business-card-image-container {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.business-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.business-card:hover .business-card-image {
+  transform: scale(1.05);
+}
+
+.business-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.2));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.business-card:hover .business-card-overlay {
+  opacity: 1;
+}
+
+.business-card-content {
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.business-card-header {
+  margin-bottom: 8px;
+}
+
+.business-card-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #202125;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.business-card-category {
+  font-size: 0.85rem;
+  color: #737373;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.business-card-category svg {
+  font-size: 0.75rem;
+  min-width: 12px;
+  color: #ff385c;
+}
+
+.business-card-address {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 20px);
+}
+
+/* Unused classes - can be removed */
+/* .business-card-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: #737373;
+}
+
+.price-range {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.delivery-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+} */
+
+.business-card-footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.business-card-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rating-stars {
+  color: #ffd700;
+  display: flex;
+  gap: 1px;
+  font-size: 0.85rem;
+}
+
+.rating-number {
+  font-size: 0.85rem;
+  color: #737373;
+}
+
+.business-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+/* Colored action buttons */
+.action-button.email {
+  background: #ea4335;
+}
+
+.action-button.whatsapp {
+  background: #25d366;
+}
+
+.action-button.phone {
+  background: #0088cc;
+}
+
+.action-button.email svg,
+.action-button.whatsapp svg,
+.action-button.phone svg {
+  color: white;
+}
+
+.action-button.email:hover {
+  background: #d93126;
+}
+
+.action-button.whatsapp:hover {
+  background: #20bd5a;
+}
+
+.action-button.phone:hover {
+  background: #0077b3;
+}
+
+.action-button.admin {
+  color: white;
+}
+
+.action-button.admin[title*="עריכה"],
+.action-button.admin:has(.tooltip:contains("עריכה")) {
+  background: #4a90e2;
+}
+
+.action-button.admin[title*="עריכה"]:hover,
+.action-button.admin:has(.tooltip:contains("עריכה")):hover {
+  background: #357abd;
+}
+
+.action-button.admin[title*="מחיקה"],
+.action-button.admin:has(.tooltip:contains("מחיקה")),
+.action-button.admin:has(.tooltip:contains("אישור מחיקה")) {
+  background: #e74c3c;
+}
+
+.action-button.admin[title*="מחיקה"]:hover,
+.action-button.admin:has(.tooltip:contains("מחיקה")):hover,
+.action-button.admin:has(.tooltip:contains("אישור מחיקה")):hover {
+  background: #c0392b;
+}
+
+.action-button.admin[title*="ביטול"],
+.action-button.admin:has(.tooltip:contains("ביטול")) {
+  background: #95a5a6;
+}
+
+.action-button.admin[title*="ביטול"]:hover,
+.action-button.admin:has(.tooltip:contains("ביטול")):hover {
+  background: #7f8c8d;
+}
+
+.action-button.admin[title*="שחזור"],
+.action-button.admin:has(.tooltip:contains("שחזור")) {
+  background: #2ecc71;
+}
+
+.action-button.admin[title*="שחזור"]:hover,
+.action-button.admin:has(.tooltip:contains("שחזור")):hover {
+  background: #27ae60;
+}
+
+.action-button.admin svg,
+.action-button.admin span {
+  color: white;
+  font-size: 0.9rem;
+}
+
+.business-card-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  z-index: 1;
+}
+
+.badge-open {
+  background: #4caf50;
+  color: white;
+}
+
+.badge-closed {
+  background: #f44336;
+  color: white;
+}
+
+.business-card.inactive {
+  opacity: 0.7;
+  position: relative;
+}
+
+.business-card.inactive .action-button:not(.restore-button) {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.business-card.inactive::after {
+  content: 'לא פעיל';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  background: rgba(244, 67, 54, 0.9);
+  color: white;
+  padding: 8px 40px;
+  font-weight: 500;
+  font-size: 1.2rem;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Remove the custom tooltip styles */
+.action-button .tooltip {
+  display: none;
+}
+
+.action-button:hover .tooltip {
+  display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .business-cards-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .business-cards-container {
+    grid-template-columns: 1fr;
+    padding: 0 16px;
+  }
+
+  .business-card {
+    height: 260px;
+  }
+}
+
+.favorite-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.favorite-button svg {
+  width: 20px;
+  height: 20px;
+  color: #ccc;
+  transition: all 0.3s ease;
+}
+
+.favorite-button:hover {
+  transform: scale(1.1);
+  background: white;
+}
+
+.favorite-button.active {
+  background: #fff;
+}
+
+.favorite-button.active svg {
+  color: #ff4b4b;
+}
+
+/* Update action button colors */
+.action-button.admin.edit-button {
+  background: #4a90e2;
+}
+
+.action-button.admin.edit-button:hover {
+  background: #357abd;
+}
+
+.action-button.admin.delete-button {
+  background: #e74c3c;
+}
+
+.action-button.admin.delete-button:hover {
+  background: #c0392b;
+}
+
+.action-button.admin.confirm-delete {
+  background: #4a90e2;
+}
+
+.action-button.admin.confirm-delete:hover {
+  background: #357abd;
+}
+
+.action-button.admin.cancel-delete {
+  background: #e74c3c;
+}
+
+.action-button.admin.cancel-delete:hover {
+  background: #c0392b;
+}
+
+.action-button.admin.restore-button {
+  background: #2ecc71;
+}
+
+.action-button.admin.restore-button:hover {
+  background: #27ae60;
+}
