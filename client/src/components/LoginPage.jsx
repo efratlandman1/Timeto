@@ -5,6 +5,7 @@ import { FaEnvelope, FaLock, FaClock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/userSlice';
 import { useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -14,6 +15,33 @@ const LoginPage = () => {
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const handleGoogleLoginSuccess = async (credentialResponse) => {
+        setLoading(true);
+        setError('');
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/google`, {
+                tokenId: credentialResponse.credential
+            });
+
+            if (response.data.token && response.data.user) {
+                dispatch(setUser({user: response.data.user}));
+                document.cookie = `token=${response.data.token}`;
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+                navigate('/my-businesses');
+            } else {
+                setError('ההתחברות נכשלה. נסה שוב');
+            }
+        } catch (e) {
+            setError('התחברות גוגל נכשלה');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleLoginError = () => {
+        setError('התחברות גוגל נכשלה');
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -82,6 +110,13 @@ const LoginPage = () => {
                     <button className="login-button" type="submit" disabled={loading}>
                         {loading ? 'טוען...' : 'התחברות'}
                     </button>
+
+                    <div className="google-login-container" style={{paddingTop: '15px', display: 'flex', justifyContent: 'center'}}>
+                        <GoogleLogin
+                            onSuccess={handleGoogleLoginSuccess}
+                            onError={handleGoogleLoginError}
+                        />
+                    </div>
                 </form>
             </div>
         </div>
