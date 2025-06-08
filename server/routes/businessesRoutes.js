@@ -7,6 +7,10 @@ router
     .route('/')
     .get(businessesController.getItems)
     .post(upload.single('logo'), businessesController.uploadBusinesses);
+
+router
+    .route('/all')
+    .get(businessesController.getAllBusinesses);
     
 router
     .route('/user-businesses')

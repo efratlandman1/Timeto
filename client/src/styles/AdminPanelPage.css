@@ -385,4 +385,103 @@
 .admin-table .category-group.group-color-1 { background-color: rgba(232, 245, 233, 0.5); }
 .admin-table .category-group.group-color-2 { background-color: rgba(255, 243, 224, 0.5); }
 .admin-table .category-group.group-color-3 { background-color: rgba(252, 228, 236, 0.5); }
-.admin-table .category-group.group-color-4 { background-color: rgba(243, 229, 245, 0.5); } 
+.admin-table .category-group.group-color-4 { background-color: rgba(243, 229, 245, 0.5); }
+
+.businesses-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    flex-grow: 1;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.tree-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.2s;
+}
+
+.tree-button:hover {
+    background-color: #0056b3;
+}
+
+.tree-container {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    max-height: 60vh;
+    overflow-y: auto;
+    direction: rtl;
+    text-align: right;
+}
+
+.tree-node {
+    margin-right: 20px;
+    margin-left: 0;
+}
+
+.tree-node-label {
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.tree-node-label:hover {
+    background-color: #eee;
+}
+
+.tree-node-content {
+    padding-right: 20px;
+    border-right: 1px solid #ccc;
+    padding-left: 0;
+    border-left: none;
+}
+
+.tree-leaf {
+    padding: 3px 5px;
+    margin-right: 20px;
+    margin-left: 0;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.tree-leaf strong {
+    margin-left: 8px;
+}
+
+.arrow {
+    display: inline-block;
+    width: 20px;
+    transition: transform 0.1s linear;
+    text-align: center;
+    transform: scaleX(-1);
+}
+
+.arrow.expanded {
+    transform: rotate(90deg) scaleX(-1);
+}
+
+.arrow-placeholder {
+    display: inline-block;
+    width: 20px;
+    height: 1em;
+}
+
+.highlight {
+    background-color: yellow;
+} 

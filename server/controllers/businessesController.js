@@ -3,6 +3,31 @@ const AuthUtils = require('../utils/authUtils');
 const Category = require('../models/category');
 const mongoose = require('mongoose');
 const Service = require('../models/service');
+const Feedback = require('../models/feedback');
+
+exports.getAllBusinesses = async (req, res) => {
+    try {
+        const businesses = await Business.find({})
+            .populate('categoryId', 'name')
+            .populate('services', 'name')
+            .populate('userId', 'firstName lastName');
+
+        const businessesWithFeedback = await Promise.all(
+            businesses.map(async (business) => {
+                const feedbacks = await Feedback.find({ business_id: business._id }).populate({
+                    path: 'user_id',
+                    select: 'firstName lastName _id'
+                });
+                return { ...business.toObject(), feedbacks };
+            })
+        );
+
+        res.status(200).json(businessesWithFeedback);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({message: err.message});
+    }
+};
 
 exports.uploadBusinesses = async (req, res) => {
     try {
