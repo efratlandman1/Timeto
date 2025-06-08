@@ -11,6 +11,7 @@ const matchPath = (path, routePattern) => {
 const jwtAuthMiddleware = (req, res, next) => {
     const openRoutes = [
         '/api/v1/login',
+        '/api/v1/google',
         // '/api/v1/register',
         '/api/v1/users/register',
         '/api/v1/businesses',

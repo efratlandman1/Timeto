@@ -3,8 +3,57 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user');
 require('dotenv').config();
 
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 
+exports.googleLogin = async (req, res) => {
+    const { tokenId } = req.body;
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: tokenId,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const { name, email, sub } = ticket.getPayload();
+
+        let user = await User.findOne({ email });
+
+        if (user) {
+            // אם המשתמש קיים, נעדכן אותו לשיטת אימות של גוגל
+            user.authProvider = 'google';
+            user.providerId = sub;
+            user.password = undefined; // אין צורך בסיסמה
+        } else {
+            // אם המשתמש לא קיים, ניצור אחד חדש
+            const [firstName, ...lastName] = name.split(' ');
+            user = new User({
+                firstName: firstName,
+                lastName: lastName.join(' ') || ' ',
+                email: email,
+                authProvider: 'google',
+                providerId: sub,
+            });
+        }
+
+        await user.save();
+
+        // ניצור טוקן JWT עבור המשתמש החדש/הקיים
+        const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        const userData = {
+            id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            //... וכל שאר הפרטים שאתה שולח בדרך כלל
+        };
+
+        res.status(200).json({ token, user: userData });
+    } catch (err) {
+        console.error('Google login error:', err);
+        res.status(500).json({ error: 'Google authentication failed' });
+    }
+};
 
 exports.login = async (req, res) => {
     try {
