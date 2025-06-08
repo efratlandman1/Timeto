@@ -14,21 +14,21 @@ exports.googleLogin = async (req, res) => {
             idToken: tokenId,
             audience: process.env.GOOGLE_CLIENT_ID,
         });
-        const { name, email, sub } = ticket.getPayload();
+        const { email, sub, given_name, family_name } = ticket.getPayload();
 
         let user = await User.findOne({ email });
 
         if (user) {
-            // אם המשתמש קיים, נעדכן אותו לשיטת אימות של גוגל
             user.authProvider = 'google';
             user.providerId = sub;
-            user.password = undefined; // אין צורך בסיסמה
+            user.password = undefined;
+            // ניתן לעדכן את השם במקרה שרוצים
+            user.firstName = given_name || user.firstName;
+            user.lastName = family_name || user.lastName;
         } else {
-            // אם המשתמש לא קיים, ניצור אחד חדש
-            const [firstName, ...lastName] = name.split(' ');
             user = new User({
-                firstName: firstName,
-                lastName: lastName.join(' ') || ' ',
+                firstName: given_name || '',
+                lastName: family_name || '',
                 email: email,
                 authProvider: 'google',
                 providerId: sub,
@@ -37,15 +37,17 @@ exports.googleLogin = async (req, res) => {
 
         await user.save();
 
-        // ניצור טוקן JWT עבור המשתמש החדש/הקיים
-        const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign(
+            { userId: user._id, email: user.email, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
 
         const userData = {
             id: user._id,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            //... וכל שאר הפרטים שאתה שולח בדרך כלל
         };
 
         res.status(200).json({ token, user: userData });
@@ -54,6 +56,7 @@ exports.googleLogin = async (req, res) => {
         res.status(500).json({ error: 'Google authentication failed' });
     }
 };
+
 
 exports.login = async (req, res) => {
     try {
