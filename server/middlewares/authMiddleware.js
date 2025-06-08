@@ -7,7 +7,7 @@ const matchPath = (path, routePattern) => {
   const routeRegex = new RegExp('^' + routePattern.replace(/:[^\/]+/g, '[^/]+') + '$');
   return routeRegex.test(path);
 };
-
+ 
 const jwtAuthMiddleware = (req, res, next) => {
     const openRoutes = [
         '/api/v1/login',
