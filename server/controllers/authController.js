@@ -120,16 +120,24 @@ exports.requestPasswordReset = async (req, res) => {
                 <p>This link will expire in 1 hour.</p>
             `;
 
-            try {
-                await sendEmail({
-                    email: user.email,
-                    subject: 'Password Reset Request',
-                    html: message,
-                });
-            } catch (err) {
-                console.error('Email sending error:', err);
-                // Even if email fails, we don't want to leak info.
-                // The token is still in the DB for manual resend if needed.
+            // Whitelist logic for development environment
+            const isDev = process.env.NODE_ENV === 'dev';
+            const emailWhitelist = process.env.EMAIL_WHITELIST ? process.env.EMAIL_WHITELIST.split(',') : [];
+
+            if (isDev && !emailWhitelist.includes(user.email)) {
+                console.log(`Skipping password reset email for ${user.email} (not in whitelist for dev env).`);
+            } else {
+                try {
+                    await sendEmail({
+                        email: user.email,
+                        subject: 'Password Reset Request',
+                        html: message,
+                    });
+                } catch (err) {
+                    console.error('Email sending error:', err);
+                    // Even if email fails, we don't want to leak info.
+                    // The token is still in the DB for manual resend if needed.
+                }
             }
         }
 
