@@ -63,7 +63,12 @@ const LoginPage = () => {
                 setError('ההתחברות נכשלה. נסה שוב');
             }
         } catch (e) {
-            setError('האימייל או הסיסמה שגויים');
+            if (e.response && e.response.status === 429) {
+                setError(e.response.data);
+            } else {
+                setError('האימייל או הסיסמה שגויים');
+            }
+            console.error('Login error:', e.response ? e.response.data : e.message);
         } finally {
             setLoading(false);
         }

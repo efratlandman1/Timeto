@@ -5,6 +5,7 @@ const PasswordResetToken = require('../models/PasswordResetToken');
 const sendEmail = require('../utils/sendEmail');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
+const crypto = require('crypto');
 
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -107,18 +108,23 @@ exports.requestPasswordReset = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (user) {
-            const token = uuidv4();
+            // Create a secure, random token
+            const resetToken = crypto.randomBytes(32).toString('hex');
+            
+            // Hash the token before saving it to the database
+            const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
             const expiresAt = new Date(Date.now() + 3600000); // 1 hour
 
-            // Find a token by email and update it, or create a new one if it doesn't exist.
             await PasswordResetToken.findOneAndUpdate(
                 { email },
-                { token, expiresAt, used: false },
+                { token: hashedToken, expiresAt, used: false },
                 { new: true, upsert: true }
             );
 
             const baseUrl = process.env.RESET_PASSWORD_BASE_URL || 'http://localhost:3000';
-            const resetUrl = `${baseUrl}/reset-password?token=${token}`;
+            // Send the unhashed token to the user
+            const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
             const message = `
                 <h1>You have requested a password reset</h1>
                 <p>Please go to this link to reset your password:</p>
@@ -165,8 +171,11 @@ exports.resetPassword = async (req, res) => {
         if (!token || !newPassword) {
             return res.status(400).json({ message: 'Token and new password are required.' });
         }
+        
+        // Hash the incoming token to match the one in the DB
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
-        const resetToken = await PasswordResetToken.findOne({ token });
+        const resetToken = await PasswordResetToken.findOne({ token: hashedToken });
 
         if (!resetToken || resetToken.used || resetToken.expiresAt < new Date()) {
             return res.status(400).json({ message: 'Invalid or expired token.' });
@@ -180,15 +189,13 @@ exports.resetPassword = async (req, res) => {
         const salt = await bcryptjs.genSalt(10);
         user.password = await bcryptjs.hash(newPassword, salt);
         
-        // Switch user to local authentication
         user.authProvider = 'local';
-        user.providerId = undefined; // Remove providerId
+        user.providerId = undefined; 
         
         await user.save();
 
         resetToken.used = true;
         await resetToken.save();
-        // Or await PasswordResetToken.deleteOne({ token });
 
         res.status(200).json({ message: 'Password has been reset successfully.' });
 

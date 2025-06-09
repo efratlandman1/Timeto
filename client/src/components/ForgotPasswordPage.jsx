@@ -16,7 +16,13 @@ const ForgotPasswordPage = () => {
             await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/request-password-reset`, { email });
             toast.success('אם קיים חשבון עם כתובת זו, נשלח אליו קישור לאיפוס סיסמה.');
         } catch (error) {
-            toast.error('אירעה שגיאה. אנא נסו שוב.');
+            if (error.response && error.response.status === 429) {
+                // Handle Rate Limit error specifically
+                toast.error(error.response.data);
+            } else {
+                toast.error('אירעה שגיאה. אנא נסו שוב.');
+            }
+            console.error('Forgot password error:', error.response ? error.response.data : error.message);
         } finally {
             setLoading(false);
             setEmail('');
