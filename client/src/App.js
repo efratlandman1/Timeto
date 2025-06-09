@@ -15,6 +15,8 @@ import MyFavoritesPage from './components/MyFavoritesPage';
 import TermsPage from './components/TermsPage';
 import AdminPanelPage from './components/AdminPanelPage';
 import UserProfilePage from './components/UserProfilePage';
+import ForgotPasswordPage from './components/ForgotPasswordPage';
+import ResetPasswordPage from './components/ResetPasswordPage';
 import { useDispatch } from 'react-redux';
 import { setUser } from './redux/userSlice';
 import { ToastContainer } from 'react-toastify';
@@ -70,6 +72,8 @@ function App() {
                     <Route path="/suggest" element={<SuggestItemPage />} />
                     <Route path="/terms" element={<TermsPage />} />
                     <Route path="/admin" element={<AdminPanelPage />} />
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                    <Route path="/reset-password" element={<ResetPasswordPage />} />
                 </Routes>
                 <Accessibility />
             </div>

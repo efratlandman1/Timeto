@@ -4,7 +4,7 @@ import '../styles/LoginPage.css';
 import { FaEnvelope, FaLock, FaClock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/userSlice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 
 const LoginPage = () => {
@@ -110,6 +110,10 @@ const LoginPage = () => {
                     <button className="login-button" type="submit" disabled={loading}>
                         {loading ? 'טוען...' : 'התחברות'}
                     </button>
+
+                    <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                        <Link to="/forgot-password">שכחת סיסמה?</Link>
+                    </div>
 
                     <div className="google-login-container" style={{paddingTop: '15px', display: 'flex', justifyContent: 'center'}}>
                         <GoogleLogin

@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
+const PasswordResetToken = require('../models/PasswordResetToken');
+const sendEmail = require('../utils/sendEmail');
+const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 
 const { OAuth2Client } = require('google-auth-library');
@@ -89,6 +92,92 @@ exports.login = async (req, res) => {
     } catch (err) {
         console.error('Login error:', err);
         res.status(500).json({ error: 'Server error during login' });
+    }
+};
+
+exports.requestPasswordReset = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (user) {
+            const token = uuidv4();
+            const expiresAt = new Date(Date.now() + 3600000); // 1 hour
+
+            // Find a token by email and update it, or create a new one if it doesn't exist.
+            await PasswordResetToken.findOneAndUpdate(
+                { email },
+                { token, expiresAt, used: false },
+                { new: true, upsert: true }
+            );
+
+            const baseUrl = process.env.RESET_PASSWORD_BASE_URL || 'http://localhost:3000';
+            const resetUrl = `${baseUrl}/reset-password?token=${token}`;
+            const message = `
+                <h1>You have requested a password reset</h1>
+                <p>Please go to this link to reset your password:</p>
+                <a href="${resetUrl}" clicktracking=off>${resetUrl}</a>
+                <p>This link will expire in 1 hour.</p>
+            `;
+
+            try {
+                await sendEmail({
+                    email: user.email,
+                    subject: 'Password Reset Request',
+                    html: message,
+                });
+            } catch (err) {
+                console.error('Email sending error:', err);
+                // Even if email fails, we don't want to leak info.
+                // The token is still in the DB for manual resend if needed.
+            }
+        }
+
+        res.status(200).json({ message: 'If a user with that email exists, a password reset link has been sent.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+
+        if (!token || !newPassword) {
+            return res.status(400).json({ message: 'Token and new password are required.' });
+        }
+
+        const resetToken = await PasswordResetToken.findOne({ token });
+
+        if (!resetToken || resetToken.used || resetToken.expiresAt < new Date()) {
+            return res.status(400).json({ message: 'Invalid or expired token.' });
+        }
+
+        const user = await User.findOne({ email: resetToken.email });
+        if (!user) {
+            return res.status(400).json({ message: 'User not found.' });
+        }
+
+        const salt = await bcryptjs.genSalt(10);
+        user.password = await bcryptjs.hash(newPassword, salt);
+        
+        // Switch user to local authentication
+        user.authProvider = 'local';
+        user.providerId = undefined; // Remove providerId
+        
+        await user.save();
+
+        resetToken.used = true;
+        await resetToken.save();
+        // Or await PasswordResetToken.deleteOne({ token });
+
+        res.status(200).json({ message: 'Password has been reset successfully.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
