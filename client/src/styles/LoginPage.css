@@ -46,7 +46,7 @@
 .login-input-icon {
     position: absolute;
     top: 50%;
-    right: 16px;
+    left: 16px;
     transform: translateY(-50%);
     color: #d32f2f;
     font-size: 1.2rem;
@@ -55,19 +55,20 @@
 
 .login-input {
     width: 100%;
-    padding: 1rem 3rem 1rem 1rem;
+    padding: 1rem 1rem 1rem 3rem;
     border-radius: 12px;
-    border: 2px solid #e0e0e0;
+    border: 1px solid #e0e0e0;
     font-size: 1rem;
     text-align: right;
     transition: all 0.3s ease;
-    background: white;
+    background: #f0f5fa;
 }
 
 .login-input:focus {
     border-color: #d32f2f;
     box-shadow: 0 0 0 4px rgba(211, 47, 47, 0.1);
     outline: none;
+    background: white;
 }
 
 .login-input::placeholder {
@@ -108,7 +109,7 @@
 .login-password-toggle {
     position: absolute;
     top: 50%;
-    left: 16px;
+    right: 16px;
     transform: translateY(-50%);
     cursor: pointer;
     color: #757575;
@@ -118,6 +119,19 @@
 
 .login-password-toggle:hover {
     color: #d32f2f;
+}
+
+.login-forgot-password-link {
+    display: block;
+    color: #d32f2f;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.login-forgot-password-link:hover {
+    opacity: 0.8;
 }
 
 .login-checkbox {

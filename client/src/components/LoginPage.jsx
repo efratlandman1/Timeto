@@ -79,7 +79,6 @@ const LoginPage = () => {
                     {error && <div className="login-error">{error}</div>}
 
                     <div className="login-input-wrapper">
-                        <FaEnvelope className="login-input-icon" />
                         <input
                             className="login-input"
                             type="email"
@@ -90,10 +89,10 @@ const LoginPage = () => {
                             onInvalid={(e) => e.target.setCustomValidity('אנא הזן כתובת אימייל חוקית')}
                             onInput={(e) => e.target.setCustomValidity('')}
                         />
+                        <FaEnvelope className="login-input-icon" />
                     </div>
 
                     <div className="login-input-wrapper">
-                        <FaLock className="login-input-icon" />
                         <input
                             className="login-input"
                             type={showPassword ? "text" : "password"}
@@ -102,6 +101,7 @@ const LoginPage = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
+                        <FaLock className="login-input-icon" />
                         <span className="login-password-toggle" onClick={() => setShowPassword(!showPassword)}>
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
@@ -111,9 +111,7 @@ const LoginPage = () => {
                         {loading ? 'טוען...' : 'התחברות'}
                     </button>
 
-                    <div style={{ textAlign: 'center', marginTop: '10px' }}>
-                        <Link to="/forgot-password">שכחת סיסמה?</Link>
-                    </div>
+                    <Link to="/forgot-password" className="login-forgot-password-link">שכחת סיסמה?</Link>
 
                     <div className="google-login-container" style={{paddingTop: '15px', display: 'flex', justifyContent: 'center'}}>
                         <GoogleLogin
