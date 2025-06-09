@@ -123,7 +123,8 @@ exports.requestPasswordReset = async (req, res) => {
             // Whitelist logic for development environment
             const isDev = process.env.NODE_ENV === 'dev';
             const emailWhitelist = process.env.EMAIL_WHITELIST ? process.env.EMAIL_WHITELIST.split(',') : [];
-
+            console.log('isDev',isDev);
+            console.log('emailWhitelist',emailWhitelist);
             if (isDev && !emailWhitelist.includes(user.email)) {
                 console.log(`Skipping password reset email for ${user.email} (not in whitelist for dev env).`);
             } else {
@@ -133,6 +134,8 @@ exports.requestPasswordReset = async (req, res) => {
                         subject: 'Password Reset Request',
                         html: message,
                     });
+                    console.log('Password reset email sent to:', user.email);
+
                 } catch (err) {
                     console.error('Email sending error:', err);
                     // Even if email fails, we don't want to leak info.
