@@ -17,18 +17,24 @@ exports.googleLogin = async (req, res) => {
             idToken: tokenId,
             audience: process.env.GOOGLE_CLIENT_ID,
         });
-        const { email, sub, given_name, family_name } = ticket.getPayload();
+        const { email, sub, given_name, family_name, email_verified } = ticket.getPayload();
+
+        // 1. Email Verification Check
+        if (!email_verified) {
+            return res.status(400).json({ error: 'Google account email is not verified.' });
+        }
 
         let user = await User.findOne({ email });
 
         if (user) {
+            // User exists, convert them to a Google-authenticated user
             user.authProvider = 'google';
             user.providerId = sub;
-            user.password = undefined;
-            // ניתן לעדכן את השם במקרה שרוצים
+            user.password = undefined; // Clear the local password
             user.firstName = given_name || user.firstName;
             user.lastName = family_name || user.lastName;
         } else {
+            // If user does not exist, create a new one
             user = new User({
                 firstName: given_name || '',
                 lastName: family_name || '',
