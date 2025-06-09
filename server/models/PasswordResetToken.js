@@ -4,6 +4,7 @@ const passwordResetTokenSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
+        index: true,
     },
     token: {
         type: String,
@@ -18,11 +19,12 @@ const passwordResetTokenSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
+}, {
+    autoIndex: true,
+    timestamps: true
 });
+
+passwordResetTokenSchema.index({ createdAt: 1 }, { expireAfterSeconds: 3600 });
 
 const PasswordResetToken = mongoose.model('PasswordResetToken', passwordResetTokenSchema, 'password_reset_tokens');
 
