@@ -20,7 +20,7 @@ exports.googleLogin = async (req, res) => {
         });
         const { email, sub, given_name, family_name, email_verified } = ticket.getPayload();
 
-        // 1. Email Verification Check
+        // Google already verifies the email, so this is a trusted source.
         if (!email_verified) {
             return res.status(400).json({ error: 'Google account email is not verified.' });
         }
@@ -28,20 +28,22 @@ exports.googleLogin = async (req, res) => {
         let user = await User.findOne({ email });
 
         if (user) {
-            // User exists, convert them to a Google-authenticated user
+            // User exists, ensure they are marked as verified
             user.authProvider = 'google';
             user.providerId = sub;
-            user.password = undefined; // Clear the local password
+            user.password = undefined; 
+            user.is_verified = true; // Mark as verified
             user.firstName = given_name || user.firstName;
             user.lastName = family_name || user.lastName;
         } else {
-            // If user does not exist, create a new one
+            // If user does not exist, create a new, already-verified one
             user = new User({
                 firstName: given_name || '',
                 lastName: family_name || '',
                 email: email,
                 authProvider: 'google',
                 providerId: sub,
+                is_verified: true, // Mark as verified from the start
             });
         }
 
@@ -71,8 +73,16 @@ exports.googleLogin = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
-        if (!user) {
-            return res.status(400).json({ error: 'Email not found' });
+        if (!user || user.authProvider !== 'local') {
+            return res.status(401).json({ error: 'Invalid credentials or login method.' });
+        }
+        
+        // Block login if email is not verified
+        if (!user.is_verified) {
+            return res.status(403).json({ 
+                error: 'יש לאמת את כתובת המייל לפני שניתן להתחבר.',
+                code: 'EMAIL_NOT_VERIFIED'
+            });
         }
 
         const isMatch = await bcryptjs.compare(req.body.password, user.password);
@@ -202,6 +212,49 @@ exports.resetPassword = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.verifyEmail = async (req, res) => {
+    try {
+        const { token } = req.query;
+
+        if (!token) {
+            return res.status(400).json({ message: 'Verification token is missing.' });
+        }
+
+        // Hash the incoming token to match the one in the DB
+        const hashedToken = crypto
+            .createHash('sha256')
+            .update(token)
+            .digest('hex');
+
+        // Find user by the HASHED token
+        const user = await User.findOne({ verification_token: hashedToken });
+
+        if (!user) {
+            return res.status(400).json({ message: 'אסימון אימות שגוי או פג תוקף.' });
+        }
+
+        user.is_verified = true;
+        user.verification_token = null; // Clear the token after use
+        await user.save();
+        
+        // Automatically log the user in by creating and sending a JWT
+        const jwtToken = jwt.sign({ userId: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        
+        // Remove password from the returned user object
+        const { password, ...userData } = user.toObject();
+
+        res.status(200).json({ 
+            message: 'האימייל אומת בהצלחה!',
+            token: jwtToken,
+            user: userData
+        });
+
+    } catch (error) {
+        console.error('Email verification error:', error);
+        res.status(500).json({ message: 'Server error during email verification.' });
     }
 };
 

@@ -20,6 +20,16 @@ const usersSchema = new mongoose.Schema({
     type: String,
     enum: ['admin', 'manager', 'end-user'],
     default: 'end-user'
+  },
+
+  // 🆕 שדות אימות
+  is_verified: {
+    type: Boolean,
+    default: false
+  },
+  verification_token: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true

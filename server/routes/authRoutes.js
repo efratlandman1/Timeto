@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, login, googleLogin, requestPasswordReset, resetPassword } = require('../controllers/authController');
+const { registerUser, login, googleLogin, requestPasswordReset, resetPassword, verifyEmail } = require('../controllers/authController');
 const { authLimiter } = require('../middlewares/rateLimiter');
 
 const router = express.Router();
@@ -9,6 +9,7 @@ router.post('/login', authLimiter, login);
 router.post('/google', authLimiter, googleLogin);
 router.post('/request-password-reset', authLimiter, requestPasswordReset);
 router.post('/reset-password', resetPassword);
+router.get('/verify-email', verifyEmail);
 
 module.exports = router;
      

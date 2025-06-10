@@ -1,5 +1,6 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 
 // פונקציה לבדיקת התאמה של מסלול עם פרמטרים דינמיים
@@ -8,14 +9,14 @@ const matchPath = (path, routePattern) => {
   return routeRegex.test(path);
 };
 
-const jwtAuthMiddleware = (req, res, next) => {
+const jwtAuthMiddleware = async (req, res, next) => {
     const openRoutes = [
         '/api/v1/login',
         '/api/v1/google',
         '/api/v1/request-password-reset',
         '/api/v1/reset-password',
-        // '/api/v1/register',
         '/api/v1/users/register',
+        '/api/v1/verify-email',
         '/api/v1/businesses',
         '/api/v1/categories',
         '/api/v1/services',
@@ -47,7 +48,18 @@ const jwtAuthMiddleware = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
+        
+        const user = await User.findById(decoded.userId).select('-password');
+        
+        if (!user) {
+            return res.status(401).json({ message: 'Authorization failed, user not found.' });
+        }
+        
+        if (!user.is_verified) {
+            return res.status(403).json({ message: 'Please verify your email to access this resource.' });
+        }
+
+        req.user = user;
         next();
     } catch (err) {
         return res.status(403).json({ message: 'Invalid or expired token.' });

@@ -1,20 +1,29 @@
 const jwt = require('jsonwebtoken');
 const User = require("../models/user");
 const bcryptjs = require('bcryptjs');
+const crypto = require('crypto');
+const sendEmail = require('../utils/sendEmail');
 
 exports.registerUser = async (req, res) => {
-   console.log("registerUser");
-    try {
-        // בדיקה אם קיים משתמש עם אותו אימייל
+   try {
         const existingUser = await User.findOne({ email: req.body.email });
         if (existingUser) {
+            // אם המשתמש קיים אבל לא מאומת, אפשר לשקול לשלוח שוב מייל אימות
+            // כרגע, נחזיר שגיאה פשוטה כדי למנוע דליפת מידע
             return res.status(400).json({ error: 'Email already exists' });
         }
 
-        // הצפנת הסיסמה
         const hashedPassword = await bcryptjs.hash(req.body.password, 10);
+        
+        // 1. Generate verification token
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+        
+        // 2. Hash the token for database storage
+        const hashedToken = crypto
+            .createHash('sha256')
+            .update(verificationToken)
+            .digest('hex');
 
-        // יצירת המשתמש
         const newUser = new User({
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -22,21 +31,50 @@ exports.registerUser = async (req, res) => {
             phone: req.body.phone,
             nickname: req.body.nickname,
             password: hashedPassword,
-            role: req.body.role || 'end-user'
+            role: req.body.role || 'end-user',
+            verification_token: hashedToken // 3. Save the HASHED token
         });
 
         const savedUser = await newUser.save();
+        
+        // 4. Send verification email with the ORIGINAL token
+        const baseUrl = process.env.RESET_PASSWORD_BASE_URL || 'http://localhost:3000';
+        const verificationUrl = `${baseUrl}/verify-email?token=${verificationToken}`;
+        const message = `
+            <h1>Welcome to TimeTo!</h1>
+            <p>Thank you for registering. Please click the link below to verify your email address:</p>
+            <a href="${verificationUrl}" clicktracking=off>${verificationUrl}</a>
+            <p>This link is valid for one hour.</p>
+        `;
 
-        // יצירת JWT
-        const token = jwt.sign({ userId: savedUser._id, email: savedUser.email, role: savedUser.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        // Whitelist logic for development environment
+        const isDev = process.env.NODE_ENV === 'dev';
+        const emailWhitelist = process.env.EMAIL_WHITELIST ? process.env.EMAIL_WHITELIST.split(',') : [];
+        
+        if (isDev && !emailWhitelist.includes(savedUser.email)) {
+            console.log(`Skipping verification email for ${savedUser.email} (not in whitelist for dev env).`);
+            // In dev, you might want to log the verification link to the console for easy testing
+            console.log(`Verification URL for ${savedUser.email}: ${verificationUrl}`);
+        } else {
+            try {
+                await sendEmail({
+                    email: savedUser.email,
+                    subject: 'Email Verification for TimeTo',
+                    html: message,
+                });
+            } catch (err) {
+                console.error('Email sending error during registration:', err);
+            }
+        }
 
-        // שליחת טוקן + מידע על המשתמש (בלי הסיסמה)
-        const { password, ...userData } = savedUser.toObject();
-        res.status(201).json({ token, user: userData });
+        // 5. Respond with a success message, NOT a token
+        res.status(201).json({ 
+            message: 'ההרשמה הצליחה! אנא בדוק את תיבת המייל שלך כדי לאמת את החשבון.' 
+        });
 
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: 'Failed to create user' });
+        res.status(500).json({ error: 'ההרשמה למערכת נכשלה' });
     }
 };
 

@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/userSlice';
 import { useNavigate, Link } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
+import { toast } from 'react-toastify';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -25,14 +26,18 @@ const LoginPage = () => {
             });
 
             if (response.data.token && response.data.user) {
+                toast.success('התחברת בהצלחה עם גוגל!');
                 dispatch(setUser({user: response.data.user}));
-                document.cookie = `token=${response.data.token}`;
+                document.cookie = `token=${response.data.token}; path=/`;
+                localStorage.setItem('token', response.data.token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
                 navigate('/my-businesses');
             } else {
+                toast.error('ההתחברות עם גוגל נכשלה. נסה שוב');
                 setError('ההתחברות נכשלה. נסה שוב');
             }
         } catch (e) {
+            toast.error('התחברות גוגל נכשלה');
             setError('התחברות גוגל נכשלה');
         } finally {
             setLoading(false);
@@ -40,6 +45,7 @@ const LoginPage = () => {
     };
 
     const handleGoogleLoginError = () => {
+        toast.error('התחברות גוגל נכשלה');
         setError('התחברות גוגל נכשלה');
     };
 
@@ -49,26 +55,33 @@ const LoginPage = () => {
         setError('');
     
         try {
-            const response = await axios.post(process.env.REACT_APP_API_DOMAIN + '/api/v1/login', {
+            const response = await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/auth/login`, {
                 email,
                 password
             });
     
             if (response.data.token && response.data.user) {
                 dispatch(setUser({user: response.data.user}));
-                document.cookie = `token=${response.data.token}`;
+                document.cookie = `token=${response.data.token}; path=/`;
+                localStorage.setItem('token', response.data.token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
                 navigate('/my-businesses');
             } else {
                 setError('ההתחברות נכשלה. נסה שוב');
             }
         } catch (e) {
-            if (e.response && e.response.status === 429) {
+            const errData = e.response?.data;
+            if (errData && errData.code === 'EMAIL_NOT_VERIFIED') {
+                setError(errData.error);
+                toast.warn(errData.error);
+            } else if (e.response && e.response.status === 429) {
                 setError(e.response.data);
+                toast.error(e.response.data);
             } else {
                 setError('האימייל או הסיסמה שגויים');
+                toast.error('האימייל או הסיסמה שגויים');
             }
-            console.error('Login error:', e.response ? e.response.data : e.message);
+            console.error('Login error:', errData || e.message);
         } finally {
             setLoading(false);
         }
