@@ -34,7 +34,7 @@ const ResetPasswordPage = () => {
         setMessage({ text: '', type: '' });
         try {
             await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/reset-password`, { token, newPassword: password });
-            setMessage({ text: 'הסיסמה אופסה בהצלחה! ניתן להתחבר מחדש.', type: 'success' });
+            setMessage({ text: 'סיסמה חדשה? יש ✔ עכשיו אפשר להיכנס', type: 'success' });
             setTimeout(() => navigate('/auth'), 3000);
         } catch (error) {
             if (error.response && error.response.status === 429) {
@@ -59,14 +59,14 @@ const ResetPasswordPage = () => {
 
                 {message.type === 'success' ? (
                     <div className="success-view">
-                        <h2>הסיסמה שונתה!</h2>
-                        <p>{message.text}</p>
+                        <h2>🔐 הסיסמה החדשה מוכנה! </h2>
+                        {/* <p>{message.text}</p> */}
                         <p>מיד תועבר לדף ההתחברות...</p>
                     </div>
                 ) : (
                     <>
                         <h2>איפוס סיסמה</h2>
-                        <p>הגדירו סיסמה חדשה לחשבונכם.</p>
+                        <p>הגדירו סיסמה חדשה לחשבונכם</p>
                         <form className="email-form" onSubmit={handleSubmit}>
                             <div className="password-input-wrapper">
                                 <input

@@ -136,8 +136,8 @@ const AuthPage = () => {
                             </div>
                             <button type="submit" className="confirm-button" disabled={isLoading}>המשך</button>
                              <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password');}} className="forgot-password-link">
-                                שכחתי סיסמה?
-                            </a>
+                             יצירת סיסמה חדשה
+                        </a>
                             {message.text && (
                                 <p className={`auth-message ${message.type === 'success' ? 'success-message' : 'error-message'}`}>
                                     {message.text}

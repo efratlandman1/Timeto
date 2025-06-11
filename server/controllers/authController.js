@@ -31,7 +31,9 @@ exports.handleAuth = async (req, res) => {
                 // if (user.authProvider !== 'local' || !user.password) {
                 //     return res.status(409).json({ error: `This account is managed by ${user.authProvider}. Please log in using that method.` });
                 // }
-
+                if (!user.password) {
+                    return res.status(400).json({ error: 'כבר יש חשבון עם כתובת האימייל הזו, אך לא הוגדרה לו סיסמה. תוכל להמשיך על ידי הגדרת סיסמה חדשה' });
+                }
                 const isMatch = await bcryptjs.compare(password, user.password);
                 if (!isMatch) {
                     return res.status(401).json({ error: 'סיסמה לא תקינה' });
@@ -140,7 +142,9 @@ exports.googleLogin = async (req, res) => {
                 is_verified: true,
                 phone: '',
                 nickname: '',
-                role: 'end-user'
+                role: 'end-user',
+                password: undefined // Clear the local password
+
             });
         } else {
              // If user exists, update their provider info and names from Google
@@ -149,6 +153,8 @@ exports.googleLogin = async (req, res) => {
             user.is_verified = true;
             if (given_name) user.firstName = given_name;
             if (family_name) user.lastName = family_name;
+            user.password =  undefined // Clear the local password
+
         }
         
         await user.save();
