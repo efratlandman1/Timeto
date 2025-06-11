@@ -241,7 +241,7 @@ exports.requestPasswordReset = async (req, res) => {
                 { new: true, upsert: true }
             );
 
-            const resetUrl = `${process.env.SERVER_URL || 'http://localhost:5050'}/reset-password?token=${resetToken}`; 
+            const resetUrl = `${process.env.SERVER_URL || 'http://localhost:5050'}/api/v1/reset-password?token=${resetToken}`; 
             await sendEmail({
                 email: user.email,
                 subject: 'בקשה לאיפוס סיסמה',
