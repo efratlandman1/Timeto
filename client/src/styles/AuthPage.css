@@ -137,7 +137,7 @@
     text-align: right; /* Default to RTL */
 }
 
-.email-form .submit-button {
+/* .email-form .submit-button {
     width: 100%;
     padding: 14px;
     border-radius: 8px;
@@ -149,11 +149,11 @@
     cursor: pointer;
     transition: background-color 0.2s;
     text-align: center;
-}
+} */
 
-.email-form .submit-button:hover {
+/* .email-form .submit-button:hover {
     background-color: var(--primary-dark, #ff1a1a);
-}
+} */
 
 .forgot-password-link {
     display: block;

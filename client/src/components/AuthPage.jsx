@@ -33,6 +33,12 @@ const AuthPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage({ text: '', type: '' });
+
+        if (password.length < 8) {
+            setMessage({ text: 'הסיסמה חייבת להכיל לפחות 8 תווים.', type: 'error' });
+            return;
+        }
+        
         setIsLoading(true);
 
         try {
@@ -89,7 +95,7 @@ const AuthPage = () => {
                 <div className="auth-modal" style={{ opacity: isLoading ? 0.7 : 1 }}>
                     <button onClick={handleClose} className="close-button">×</button>
                     <h2>בואו ניכנס</h2>
-                    <p>זה הרגע להתחבר או להירשם</p>
+                    <p> הצטרפו עכשיו והתחילו לגלות דברים מעניינים סביבכם</p>
                     
                     <div className="auth-content">
                         <GoogleLogin
@@ -104,7 +110,7 @@ const AuthPage = () => {
                             shape="pill"
                             width="350px"
                         />
-                        <div className="divider">כניסה / הרשמה עם כתובת מייל</div>
+                        <div className="divider">התחברות פשוטה עם כתובת המייל שלכם</div>
                         <form onSubmit={handleSubmit} className="email-form">
                             <input
                                 type="email"
@@ -128,7 +134,7 @@ const AuthPage = () => {
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
                             </div>
-                            <button type="submit" className="submit-button" disabled={isLoading}>המשך</button>
+                            <button type="submit" className="confirm-button" disabled={isLoading}>המשך</button>
                              <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password');}} className="forgot-password-link">
                                 שכחתי סיסמה?
                             </a>

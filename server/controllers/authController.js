@@ -15,7 +15,10 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 exports.handleAuth = async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required." });
+        return res.status(400).json({ error: "נדרשים אימייל וסיסמה." });
+    }
+    if (password.length < 8) {
+        return res.status(400).json({ error: "הסיסמה חייבת להכיל לפחות 8 תווים." });
     }
 
     try {
@@ -31,7 +34,7 @@ exports.handleAuth = async (req, res) => {
 
                 const isMatch = await bcryptjs.compare(password, user.password);
                 if (!isMatch) {
-                    return res.status(401).json({ error: 'Incorrect password.' });
+                    return res.status(401).json({ error: 'סיסמה לא תקינה' });
                 }
 
                 // Login successful
@@ -68,7 +71,7 @@ exports.handleAuth = async (req, res) => {
                     html: emailTemplates.resendVerification(verificationUrl),
                 });
                 
-                return res.status(200).json({ status: 'verification-resent', message: 'Your password has been updated. Please check your email to verify your account.' });
+                return res.status(200).json({ status: 'verification-resent', message: 'הסיסמה שלך עודכנה. אנא בדוק את האימייל שלך כדי לאמת את חשבונך.' });
             }
         } else {
             // Case 3: User does not exist -> Create user, send verification
@@ -98,16 +101,16 @@ exports.handleAuth = async (req, res) => {
             const verificationUrl = `${process.env.SERVER_URL || 'http://localhost:5050'}/api/v1/verify-email?token=${verificationToken}`;
             await sendEmail({
                 email: newUser.email,
-                subject: 'Welcome to Time-To! Please Verify Your Email',
+                subject: 'ברוכים הבאים ל-Time-To!',
 
                 html: emailTemplates.verifyEmail(verificationUrl),
             });
 
-            return res.status(201).json({ status: 'user-created', message: 'Account created. Please check your email to verify your account.' });
+            return res.status(201).json({ status: 'user-created', message: 'החשבון נוצר. אנא בדוק את האימייל שלך כדי לאמת את חשבונך.' });
         }
     } catch (err) {
         console.error('Auth handling error:', err);
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: 'שגיאת שרת' });
     }
 };
 
@@ -121,7 +124,7 @@ exports.googleLogin = async (req, res) => {
         const { email, sub, given_name, family_name, email_verified } = ticket.getPayload();
 
         if (!email_verified) {
-            return res.status(400).json({ error: 'Google account email is not verified.' });
+            return res.status(400).json({ error: 'חשבון הגוגל אינו מאומת.' });
         }
 
         let user = await User.findOne({ email });
@@ -161,7 +164,7 @@ exports.googleLogin = async (req, res) => {
         res.status(200).json({ token, user: userData });
     } catch (err) {
         console.error('Google login error:', err);
-        res.status(500).json({ error: 'Google authentication failed' });
+        res.status(500).json({ error: 'אימות גוגל נכשל' });
     }
 };
 
@@ -262,14 +265,18 @@ exports.resetPassword = async (req, res) => {
         const { token, newPassword } = req.body;
 
         if (!token || !newPassword) {
-            return res.status(400).json({ message: 'אסימון וסיסמה חדשה נדרשים.' });
+            return res.status(400).json({ message: 'נדרשים token וסיסמה חדשה.' });
         }
         
+        if (newPassword.length < 8) {
+            return res.status(400).json({ message: 'הסיסמה חייבת להכיל לפחות 8 תווים.' });
+        }
+
         const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
         const resetTokenDoc = await PasswordResetToken.findOne({ token: hashedToken });
 
         if (!resetTokenDoc || resetTokenDoc.used || resetTokenDoc.expiresAt < new Date()) {
-            return res.status(400).json({ message: 'האסימון שגוי או פג תוקף.' });
+            return res.status(400).json({ message: 'ה-token שגוי או שפג תוקפו.' });
         }
 
         const user = await User.findOne({ email: resetTokenDoc.email });

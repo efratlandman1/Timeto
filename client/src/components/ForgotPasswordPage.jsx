@@ -15,7 +15,7 @@ const ForgotPasswordPage = () => {
         try {
             await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/request-password-reset`, { email });
             setMessage({
-                text: 'אם קיים חשבון עם כתובת זו, נשלח אליו קישור לאיפוס סיסמה.',
+                text: 'אם יש חשבון עם הכתובת שהוזנה – שלחנו אליו קישור לאיפוס. שווה לבדוק גם בספאם 😉',
                 type: 'success'
             });
         } catch (error) {
@@ -44,12 +44,12 @@ const ForgotPasswordPage = () => {
                     <div className="success-view">
                         <h2>בקשה נשלחה!</h2>
                         <p>{message.text}</p>
-                        <Link to="/auth" className="submit-button" style={{textDecoration: 'none', marginTop: '1rem'}}>חזרה להתחברות</Link>
+                        <Link to="/auth" className="confirm-button" style={{textDecoration: 'none', marginTop: '1rem'}}>חזרה להתחברות</Link>
                     </div>
                 ) : (
                     <>
                         <h2>איפוס סיסמה</h2>
-                        <p>הזינו את כתובת האימייל שלכם ונשלח אליכם קישור לאיפוס.</p>
+                        <p>הזינו את כתובת האימייל שלכם ונשלח קישור לאיפוס הסיסמה</p>
                         <form className="email-form" onSubmit={handleSubmit}>
                             <div className="input-wrapper">
                                 <input
@@ -61,7 +61,7 @@ const ForgotPasswordPage = () => {
                                     required
                                 />
                             </div>
-                            <button type="submit" className="submit-button" disabled={isLoading}>
+                            <button type="submit" className="confirm-button" disabled={isLoading}>
                                 שלח קישור איפוס
                             </button>
                         </form>

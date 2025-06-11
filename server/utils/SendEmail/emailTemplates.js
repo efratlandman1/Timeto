@@ -32,7 +32,7 @@ const emailTemplates = {
     verifyEmail: (link) =>
       baseTemplate({
         title: 'אימות כתובת הדוא"ל שלך',
-        message: 'לחץ על הכפתור למטה כדי לאמת את כתובת הדוא"ל שלך ולסיים את ההרשמה.',
+        message: 'נשאר רק צעד אחד – לחצו על הכפתור ואשרו את כתובת המייל שלכם',
         buttonText: 'אמת כתובת דוא"ל',
         buttonLink: link,
       }),
@@ -48,7 +48,7 @@ const emailTemplates = {
     resetPassword: (link) =>
       baseTemplate({
         title: 'איפוס סיסמה',
-        message: 'לחץ על הכפתור למטה כדי לבחור סיסמה חדשה.',
+        message: 'בואו לבחור סיסמה חדשה ולהיכנס מחדש בבטחה',
         buttonText: 'אפס סיסמה',
         buttonLink: link,
       }),

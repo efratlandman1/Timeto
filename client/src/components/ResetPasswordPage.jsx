@@ -26,7 +26,7 @@ const ResetPasswordPage = () => {
             return;
         }
         if (!token) {
-            setMessage({ text: 'אסימון איפוס הסיסמה חסר או לא תקין.', type: 'error' });
+            setMessage({ text: 'token איפוס הסיסמה חסר או לא תקין.', type: 'error' });
             return;
         }
 
@@ -94,7 +94,7 @@ const ResetPasswordPage = () => {
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
                             </div>
-                            <button type="submit" className="submit-button" disabled={isLoading}>
+                            <button type="submit" className="confirm-button" disabled={isLoading}>
                                 אפס סיסמה
                             </button>
                         </form>
