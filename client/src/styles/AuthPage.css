@@ -1,0 +1,244 @@
+.auth-page-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.auth-modal {
+    background-color: #fff;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    text-align: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.close-button {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-modal h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #2d3436;
+}
+
+.auth-modal p {
+    color: #636e72;
+    margin-bottom: 24px;
+}
+
+.social-login-button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background-color 0.2s;
+}
+
+.social-login-button:hover {
+    background-color: #f7f7f7;
+}
+
+.social-login-button img {
+    width: 20px;
+    height: 20px;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #b0b0b0;
+    margin: 24px 0;
+    font-size: 14px;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.divider:not(:empty)::before {
+    margin-right: .25em;
+}
+
+.divider:not(:empty)::after {
+    margin-left: .25em;
+}
+
+.email-form {
+    position: relative;
+}
+
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    left: 14px; /* Adjust for RTL */
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #999;
+}
+
+[dir="ltr"] .password-toggle-icon {
+    left: auto;
+    right: 14px;
+}
+
+.email-form .form-input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 16px;
+    text-align: right; /* Default to RTL */
+}
+
+.email-form .submit-button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--primary-color, #ff4d4d);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-align: center;
+}
+
+.email-form .submit-button:hover {
+    background-color: var(--primary-dark, #ff1a1a);
+}
+
+.forgot-password-link {
+    display: block;
+    margin-top: 16px;
+    color: var(--primary-color, #ff4d4d);
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.auth-message {
+    margin-top: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    border: 1px solid transparent;
+}
+
+.auth-message.error-message {
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+}
+
+.auth-message.success-message {
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+}
+
+.verification-sent-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.verification-sent-view h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d3436;
+    margin-bottom: 16px;
+}
+
+.verification-text {
+    font-size: 16px;
+    color: #636e72;
+    line-height: 1.6;
+    max-width: 380px;
+    margin-bottom: 24px;
+}
+
+.open-gmail-button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background-color 0.2s;
+    color: #333;
+    text-decoration: none;
+}
+
+.open-gmail-button:hover {
+    background-color: #f7f7f7;
+}
+
+.resend-email-button {
+    background: none;
+    border: none;
+    color: var(--primary-color, #ff4d4d);
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.resend-text {
+    font-size: 0.9rem;
+} 

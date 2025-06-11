@@ -15,6 +15,8 @@ const jwtAuthMiddleware = async (req, res, next) => {
         '/api/v1/google',
         '/api/v1/request-password-reset',
         '/api/v1/reset-password',
+        '/api/v1/auth',
+        '/api/v1/set-password',
         '/api/v1/users/register',
         '/api/v1/verify-email',
         '/api/v1/businesses',
