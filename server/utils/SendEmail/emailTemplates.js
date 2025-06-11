@@ -1,21 +1,32 @@
 // emailTemplates.js
 
 function baseTemplate({ title, message, buttonText, buttonLink }) {
-    return `
-      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9;">
-        <div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <h2 style="color: #333;">${title}</h2>
-          <p style="font-size: 16px; color: #555;">${message}</p>
-          <a href="${buttonLink}" style="display: inline-block; margin-top: 20px; padding: 12px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-            ${buttonText}
-          </a>
-          <p style="margin-top: 40px; font-size: 12px; color: #aaa;">
-            אם לא ביקשת את הפעולה הזו, תוכל להתעלם מהמייל הזה.
-          </p>
-        </div>
+  return `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; padding: 30px; direction: rtl; text-align: right;">
+      <div style="max-width: 600px; margin: auto; background: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <h2 style="color: #d32f2f; font-size: 24px; margin-bottom: 20px;">${title}</h2>
+        <p style="font-size: 16px; color: #444; line-height: 1.6;">${message}</p>
+        <a href="${buttonLink}" style="
+          display: inline-block;
+          margin-top: 30px;
+          padding: 14px 28px;
+          background-color: #d32f2f;
+          color: white;
+          text-decoration: none;
+          font-weight: bold;
+          border-radius: 8px;
+          box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+          transition: background-color 0.3s ease;">
+          ${buttonText}
+        </a>
+        <p style="margin-top: 50px; font-size: 12px; color: #888;">
+          אם לא ביקשת את הפעולה הזו, תוכל להתעלם מהמייל הזה – לא יתבצע שום שינוי.
+        </p>
       </div>
-    `;
-  }
+    </div>
+  `;
+}
+
   
 const emailTemplates = {
     verifyEmail: (link) =>

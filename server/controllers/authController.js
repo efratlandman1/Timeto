@@ -60,10 +60,11 @@ exports.handleAuth = async (req, res) => {
                 await user.save();
 
                 const verificationUrl = `${process.env.SERVER_URL || 'http://localhost:5050'}/api/v1/verify-email?token=${verificationToken}`;
+                console.log("User exists but is not verified" );
                 await sendEmail({
                     email: user.email,
-                    subject: 'Welcome to Time-To! Please Verify Your Email',
-                    html: emailTemplates.verifyEmail(verificationUrl),
+                    subject: 'אימות כתובת דוא"ל מחדש',
+                    html: emailTemplates.resendVerification(verificationUrl),
                 });
                 
                 return res.status(200).json({ status: 'verification-resent', message: 'Your password has been updated. Please check your email to verify your account.' });
@@ -86,11 +87,14 @@ exports.handleAuth = async (req, res) => {
 
             await newUser.save();
 
+            console.log("User is not exists" );
+
             const verificationUrl = `${process.env.SERVER_URL || 'http://localhost:5050'}/api/v1/verify-email?token=${verificationToken}`;
             await sendEmail({
                 email: newUser.email,
-                subject: 'אימות כתובת דוא"ל מחדש',
-                html: emailTemplates.resendVerification(verificationUrl),
+                subject: 'Welcome to Time-To! Please Verify Your Email',
+
+                html: emailTemplates.verifyEmail(verificationUrl),
             });
 
             return res.status(201).json({ status: 'user-created', message: 'Account created. Please check your email to verify your account.' });
@@ -282,22 +286,23 @@ exports.resetPassword = async (req, res) => {
 };
 
 // This controller will handle the client-side landing after a password reset link is clicked.
-// It will validate the token and redirect the user to the correct frontend page.
-exports.redirectToSetPassword = async (req, res) => {
+// It redirects the user to the reset password page on the client with the token.
+exports.handlePasswordResetRedirect = async (req, res) => {
     try {
         const { token } = req.query;
         const clientUrl = process.env.CLIENT_URL || 'http://localhost:3030';
 
         if (!token) {
-            return res.redirect(`${clientUrl}/set-password?error=invalid_token`);
+            // Redirect to the forgot-password page with an error
+            return res.redirect(`${clientUrl}/forgot-password?error=invalid_token`);
         }
     
-        // No need to validate the token type here, just redirect.
-        // The validation will happen on the set-password page when the user submits the form.
-        res.redirect(`${clientUrl}/set-password?token=${token}`);
+        // Redirect to the client-side reset password page
+        res.redirect(`${clientUrl}/reset-password?token=${token}`);
 
     } catch (error) {
-        console.error('Redirect to set password error:', error);
-        res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3030'}/set-password?error=server_error`);
+        console.error('Redirect to reset password error:', error);
+        // Redirect to the forgot-password page with an error
+        res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3030'}/forgot-password?error=server_error`);
     }
 };
