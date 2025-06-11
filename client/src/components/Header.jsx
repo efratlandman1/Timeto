@@ -74,7 +74,7 @@ const Header = () => {
     useEffect(() => {
         const token = getToken();
         if (token && loginUser) {
-            setUsername(loginUser.firstName);
+            setUsername(loginUser.firstName || loginUser.email);
             setGreeting(getGreeting());
         } else {
             setUsername(null);

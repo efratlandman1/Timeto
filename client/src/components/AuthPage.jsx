@@ -1,76 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { setUser, logout } from '../redux/userSlice';
-import '../styles/AuthPage.css'; // Import the new CSS file
-import { Link } from 'react-router-dom';
+import { setUser } from '../redux/userSlice';
+import '../styles/AuthPage.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const AuthPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [authStep, setAuthStep] = useState('enter-email'); // 'enter-email', 'enter-password', 'verification-sent'
+    const [showPassword, setShowPassword] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
-    const [isLoading, setIsLoading] = useState(false); // Spinner state
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-    const dispatch = useDispatch(); // Redux dispatch
+    const dispatch = useDispatch();
+    const [searchParams] = useSearchParams();
     const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
 
-    const handleEmailSubmit = async (e) => {
-        if(e) e.preventDefault();
+    useEffect(() => {
+        const verificationStatus = searchParams.get('verification_status');
+        if (verificationStatus) {
+            if (verificationStatus === 'success') {
+                setMessage({ text: 'האימייל אומת בהצלחה! כעת ניתן להתחבר.', type: 'success' });
+            } else { // 'failure'
+                setMessage({ text: 'אימות האימייל נכשל. ייתכן שהקישור אינו תקין או שפג תוקפו. אנא נסה שנית.', type: 'error' });
+            }
+            navigate('/auth', { replace: true });
+        }
+    }, [searchParams, navigate]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         setMessage({ text: '', type: '' });
         setIsLoading(true);
+
         try {
-            const res = await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/auth`, { email });
-            if (res.data.status === 'verification-sent') {
-                setAuthStep('verification-sent');
-            } else if (res.data.status === 'verified') {
-                setAuthStep('enter-password');
+            const res = await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/auth`, { email, password });
+
+            if (res.data.action === 'login') {
+                document.cookie = `token=${res.data.token}; path=/`;
+                localStorage.setItem('user', JSON.stringify(res.data.user));
+                dispatch(setUser(res.data.user));
+                navigate('/');
+            } else if (res.data.status === 'verification-resent' || res.data.status === 'user-created') {
+                setMessage({ text: res.data.message, type: 'success' });
             }
         } catch (error) {
-            if (error.response && error.response.status === 429) {
-                setMessage({
-                    text: 'ניסית יותר מדי פעמים. אנא נסה שוב מאוחר יותר.',
-                    type: 'error'
-                });
-            } else {
-                setMessage({
-                    text: error.response?.data?.error || 'משהו השתבש. נסה שוב.',
-                    type: 'error'
-                });
-            }
+            const errorMessage = error.response?.data?.error || 'אירעה שגיאה. אנא נסה שוב.';
+            setMessage({ text: errorMessage, type: 'error' });
         } finally {
             setIsLoading(false);
         }
     };
-
-    const handlePasswordSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
-        try {
-            const res = await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/login`, { email, password });
-            document.cookie = `token=${res.data.token}; path=/`;
-            localStorage.setItem('user', JSON.stringify(res.data.user));
-            dispatch(setUser(res.data.user));
-            navigate('/');
-        } catch (error) {
-            if (error.response && error.response.status === 429) {
-                setMessage({
-                    text: 'ניסית יותר מדי פעמים. אנא נסה שוב מאוחר יותר.',
-                    type: 'error'
-                });
-            } else if (error.response?.data?.error) {
-                setMessage({ text: error.response.data.error, type: 'error' });
-            } else {
-                setMessage({ text: 'ההתחברות נכשלה, אנא בדוק את הפרטים ונסה שוב.', type: 'error' });
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
+    
     const responseGoogle = async (credentialResponse) => {
         if (credentialResponse.credential) {
             setIsLoading(true);
@@ -81,17 +64,10 @@ const AuthPage = () => {
                 localStorage.setItem('user', JSON.stringify(res.data.user));
                 navigate('/');
             } catch (error) {
-                if (error.response && error.response.status === 429) {
-                    setMessage({
-                        text: 'ניסית יותר מדי פעמים. אנא נסה שוב מאוחר יותר.',
-                        type: 'error'
-                    });
-                } else {
-                    setMessage({
-                        text: error.response?.data?.error || 'התחברות גוגל נכשלה.',
-                        type: 'error'
-                    });
-                }
+                setMessage({
+                    text: error.response?.data?.error || 'התחברות גוגל נכשלה.',
+                    type: 'error'
+                });
             } finally {
                 setIsLoading(false);
             }
@@ -102,68 +78,20 @@ const AuthPage = () => {
         navigate('/');
     };
 
-    const handleResend = async () => {
-        if (!email) return;
-        setIsLoading(true);
-        try {
-
-            await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/resend-verification`, { email });
-            setMessage({
-                text: `מייל אימות חדש נשלח לכתובת ${email}.`,
-                type: 'success' 
-            });
-        } catch (error) {
-            setMessage({ text: 'שליחה מחדש נכשלה. אנא נסה שוב.', type: 'error' });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const renderStep = () => {
-        switch (authStep) {
-            case 'enter-password':
-                return (
-                    <form onSubmit={handlePasswordSubmit} className="email-form">
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="סיסמה"
-                            required
-                            className="form-input"
-                            autoFocus
-                        />
-                        <button type="submit" className="submit-button" disabled={isLoading}>התחבר</button>
-                        <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password');}} className="forgot-password-link">
-                            שכחתי סיסמה?
-                        </a>
-                        {message.type === 'error' && <p className="auth-message error-message">{message.text}</p>}
-                    </form>
-                );
-            case 'verification-sent':
-                return (
-                    <div className="verification-sent-view">
-                         <h3>מייל בדרך אליך!</h3>
-                         <p className="verification-text">
-                             שלחנו הרגע מייל אימות לכתובת <strong>{email}</strong>. לחץ על הקישור שבפנים ומיד תוכל להתחיל. לפעמים המייל מתחבא בתיבת הספאם, כדאי להציץ גם שם.
-                         </p>
-                         <button onClick={() => handleEmailSubmit()} className="resend-email-button">
-                            לא קיבלתי, אפשר לשלוח שוב?
-                         </button>
-                         <p>
-                            לא קיבלתם את המייל? בדקו את תיבת הספאם או <span onClick={handleResend} className="resend-link">לחצו כאן לשליחה חוזרת</span>.
-                         </p>
-                         {message.text && (
-                            <p className={`auth-message ${message.type === 'success' ? 'success-message' : 'error-message'}`}>
-                                {message.text}
-                            </p>
-                        )}
+    return (
+        <GoogleOAuthProvider clientId={clientId}>
+            <div className="auth-page-overlay">
+                {isLoading && (
+                    <div className="spinner-overlay">
+                        <div className="spinner"></div>
                     </div>
-                );
-            case 'enter-email':
-            default:
-                return (
-                    <>
+                )}
+                <div className="auth-modal" style={{ opacity: isLoading ? 0.7 : 1 }}>
+                    <button onClick={handleClose} className="close-button">×</button>
+                    <h2>בואו ניכנס</h2>
+                    <p>זה הרגע להתחבר או להירשם</p>
+                    
+                    <div className="auth-content">
                         <GoogleLogin
                             onSuccess={responseGoogle}
                             onError={() => {
@@ -177,7 +105,7 @@ const AuthPage = () => {
                             width="350px"
                         />
                         <div className="divider">כניסה / הרשמה עם כתובת מייל</div>
-                        <form onSubmit={handleEmailSubmit} className="email-form">
+                        <form onSubmit={handleSubmit} className="email-form">
                             <input
                                 type="email"
                                 value={email}
@@ -185,34 +113,31 @@ const AuthPage = () => {
                                 placeholder="כתובת מייל"
                                 required
                                 className="form-input"
+                                autoFocus
                             />
+                            <div className="password-input-wrapper">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="סיסמה"
+                                    required
+                                    className="form-input"
+                                />
+                                <span onClick={() => setShowPassword(!showPassword)} className="password-toggle-icon">
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </span>
+                            </div>
                             <button type="submit" className="submit-button" disabled={isLoading}>המשך</button>
-                            {message.type === 'error' && <p className="auth-message error-message">{message.text}</p>}
+                             <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password');}} className="forgot-password-link">
+                                שכחתי סיסמה?
+                            </a>
+                            {message.text && (
+                                <p className={`auth-message ${message.type === 'success' ? 'success-message' : 'error-message'}`}>
+                                    {message.text}
+                                </p>
+                            )}
                         </form>
-                    </>
-                );
-        }
-    }
-
-    return (
-        <GoogleOAuthProvider clientId={clientId}>
-            <div className="auth-page-overlay">
-                {isLoading && (
-                    <div className="spinner-overlay">
-                        <div className="spinner"></div>
-                    </div>
-                )}
-                <div className="auth-modal" style={{ opacity: isLoading ? 0.7 : 1 }}>
-                    <button onClick={handleClose} className="close-button">×</button>
-                    {authStep !== 'verification-sent' && (
-                        <>
-                            <h2>בואו ניכנס</h2>
-                            <p>זה הרגע להתחבר או להירשם</p>
-                        </>
-                    )}
-                    
-                    <div className="auth-content">
-                        {renderStep()}
                     </div>
                 </div>
             </div>
@@ -220,4 +145,4 @@ const AuthPage = () => {
     );
 };
 
-export default AuthPage; 
+export default AuthPage;

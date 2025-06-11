@@ -35,6 +35,7 @@ exports.handleAuth = async (req, res) => {
                 }
 
                 // Login successful
+                
                 const token = jwt.sign({ firstName: user.firstName,lastName: user.lastName, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
                 const userData = {
                     id: user._id,
@@ -82,9 +83,14 @@ exports.handleAuth = async (req, res) => {
                 password: hashedPassword,
                 verification_token: hashedVerificationToken,
                 is_verified: false,
-                authProvider: 'local'
+                authProvider: 'local',
+                firstName: '',
+                lastName: '',
+                phone: '',
+                nickname: '',
+                role: 'end-user'
             });
-
+            console.log("newUser:",newUser);
             await newUser.save();
 
             console.log("User is not exists" );
@@ -129,6 +135,9 @@ exports.googleLogin = async (req, res) => {
                 authProvider: 'google',
                 providerId: sub,
                 is_verified: true,
+                phone: '',
+                nickname: '',
+                role: 'end-user'
             });
         } else {
              // If user exists, update their provider info and names from Google
