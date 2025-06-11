@@ -17,7 +17,7 @@ const jwtAuthMiddleware = async (req, res, next) => {
         '/api/v1/reset-password',
         '/api/v1/auth',
         '/api/v1/set-password',
-        '/api/v1/users/register',
+        // '/api/v1/users/register',
         '/api/v1/verify-email',
         '/api/v1/businesses',
         '/api/v1/categories',

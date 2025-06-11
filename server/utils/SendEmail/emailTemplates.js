@@ -17,7 +17,7 @@ function baseTemplate({ title, message, buttonText, buttonLink }) {
     `;
   }
   
-  export const emailTemplates = {
+const emailTemplates = {
     verifyEmail: (link) =>
       baseTemplate({
         title: 'אימות כתובת הדוא"ל שלך',
@@ -43,3 +43,4 @@ function baseTemplate({ title, message, buttonText, buttonLink }) {
       }),
   };
   
+  module.exports = { emailTemplates };

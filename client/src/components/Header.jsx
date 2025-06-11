@@ -236,13 +236,9 @@ const Header = () => {
                         </div>
                     ) : (
                         <div className="auth-buttons">
-                            <button className="auth-button" onClick={() => navigate("/register")}>
-                                <FaUserCircle />
-                                {t('header.register')}
-                            </button>
-                            <button className="auth-button" onClick={() => navigate("/login")}>
+                            <button className="auth-button" onClick={() => navigate("/auth")}>
                                 <FaSignInAlt />
-                                {t('header.login')}
+                                הרשמה / כניסה
                             </button>
                         </div>
                     )}

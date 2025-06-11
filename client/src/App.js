@@ -66,8 +66,8 @@ function App() {
                     <Route path="/my-businesses" element={<UserBusinessPage />} />
                     <Route path="/my-favorites" element={<MyFavoritesPage />} />
                     <Route path="/auth" element={<AuthPage />} />
-                    <Route path="/login" element={<AuthPage />} />
-                    <Route path="/register" element={<AuthPage />} />
+                    {/* <Route path="/login" element={<AuthPage />} /> */}
+                    {/* <Route path="/register" element={<AuthPage />} /> */}
                     {/* <Route path="/login" element={<LoginPage />} /> */}
                     {/* <Route path="/register" element={<RegistrationPage />} /> */}
                     <Route path="/profile" element={<UserProfilePage />} />
