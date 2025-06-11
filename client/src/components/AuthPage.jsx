@@ -51,7 +51,8 @@ const AuthPage = () => {
         setIsLoading(true);
         try {
             const res = await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/login`, { email, password });
-
+            document.cookie = `token=${res.data.token}; path=/`;
+            localStorage.setItem('user', JSON.stringify(res.data.user));
             dispatch(setUser(res.data.user));
             navigate('/');
         } catch (error) {
@@ -76,6 +77,8 @@ const AuthPage = () => {
             try {
                 const res = await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/google`, { tokenId: credentialResponse.credential });
                 dispatch(setUser(res.data.user));
+                document.cookie = `token=${res.data.token}; path=/`;
+                localStorage.setItem('user', JSON.stringify(res.data.user));
                 navigate('/');
             } catch (error) {
                 if (error.response && error.response.status === 429) {

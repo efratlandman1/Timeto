@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainPage from './components/MainPage';
 import EditBusinessPage from './components/EditBusinessPage';
 import UserBusinessPage from './components/UserBusinessesPage';
 import AuthPage from './components/AuthPage';
+// import LoginPage from './components/LoginPage';
 import Header from './components/Header';
 // import RegistrationPage from "./components/RegistrationPage";
 import GlobalStyles from './GlobalStyles';
@@ -65,8 +66,10 @@ function App() {
                     <Route path="/my-businesses" element={<UserBusinessPage />} />
                     <Route path="/my-favorites" element={<MyFavoritesPage />} />
                     <Route path="/auth" element={<AuthPage />} />
-                    <Route path="/login" element={<Navigate to="/auth" replace />} />
-                    <Route path="/register" element={<Navigate to="/auth" replace />} />
+                    <Route path="/login" element={<AuthPage />} />
+                    <Route path="/register" element={<AuthPage />} />
+                    {/* <Route path="/login" element={<LoginPage />} /> */}
+                    {/* <Route path="/register" element={<RegistrationPage />} /> */}
                     <Route path="/profile" element={<UserProfilePage />} />
                     <Route path="/search-results" element={<SearchResultPage />} />
                     <Route path="/feedback-page" element={<FeedbackPage />} />

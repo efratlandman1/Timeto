@@ -46,7 +46,8 @@ const SetPasswordPage = () => {
                 token: token,
                 newPassword: password
             });
-
+            document.cookie = `token=${res.data.token}; path=/`;
+            localStorage.setItem('user', JSON.stringify(res.data.user));
             dispatch(setUser(res.data.user)); // Dispatch user data to Redux
             setMessage({ text: res.data.message, type: 'success' });
 

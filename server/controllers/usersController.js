@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 const User = require("../models/user");
 const bcryptjs = require('bcryptjs');
 const crypto = require('crypto');
-const sendEmail = require('../utils/sendEmail');
+const sendEmail = require('../utils/SendEmail/sendEmail');
+const { emailTemplates } = require('../utils/Sendmail/emailTemplates'); // אם אתה משתמש ב-export במקום module.exports
 
 exports.registerUser = async (req, res) => {
    try {
@@ -38,15 +39,9 @@ exports.registerUser = async (req, res) => {
         const savedUser = await newUser.save();
         
         // 4. Send verification email with the ORIGINAL token
-        const baseUrl = process.env.RESET_PASSWORD_BASE_URL || 'http://localhost:3000';
+        const baseUrl = process.env.CLIENT_URL || 'http://localhost:3000';
         const verificationUrl = `${baseUrl}/verify-email?token=${verificationToken}`;
-        const message = `
-            <h1>Welcome to TimeTo!</h1>
-            <p>Thank you for registering. Please click the link below to verify your email address:</p>
-            <a href="${verificationUrl}" clicktracking=off>${verificationUrl}</a>
-            <p>This link is valid for one hour.</p>
-        `;
-
+        
         // Whitelist logic for development environment
         const isDev = process.env.NODE_ENV === 'dev';
         const emailWhitelist = process.env.EMAIL_WHITELIST ? process.env.EMAIL_WHITELIST.split(',') : [];
@@ -59,8 +54,8 @@ exports.registerUser = async (req, res) => {
             try {
                 await sendEmail({
                     email: savedUser.email,
-                    subject: 'Email Verification for TimeTo',
-                    html: message,
+                    subject: 'אימותת כתובת דוא"ל',
+                    html: emailTemplates.verifyEmail(verificationLink),
                 });
             } catch (err) {
                 console.error('Email sending error during registration:', err);
