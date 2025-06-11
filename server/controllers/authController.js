@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
 const PasswordResetToken = require('../models/PasswordResetToken');
-const sendEmail = require('../utils/sendEmail');
+const sendEmail = require('../utils/SendEmail/sendEmail');
+const { emailTemplates } = require('../utils/SendEmail/emailTemplates'); // אם אתה משתמש ב-export במקום module.exports
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const crypto = require('crypto');
@@ -10,53 +11,65 @@ const crypto = require('crypto');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-
-// Handles both registration and login for local accounts
+// Handles user login and registration with a single endpoint.
 exports.handleAuth = async (req, res) => {
-    const { email, password, firstName, lastName } = req.body;
-
+    const { email, password } = req.body;
     if (!email || !password) {
-        return res.status(400).json({ error: "דוא'ל וסיסמה נדרשים." });
+        return res.status(400).json({ error: "Email and password are required." });
     }
 
     try {
-        const existingUser = await User.findOne({ email });
+        let user = await User.findOne({ email });
 
-        if (existingUser) {
-            // User exists, so attempt to log in
-            if (existingUser.authProvider !== 'local') {
-                return res.status(401).json({ error: 'נא להתחבר באמצעות ' + existingUser.authProvider });
-            }
+        if (user) {
+            // User exists
+            if (user.is_verified) {
+                // Case 1: User exists and is verified -> Standard login
+                // if (user.authProvider !== 'local' || !user.password) {
+                //     return res.status(409).json({ error: `This account is managed by ${user.authProvider}. Please log in using that method.` });
+                // }
 
-            if (!existingUser.is_verified) {
-                // Here you could add logic to resend verification email if needed
-                return res.status(403).json({
-                    error: 'יש לאמת את כתובת המייל לפני שניתן להתחבר.',
-                    code: 'EMAIL_NOT_VERIFIED'
+                const isMatch = await bcryptjs.compare(password, user.password);
+                if (!isMatch) {
+                    return res.status(401).json({ error: 'Incorrect password.' });
+                }
+
+                // Login successful
+                const token = jwt.sign({ firstName: user.firstName,lastName: user.lastName, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+                const userData = {
+                    id: user._id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                    role: user.role,
+                };
+                return res.status(200).json({ token, user: userData, action: 'login' });
+
+            } else {
+                // Case 2: User exists but is not verified -> Overwrite password and resend verification
+                // if (user.authProvider !== 'local') {
+                //      return res.status(409).json({ error: `This account, linked with ${user.authProvider}, is not verified.` });
+                // }
+                
+                const salt = await bcryptjs.genSalt(10);
+                user.password = await bcryptjs.hash(password, salt);
+                
+                const verificationToken = crypto.randomBytes(32).toString('hex');
+                user.verification_token = crypto.createHash('sha256').update(verificationToken).digest('hex');
+                
+                await user.save();
+
+                const verificationUrl = `${process.env.SERVER_URL || 'http://localhost:5050'}/api/v1/verify-email?token=${verificationToken}`;
+                await sendEmail({
+                    email: user.email,
+                    subject: 'Welcome to Time-To! Please Verify Your Email',
+                    html: emailTemplates.verifyEmail(verificationUrl),
                 });
+                
+                return res.status(200).json({ status: 'verification-resent', message: 'Your password has been updated. Please check your email to verify your account.' });
             }
-
-            const isMatch = await bcryptjs.compare(password, existingUser.password);
-            if (!isMatch) {
-                return res.status(400).json({ error: 'סיסמה שגויה' });
-            }
-
-            const token = jwt.sign({ userId: existingUser._id, email: existingUser.email, role: existingUser.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            const userData = {
-                id: existingUser._id,
-                firstName: existingUser.firstName,
-                lastName: existingUser.lastName,
-                email: existingUser.email,
-                role: existingUser.role,
-            };
-            return res.status(200).json({ token, user: userData, action: 'login' });
-
         } else {
-            // User does not exist, so create a new user (register)
-            if (!firstName) {
-                return res.status(400).json({ error: "שם פרטי הוא שדה חובה." });
-            }
-
+            // Case 3: User does not exist -> Create user, send verification
             const salt = await bcryptjs.genSalt(10);
             const hashedPassword = await bcryptjs.hash(password, salt);
             
@@ -66,8 +79,6 @@ exports.handleAuth = async (req, res) => {
             const newUser = new User({
                 email,
                 password: hashedPassword,
-                firstName,
-                lastName: lastName || '',
                 verification_token: hashedVerificationToken,
                 is_verified: false,
                 authProvider: 'local'
@@ -75,25 +86,21 @@ exports.handleAuth = async (req, res) => {
 
             await newUser.save();
 
-            const verificationUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}`;
-            const emailHtml = `<p>ברוך הבא! אנא לחץ על הקישור הבא כדי לאמת את חשבונך: <a href="${verificationUrl}">${verificationUrl}</a></p>`;
-            
+            const verificationUrl = `${process.env.SERVER_URL || 'http://localhost:5050'}/api/v1/verify-email?token=${verificationToken}`;
             await sendEmail({
                 email: newUser.email,
-                subject: 'אימות כתובת דוא"ל',
-                html: emailHtml,
+                subject: 'אימות כתובת דוא"ל מחדש',
+                html: emailTemplates.resendVerification(verificationUrl),
             });
 
-            return res.status(201).json({ message: 'משתמש נוצר. נשלח אימייל אימות.', action: 'register' });
+            return res.status(201).json({ status: 'user-created', message: 'Account created. Please check your email to verify your account.' });
         }
     } catch (err) {
         console.error('Auth handling error:', err);
-        res.status(500).json({ error: 'שגיאת שרת' });
+        res.status(500).json({ error: 'Server error' });
     }
 };
 
-
-// Handles Google login
 exports.googleLogin = async (req, res) => {
     const { tokenId } = req.body;
     try {
@@ -109,14 +116,8 @@ exports.googleLogin = async (req, res) => {
 
         let user = await User.findOne({ email });
 
-        if (user) {
-            user.authProvider = 'google';
-            user.providerId = sub;
-            user.password = undefined; 
-            user.is_verified = true;
-            user.firstName = given_name || user.firstName;
-            user.lastName = family_name || user.lastName;
-        } else {
+        if (!user) {
+            // If user does not exist, create one. This flow assumes Google users are always welcome.
             user = new User({
                 firstName: given_name || '',
                 lastName: family_name || '',
@@ -125,16 +126,24 @@ exports.googleLogin = async (req, res) => {
                 providerId: sub,
                 is_verified: true,
             });
+        } else {
+             // If user exists, update their provider info and names from Google
+            user.authProvider = 'google';
+            user.providerId = sub;
+            user.is_verified = true;
+            if (given_name) user.firstName = given_name;
+            if (family_name) user.lastName = family_name;
         }
-
+        
         await user.save();
+        const token = jwt.sign({ firstName: user.firstName,lastName: user.lastName, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
         const userData = {
             id: user._id,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
+            role: user.role,
         };
         res.status(200).json({ token, user: userData });
     } catch (err) {
@@ -143,67 +152,64 @@ exports.googleLogin = async (req, res) => {
     }
 };
 
-// Verifies the email token and redirects user to set their password
+// לא קיבלתם את המייל? בדקו את תיבת הספאם או 
+exports.resendVerificationEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user || user.is_verified ) {
+            return res.status(400).json({ message: 'לא ניתן לשלוח מחדש אימות למשתמש זה.' });
+        }
+        
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+        user.verification_token = crypto.createHash('sha256').update(verificationToken).digest('hex');
+        await user.save();
+
+        const verificationUrl = `${process.env.REACT_APP_API_DOMAIN || 'http://localhost:5050'}/api/v1/verify-email?token=${verificationToken}`;
+        
+        await sendEmail({
+            email: user.email,
+            subject: 'אימות כתובת דוא"ל מחדש',
+            html: emailTemplates.resendVerification(verificationUrl),
+        });
+
+        res.status(200).json({ message: 'מייל אימות נשלח מחדש.' });
+
+    } catch (error) {
+        console.error('Resend verification email error:', error);
+        res.status(500).json({ message: 'שגיאת שרת' });
+    }
+};
+
+// Verifies the email token and redirects user to a status page.
 exports.verifyEmail = async (req, res) => {
     try {
         const { token } = req.query;
+        const clientUrl = process.env.CLIENT_URL || 'http://localhost:3030';
 
         if (!token) {
-            return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3000'}/set-password?error=invalid_token`);
+            return res.redirect(`${clientUrl}/auth?verification_status=failure`);
         }
 
         const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
         const user = await User.findOne({ verification_token: hashedToken });
 
         if (!user) {
-            return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3000'}/set-password?error=invalid_token`);
+            return res.redirect(`${clientUrl}/auth?verification_status=failure`);
         }
         
-        return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3000'}/set-password?token=${token}`);
-    } catch (error) {
-        console.error('Email verification error:', error);
-        res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3000'}/set-password?error=server_error`);
-    }
-};
-
-// Sets the password for a new user after they have verified their email
-exports.setPasswordAfterVerification = async (req, res) => {
-    const { token, password } = req.body;
-
-    if (!token || !password) {
-        return res.status(400).json({ error: 'אסימון וסיסמה נדרשים.' });
-    }
-
-    try {
-        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-        const user = await User.findOne({ verification_token: hashedToken });
-
-        if (!user) {
-            return res.status(400).json({ error: 'אסימון אימות שגוי או פג תוקף.' });
-        }
-
-        const salt = await bcryptjs.genSalt(10);
-        user.password = await bcryptjs.hash(password, salt);
         user.is_verified = true;
         user.verification_token = undefined;
-        
         await user.save();
-
-        const jwtToken = jwt.sign({ userId: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        const userData = {
-            id: user._id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            role: user.role,
-        };
-        res.status(200).json({ token: jwtToken, user: userData, message: 'הסיסמה נקבעה בהצלחה והינך מחובר.' });
-    } catch (err) {
-        console.error('Set password error:', err);
-        res.status(500).json({ error: 'שגיאת שרת.' });
+        
+        return res.redirect(`${clientUrl}/auth?verification_status=success`);
+    } catch (error) {
+        console.error('Email verification error:', error);
+        const clientUrl = process.env.CLIENT_URL || 'http://localhost:3030';
+        res.redirect(`${clientUrl}/auth?verification_status=failure`);
     }
 };
-
 
 // Sends a password reset link to the user's email
 exports.requestPasswordReset = async (req, res) => {
@@ -222,18 +228,11 @@ exports.requestPasswordReset = async (req, res) => {
                 { new: true, upsert: true }
             );
 
-            const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
-            const message = `
-                <h1>ביקשת איפוס סיסמה</h1>
-                <p>אנא לחץ על הקישור הבא כדי לאפס את סיסמתך:</p>
-                <a href="${resetUrl}" clicktracking=off>${resetUrl}</a>
-                <p>תוקף הקישור יפוג בעוד שעה.</p>
-            `;
-            
+            const resetUrl = `${process.env.SERVER_URL || 'http://localhost:5050'}/reset-password?token=${resetToken}`; 
             await sendEmail({
                 email: user.email,
                 subject: 'בקשה לאיפוס סיסמה',
-                html: message,
+                html: emailTemplates.resetPassword(resetUrl),
             });
         }
         
@@ -282,41 +281,23 @@ exports.resetPassword = async (req, res) => {
     }
 };
 
-// A standalone login function, kept for compatibility with the router, though handleAuth is primary
-exports.login = async (req, res) => {
+// This controller will handle the client-side landing after a password reset link is clicked.
+// It will validate the token and redirect the user to the correct frontend page.
+exports.redirectToSetPassword = async (req, res) => {
     try {
-        const user = await User.findOne({ email: req.body.email });
-        if (!user || user.authProvider !== 'local') {
-            return res.status(401).json({ error: 'Invalid credentials or login method.' });
-        }
-        
-        if (!user.is_verified) {
-            return res.status(403).json({ 
-                error: 'יש לאמת את כתובת המייל לפני שניתן להתחבר.',
-                code: 'EMAIL_NOT_VERIFIED'
-            });
-        }
+        const { token } = req.query;
+        const clientUrl = process.env.CLIENT_URL || 'http://localhost:3030';
 
-        const isMatch = await bcryptjs.compare(req.body.password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ error: 'Incorrect password' });
+        if (!token) {
+            return res.redirect(`${clientUrl}/set-password?error=invalid_token`);
         }
+    
+        // No need to validate the token type here, just redirect.
+        // The validation will happen on the set-password page when the user submits the form.
+        res.redirect(`${clientUrl}/set-password?token=${token}`);
 
-        const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        const userData = {
-            id: user._id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            phone: user.phone,
-            email: user.email,
-            nickname: user.nickname,
-            role: user.role,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt
-        };
-        res.status(200).json({ token, user: userData });
-    } catch (err) {
-        console.error('Login error:', err);
-        res.status(500).json({ error: 'Server error during login' });
+    } catch (error) {
+        console.error('Redirect to set password error:', error);
+        res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3030'}/set-password?error=server_error`);
     }
 };

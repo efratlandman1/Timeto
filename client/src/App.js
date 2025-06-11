@@ -18,7 +18,7 @@ import AdminPanelPage from './components/AdminPanelPage';
 import UserProfilePage from './components/UserProfilePage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
-import SetPasswordPage from './components/SetPasswordPage';
+// import SetPasswordPage from './components/SetPasswordPage';
 import { useDispatch } from 'react-redux';
 import { setUser } from './redux/userSlice';
 import { ToastContainer } from 'react-toastify';
@@ -79,7 +79,7 @@ function App() {
                     <Route path="/admin" element={<AdminPanelPage />} />
                     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                     <Route path="/reset-password" element={<ResetPasswordPage />} />
-                    <Route path="/set-password" element={<SetPasswordPage />} />
+                    {/* <Route path="/set-password" element={<SetPasswordPage />} /> */}
                 </Routes>
                 <Accessibility />
             </div>
