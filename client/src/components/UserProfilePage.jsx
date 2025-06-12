@@ -45,6 +45,11 @@ const UserProfilePage = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
   
+    if (formData.password && formData.password.length < 8) {
+      toast.error('הסיסמה חייבת להכיל לפחות 8 תווים.');
+      return;
+    }
+
     if (formData.password && formData.password !== formData.confirmPassword) {
       toast.error('הסיסמאות אינן תואמות');
       return;
