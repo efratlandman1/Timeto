@@ -48,7 +48,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     try {
       const token = getToken();
       if (!token) {
-        navigate('/login');
+        navigate('/auth');
         return;
       }
 
@@ -74,7 +74,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
 
   // const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
   // if (!token) {
-  //   window.location.href = '/login';
+  //   window.location.href = '/auth';
   //   return null;
   // }
 
@@ -83,7 +83,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     try {
       const token = getToken();
       if (!token) {
-        window.location.href = '/login';
+        window.location.href = '/auth';
         return null;
       }
       const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${business._id}`, {
@@ -108,7 +108,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     try {
       const token = getToken();
       if (!token) {
-        window.location.href = '/login';
+        window.location.href = '/auth';
         return null;
       }
       const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/restore/${business._id}`, {

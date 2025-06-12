@@ -13,7 +13,7 @@ const MyFavoritesPage = () => {
     useEffect(() => {
         const token = getToken();
         if (!token) {
-            navigate('/login');
+            navigate('/auth');
             return;
         }
 
@@ -24,7 +24,7 @@ const MyFavoritesPage = () => {
                 });
                 
                 if (response.status !== 200) {
-                    navigate('/login');
+                    navigate('/auth');
                     return;
                 }
                 

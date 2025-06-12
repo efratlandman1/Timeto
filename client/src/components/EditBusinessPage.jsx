@@ -204,7 +204,7 @@ const EditBusinessPage = () => {
     const loadBusiness = async (businessId) => {
       const token = getToken();
       if (!token) {
-        window.location.href = '/login';
+        window.location.href = '/auth';
         return;
       }
       setIsLoading(true);
