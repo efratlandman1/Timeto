@@ -12,7 +12,7 @@ const adminAuth = require('../middlewares/adminAuth'); // Import the admin middl
 
 // All other user management routes are for admins only
 router.get('/', adminAuth, usersController.getAllUsers);
-router.put('/:id', adminAuth, usersController.updateUser);
+router.put('/:id', usersController.updateUser);
 router.delete('/:id', adminAuth, usersController.deleteUser);
 
 module.exports = router;

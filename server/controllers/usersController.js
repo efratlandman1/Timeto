@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require("../models/user");
-// const bcryptjs = require('bcryptjs');
+ const bcryptjs = require('bcryptjs');
 // const crypto = require('crypto');
 // const sendEmail = require('../utils/SendEmail/sendEmail');
 // const { emailTemplates } = require('../utils/Sendmail/emailTemplates'); // אם אתה משתמש ב-export במקום module.exports
@@ -85,22 +85,32 @@ exports.getAllUsers = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     try {
+        console.log("updateUser");
         const updateData = { ...req.body };
-
-        // Securely hash the password only if a new one is provided
         if (updateData.password && updateData.password.length > 0) {
             updateData.password = await bcryptjs.hash(updateData.password, 10);
         } else {
             // Ensure the password is not overwritten with an empty value
             delete updateData.password;
         }
-
         const updatedUser = await User.findByIdAndUpdate(req.params.id, updateData, { new: true }).select('-password');
-
+       
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
-        res.json(updatedUser);
+
+        const userData = {
+            id: updatedUser._id,
+            firstName: updatedUser.firstName,
+            lastName: updatedUser.lastName,
+            email: updatedUser.email,
+            role: updatedUser.role, 
+            phone : updatedUser.phone,
+            nickname : updatedUser.nickname
+        };
+        // res.json(userData);
+        res.status(200).json({ user:userData });
+
     } catch (error) {
         res.status(400).json({ message: 'Error updating user', error });
     }

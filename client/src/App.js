@@ -32,11 +32,12 @@ function App() {
     const dispatch = useDispatch();
     const { i18n } = useTranslation();
     
-    // Handle refresh
-    let user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-        dispatch(setUser({user: user}));
-    }
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user) {
+            dispatch(setUser(user));
+        }
+    }, [dispatch]);
 
     // Update document direction when language changes
     useEffect(() => {
