@@ -3,9 +3,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainPage from './components/MainPage';
 import EditBusinessPage from './components/EditBusinessPage';
 import UserBusinessPage from './components/UserBusinessesPage';
-import LoginPage from './components/LoginPage';
+import AuthPage from './components/AuthPage';
+// import LoginPage from './components/LoginPage';
 import Header from './components/Header';
-import RegistrationPage from "./components/RegistrationPage";
+// import RegistrationPage from "./components/RegistrationPage";
 import GlobalStyles from './GlobalStyles';
 import SearchResultPage from './components/SearchResultPage';
 import FeedbackPage from './components/FeedbackPage';
@@ -17,6 +18,7 @@ import AdminPanelPage from './components/AdminPanelPage';
 import UserProfilePage from './components/UserProfilePage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
+// import SetPasswordPage from './components/SetPasswordPage';
 import { useDispatch } from 'react-redux';
 import { setUser } from './redux/userSlice';
 import { ToastContainer } from 'react-toastify';
@@ -30,11 +32,12 @@ function App() {
     const dispatch = useDispatch();
     const { i18n } = useTranslation();
     
-    // Handle refresh
-    let user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-        dispatch(setUser({user: user}));
-    }
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user) {
+            dispatch(setUser(user));
+        }
+    }, [dispatch]);
 
     // Update document direction when language changes
     useEffect(() => {
@@ -63,8 +66,11 @@ function App() {
                     <Route path="/edit/:id" element={<EditBusinessPage />} />
                     <Route path="/my-businesses" element={<UserBusinessPage />} />
                     <Route path="/my-favorites" element={<MyFavoritesPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegistrationPage />} />
+                    <Route path="/auth" element={<AuthPage />} />
+                    {/* <Route path="/login" element={<AuthPage />} /> */}
+                    {/* <Route path="/register" element={<AuthPage />} /> */}
+                    {/* <Route path="/login" element={<LoginPage />} /> */}
+                    {/* <Route path="/register" element={<RegistrationPage />} /> */}
                     <Route path="/profile" element={<UserProfilePage />} />
                     <Route path="/search-results" element={<SearchResultPage />} />
                     <Route path="/feedback-page" element={<FeedbackPage />} />
@@ -74,6 +80,7 @@ function App() {
                     <Route path="/admin" element={<AdminPanelPage />} />
                     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                     <Route path="/reset-password" element={<ResetPasswordPage />} />
+                    {/* <Route path="/set-password" element={<SetPasswordPage />} /> */}
                 </Routes>
                 <Accessibility />
             </div>

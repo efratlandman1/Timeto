@@ -72,7 +72,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
 
         if (!token) {
         showToast('לא נמצאה הרשאת התחברות. התחברי מחדש.', true);
-        setTimeout(() => window.location.href = '/login', 3000);
+        setTimeout(() => window.location.href = '/auth', 3000);
         return;
         }
 

@@ -6,9 +6,9 @@ const PAGE_NAMES = {
     '/my-businesses': 'עסקים שלי',
     '/business': 'פרופיל עסק',
     '/suggest': 'הצעת פריט',
-    '/feedback': 'משוב',
-    '/login': 'התחברות',
-    '/register': 'הרשמה'
+    '/feedback': 'משוב'//,
+    // '/login': 'התחברות'//,
+    // '/register': 'הרשמה'
 };
 
 /**

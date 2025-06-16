@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
 const usersSchema = new mongoose.Schema({
-  firstName: { type: String, required: true },
-  lastName:  { type: String, required: true },
+  firstName: { type: String },
+  lastName:  { type: String},
   email:     { type: String, required: true, unique: true },
   phone:     { type: String },
   nickname:  { type: String },
   password:  { type: String, required: function() {
-    // סיסמה נדרשת רק אם המשתמש הוא 'מקומי'
-    return this.authProvider === 'local';
+    // A password is required only if the user is 'local' and verified.
+    return this.authProvider === 'local' && this.is_verified;
   }},
   authProvider: {
     type: String,
@@ -20,6 +20,16 @@ const usersSchema = new mongoose.Schema({
     type: String,
     enum: ['admin', 'manager', 'end-user'],
     default: 'end-user'
+  },
+
+  // 🆕 שדות אימות
+  is_verified: {
+    type: Boolean,
+    default: false
+  },
+  verification_token: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true

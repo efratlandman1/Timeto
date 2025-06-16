@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { setUser as setReduxUser } from '../redux/userSlice';
 import '../styles/LoginPage.css'; // Reusing the same styles for a consistent look
 import { FaUser, FaLock, FaEnvelope, FaPhone, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { getToken } from '../utils/auth';
@@ -17,25 +19,24 @@ const UserProfilePage = () => {
     confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [user, setUser] = useState(null);
+  const user = useSelector((state) => state.user.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Load user data from localStorage
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser) {
-      setUser(storedUser);
+    // Load user data from Redux store
+    if (user) {
       setFormData({
-        firstName: storedUser.firstName || '',
-        lastName: storedUser.lastName || '',
-        email: storedUser.email || '',
-        phone: storedUser.phone || '',
-        nickname: storedUser.nickname || '',
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        nickname: user.nickname || '',
         password: '',
         confirmPassword: '',
       });
     }
-  }, []);
+  }, [user]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -44,9 +45,19 @@ const UserProfilePage = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
   
+    if (formData.password && formData.password.length < 8) {
+      toast.error('הסיסמה חייבת להכיל לפחות 8 תווים.');
+      return;
+    }
+
     if (formData.password && formData.password !== formData.confirmPassword) {
       toast.error('הסיסמאות אינן תואמות');
       return;
+    }
+  
+    if (!user || !user.id) {
+        toast.error('לא ניתן לעדכן פרופיל, משתמש לא זוהה.');
+        return;
     }
   
     try {
@@ -62,10 +73,12 @@ const UserProfilePage = () => {
             headers: { Authorization: `Bearer ${token}` }
         };
 
-        const response = await axios.put(`${process.env.REACT_APP_API_DOMAIN}/api/v1/users/${user._id}`, payload, config);
+        const response = await axios.put(`${process.env.REACT_APP_API_DOMAIN}/api/v1/users/${user.id}`, payload, config);
   
-        // Update localStorage with the new user details
-        localStorage.setItem('user', JSON.stringify(response.data));
+        const updatedUser = response.data;
+        dispatch(setReduxUser(updatedUser.user));
+        localStorage.setItem('user', JSON.stringify(updatedUser.user));
+        
         toast.success('הפרופיל עודכן בהצלחה');
         
         // Navigate after a short delay to allow user to see the toast

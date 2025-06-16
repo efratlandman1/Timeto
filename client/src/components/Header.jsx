@@ -17,9 +17,10 @@ import {
     FaIdCard
 } from "react-icons/fa";
 import "../styles/Header.css";
-import { useSelector } from 'react-redux';
+import { useSelector,useDispatch  } from 'react-redux';
 import { getToken } from "../utils/auth";
 import { useTranslation } from 'react-i18next';
+import { logout } from '../redux/userSlice';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -32,6 +33,7 @@ const Header = () => {
     const loginUser = useSelector(state => state.user.user);
     const isAdmin = loginUser && loginUser.role === 'admin';
     const { t, i18n } = useTranslation();
+    const dispatch = useDispatch();
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -72,7 +74,7 @@ const Header = () => {
     useEffect(() => {
         const token = getToken();
         if (token && loginUser) {
-            setUsername(loginUser.firstName);
+            setUsername(loginUser.firstName || loginUser.email);
             setGreeting(getGreeting());
         } else {
             setUsername(null);
@@ -89,8 +91,9 @@ const Header = () => {
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         setUsername(null);
         localStorage.removeItem('user');
+        dispatch(logout());
         setShowUserMenu(false);
-        navigate("/login");
+        navigate("/");
     };
 
     const handleLanguageToggle = () => {
@@ -233,13 +236,9 @@ const Header = () => {
                         </div>
                     ) : (
                         <div className="auth-buttons">
-                            <button className="auth-button" onClick={() => navigate("/register")}>
-                                <FaUserCircle />
-                                {t('header.register')}
-                            </button>
-                            <button className="auth-button" onClick={() => navigate("/login")}>
+                            <button className="auth-button" onClick={() => navigate("/auth")}>
                                 <FaSignInAlt />
-                                {t('header.login')}
+                                הרשמה / כניסה
                             </button>
                         </div>
                     )}

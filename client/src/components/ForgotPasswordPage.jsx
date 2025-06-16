@@ -1,64 +1,73 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import '../styles/LoginPage.css'; // Reuse existing CSS
-import { FaEnvelope } from 'react-icons/fa';
+import '../styles/AuthPage.css'; // Use the new unified styles
 
 const ForgotPasswordPage = () => {
     const [email, setEmail] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [message, setMessage] = useState({ text: '', type: '' });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
+        setIsLoading(true);
+        setMessage({ text: '', type: '' });
         try {
             await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/request-password-reset`, { email });
-            toast.success('אם קיים חשבון עם כתובת זו, נשלח אליו קישור לאיפוס סיסמה.');
+            setMessage({
+                text: 'אם יש חשבון עם הכתובת שהוזנה – שלחנו אליו קישור לאיפוס. שווה לבדוק גם בספאם 😉',
+                type: 'success'
+            });
         } catch (error) {
             if (error.response && error.response.status === 429) {
-                // Handle Rate Limit error specifically
-                toast.error(error.response.data);
+                setMessage({ text: 'ניסית יותר מדי פעמים. אנא נסה שוב מאוחר יותר.', type: 'error' });
             } else {
-                toast.error('אירעה שגיאה. אנא נסו שוב.');
+                setMessage({ text: 'אירעה שגיאה. אנא נסה שוב.', type: 'error' });
             }
-            console.error('Forgot password error:', error.response ? error.response.data : error.message);
         } finally {
-            setLoading(false);
+            setIsLoading(false);
             setEmail('');
         }
     };
 
     return (
-        <div className="narrow-page-container">
-            <div className="narrow-page-content">
-                <form className="login-form" onSubmit={handleSubmit}>
-                    <h1 className="login-title">שכחת סיסמה?</h1>
-                    <p style={{ color: '#666', marginBottom: '2rem', marginTop: '-1rem' }}>
-                        הזינו את כתובת האימייל שלכם ונשלח אליכם קישור לאיפוס.
-                    </p>
+        <div className="auth-page-overlay">
+            {isLoading && (
+                <div className="spinner-overlay">
+                    <div className="spinner"></div>
+                </div>
+            )}
+            <div className="auth-modal" style={{ opacity: isLoading ? 0.7 : 1 }}>
+                <Link to="/auth" className="close-button">×</Link>
 
-                    <div className="login-input-wrapper">
-                        <FaEnvelope className="login-input-icon" />
-                        <input
-                            className="login-input"
-                            type="email"
-                            id="email"
-                            placeholder="אימייל"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
+                {message.type === 'success' ? (
+                    <div className="success-view">
+                        <h2>בקשה נשלחה!</h2>
+                        <p>{message.text}</p>
+                        <Link to="/auth" className="confirm-button" style={{textDecoration: 'none', marginTop: '1rem'}}>חזרה להתחברות</Link>
                     </div>
-
-                    <button type="submit" className="login-button" disabled={loading}>
-                        {loading ? 'שולח...' : 'שלח קישור איפוס'}
-                    </button>
-
-                    <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-                        <Link to="/login">חזרה להתחברות</Link>
-                    </div>
-                </form>
+                ) : (
+                    <>
+                        <h2>איפוס סיסמה</h2>
+                        <p>הזינו את כתובת האימייל שלכם ונשלח קישור לאיפוס הסיסמה</p>
+                        <form className="email-form" onSubmit={handleSubmit}>
+                            <div className="input-wrapper">
+                                <input
+                                    className="form-input"
+                                    type="email"
+                                    placeholder="אימייל"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <button type="submit" className="confirm-button" disabled={isLoading}>
+                                שלח קישור איפוס
+                            </button>
+                        </form>
+                        {message.type === 'error' && <p className="auth-message error-message">{message.text}</p>}
+                    </>
+                )}
             </div>
         </div>
     );
