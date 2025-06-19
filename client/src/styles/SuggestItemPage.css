@@ -10,20 +10,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.suggest-item-container {
-  min-height: 100vh;
-  padding: 2rem;
-  background-color: var(--background-color);
-}
-
-.suggest-item-content {
-  max-width: 800px;
-  margin: 0 auto;
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
 .suggest-form {
   margin-top: 2rem;
@@ -89,20 +75,11 @@
   box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15);
 }
 
-/* RTL Support */
-.suggest-item-container {
-  direction: rtl;
-}
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .suggest-item-container {
-    padding: 1rem;
-  }
-  
-  .suggest-item-content {
-    padding: 1.5rem;
-  }
+
 
   .radio-group {
     flex-direction: column;
