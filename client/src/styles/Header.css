@@ -136,7 +136,7 @@
     font-size: 16px;
     color: #666;
 }
-
+/* 
 .nav-button.with-hover {
     display: flex;
     align-items: center;
@@ -159,7 +159,7 @@
 .nav-button.with-hover:focus-visible {
     outline: 2px solid #007bff;
     outline-offset: 2px;
-}
+} */
 
 .user-menu {
     position: relative;
