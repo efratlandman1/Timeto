@@ -226,31 +226,6 @@ input[type="range"] {
     background: #fff;
 }
 
-.clear-button, .submit-button {
-    height: 42px;
-    padding: 0 24px;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 120px;
-}
-
-.clear-button {
-    background: #fff;
-    color: #ff4d4d;
-    border: 2px solid #ff4d4d;
-}
-
-.submit-button {
-    background: #ff4d4d;
-    color: white;
-    border: none;
-}
-
 @media (max-width: 480px) {
     .modal-content {
         padding: 12px;
@@ -258,9 +233,5 @@ input[type="range"] {
     .modal-actions {
         flex-direction: column;
         gap: 10px;
-    }
-    .clear-button, .submit-button {
-        width: 100%;
-        padding: 10px 0;
-    }
+    }  
 }

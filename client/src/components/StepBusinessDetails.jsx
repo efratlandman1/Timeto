@@ -178,7 +178,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
       </div>
 
       <div className="form-group-logo">
-        <label htmlFor="logo" className="button file-upload">
+        <label htmlFor="logo" className="upload-logo-button">
           <FaUpload className="icon" />
           {'בחירת לוגו'}
           <input

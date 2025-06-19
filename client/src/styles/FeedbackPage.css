@@ -123,30 +123,6 @@
   box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.1);
 }
 
-/* Submit Button */
-.confirm-button {
-  width: 100%;
-  padding: 0.875rem;
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.confirm-button:hover {
-  background: var(--primary-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 77, 77, 0.15);
-}
-
-.confirm-button:active {
-  transform: translateY(0);
-}
-
 /* Previous Feedbacks */
 .feedback-page-feedback-list {
   margin-top: 1.5rem;
@@ -279,10 +255,6 @@
 
   .star {
     font-size: 1.75rem;
-  }
-
-  .confirm-button {
-    padding: 0.75rem;
   }
 
   .feedback-page-feedback-item {

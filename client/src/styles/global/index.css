@@ -156,12 +156,6 @@ input, textarea, select {
     text-align: inherit;
 }
 
-/* Icons and Buttons */
-button {
-    cursor: pointer;
-    font-family: inherit;
-}
-
 /* Lists */
 ul, ol {
     padding-inline-start: 20px;
@@ -244,40 +238,6 @@ body {
   line-height: 1.5;
 }
 
-/* Global Button Styles */
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  gap: 0.5rem;
-}
-
-.button-primary {
-  background: var(--primary-color);
-  color: white;
-}
-
-.button-primary:hover {
-  background: var(--primary-dark);
-  transform: translateY(-2px);
-}
-
-.button-secondary {
-  background: white;
-  color: var(--primary-color);
-  border: 1px solid var(--primary-color);
-}
-
-.button-secondary:hover {
-  background: var(--primary-color);
-  color: white;
-}
 
 /* Global Form Styles */
 .form-group {

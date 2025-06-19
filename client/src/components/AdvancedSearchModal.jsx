@@ -219,7 +219,7 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
 
         <div className="modal-actions">
           <button className="clear-button" onClick={handleClearAll}>נקה הכל</button>
-          <button className="submit-button" onClick={handleSubmit}>הצג תוצאות</button>
+          <button className="confirm-button" onClick={handleSubmit}>הצג תוצאות</button>
         </div>
       </div>
     </div>

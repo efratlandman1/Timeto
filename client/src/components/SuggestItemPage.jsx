@@ -195,8 +195,8 @@ const SuggestItemPage = () => {
             />
           </div>
 
-          <button type="submit" className="submit-button">
-            <FaPaperPlane />
+          <button type="submit" className="confirm-button">
+            {/* <FaPaperPlane /> */}
             שלח הצעה
           </button>
         </form>

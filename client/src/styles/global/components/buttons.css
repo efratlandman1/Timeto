@@ -1,17 +1,25 @@
-/* Navigation Buttons */
-.nav-button {
+/* Base Button Styles - Applied to all buttons */
+.nav-button,
+.confirm-button,
+.clear-button {
     display: inline-flex;
     align-items: center;
-    gap: var(--button-gap-lg);
-    padding: var(--button-padding-md);
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+/* Navigation Buttons */
+.nav-button {
     background: var(--button-bg-transparent);
-    border: none;
     color: var(--text-primary);
     border-radius: var(--border-radius-md);
-    cursor: pointer;
     font-size: var(--button-font-md);
     font-weight: 400;
-    transition: all 0.2s ease;
+    gap: var(--button-gap-lg);
+    padding: var(--button-padding-md);
+    border: none;
 }
 
 .nav-button:hover {
@@ -64,6 +72,53 @@
     color: var(--primary-color);
 }
 
+/* Confirm Button */
+.confirm-button {
+    width: 100%;
+    background: var(--primary-color);
+    color: var(--button-text-white);
+    padding: var(--button-padding-lg);
+    font-size: var(--button-font-md);
+    font-weight: 500;
+    border: none;
+    border-radius: var(--border-radius-lg);
+}
+
+.confirm-button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 77, 77, 0.15);
+}
+
+.confirm-button:active {
+    transform: translateY(0);
+}
+
+.confirm-button:disabled {
+    background: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Clear Button */
+.clear-button {
+    height: 42px;
+    padding: 0 24px;
+    background: var(--button-text-white);
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    border-radius: var(--border-radius-lg);
+    font-weight: 500;
+    min-width: 120px;
+}
+
+.clear-button:hover {
+    background: var(--primary-color);
+    color: var(--button-text-white);
+}
+
 /* Responsive Design - 6 Breakpoints */
 
 /* 2xl: 1536px - 4K and ultra-wide displays */
@@ -87,6 +142,12 @@
     .nav-button.above-header {
         margin-bottom: var(--button-margin-2xl);
     }
+    
+    .confirm-button {
+        font-size: var(--button-font-2xl);
+        padding: var(--button-padding-2xl);
+    }
+    
 }
 
 /* xl: 1280px - Wide desktops */
@@ -110,6 +171,12 @@
     .nav-button.above-header {
         margin-bottom: var(--button-margin-xl);
     }
+    
+    .confirm-button {
+        font-size: var(--button-font-xl);
+        padding: var(--button-padding-xxl);
+    }
+    
 }
 
 /* lg: 1024px - Laptops and small desktops */
@@ -132,6 +199,11 @@
     
     .nav-button.above-header {
         margin-bottom: var(--button-margin-lg);
+    }
+    
+    .confirm-button {
+        font-size: var(--button-font-lg);
+        padding: var(--button-padding-lg);
     }
 }
 
@@ -156,6 +228,16 @@
     .nav-button.above-header {
         margin-bottom: var(--button-margin-sm);
     }
+    
+    .confirm-button {
+        font-size: var(--button-font-sm);
+        padding: var(--button-padding-sm);
+    }
+    
+    .clear-button {
+        width: 100%;
+        padding: 10px 0;
+    }
 }
 
 /* sm: 640px - Mobile landscape and small tablets */
@@ -179,6 +261,11 @@
     .nav-button.above-header {
         margin-bottom: var(--button-margin-xs);
     }
+    
+    .confirm-button {
+        font-size: var(--button-font-xs);
+        padding: var(--button-padding-xs);
+    }
 }
 
 /* xs: 480px - Small mobile */
@@ -201,5 +288,10 @@
     
     .nav-button.above-header {
         margin-bottom: var(--button-margin-xs);
+    }
+    
+    .confirm-button {
+        font-size: var(--button-font-xs);
+        padding: var(--button-padding-xs);
     }
 } 
