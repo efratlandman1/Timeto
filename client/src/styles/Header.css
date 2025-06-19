@@ -136,30 +136,6 @@
     font-size: 16px;
     color: #666;
 }
-/* 
-.nav-button.with-hover {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border: none;
-    background: none;
-    color: inherit;
-    font-size: inherit;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.nav-button.with-hover:hover,
-.nav-button.with-hover:focus {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-.nav-button.with-hover:focus-visible {
-    outline: 2px solid #007bff;
-    outline-offset: 2px;
-} */
 
 .user-menu {
     position: relative;
