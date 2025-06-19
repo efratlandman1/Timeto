@@ -140,7 +140,7 @@ body {
 }
 
 /* Global Colors */
-:root {
+/* :root {
     --primary-color: #ff4d4d;
     --primary-light: #ff8080;
     --primary-dark: #ff1a1a;
@@ -149,7 +149,7 @@ body {
     --text-light: #636e72;
     --border-color: #eee;
     --shadow-color: rgba(0, 0, 0, 0.1);
-}
+} */
 
 /* Form Elements */
 input, textarea, select {

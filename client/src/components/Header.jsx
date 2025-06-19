@@ -264,7 +264,7 @@ const Header = () => {
                 </div>
 
                 <div className="nav-left">
-                    <div className="lang-switch">
+                    {/* <div className="lang-switch">
                         <label className="switch">
                             <input
                                 type="checkbox"
@@ -276,7 +276,7 @@ const Header = () => {
                                 <span className="lang-label en">EN</span>
                             </span>
                         </label>
-                    </div>
+                    </div> */}
 
                     {username ? (
                         <div className="user-menu" ref={userMenuRef}>
@@ -342,12 +342,12 @@ const Header = () => {
                             )}
                         </div>
                     ) : (
-                        <div className="auth-buttons">
-                            <button className="auth-button" onClick={() => navigate("/auth")}>
+                        // <div className="auth-buttons">
+                            <button className="nav-button" onClick={() => navigate("/auth")}>
                                 <FaSignInAlt />
                                 הרשמה / כניסה
                             </button>
-                        </div>
+                        // </div>
                     )}
                 </div>
             </nav>
