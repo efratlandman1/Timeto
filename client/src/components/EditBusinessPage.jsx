@@ -1,9 +1,10 @@
 // ... כל הייבוא נשאר כמו שהיה
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams,useNavigate  } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaSave, FaPlus, FaEdit, FaArrowRight } from 'react-icons/fa';
+import { LoadScript } from '@react-google-maps/api';
 import StepBusinessDetails from './StepBusinessDetails';
 import StepBusinessServices from './StepBusinessServices';
 import StepBusinessHours from './StepBusinessHours';
@@ -12,7 +13,9 @@ import { setSelectedBusiness } from '../redux/businessSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Steps, StepsProvider, useSteps } from 'react-step-builder';
-import {getToken} from "../utils/auth";
+import { getToken } from "../utils/auth";
+
+const GOOGLE_MAPS_LIBRARIES = ['places'];
 
 const requiredFields = ["name", "categoryId", "address", "phone", "prefix", "email"];
 
@@ -367,15 +370,20 @@ const EditBusinessPage = () => {
           </div>
         </div>
 
-        <StepsProvider>
-          <MySteps
-            businessData={businessData}
-            setBusinessData={setBusinessData}
-            categories={categories}
-            handleSubmit={handleSubmit}
-            selectedBusiness={selectedBusiness}
-          />
-        </StepsProvider>
+        <LoadScript
+          googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
+          libraries={GOOGLE_MAPS_LIBRARIES}
+        >
+          <StepsProvider>
+            <MySteps
+              businessData={businessData}
+              setBusinessData={setBusinessData}
+              categories={categories}
+              handleSubmit={handleSubmit}
+              selectedBusiness={selectedBusiness}
+            />
+          </StepsProvider>
+        </LoadScript>
         <ToastContainer position="bottom-center" rtl={true} />
       </div>
     </div>

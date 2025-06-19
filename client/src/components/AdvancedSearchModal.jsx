@@ -4,6 +4,8 @@ import axios from 'axios';
 import '../styles/AdvancedSearchPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+const MAX_DISTANCE_KM = 100;
+
 const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -11,6 +13,7 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   const [services, setServices] = useState([]);
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
+  const [distance, setDistance] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
   const prevCategoryRef = useRef('');
@@ -22,6 +25,7 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
       setSelectedServices([]);
       setRating(0);
       setHoveredRating(0);
+      setDistance(0);
     }
   }, [isOpen]);
 
@@ -92,6 +96,9 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
       if (filters.rating) {
         setRating(parseInt(filters.rating));
       }
+      if (filters.maxDistance) {
+        setDistance(Number(filters.maxDistance));
+      }
     }
   }, [filters]);
 
@@ -104,42 +111,26 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
     });
   };
 
+  const handleClearAll = () => {
+    setSelectedCategory('');
+    setSelectedServices([]);
+    setRating(0);
+    setHoveredRating(0);
+    setDistance(0);
+  };
+
   const handleSubmit = () => {
-    // Get current URL search params
     const currentParams = new URLSearchParams(location.search);
-    
-    // Keep only the search query and sort parameters if they exist
     const newParams = new URLSearchParams();
     const searchQuery = currentParams.get('q');
     const sortParam = currentParams.get('sort');
-    
-    if (searchQuery) {
-      newParams.set('q', searchQuery);
-    }
-    if (sortParam) {
-      newParams.set('sort', sortParam);
-    }
-    
-    // Add new filter selections
-    if (selectedCategory) {
-      newParams.set('categoryName', selectedCategory);
-    }
-    
-    // Add all currently selected services (replacing any existing ones)
-    selectedServices.forEach(service => {
-      newParams.append('services', service);
-    });
-    
-    if (rating > 0) {
-      newParams.set('rating', rating.toString());
-    }
-    
-    // Navigate to new URL with updated parameters
-    navigate({
-      pathname: location.pathname,
-      search: newParams.toString()
-    });
-    
+    if (searchQuery) newParams.set('q', searchQuery);
+    if (sortParam) newParams.set('sort', sortParam);
+    if (selectedCategory) newParams.set('categoryName', selectedCategory);
+    selectedServices.forEach(service => newParams.append('services', service));
+    if (rating > 0) newParams.set('rating', rating.toString());
+    if (distance > 0) newParams.set('maxDistance', distance.toString());
+    navigate({ pathname: location.pathname, search: newParams.toString() });
     onClose();
   };
 
@@ -148,7 +139,7 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
       <div className="rating-selector">
         <div className="rating-stars-row">
           <div className="stars-wrapper">
-            {[5, 4, 3, 2, 1].map((star) => (
+            {[1, 2, 3, 4, 5].map((star) => (
               <FaStar
                 key={star}
                 className={`rating-star ${star <= (hoveredRating || rating) ? 'active' : ''}`}
@@ -172,47 +163,63 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
           <FaTimes />
         </button>
         <h2>חיפוש מורחב</h2>
-
-        <div className="form-group">
-          <label>קטגוריה</label>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <option value="">בחר קטגוריה</option>
-            {categories.map((cat) => (
-              <option key={cat._id} value={cat.name}>{cat.name}</option>
-            ))}
-          </select>
-        </div>
-
-        {services.length > 0 && (
-          <div className="form-group tags-section">
-            <label>שירותים</label>
-            <div className="tags-container">
-              {services.map((service) => (
-                <div
-                  key={service._id}
-                  className={`tag selectable ${selectedServices.includes(service.name) ? 'selected' : ''}`}
-                  onClick={() => handleServiceClick(service.name)}
-                >
-                  {service.name}
-                </div>
+        
+        <div className="modal-scroll-content">
+          <div className="form-group">
+            <label>קטגוריה</label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              <option value="">בחר קטגוריה</option>
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat.name}>{cat.name}</option>
               ))}
+            </select>
+          </div>
+
+          {services.length > 0 && (
+            <div className="form-group tags-section">
+              <label>שירותים</label>
+              <div className="tags-container">
+                {services.map((service) => (
+                  <div
+                    key={service._id}
+                    className={`tag selectable ${selectedServices.includes(service.name) ? 'selected' : ''}`}
+                    onClick={() => handleServiceClick(service.name)}
+                  >
+                    {service.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="form-group">
+            <label>דירוג מינימלי</label>
+            {renderStarRating()}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="distance-slider">מרחק מקסימלי (ק"מ)</label>
+            <div className="distance-slider-row">
+              <input
+                id="distance-slider"
+                type="range"
+                min={0}
+                max={MAX_DISTANCE_KM}
+                value={distance}
+                onChange={e => setDistance(Number(e.target.value))}
+                step={1}
+              />
+              <span className="distance-value">{distance} ק"מ</span>
             </div>
           </div>
-        )}
-
-        <div className="form-group">
-          <label>דירוג מינימלי</label>
-          {renderStarRating()}
         </div>
 
-        <div className="buttons-container">
-          <button className="modal-button secondary" onClick={onClose}>ביטול</button>
-          <button className="modal-button primary" onClick={handleSubmit}>
-            {selectedCategory || selectedServices.length > 0 || rating > 0 ? 'החל סינון' : 'סגור'}
-          </button>
+        <div className="modal-actions">
+          <button className="clear-button" onClick={handleClearAll}>נקה הכל</button>
+          <button className="submit-button" onClick={handleSubmit}>הצג תוצאות</button>
         </div>
       </div>
     </div>

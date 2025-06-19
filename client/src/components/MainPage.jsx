@@ -6,6 +6,8 @@ import '../styles/MainPage.css';
 import '../styles/businessCard.css';
 import { useNavigate } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaUserFriends, FaStar, FaCalendarCheck } from 'react-icons/fa';
+import { buildQueryUrl } from '../utils/buildQueryUrl';
+import { useSelector } from 'react-redux';
 
 const MainPage = () => {
     const [businesses, setBusinesses] = useState([]);
@@ -22,6 +24,10 @@ const MainPage = () => {
     });
     const [isStatsLoading, setIsStatsLoading] = useState(true);
     const navigate = useNavigate();
+    
+    const userLocation = useSelector(state => state.location.coords);
+    const locationLoading = useSelector(state => state.location.loading);
+    const locationError = useSelector(state => state.location.error);
 
     const bannerImages = [
         '/uploads/business1.jpeg',
@@ -53,11 +59,14 @@ const MainPage = () => {
         setCurrentSlide(index);
     };
 
-    useEffect(() => { 
+    useEffect(() => {
         fetchCategories();
-        fetchBusinesses();
         fetchStats();
     }, []);
+
+    useEffect(() => {
+        fetchBusinesses();
+    }, [userLocation, locationError]);
 
     const fetchCategories = async () => {
         try {
@@ -71,32 +80,30 @@ const MainPage = () => {
     const fetchBusinesses = async () => {
         try {
             // Fetch new businesses
-            const newBusinessesResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
-                params: {
-                    sort: 'newest',
-                    limit: 3
-                }
-            });
+            const newBusinessesUrl = buildQueryUrl(
+                `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`,
+                { sort: 'newest', limit: 3 }
+            );
+            const newBusinessesResponse = await axios.get(newBusinessesUrl);
             console.log('New businesses response:', newBusinessesResponse.data);
             setNewBusinesses(newBusinessesResponse.data.data);
 
             // Fetch popular nearby businesses
-            const popularNearbyResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
-                params: {
-                    sort: 'popular_nearby',
-                    limit: 3
-                }
-            });
+            const popularNearbyUrl = buildQueryUrl(
+                `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`,
+                { sort: 'popular_nearby', limit: 3 },
+                userLocation
+            );
+            const popularNearbyResponse = await axios.get(popularNearbyUrl);
             console.log('Popular nearby response:', popularNearbyResponse.data);
             setPopularBusinesses(popularNearbyResponse.data.data);
 
             // Fetch recommended businesses (using high rating as criteria)
-            const recommendedResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`, {
-                params: {
-                    sort: 'rating',
-                    limit: 3
-                }
-            });
+            const recommendedUrl = buildQueryUrl(
+                `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`,
+                { sort: 'rating', limit: 3 }
+            );
+            const recommendedResponse = await axios.get(recommendedUrl);
             console.log('Recommended response:', recommendedResponse.data);
             setRecommendedBusinesses(recommendedResponse.data.data);
 
@@ -294,7 +301,7 @@ const MainPage = () => {
                             <a href="/search-results?sort=popular_nearby" className="view-all">הצג הכל</a>
                         </div>
                         <div className="card-slider">
-                            {recommendedBusinesses.map((business) => (
+                            {popularBusinesses.map((business) => (
                                 <BusinessCard key={business._id} business={business} />
                             ))}
                         </div>
@@ -306,7 +313,7 @@ const MainPage = () => {
                             <a href="/search-results?sort=rating" className="view-all">הצג הכל</a>
                         </div>
                         <div className="card-slider">
-                            {popularBusinesses.map((business) => (
+                            {recommendedBusinesses.map((business) => (
                                 <BusinessCard key={business._id} business={business} />
                             ))}
                         </div>

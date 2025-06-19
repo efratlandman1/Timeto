@@ -27,6 +27,7 @@ import Accessibility from './components/Accessibility';
 import './styles/global/index.css';
 import './i18n';
 import { useTranslation } from 'react-i18next';
+import { fetchUserLocation } from './redux/locationSlice';
 
 function App() {
     const dispatch = useDispatch();
@@ -37,6 +38,10 @@ function App() {
         if (user) {
             dispatch(setUser(user));
         }
+    }, [dispatch]);
+
+    useEffect(() => {
+        dispatch(fetchUserLocation());
     }, [dispatch]);
 
     // Update document direction when language changes

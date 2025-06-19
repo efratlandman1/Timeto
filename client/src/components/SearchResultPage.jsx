@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import BusinessCard from './BusinessCard';
 import AdvancedSearchModal from './AdvancedSearchModal';
 import axios from 'axios';
@@ -7,6 +7,8 @@ import '../styles/AdvancedSearchPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchBar from './SearchBar';
 import { FaFilter, FaTimes, FaChevronDown, FaSort } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
+import { buildQueryUrl } from '../utils/buildQueryUrl';
 
 const ITEMS_PER_PAGE = 8;
 
@@ -28,9 +30,29 @@ const SearchResultPage = () => {
     const [showSortDropdown, setShowSortDropdown] = useState(false);
     const sortDropdownRef = useRef(null);
     const advancedSearchRef = useRef(null);
+    const prevSortRef = useRef('rating');
+    const prevFiltersRef = useRef('');
+    const prevLocationErrorRef = useRef(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
 
     const navigate = useNavigate();
     const location = useLocation();
+    const userLocation = useSelector(state => state.location.coords);
+    const locationLoading = useSelector(state => state.location.loading);
+    const locationError = useSelector(state => state.location.error);
+
+    const observer = useRef();
+    const lastBusinessElementRef = useCallback(node => {
+        if (isLoading) return;
+        if (observer.current) observer.current.disconnect();
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore) {
+                setCurrentPage(prevPage => prevPage + 1);
+            }
+        });
+        if (node) observer.current.observe(node);
+    }, [isLoading, hasMore]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -50,9 +72,8 @@ const SearchResultPage = () => {
         const params = new URLSearchParams(location.search);
         const filters = {};
         const sort = params.get('sort') || 'rating';
-
         for (const [key, value] of params.entries()) {
-            if (key !== 'sort' && key !== 'q') {
+            if (key !== 'sort' && key !== 'q' && key !== 'page' && key !== 'limit') {
                 if (key in filters) {
                     if (Array.isArray(filters[key])) {
                         filters[key].push(value);
@@ -64,52 +85,107 @@ const SearchResultPage = () => {
                 }
             }
         }
-
         setActiveFilters(filters);
         setSortOption(sort);
     }, [location.search]);
 
     useEffect(() => {
-        const fetchBusinesses = async () => {
-            try {
-                const params = new URLSearchParams(location.search);
-                params.set('page', currentPage.toString());
-                params.set('limit', ITEMS_PER_PAGE.toString());
-                
-                // Create URL with all parameters, including multiple services
-                const url = new URL(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`);
-                params.forEach((value, key) => {
-                    url.searchParams.append(key, value);
-                });
-                
-                const res = await axios.get(url.toString());
-                
-                setBusinesses(res.data.data || []);
-                setTotalPages(res.data.pagination?.totalPages || 1);
-            } catch (error) {
-                console.error("Error fetching businesses:", error);
-            }
-        };
+        const params = new URLSearchParams(location.search);
+        const sort = params.get('sort') || 'rating';
+        const filtersString = JSON.stringify(activeFilters);
+        if (
+            currentPage !== 1 &&
+            (prevSortRef.current !== sort || prevFiltersRef.current !== filtersString)
+        ) {
+            setCurrentPage(1);
+        }
+        prevSortRef.current = sort;
+        prevFiltersRef.current = filtersString;
+    }, [activeFilters, sortOption, location.search]);
 
-        fetchBusinesses();
-    }, [location.search, currentPage]);
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const sort = params.get('sort') || 'rating';
+        const maxDistance = params.get('maxDistance');
+        
+        const needsLocationSorting = sort === 'distance' || sort === 'popular_nearby';
+        const needsLocationFiltering = maxDistance;
+        const needsLocation = needsLocationSorting || needsLocationFiltering;
+
+        console.log('SearchResultPage - Location logic:', {
+            sort,
+            maxDistance,
+            needsLocationSorting,
+            needsLocationFiltering,
+            needsLocation,
+            userLocation,
+            locationLoading,
+            locationError
+        });
+
+        if (needsLocation) {
+            if (locationLoading) return;
+            if (!userLocation && !locationError) return;
+            if (locationError && prevLocationErrorRef.current === locationError && currentPage !== 1) return;
+            prevLocationErrorRef.current = locationError;
+        }
+
+        const paramsObj = {};
+        for (const [key, value] of params.entries()) {
+            if (key === 'services') {
+                if (!paramsObj.services) paramsObj.services = [];
+                paramsObj.services.push(value);
+            } else {
+                paramsObj[key] = value;
+            }
+        }
+        paramsObj.page = currentPage;
+        paramsObj.limit = ITEMS_PER_PAGE;
+        if (needsLocation && locationError) {
+            paramsObj.sort = 'rating';
+        }
+        
+        console.log('SearchResultPage - Final params:', paramsObj);
+        
+        setIsLoading(true);
+        const url = buildQueryUrl(
+            `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`,
+            paramsObj,
+            needsLocation && userLocation ? userLocation : undefined
+        );
+        
+        console.log('SearchResultPage - Final URL:', url);
+        
+        axios.get(url)
+            .then(res => {
+                const newBusinesses = res.data.data || [];
+                setBusinesses(prevBusinesses => 
+                    currentPage === 1 ? newBusinesses : [...prevBusinesses, ...newBusinesses]
+                );
+                setTotalPages(res.data.pagination?.totalPages || 1);
+                setHasMore(currentPage < (res.data.pagination?.totalPages || 1));
+                setIsLoading(false);
+            })
+            .catch(error => {
+                console.error('Error fetching businesses:', error);
+                setIsLoading(false);
+            });
+    }, [location.search, currentPage, userLocation, locationLoading, locationError]);
 
     const handleFilterChange = (key, value) => {
         const newParams = new URLSearchParams(location.search);
-        
         if (Array.isArray(value)) {
             newParams.delete(key);
             value.forEach(v => newParams.append(key, v));
         } else {
             newParams.set(key, value);
         }
-        
+        newParams.set('page', 1);
         navigate({ pathname: location.pathname, search: newParams.toString() });
     };
 
     const handleRemoveFilter = (key, value = null) => {
         const newParams = new URLSearchParams(location.search);
-        
         if (value !== null && Array.isArray(activeFilters[key])) {
             const values = activeFilters[key].filter(v => v !== value);
             newParams.delete(key);
@@ -117,13 +193,13 @@ const SearchResultPage = () => {
         } else {
             newParams.delete(key);
         }
-
+        newParams.set('page', 1);
         navigate({ pathname: location.pathname, search: newParams.toString() });
     };
 
     const handleClearFilters = () => {
-        const newParams = new URLSearchParams();
         navigate({ pathname: location.pathname });
+        setCurrentPage(1);
     };
 
     const handleSortChange = (newSort) => {
@@ -133,6 +209,7 @@ const SearchResultPage = () => {
         } else {
             newParams.set('sort', newSort);
         }
+        newParams.set('page', 1);
         navigate({ pathname: location.pathname, search: newParams.toString() });
     };
 
@@ -207,6 +284,13 @@ const SearchResultPage = () => {
                     )}
                 </div>
 
+                {(sortOption === 'distance' || sortOption === 'popular_nearby') && !userLocation && !locationError && (
+                    <div style={{ color: 'gray', margin: '1rem 0', textAlign: 'center' }}>טוען מיקום...</div>
+                )}
+                {locationError && (sortOption === 'distance' || sortOption === 'popular_nearby') && (
+                    <div style={{ color: 'red', margin: '1rem 0', textAlign: 'center' }}>{locationError}</div>
+                )}
+
                 {Object.keys(activeFilters).length > 0 && (
                     <div className="filters-area">
                         <div className="filters-header">
@@ -227,7 +311,8 @@ const SearchResultPage = () => {
                                         <div key={`${key}-${idx}`} className="filter-tag">
                                             {key === 'categoryName' ? `קטגוריה: ${v}` :
                                              key === 'rating' ? `${v} כוכבים ומעלה` :
-                                             key === 'services' ? `שירות: ${v}` : v}
+                                             key === 'services' ? `שירות: ${v}` :
+                                             key === 'maxDistance' ? `עד מרחק של: ${v} ק"מ` : v}
                                             <button onClick={() => handleRemoveFilter(key, v)}>
                                                 <FaTimes />
                                             </button>
@@ -237,7 +322,8 @@ const SearchResultPage = () => {
                                     <div key={key} className="filter-tag">
                                         {key === 'categoryName' ? `קטגוריה: ${value}` :
                                          key === 'rating' ? `${value} כוכבים ומעלה` :
-                                         key === 'services' ? `שירות: ${value}` : value}
+                                         key === 'services' ? `שירות: ${value}` :
+                                         key === 'maxDistance' ? `עד מרחק של: ${value} ק"מ` : value}
                                         <button onClick={() => handleRemoveFilter(key)}>
                                             <FaTimes />
                                         </button>
@@ -248,25 +334,29 @@ const SearchResultPage = () => {
                     </div>
                 )}
 
-                <div className="search-results-layout">
-                    <div className="business-cards-grid">
-                        {businesses.map((business) => (
-                            <BusinessCard key={business._id} business={business} />
-                        ))}
+                {/* תוצאות חיפוש */}
+                {businesses.length > 0 && (
+                    <div className="search-results-layout">
+                        <div className="business-cards-grid">
+                            {businesses.map((business, index) => {
+                                if (businesses.length === index + 1) {
+                                    return (
+                                        <div key={business._id} ref={lastBusinessElementRef}>
+                                            <BusinessCard business={business} />
+                                        </div>
+                                    );
+                                } else {
+                                    return <BusinessCard key={business._id} business={business} />;
+                                }
+                            })}
+                        </div>
                     </div>
-                </div>
+                )}
 
-                {totalPages > 1 && (
-                    <div className="pagination-container">
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                            <button
-                                key={page}
-                                onClick={() => handlePageChange(page)}
-                                className={`pagination-button ${currentPage === page ? 'active' : ''}`}
-                            >
-                                {page}
-                            </button>
-                        ))}
+                {/* לוודר */}
+                {isLoading && (
+                    <div className="loader-container">
+                        <div className="loader"></div>
                     </div>
                 )}
             </div>

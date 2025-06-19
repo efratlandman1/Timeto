@@ -14,13 +14,16 @@ import {
     FaSearch,
     FaHome,
     FaCog,
-    FaIdCard
+    FaIdCard,
+    FaSyncAlt,
+    FaTimes
 } from "react-icons/fa";
 import "../styles/Header.css";
 import { useSelector,useDispatch  } from 'react-redux';
 import { getToken } from "../utils/auth";
 import { useTranslation } from 'react-i18next';
 import { logout } from '../redux/userSlice';
+import { fetchUserLocation } from '../redux/locationSlice';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -34,6 +37,12 @@ const Header = () => {
     const isAdmin = loginUser && loginUser.role === 'admin';
     const { t, i18n } = useTranslation();
     const dispatch = useDispatch();
+    const { coords, loading, error } = useSelector(state => state.location);
+    const [showPopover, setShowPopover] = useState(false);
+    const [address, setAddress] = useState('');
+    const [addressLoading, setAddressLoading] = useState(false);
+    const [addressError, setAddressError] = useState('');
+    const popoverRef = useRef(null);
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -110,6 +119,68 @@ const Header = () => {
         return location.pathname === path;
     };
 
+    const handleRefreshLocation = () => {
+        dispatch(fetchUserLocation());
+    };
+
+    // Fetch address from coordinates
+    const fetchAddress = async (lat, lng) => {
+        setAddressLoading(true);
+        setAddressError('');
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=he`);
+            const data = await res.json();
+    
+            if (data.address) {
+                const { road, house_number, city, town, village, country } = data.address;
+    
+                // בונים את הרחוב ומספר הבית יחד בלי פסיק
+                const streetWithNumber = [road, house_number].filter(Boolean).join(' ');
+    
+                const cityName = city || town || village || '';
+                const formatted = [
+                    streetWithNumber,
+                    cityName,
+                    country || 'ישראל'
+                ].filter(Boolean).join(', ');
+    
+                setAddress(formatted);
+            } else {
+                setAddressError('לא נמצאה כתובת');
+            }
+        } catch (e) {
+            setAddressError('שגיאה בשליפת כתובת');
+        } finally {
+            setAddressLoading(false);
+        }
+    };
+    
+    
+
+    // When popover opens or coords change, fetch address
+    useEffect(() => {
+        if (showPopover && coords) {
+            fetchAddress(coords.lat, coords.lng);
+        }
+    }, [showPopover, coords]);
+
+    // Close popover on outside click
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (popoverRef.current && !popoverRef.current.contains(event.target)) {
+                setShowPopover(false);
+            }
+        }
+        if (showPopover) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showPopover]);
+
+    const formatAddress = (address) => address || '';
+
     return (
         <div className="header-container">
             <nav className="navbar">
@@ -120,6 +191,42 @@ const Header = () => {
                             <span className="logo-text-main">{t('header.logo.main')}</span>
                             <span className="logo-text-sub">{t('header.logo.sub')}</span>
                         </div>
+                    </div>
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                        <button
+                            onClick={() => setShowPopover(!showPopover)}
+                            className="refresh-location-btn styled-location-btn"
+                            title="המיקום שלי"
+                            type="button"
+                        >
+                            <FaMapMarkerAlt style={{ marginLeft: 6, fontSize: 18 }} />
+                            המיקום שלי
+                        </button>
+                        {showPopover && (
+                            <div ref={popoverRef} className="location-popover">
+                                <div className="popover-header">
+                                    <span>המיקום הנוכחי שלך</span>
+                                    <button className="close-popover-btn" onClick={() => setShowPopover(false)}><FaTimes /></button>
+                                </div>
+                                <div className="popover-content">
+                                    {addressLoading || loading ? (
+                                        <span className="address-loading">טוען כתובת...</span>
+                                    ) : addressError ? (
+                                        <span className="address-error">{addressError}</span>
+                                    ) : address ? (
+                                        <span className="address-text">{formatAddress(address)}</span>
+                                    ) : (
+                                        <span className="address-error">לא נמצא מיקום</span>
+                                    )}
+                                </div>
+                                <div className="popover-actions">
+                                    <button className="refresh-popover-btn" onClick={handleRefreshLocation} disabled={loading || addressLoading} title="רענן מיקום">
+                                        <FaSyncAlt className={loading ? 'spin' : ''} />
+                                        רענן מיקום
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 

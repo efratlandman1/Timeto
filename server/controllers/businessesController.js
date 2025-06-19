@@ -4,6 +4,187 @@ const Category = require('../models/category');
 const mongoose = require('mongoose');
 const Service = require('../models/service');
 const Feedback = require('../models/feedback');
+const mapsUtils = require('../utils/mapsUtils');
+
+const DEFAULT_ITEMS_PER_PAGE = 8;
+const CACHE_TTL = 3600; // זמן חיים של הקאש בשניות (שעה)
+
+/**
+ * בונה קוורי חיפוש טקסטואלי
+ * @param {string} q - טקסט החיפוש
+ * @param {Array} categoryIds - מערך של ID של קטגוריות תואמות
+ * @param {Array} serviceIds - מערך של ID של שירותים תואמים
+ * @returns {Object} קוורי MongoDB
+ */
+const buildSearchQuery = async (q) => {
+    // חיפוש קטגוריות תואמות
+    const matchingCategories = await Category.find({ name: new RegExp(q, 'i') });
+    const categoryIds = matchingCategories.map(cat => cat._id);
+
+    // חיפוש שירותים תואמים
+    const matchingServices = await Service.find({ name: new RegExp(q, 'i') });
+    const serviceIds = matchingServices.map(service => service._id);
+
+    // יצירת ביטוי רגולרי לחיפוש
+    const searchRegex = new RegExp(q, 'i');
+
+    return {
+        $and: [
+            { active: true },
+            {
+                $or: [
+                    // חיפוש טקסטואלי בשדות טקסט חופשי
+                    { $text: { $search: q } },
+                    // חיפוש מדויק באימייל וטלפון
+                    { email: searchRegex },
+                    { phone: searchRegex },
+                    // חיפוש בקטגוריות ושירותים
+                    { categoryId: { $in: categoryIds } },
+                    { services: { $in: serviceIds } }
+                ]
+            }
+        ]
+    };
+};
+
+/**
+ * בונה קוורי סינון לפי פרמטרים קבועים
+ * @param {string} categoryName - שם הקטגוריה
+ * @param {Array|string} services - שירותים לסינון
+ * @param {number} rating - דירוג מינימלי
+ * @returns {Object} קוורי MongoDB
+ */
+const buildFilterQuery = async (categoryName, services, rating) => {
+    const query = { active: true };
+
+    // קשר בין קטגוריה לשירותים:
+    // אם נבחרו גם קטגוריה וגם שירותים, הסינון יתבצע לפי השירותים בלבד (כל עסק שיש לו את השירות המבוקש יעלה, בלי קשר לקטגוריה)
+    // אם נבחרה רק קטגוריה, הסינון יתבצע לפי קטגוריה
+    // אם נבחרו רק שירותים, הסינון יתבצע לפי שירותים
+
+    let filterByCategory = !!categoryName && !services;
+
+    // טיפול בקטגוריה: שם או אובייקט איי.די
+    if (filterByCategory) {
+        if (mongoose.Types.ObjectId.isValid(categoryName)) {
+            query.categoryId = categoryName;
+        } else {
+            const category = await Category.findOne({ name: categoryName });
+            if (category) {
+                query.categoryId = category._id;
+            } else {
+                query.categoryId = null; // לא יוחזרו תוצאות
+            }
+        }
+    }
+
+    // טיפול בשירותים: שם או אובייקט איי.די
+    if (services) {
+        let serviceList = Array.isArray(services) ? services : [services];
+        const objectIds = serviceList.filter(id => mongoose.Types.ObjectId.isValid(id));
+
+        if (objectIds.length === serviceList.length) {
+            // כל השירותים הם ObjectId - סינון OR ביניהם
+            query.services = { $in: objectIds.map(id => new mongoose.Types.ObjectId(id)) };
+        } else {
+            const serviceDocs = await Service.find({ name: { $in: serviceList } });
+            const ids = serviceDocs.map(s => s._id);
+            if (ids.length > 0) {
+                // סינון OR בין השירותים שנמצאו
+                query.services = { $in: ids };
+            } else {
+                // לא נמצאו שירותים - לא להחזיר תוצאות
+                query.services = { $in: [null] };
+            }
+        }
+    }
+
+    if (rating) {
+        query.rating = { $gte: Number(rating) };
+    }
+
+    return query;
+};
+
+/**
+ * בונה פייפליין של geoNear עבור חיפושים מרחביים
+ * @param {Array} coordinates - קואורדינטות [lng, lat]
+ * @param {Object} query - קוורי בסיסי
+ * @param {string} sort - סוג המיון
+ * @param {number} maxDistance - מרחק מקסימלי בקילומטרים
+ * @returns {Array} פייפליין MongoDB
+ */ 
+const buildGeoNearPipeline = (coordinates, query, sort, maxDistance) => {
+    console.log('buildGeoNearPipeline - Input:', { coordinates, sort, maxDistance });
+    
+    // נבנה את אובייקט ה-geoNear
+    const geoNearStage = {
+        $geoNear: {
+            near: {
+                type: 'Point',
+                coordinates: coordinates
+            },
+            distanceField: 'distance',
+            spherical: true,
+            query
+        }
+    };
+
+    // נוסיף maxDistance רק אם הוא קיים ותקין
+    if (maxDistance !== undefined && maxDistance !== null && maxDistance !== '' && !isNaN(Number(maxDistance))) {
+        const maxDistanceMeters = Number(maxDistance) * 1000; // קילומטרים למטרים
+        geoNearStage.$geoNear.maxDistance = maxDistanceMeters;
+        console.log(`Added maxDistance: ${maxDistance} km = ${maxDistanceMeters} meters`);
+    } else {
+        console.log('No valid maxDistance provided');
+    }
+
+    console.log('Final geoNear stage:', JSON.stringify(geoNearStage, null, 2));
+
+    return [
+        geoNearStage,
+        { 
+            $sort: sort === 'popular_nearby' ? 
+                { distance: 1, rating: -1 } : 
+                { distance: 1 } 
+        }
+    ];
+};
+
+/**
+ * בונה פייפליין של lookup עבור שדות מקושרים
+ * @param {number} skip - מספר רשומות לדילוג
+ * @param {number} limit - מספר רשומות מקסימלי
+ * @returns {Array} פייפליין MongoDB
+ */
+const buildLookupPipeline = (skip, limit) => {
+    return [
+        { $skip: skip },
+        { $limit: limit },
+        { 
+            $lookup: {
+                from: 'categories',
+                localField: 'categoryId',
+                foreignField: '_id',
+                as: 'categoryId'
+            }
+        },
+        { 
+            $unwind: { 
+                path: '$categoryId', 
+                preserveNullAndEmptyArrays: true 
+            }
+        },
+        { 
+            $lookup: {
+                from: 'services',
+                localField: 'services',
+                foreignField: '_id',
+                as: 'services'
+            }
+        }
+    ];
+};
 
 exports.getAllBusinesses = async (req, res) => {
     try {
@@ -52,6 +233,16 @@ const createBusiness = async (req, res, userId) => {
     const openingHours = JSON.parse(req.body.openingHours || '[]');
     const services = JSON.parse(req.body.services || '[]');
 
+    // Get coordinates from address
+    const location = await mapsUtils.geocode(req.body.address);
+    
+    // ולידציה נוספת של הקואורדינטות
+    if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
+      return res.status(400).json({ error: 'Invalid coordinates received from geocoding service' });
+    }
+    
+    console.log(`Creating business with coordinates: [${location.lng}, ${location.lat}] for address: ${req.body.address}`);
+    
     const newBusiness = new Business({
       name: req.body.name,
       email: req.body.email,
@@ -63,7 +254,11 @@ const createBusiness = async (req, res, userId) => {
       openingHours,
       userId: userId,
       address: req.body.address,
-      logo: req.file?.filename || ''
+      logo: req.file?.filename || '',
+      location: {
+        type: 'Point',
+        coordinates: [location.lng, location.lat]
+      }
     });
 
     const savedItem = await newBusiness.save();
@@ -73,8 +268,6 @@ const createBusiness = async (req, res, userId) => {
     res.status(500).json({ error: 'Failed to create business' });
   }
 };
-
-
 
 const updateBusiness = async (req, res, userId) => {
   try {
@@ -87,12 +280,28 @@ const updateBusiness = async (req, res, userId) => {
       return res.status(403).json({ error: 'Unauthorized to edit this business' });
     }
 
+    // If address is being updated, get new coordinates
+    if (req.body.address && req.body.address !== existingBusiness.address) {
+      const location = await mapsUtils.geocode(req.body.address);
+      
+      // ולידציה של הקואורדינטות
+      if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
+        return res.status(400).json({ error: 'Invalid coordinates received from geocoding service' });
+      }
+      
+      console.log(`Updating business coordinates: [${location.lng}, ${location.lat}] for address: ${req.body.address}`);
+      
+      existingBusiness.location = {
+        type: 'Point',
+        coordinates: [location.lng, location.lat]
+      };
+    }
+
     existingBusiness.name = req.body.name || existingBusiness.name;
     existingBusiness.email = req.body.email || existingBusiness.email;
     existingBusiness.prefix = req.body.prefix || existingBusiness.prefix;
     existingBusiness.phone = req.body.phone || existingBusiness.phone;
     existingBusiness.categoryId = req.body.categoryId || existingBusiness.categoryId;
-    // existingBusiness.services = req.body.services || existingBusiness.services; // עדכון שירותים
     existingBusiness.services = typeof req.body.services === 'string' ? JSON.parse(req.body.services) : (req.body.services || existingBusiness.services);
     existingBusiness.description = req.body.description || existingBusiness.description;
     existingBusiness.address = req.body.address || existingBusiness.address;
@@ -107,7 +316,6 @@ const updateBusiness = async (req, res, userId) => {
   }
 };
 
-
 // exports.getItems = async (req, res) => {
 //     try {
 //         const businesses = await Business.find({});
@@ -117,8 +325,6 @@ const updateBusiness = async (req, res, userId) => {
 //         res.status(500).json({message: err.message});
 //     }
 // };
-const DEFAULT_ITEMS_PER_PAGE = 8; // הגדרת ברירת מחדל
-
 
 exports.getUserBusinesses = async (req, res) => {
     try {
@@ -131,145 +337,134 @@ exports.getUserBusinesses = async (req, res) => {
     }
 };
 
-
+/**
+ * מחזיר עסקים לפי פרמטרים
+ * @param {Object} req - אובייקט הבקשה
+ * @param {Object} res - אובייקט התגובה
+ */
 exports.getItems = async (req, res) => {
-  try {
-    const { q, categoryName, services, rating } = req.query;
-    const query = {};
-    query.active = true;
-    const SORT_FIELDS = {
-        rating: { rating: -1 },
-        name: { name: 1 },
-        distance: { distance: 1 },
-        newest: { createdAt: -1 },
-        popular_nearby: [['distance', 1], ['rating', -1]]
-    };
-    const sort = req.query.sort || 'rating';
-    let sortOption = SORT_FIELDS[sort] || { rating: -1 }; // Default to rating if invalid sort option
+    try {
+        const { 
+            q, 
+            categoryName, 
+            services, 
+            rating, 
+            lat, 
+            lng, 
+            maxDistance, 
+            sort = 'rating', 
+            page = 1, 
+            limit = DEFAULT_ITEMS_PER_PAGE 
+        } = req.query;
 
-    // Handle compound sorting for popular_nearby
-    if (sort === 'popular_nearby') {
-        sortOption = Object.fromEntries(SORT_FIELDS[sort]);
-    }
-    
-    // === חיפוש חופשי אם קיים q ===
-    if (q && q.trim().length > 0) {
-        const regex = new RegExp(q, 'i'); // Case-insensitive
-
-        const matchingCategories = await Category.find({ name: regex });
-        const categoryIds = matchingCategories.map(cat => cat._id);
-
-        const matchingServices = await Service.find({ name: regex });
-        const matchingServiceIds = matchingServices.map(service => service._id);
-
-        const searchConditions = {
-            $and: [
-                { active: true }, 
-                {
-                    $or: [
-                        { name: regex },
-                        { address: regex },
-                        { email: regex },
-                        { phone: { $regex: q } },
-                        { categoryId: { $in: categoryIds } },
-                        { services: { $in: matchingServiceIds } }
-                    ]
-                }
-            ]
-        };
-
-        const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || DEFAULT_ITEMS_PER_PAGE;
-        const skip = (page - 1) * limit;
-
-        const [businesses, total] = await Promise.all([
-            Business.find(searchConditions)
-                .populate('categoryId')
-                .populate('services')
-                .sort(sortOption)
-                .skip(skip)
-                .limit(limit)
-                .populate('categoryId', 'name'),
-            Business.countDocuments(searchConditions)
-        ]);
-
-        const results = businesses.map(business => {
-            const businessObj = business.toObject();
-            businessObj.categoryName = business.categoryId?.name || '';
-            return businessObj;
+        console.log('getItems - Query params:', { 
+            q, categoryName, services, rating, lat, lng, maxDistance, sort, page, limit 
         });
 
-        return res.json({
-            data: results,
-            pagination: {
-                total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit),
-                hasMore: page < Math.ceil(total / limit)
+        const pageNum = Number(page) || 1;
+        const limitNum = Number(limit) || DEFAULT_ITEMS_PER_PAGE;
+        const skip = (pageNum - 1) * limitNum;
+
+        let query = q ? 
+            await buildSearchQuery(q) : 
+            await buildFilterQuery(categoryName, services, rating);
+
+        let result;
+        let sortOption;
+
+        const needsLocationFiltering = maxDistance && lat && lng;
+        const needsLocationSorting = (sort === 'popular_nearby' || sort === 'distance') && lat && lng;
+        
+        if (needsLocationFiltering || needsLocationSorting) {
+            console.log('Using geoNear pipeline with coordinates:', [parseFloat(lng), parseFloat(lat)]);
+            const coordinates = [parseFloat(lng), parseFloat(lat)];
+            
+            // הוספת שלב לחישוב ציון הרלוונטיות הטקסטואלית
+            const textScoreStage = q ? [
+                { $addFields: { textScore: { $meta: "textScore" } } }
+            ] : [];
+
+            const pipeline = [
+                ...buildGeoNearPipeline(coordinates, query, sort, maxDistance),
+                ...textScoreStage,
+                ...buildLookupPipeline(skip, limitNum)
+            ];
+
+            // שקלול המרחק, הדירוג וציון הרלוונטיות הטקסטואלית
+            if (q && sort === 'popular_nearby') {
+                pipeline.push({
+                    $addFields: {
+                        combinedScore: {
+                            $add: [
+                                { $multiply: [{ $divide: ["$distance", 1000] }, -0.1] }, // משקל שלילי למרחק
+                                { $multiply: ["$rating", 0.3] },                         // משקל חיובי לדירוג
+                                { $multiply: ["$textScore", 0.6] }                      // משקל גבוה להתאמה טקסטואלית
+                            ]
+                        }
+                    }
+                });
+                pipeline.push({ $sort: { combinedScore: -1 } });
             }
-        });
-    }
 
-    // === סינון רגיל אם אין q ===
-    if (categoryName) {
-        const category = await Category.findOne({ name: categoryName });
-        if (category) {
-            query.categoryId = category._id;
+            const [businesses, total] = await Promise.all([
+                Business.aggregate(pipeline),
+                Business.countDocuments(query)
+            ]);
+
+            result = {
+                data: businesses,
+                pagination: {
+                    total,
+                    page: pageNum,
+                    limit: limitNum,
+                    totalPages: Math.ceil(total / limitNum),
+                    hasMore: pageNum < Math.ceil(total / limitNum)
+                }
+            };
         } else {
-            return res.status(404).json({ message: "Category not found" });
+            console.log('Using regular find pipeline (no location filtering)');
+            
+            // טיפול במיון לפי רלוונטיות טקסטואלית
+            if (q) {
+                sortOption = { score: { $meta: "textScore" } };
+            } else {
+                sortOption = {
+                    rating: { rating: -1 },
+                    name: { name: 1 },
+                    newest: { createdAt: -1 }
+                }[sort] || { rating: -1 };
+            }
+
+            const [businesses, total] = await Promise.all([
+                Business.find(query)
+                    .select(q ? { score: { $meta: "textScore" } } : {})
+                    .populate('categoryId')
+                    .populate('services')
+                    .sort(sortOption)
+                    .skip(skip)
+                    .limit(limitNum)
+                    .lean(),
+                Business.countDocuments(query)
+            ]);
+
+            result = {
+                data: businesses,
+                pagination: {
+                    total,
+                    page: pageNum,
+                    limit: limitNum,
+                    totalPages: Math.ceil(total / limitNum),
+                    hasMore: pageNum < Math.ceil(total / limitNum)
+                }
+            };
         }
+
+        res.json(result);
+
+    } catch (err) {
+        console.error('Error in getItems:', err);
+        res.status(500).json({ message: err.message });
     }
-
-    if (services) {
-        let serviceList = Array.isArray(services) ? services : [services];
-        const objectIds = serviceList.filter(id => mongoose.Types.ObjectId.isValid(id));
-
-        if (objectIds.length === serviceList.length) {
-            query.services = { $in: objectIds.map(id => new mongoose.Types.ObjectId(id)) };
-        } else {
-            const serviceDocs = await Service.find({ name: { $in: serviceList } });
-            const ids = serviceDocs.map(s => s._id);
-            if (ids.length > 0) query.services = { $in: ids };
-        }
-    }
-
-    if (rating) {
-        query.rating = { $gte: Number(rating) };
-    }
-
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || DEFAULT_ITEMS_PER_PAGE;
-    const skip = (page - 1) * limit;
-
-    console.log("query:", query);
-    console.log("sortOption:", sortOption);
-
-    const [businesses, total] = await Promise.all([
-        Business.find(query)
-            .populate('categoryId')
-            .populate('services')
-            .sort(sortOption)  // Apply the sort option here
-            .skip(skip)
-            .limit(limit),
-        Business.countDocuments(query),
-    ]);
-
-    res.json({
-        data: businesses,
-        pagination: {
-            total,
-            page,
-            limit,
-            totalPages: Math.ceil(total / limit),
-            hasMore: page < Math.ceil(total / limit)
-        },
-    });
-
-  } catch (err) {
-    console.error("Error in getItems:", err);
-    res.status(500).json({ message: 'Internal server error' });
-  }
 };
 
 //no needed auth

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FaUpload } from 'react-icons/fa';
+import { Autocomplete } from '@react-google-maps/api';
 import '../styles/StepsStyle.css';
 
 const phonePrefixes = [
@@ -8,8 +9,9 @@ const phonePrefixes = [
   '072', '073', '074', '076',
 ].sort((a, b) => Number(a) - Number(b));
 
-
 const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
+  const [autocomplete, setAutocomplete] = useState(null);
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
@@ -25,6 +27,22 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const onLoad = (autocomplete) => {
+    setAutocomplete(autocomplete);
+  };
+
+  const onPlaceChanged = () => {
+    if (autocomplete) {
+      const place = autocomplete.getPlace();
+      if (place.formatted_address) {
+        setBusinessData(prev => ({
+          ...prev,
+          address: place.formatted_address
+        }));
+      }
+    }
   };
 
   const removeLogo = () => {
@@ -44,7 +62,6 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
 
   return (
     <div className="step-business-details">
-
       <div className="form-group">
         <label htmlFor="name" className="form-label">
           שם העסק<RequiredMark />
@@ -64,15 +81,20 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
         <label htmlFor="address" className="form-label">
           כתובת<RequiredMark />
         </label>
-        <input
-          type="text"
-          id="address"
-          name="address"
-          value={businessData.address || ''}
-          onChange={handleChange}
-          className="form-input"
-          required
-        />
+        <Autocomplete
+          onLoad={onLoad}
+          onPlaceChanged={onPlaceChanged}
+        >
+          <input
+            type="text"
+            id="address"
+            name="address"
+            value={businessData.address || ''}
+            onChange={handleChange}
+            className="form-input"
+            required
+          />
+        </Autocomplete>
       </div>
 
       <div className="form-group" style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
