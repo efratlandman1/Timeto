@@ -293,25 +293,6 @@
   margin-bottom: 1.5rem;
 }
 
-.add-feedback-button {
-  background: #ff4d4d;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.add-feedback-button:hover {
-  background: #ff3333;
-  transform: translateY(-2px);
-}
-
 .feedback-stats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

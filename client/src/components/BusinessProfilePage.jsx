@@ -207,7 +207,7 @@ const BusinessProfilePage = () => {
       <div className="feedback-section">
         <div className="feedback-header">
           <h2>דירוגים ופידבקים</h2>
-          <button className="add-feedback-button" onClick={() => setShowFeedbackModal(true)}>
+          <button className="add-button" onClick={() => setShowFeedbackModal(true)}>
             <FaRegStar />
             הוסף פידבק
           </button>
