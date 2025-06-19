@@ -117,24 +117,6 @@
     background: #fff5f5;
 }
 
-.add-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.75rem 1.5rem;
-    background: #ff4d4d;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.add-button:hover {
-    background: #ff3333;
-    transform: translateY(-1px);
-}
-
 /* Modal Styles */
 .modal-overlay {
     position: fixed;
@@ -256,34 +238,7 @@
     gap: 1rem;
 }
 
-.cancel-button,
-.save-button {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
 
-.cancel-button {
-    background: white;
-    border: 1px solid #ddd;
-    color: #666;
-}
-
-.cancel-button:hover {
-    background: #f8f8f8;
-}
-
-.save-button {
-    background: #ff4d4d;
-    border: none;
-    color: white;
-}
-
-.save-button:hover {
-    background: #ff3333;
-}
 
 /* Loading Spinner */
 .loading-spinner {

@@ -1,13 +1,22 @@
 /* Base Button Styles - Applied to all buttons */
 .nav-button,
 .confirm-button,
-.clear-button {
+.clear-button,
+.add-button,
+.cancel-button,
+.save-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: inherit;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    min-width: 100px;
 }
 
 /* Navigation Buttons */
@@ -72,56 +81,103 @@
     color: var(--primary-color);
 }
 
-/* Confirm Button */
-.confirm-button {
-    width: 100%;
+/* Action Buttons - Category 1: Primary Actions (Strong Colors) */
+.confirm-button,
+.add-button,
+.save-button {
     background: var(--primary-color);
     color: var(--button-text-white);
-    padding: var(--button-padding-lg);
-    font-size: var(--button-font-md);
-    font-weight: 500;
-    border: none;
-    border-radius: var(--border-radius-lg);
+    gap: 12px;
 }
 
-.confirm-button:hover {
+.confirm-button:hover,
+.add-button:hover,
+.save-button:hover {
     background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 77, 77, 0.15);
+    transform: translateY(-1px);
 }
 
-.confirm-button:active {
+.confirm-button:active,
+.add-button:active,
+.save-button:active {
     transform: translateY(0);
 }
 
-.confirm-button:disabled {
-    background: #f5f5f5;
-    color: #999;
+.confirm-button:disabled,
+.add-button:disabled,
+.save-button:disabled {
+    background: var(--bg-light);
+    border-color: var(--border-color);
+    color: var(--text-muted);
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
 }
 
-/* Clear Button */
-.clear-button {
-    height: 42px;
-    padding: 0 24px;
-    background: var(--button-text-white);
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
-    border-radius: var(--border-radius-lg);
-    font-weight: 500;
-    min-width: 120px;
-}
-
-.clear-button:hover {
-    background: var(--primary-color);
+/* Icons for Primary Action Buttons - Light icons on dark background */
+.confirm-button .icon,
+.confirm-button svg,
+.add-button .icon,
+.add-button svg,
+.save-button .icon,
+.save-button svg {
+    font-size: var(--button-icon-md);
     color: var(--button-text-white);
 }
 
+.confirm-button:hover .icon,
+.confirm-button:hover svg,
+.add-button:hover .icon,
+.add-button:hover svg,
+.save-button:hover .icon,
+.save-button:hover svg {
+    color: var(--button-text-white);
+}
+
+.confirm-button:disabled .icon,
+.confirm-button:disabled svg,
+.add-button:disabled .icon,
+.add-button:disabled svg,
+.save-button:disabled .icon,
+.save-button:disabled svg {
+    color: var(--text-muted);
+}
+
+/* Action Buttons - Category 2: Secondary Actions (Soft Colors) */
+.clear-button,
+.cancel-button {
+    background: var(--button-text-white);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.clear-button:hover,
+.cancel-button:hover {
+    background: var(--bg-light);
+    color: var(--text-primary);
+}
+
+/* Icons for Secondary Action Buttons - Dark icons on light background */
+.clear-button .icon,
+.clear-button svg,
+.cancel-button .icon,
+.cancel-button svg {
+    font-size: var(--button-icon-md);
+    color: var(--text-secondary);
+}
+
+.clear-button:hover .icon,
+.clear-button:hover svg,
+.cancel-button:hover .icon,
+.cancel-button:hover svg {
+    color: var(--text-primary);
+}
+
 /* Responsive Design - 6 Breakpoints */
+/* COMMENTED OUT UNTIL FURTHER NOTICE
 
 /* 2xl: 1536px - 4K and ultra-wide displays */
+/*
 @media (max-width: 1536px) {
     .nav-button {
         font-size: var(--button-font-2xl);
@@ -148,10 +204,16 @@
         padding: var(--button-padding-2xl);
     }
     
+    .add-button,
+    .cancel-button,
+    .save-button {
+        font-size: var(--button-font-2xl);
+        padding: var(--button-padding-2xl);
+    }
 }
 
 /* xl: 1280px - Wide desktops */
-@media (max-width: 1280px) {
+/*@media (max-width: 1280px) {
     .nav-button {
         font-size: var(--button-font-xl);
         padding: var(--button-padding-xxl);
@@ -177,10 +239,16 @@
         padding: var(--button-padding-xxl);
     }
     
+    .add-button,
+    .cancel-button,
+    .save-button {
+        font-size: var(--button-font-xl);
+        padding: var(--button-padding-xxl);
+    }
 }
 
 /* lg: 1024px - Laptops and small desktops */
-@media (max-width: 1024px) {
+/*@media (max-width: 1024px) {
     .nav-button {
         font-size: var(--button-font-lg);
         padding: var(--button-padding-lg);
@@ -205,14 +273,63 @@
         font-size: var(--button-font-lg);
         padding: var(--button-padding-lg);
     }
+    
+    .add-button,
+    .cancel-button,
+    .save-button {
+        font-size: var(--button-font-lg);
+        padding: var(--button-padding-lg);
+    }
 }
 
 /* md: 768px - Tablets */
-@media (max-width: 768px) {
+/*@media (max-width: 768px) {
+    .nav-button {
+        font-size: var(--button-font-md);
+        padding: var(--button-padding-md);
+        gap: var(--button-gap-md);
+    }
+    
+    .nav-button .icon,
+    .nav-button svg {
+        font-size: var(--button-icon-md);
+    }
+    
+    .nav-button.primary {
+        padding: var(--button-padding-lg);
+        font-size: var(--button-font-md);
+    }
+    
+    .nav-button.above-header {
+        margin-bottom: var(--button-margin-md);
+    }
+    
+    .confirm-button {
+        font-size: var(--button-font-md);
+        padding: var(--button-padding-md);
+    }
+    
+    .clear-button {
+        height: 38px;
+        padding: 0 20px;
+        font-size: var(--button-font-md);
+        min-width: 100px;
+    }
+    
+    .add-button,
+    .cancel-button,
+    .save-button {
+        font-size: var(--button-font-md);
+        padding: var(--button-padding-md);
+    }
+}
+
+/* sm: 640px - Large phones */
+/*@media (max-width: 640px) {
     .nav-button {
         font-size: var(--button-font-sm);
         padding: var(--button-padding-sm);
-        gap: var(--button-gap-md);
+        gap: var(--button-gap-sm);
     }
     
     .nav-button .icon,
@@ -221,7 +338,7 @@
     }
     
     .nav-button.primary {
-        padding: var(--button-padding-xl);
+        padding: var(--button-padding-md);
         font-size: var(--button-font-sm);
     }
     
@@ -234,42 +351,16 @@
         padding: var(--button-padding-sm);
     }
     
-    .clear-button {
-        width: 100%;
-        padding: 10px 0;
+    .add-button,
+    .cancel-button,
+    .save-button {
+        font-size: var(--button-font-sm);
+        padding: var(--button-padding-sm);
     }
 }
 
-/* sm: 640px - Mobile landscape and small tablets */
-@media (max-width: 640px) {
-    .nav-button {
-        font-size: var(--button-font-xs);
-        padding: var(--button-padding-xs);
-        gap: var(--button-gap-sm);
-    }
-    
-    .nav-button .icon,
-    .nav-button svg {
-        font-size: var(--button-icon-xs);
-    }
-    
-    .nav-button.primary {
-        padding: var(--button-padding-lg);
-        font-size: var(--button-font-xs);
-    }
-    
-    .nav-button.above-header {
-        margin-bottom: var(--button-margin-xs);
-    }
-    
-    .confirm-button {
-        font-size: var(--button-font-xs);
-        padding: var(--button-padding-xs);
-    }
-}
-
-/* xs: 480px - Small mobile */
-@media (max-width: 480px) {
+/* xs: 480px - Small phones */
+/*@media (max-width: 480px) {
     .nav-button {
         font-size: var(--button-font-xs);
         padding: var(--button-padding-xs);
@@ -282,7 +373,7 @@
     }
     
     .nav-button.primary {
-        padding: var(--button-padding-lg);
+        padding: var(--button-padding-sm);
         font-size: var(--button-font-xs);
     }
     
@@ -294,4 +385,12 @@
         font-size: var(--button-font-xs);
         padding: var(--button-padding-xs);
     }
-} 
+    
+    .add-button,
+    .cancel-button,
+    .save-button {
+        font-size: var(--button-font-xs);
+        padding: var(--button-padding-xs);
+    }
+}
+*/

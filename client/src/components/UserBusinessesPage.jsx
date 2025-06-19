@@ -55,10 +55,10 @@ const UserBusinessesPage = () => {
                     </div>
                     <div className="page-header__action">
                         <button 
-                            className="add-business-button"
+                            className="add-button"
                             onClick={() => navigate('/edit')}
                         >
-                            <FaPlus className="add-business-icon" />
+                            <FaPlus />
                             הוספת עסק חדש
                         </button>
                     </div>
