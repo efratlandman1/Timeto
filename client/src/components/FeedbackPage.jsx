@@ -115,7 +115,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
                     dir="rtl"
                     onClick={(e) => e.stopPropagation()}
                     >
-                    <button className="feedback-page-close-button" onClick={onClose}>×</button>
+                    <button className="close-button" onClick={onClose}>×</button>
                     <h2 className="feedback-page-title">
                         חוות דעת על {businessName || 'העסק'}
                     </h2>

@@ -45,26 +45,6 @@
   font-weight: 600;
 }
 
-.close-button {
-  background: none;
-  border: none;
-  color: #666;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.close-button svg {
-  width: 20px;
-  height: 20px;
-}
-
-.close-button:hover {
-  color: #ff4d4d;
-}
-
 /* Panel Content */
 .panel-content {
   padding: 16px;

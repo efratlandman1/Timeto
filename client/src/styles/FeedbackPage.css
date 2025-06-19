@@ -31,25 +31,6 @@
   overflow-y: auto;
 }
 
-.feedback-page-close-button {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #666;
-  cursor: pointer;
-  padding: 0.5rem;
-  line-height: 1;
-  transition: all 0.2s ease;
-  z-index: 2;
-}
-
-.feedback-page-close-button:hover {
-  color: #333;
-  transform: scale(1.1);
-}
 
 .feedback-page-title {
   font-size: 1.5rem;

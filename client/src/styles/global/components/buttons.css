@@ -173,6 +173,39 @@
     color: var(--text-primary);
 }
 
+/* Close Button - Modal/Popup close button (X) */
+.close-button {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    min-width: auto;
+    width: 40px;
+    height: 40px;
+    z-index: 10;
+}
+
+.close-button:hover {
+    background: var(--bg-light);
+    color: var(--text-primary);
+}
+
+.close-button .icon,
+.close-button svg {
+    font-size: inherit;
+    color: inherit;
+}
+
 /* Responsive Design - 6 Breakpoints */
 /* COMMENTED OUT UNTIL FURTHER NOTICE
 
