@@ -2,26 +2,26 @@
 .nav-button {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background: none;
+    gap: var(--button-gap-lg);
+    padding: var(--button-padding-md);
+    background: var(--button-bg-transparent);
     border: none;
     color: var(--text-primary);
-    border-radius: 6px;
+    border-radius: var(--border-radius-md);
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: var(--button-font-md);
     font-weight: 400;
     transition: all 0.2s ease;
 }
 
 .nav-button:hover {
     color: var(--primary-color);
-    background-color: var(--background-light);
+    background-color: var(--bg-light);
 }
 
 .nav-button .icon,
 .nav-button svg {
-    font-size: 1.1rem;
+    font-size: var(--button-icon-md);
     color: var(--text-secondary);
     order: -1;
 }
@@ -33,29 +33,29 @@
 
 /* Above Header Navigation Button */
 .nav-button.above-header {
-    margin-bottom: 1rem;
+    margin-bottom: var(--button-margin-md);
 }
 
 .nav-button.primary {
     background-color: var(--primary-color);
-    color: white;
-    padding: 0.75rem 1.25rem;
-    border-radius: 8px;
+    color: var(--button-text-white);
+    padding: var(--button-padding-xxl);
+    border-radius: var(--border-radius-lg);
     font-weight: 500;
 }
 
 .nav-button.primary:hover {
-    background-color: var(--primary-color-dark);
-    color: white;
+    background-color: var(--primary-dark);
+    color: var(--button-text-white);
 }
 
 .nav-button.primary .icon,
 .nav-button.primary svg {
-    color: white;
+    color: var(--button-text-white);
 }
 
 .nav-button.active {
-    background-color: var(--primary-color-light);
+    background-color: var(--primary-light);
     color: var(--primary-color);
 }
 
@@ -64,10 +64,142 @@
     color: var(--primary-color);
 }
 
-/* Responsive Design */
+/* Responsive Design - 6 Breakpoints */
+
+/* 2xl: 1536px - 4K and ultra-wide displays */
+@media (max-width: 1536px) {
+    .nav-button {
+        font-size: var(--button-font-2xl);
+        padding: var(--button-padding-2xl);
+        gap: var(--button-gap-2xl);
+    }
+    
+    .nav-button .icon,
+    .nav-button svg {
+        font-size: var(--button-icon-2xl);
+    }
+    
+    .nav-button.primary {
+        padding: var(--button-padding-3xl);
+        font-size: var(--button-font-2xl);
+    }
+    
+    .nav-button.above-header {
+        margin-bottom: var(--button-margin-2xl);
+    }
+}
+
+/* xl: 1280px - Wide desktops */
+@media (max-width: 1280px) {
+    .nav-button {
+        font-size: var(--button-font-xl);
+        padding: var(--button-padding-xxl);
+        gap: var(--button-gap-xl);
+    }
+    
+    .nav-button .icon,
+    .nav-button svg {
+        font-size: var(--button-icon-xl);
+    }
+    
+    .nav-button.primary {
+        padding: var(--button-padding-2xl);
+        font-size: var(--button-font-xl);
+    }
+    
+    .nav-button.above-header {
+        margin-bottom: var(--button-margin-xl);
+    }
+}
+
+/* lg: 1024px - Laptops and small desktops */
+@media (max-width: 1024px) {
+    .nav-button {
+        font-size: var(--button-font-lg);
+        padding: var(--button-padding-lg);
+        gap: var(--button-gap-lg);
+    }
+    
+    .nav-button .icon,
+    .nav-button svg {
+        font-size: var(--button-icon-lg);
+    }
+    
+    .nav-button.primary {
+        padding: var(--button-padding-xxl);
+        font-size: var(--button-font-lg);
+    }
+    
+    .nav-button.above-header {
+        margin-bottom: var(--button-margin-lg);
+    }
+}
+
+/* md: 768px - Tablets */
 @media (max-width: 768px) {
     .nav-button {
-        font-size: 0.85rem;
-        padding: 0.4rem 0.8rem;
+        font-size: var(--button-font-sm);
+        padding: var(--button-padding-sm);
+        gap: var(--button-gap-md);
+    }
+    
+    .nav-button .icon,
+    .nav-button svg {
+        font-size: var(--button-icon-sm);
+    }
+    
+    .nav-button.primary {
+        padding: var(--button-padding-xl);
+        font-size: var(--button-font-sm);
+    }
+    
+    .nav-button.above-header {
+        margin-bottom: var(--button-margin-sm);
+    }
+}
+
+/* sm: 640px - Mobile landscape and small tablets */
+@media (max-width: 640px) {
+    .nav-button {
+        font-size: var(--button-font-xs);
+        padding: var(--button-padding-xs);
+        gap: var(--button-gap-sm);
+    }
+    
+    .nav-button .icon,
+    .nav-button svg {
+        font-size: var(--button-icon-xs);
+    }
+    
+    .nav-button.primary {
+        padding: var(--button-padding-lg);
+        font-size: var(--button-font-xs);
+    }
+    
+    .nav-button.above-header {
+        margin-bottom: var(--button-margin-xs);
+    }
+}
+
+/* xs: 480px - Small mobile */
+@media (max-width: 480px) {
+    .nav-button {
+        font-size: var(--button-font-xs);
+        padding: var(--button-padding-xs);
+        gap: var(--button-gap-xs);
+    }
+    
+    .nav-button .icon,
+    .nav-button svg {
+        font-size: var(--button-icon-xs);
+    }
+    
+    .nav-button.primary {
+        padding: var(--button-padding-lg);
+        font-size: var(--button-font-xs);
+    }
+    
+    .nav-button.above-header {
+        margin-bottom: var(--button-margin-xs);
     }
 } 

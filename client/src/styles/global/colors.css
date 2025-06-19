@@ -23,6 +23,10 @@
     --warning-color: #ffc107;
     --error-color: #dc3545;
     
+    /* Button Colors */
+    --button-text-white: #ffffff;
+    --button-bg-transparent: transparent;
+    
     /* Shadow */
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
