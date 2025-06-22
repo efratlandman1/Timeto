@@ -259,8 +259,8 @@ const MainPage = () => {
                     <div className="categories-header">
                         <h2>קטגוריות פופולריות</h2>
                     </div>
-                    <button className="category-arrow left" onClick={() => handleScroll('left')}>
-                        <FaChevronLeft />
+                    <button className="arrow-button" onClick={() => handleScroll('right')}>
+                        <FaChevronRight />
                     </button>
                     <div className="categories">
                         {categories.map((category) => (
@@ -276,9 +276,10 @@ const MainPage = () => {
                             </div>
                         ))}
                     </div>
-                    <button className="category-arrow right" onClick={() => handleScroll('right')}>
-                        <FaChevronRight />
+                    <button className="arrow-button" onClick={() => handleScroll('left')}>
+                        <FaChevronLeft />
                     </button>
+                    
                 </div>
 
                 {/* Business Groups */}
@@ -325,7 +326,7 @@ const MainPage = () => {
                     <div className="bottom-banner-content">
                         <h2>הצטרף לקהילת זמן</h2>
                         <p>הוסף את העסק שלך והתחיל לקבל לקוחות חדשים עוד היום</p>
-                        <button className="banner-button" onClick={() => navigate('/edit')}>
+                        <button className="add-button" onClick={() => navigate('/edit')}>
                             הוסף עסק חינם
                         </button>
                     </div>

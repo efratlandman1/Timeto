@@ -80,7 +80,7 @@
     color: #666;
 }
 
-/* Navigation buttons */
+/* Div Navigation buttons */
 .nav-links {
     display: flex;
     align-items: center;
@@ -146,63 +146,10 @@
     position: relative;
 }
 
-/* Unused class - can be removed */
-/* .lang-button {
-    background: none;
-    border: none;
-    padding: 0.5rem;
-    color: #333;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    font-size: 1.25rem;
-} */
-
-/* Unused class - can be removed */
-/* .lang-button:hover {
-    color: #ff4d4d;
-} */
-
 .lang-dropdown {
     min-width: 120px;
 }
 
-/* Auth section */
-.auth-buttons {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.auth-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background: none;
-    border: none;
-    color: var(--text-primary);
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 400;
-    transition: all 0.2s ease;
-}
-
-.auth-button:hover {
-    color: var(--primary-color);
-    background-color: var(--background-light);
-}
-
-.auth-button svg {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-}
-
-.auth-button:hover svg {
-    color: var(--primary-color);
-}
 
 /* Unused class - can be removed */
 /* .user-icon {

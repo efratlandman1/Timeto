@@ -129,18 +129,18 @@ const NavigationButtons = ({ businessData }) => {
   return (
     <div className="edit-business-navigation-buttons">
       {current > 1 ? (
-        <button onClick={prev} className="edit-business-arrow-button" aria-label="Previous step">
+        <button onClick={prev} className="arrow-button" aria-label="Previous step">
           →
         </button>
       ) : (
-        <div className="edit-business-arrow-spacer" />
+        <div className="arrow-spacer" />
       )}
       {current < total ? (
-        <button onClick={handleNext} className="edit-business-arrow-button" aria-label="Next step">
+        <button onClick={handleNext} className="arrow-button" aria-label="Next step">
           ←
         </button>
       ) : (
-        <div className="edit-business-arrow-spacer" />
+        <div className="arrow-spacer" />
       )}
     </div>
   );

@@ -505,3 +505,47 @@
     }
 }
 */
+
+/* Arrow Button Styles - Navigation arrows for multi-step forms */
+.arrow-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    color: #666;
+    border: 2px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.arrow-button:hover {
+    border-color: #d32f2f;
+    color: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.arrow-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.arrow-button:disabled:hover {
+    border-color: #e0e0e0;
+    color: #666;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Arrow Spacer - For consistent spacing in navigation */
+.arrow-spacer {
+    width: 40px;
+}
+

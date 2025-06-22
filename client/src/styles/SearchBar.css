@@ -235,32 +235,6 @@
   color: #666;
 }
 
-/* Pagination */
-.load-more-button {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  text-align: center;
-  background: #f8f8f8;
-  border: none;
-  color: #666;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.load-more-button:hover {
-  background: #f0f0f0;
-  color: #333;
-}
-
-.load-more-button:disabled {
-  background: #f8f8f8;
-  color: #999;
-  cursor: not-allowed;
-}
-
 /* Mobile Styles */
 @media (max-width: 768px) {
   .search-bar {
@@ -301,14 +275,6 @@ body.blurred::before {
 
 .load-more-item:hover {
   background: #ececec;
-}
-
-.load-more-button {
-  color: #007bff;
-  font-weight: bold;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 /* אם טעינת התוצאות היא אוטומטית - אפשר להשאיר רק את הספינר */

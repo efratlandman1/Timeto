@@ -109,33 +109,6 @@
     padding: 0 20px;
 }
 
-.edit-business-arrow-button {
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 50%;
-    font-size: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: white;
-    color: #666;
-    border: 2px solid #e0e0e0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.edit-business-arrow-button:hover {
-    border-color: #d32f2f;
-    color: #d32f2f;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.edit-business-arrow-spacer {
-    width: 40px;
-}
-
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
@@ -208,12 +181,7 @@
     .edit-business-navigation-buttons {
         gap: 20px;
     }
-
-    .edit-business-arrow-button {
-        width: 36px;
-        height: 36px;
-        font-size: 18px;
-    }
+  
 }
 
 /* Input Focus States */

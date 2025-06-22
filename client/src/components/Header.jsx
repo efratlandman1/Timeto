@@ -342,12 +342,10 @@ const Header = () => {
                             )}
                         </div>
                     ) : (
-                        // <div className="auth-buttons">
                             <button className="nav-button" onClick={() => navigate("/auth")}>
                                 <FaSignInAlt />
                                 הרשמה / כניסה
                             </button>
-                        // </div>
                     )}
                 </div>
             </nav>
