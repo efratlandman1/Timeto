@@ -191,39 +191,3 @@
     border-color: #d32f2f !important;
     box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15) !important;
 }
-
-/* Update logo upload button */
-.upload-logo-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 24px;
-    background: white;
-    color: #666;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    width: auto;
-    min-width: 200px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.upload-logo-button:hover {
-    background: #f8f8f8;
-    color: #d32f2f;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
-}
-
-.upload-logo-button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(211, 47, 47, 0.1);
-}
-
-.upload-logo-button .icon {
-    font-size: 20px;
-    color: inherit;
-}

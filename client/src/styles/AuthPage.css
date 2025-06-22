@@ -173,38 +173,6 @@
     margin-bottom: 24px;
 }
 
-.open-gmail-button {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    background-color: #fff;
-    margin-bottom: 12px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: background-color 0.2s;
-    color: #333;
-    text-decoration: none;
-}
-
-.open-gmail-button:hover {
-    background-color: #f7f7f7;
-}
-
-.resend-email-button {
-    background: none;
-    border: none;
-    color: var(--primary-color, #ff4d4d);
-    font-size: 15px;
-    cursor: pointer;
-    font-weight: 500;
-}
-
 .resend-text {
     font-size: 0.9rem;
 } 
