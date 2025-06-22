@@ -25,47 +25,7 @@
     direction: rtl;
 }
 
-.filter-tag {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #ffffff;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    color: #333;
-    border: 1px solid #e6e6e6;
-    transition: all 0.2s ease;
-    font-weight: normal;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
 
-.filter-tag:hover {
-    border-color: #ff4d4d;
-    background-color: #fff;
-}
-
-.filter-tag button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    color: #ff4d4d;
-    cursor: pointer;
-    padding: 2px;
-    font-size: 12px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-    margin-right: 2px;
-}
-
-.filter-tag button:hover {
-    background: #fff0f0;
-    color: #ff3333;
-}
 
 .clear-all-filters {
     display: flex;
@@ -91,68 +51,6 @@
     font-size: 12px;
 }
 
-/* Unused class - can be removed */
-/* .mobile-filter-button {
-    display: none;
-    align-items: center;
-    gap: 8px;
-    background: white;
-    border: 1px solid #eee;
-    padding: 10px 16px;
-    border-radius: 8px;
-    color: #333;
-    font-weight: 500;
-    cursor: pointer;
-    margin-bottom: 16px;
-} */
-
-/* Unused class - can be removed */
-/* .mobile-filter-button svg {
-    color: #ff4d4d;
-} */
-
-/* Filters Section */
-/* Unused class - can be removed */
-/* .filters-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 1.5rem;
-    width: 100%;
-} */
-
-/* Unused class - can be removed */
-/* .remove-filter {
-    color: #ff4d4d;
-    cursor: pointer;
-    font-size: 1.2rem;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-} */
-
-/* Unused class - can be removed */
-/* .remove-filter:hover {
-    color: #ff3333;
-} */
-
-/* Sort Section */
-/* Unused class - can be removed */
-/* .sort-container {
-    margin-bottom: 1.5rem;
-    width: 100%;
-} */
-
-.sort-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 1rem;
-    color: #2d3436;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0.5rem 0;
-}
 
 /* Unused class - can be removed */
 /* .sort-arrow {
@@ -193,10 +91,7 @@
         padding: 4rem 0.5rem 1rem;
     } */
 
-    /* .mobile-filter-button {
-        display: flex;
-    } */
-
+   
     .advanced-search-panel:not(.mobile) {
         display: none;
     }
@@ -211,25 +106,7 @@
     padding: 1rem;
 }
 
-.pagination-button {
-    padding: 0.5rem 1rem;
-    border: none;
-    background: #f8f9fa;
-    color: #2d3436;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
 
-.pagination-button:hover {
-    background: #f0f0f0;
-}
-
-.pagination-button.active {
-    background: #ff4d4d;
-    color: white;
-}
 
 .search-page-container {
     max-width: 1200px;
@@ -291,90 +168,19 @@
     height: 40px;
 }
 
-.filter-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-    border: 1px solid #e0e0e0;
-    padding: 0 12px;
-    border-radius: 6px;
-    color: #666;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    height: 100%;
-    min-width: 40px;
-}
-
-.filter-button:hover {
-    border-color: #ff4d4d;
-    color: #ff4d4d;
-}
-
 .sort-area {
     position: relative;
     min-width: 140px;
     height: 100%;
 }
 
-.sort-button {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.75rem 1rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background: white;
-    color: #333;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 160px;
-    width: 100%;
-}
 
-.sort-button:hover {
-    border-color: #ff4d4d;
-    color: #ff4d4d;
-    background: #fff8f8;
-}
 
-.sort-button .sort-text {
-    flex: 1;
-    text-align: center;
-    margin-left: 0.5rem;
-}
-
-.sort-button .sort-icon {
-    font-size: 1.1rem;
-    flex-shrink: 0;
-    color: #666;
-    transition: transform 0.2s ease;
-}
-
-.sort-button:hover .sort-icon {
-    color: #ff4d4d;
-}
-
-.sort-label {
-    color: #666;
-}
 
 .selected-sort {
     font-weight: 500;
 }
 
-.sort-chevron {
-    font-size: 12px;
-    color: #666;
-    transition: transform 0.2s ease;
-    margin-right: auto;
-}
-
-.sort-chevron.open {
-    transform: rotate(180deg);
-}
 
 .sort-dropdown {
     position: absolute;
@@ -465,43 +271,6 @@
     color: #ff3333;
 }
 
-.filter-tag {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: white;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 13px;
-    color: #333;
-    border: 1px solid #ff4d4d;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-
-.filter-tag:hover {
-    background-color: #fff0f0;
-}
-
-.filter-tag button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    color: #ff4d4d;
-    cursor: pointer;
-    padding: 0;
-    font-size: 12px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-}
-
-.filter-tag button:hover {
-    background-color: #ffe5e5;
-}
 
 @media (max-width: 768px) {
     .search-controls-wrapper {
@@ -565,72 +334,14 @@
     gap: 0.75rem;
 }
 
-/* Filter Button */
-.filter-button {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background: white;
-    color: #333;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-
-.filter-button:hover {
-    border-color: #ff4d4d;
-    color: #ff4d4d;
-    background: #fff8f8;
-}
-
-.filter-button svg {
-    font-size: 1.1rem;
-}
 
 /* Sort Control */
 .sort-control {
     position: relative;
 }
 
-.sort-button {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background: white;
-    color: #333;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 160px;
-}
 
-.sort-button:hover {
-    border-color: #ff4d4d;
-    color: #ff4d4d;
-    background: #fff8f8;
-}
 
-.sort-button svg {
-    font-size: 1.1rem;
-}
-
-.sort-button .FaChevronDown {
-    margin-right: auto;
-    transition: transform 0.2s ease;
-}
-
-.sort-button .FaChevronDown.open {
-    transform: rotate(180deg);
-}
 
 .sort-dropdown {
     position: absolute;
@@ -708,9 +419,6 @@
         justify-content: space-between;
     }
 
-    .sort-button {
-        min-width: 140px;
-    }
 
     .advanced-search-panel {
         width: 95%;

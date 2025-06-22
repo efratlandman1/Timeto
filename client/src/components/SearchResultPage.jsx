@@ -247,8 +247,8 @@ const SearchResultPage = () => {
                                     onClick={() => setShowSortDropdown(!showSortDropdown)}
                                     aria-expanded={showSortDropdown}
                                 >
-                                    <span className="sort-text">{SORT_OPTIONS[sortOption]}</span>
-                                    <FaSort className="sort-icon" />
+                                    <span >{SORT_OPTIONS[sortOption]}</span>
+                                    <FaSort  />
                                 </button>
                                 {showSortDropdown && (
                                     <div className="sort-dropdown">

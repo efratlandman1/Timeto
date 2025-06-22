@@ -4,7 +4,9 @@
 .clear-button,
 .add-button,
 .cancel-button,
-.save-button {
+.save-button,
+.filter-button,
+.sort-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -204,6 +206,82 @@
 .close-button svg {
     font-size: inherit;
     color: inherit;
+}
+
+/* Search and Filter Buttons */
+.filter-button,
+.sort-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    color: #333;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: auto;
+    white-space: nowrap;
+    /* background: #f8f9fa; */
+    /* color: #666; */
+    /* padding: 0.5rem 1rem; */
+    /* min-width: 160px; */
+    justify-content: space-between;
+}
+
+.filter-button:hover,
+.sort-button:hover {
+    border-color: #ff4d4d;
+    color: #ff4d4d;
+    background: #fff8f8;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(211, 47, 47, 0.1);
+}
+
+
+
+/* Filter Tags */
+.filter-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #333;
+    border: 1px solid #ff4d4d;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.filter-tag:hover {
+    background-color: #fff0f0;
+}
+
+.filter-tag button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    cursor: pointer;
+    padding: 2px;
+    font-size: 12px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    margin-right: 2px;
+}
+
+.filter-tag button:hover {
+    background: #fff0f0;
+    color: #ff3333;
 }
 
 /* Responsive Design - 6 Breakpoints */
