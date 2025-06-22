@@ -283,7 +283,98 @@
     background: #fff0f0;
     color: #ff3333;
 }
+/* Arrow Button Styles - Navigation arrows for multi-step forms */
+.arrow-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    color: #666;
+    border: 2px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
+.arrow-button:hover {
+    border-color: #d32f2f;
+    color: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.arrow-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.arrow-button:disabled:hover {
+    border-color: #e0e0e0;
+    color: #666;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Arrow Spacer - For consistent spacing in navigation */
+.arrow-spacer {
+    width: 40px;
+}
+
+
+
+/* Icon Button Base Styles - For buttons with icons only */
+.action-button {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    background: #f8f9fa;
+    color: #666;
+}
+
+
+.action-button:hover {
+    background: #e9ecef;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+} 
+
+.action-button:active {
+    transform: translateY(0);
+}
+
+.action-button svg {
+    font-size: 16px;
+    /* color: inherit; */
+    color: white;
+
+}
+
+/* Icon Button States */
+.action-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.action-button:disabled:hover {
+    background: #f8f9fa;
+    transform: none;
+    box-shadow: none;
+}
 /* Responsive Design - 6 Breakpoints */
 /* COMMENTED OUT UNTIL FURTHER NOTICE
 
@@ -506,46 +597,4 @@
 }
 */
 
-/* Arrow Button Styles - Navigation arrows for multi-step forms */
-.arrow-button {
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 50%;
-    font-size: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: white;
-    color: #666;
-    border: 2px solid #e0e0e0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.arrow-button:hover {
-    border-color: #d32f2f;
-    color: #d32f2f;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.arrow-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.arrow-button:disabled:hover {
-    border-color: #e0e0e0;
-    color: #666;
-    transform: none;
-    box-shadow: none;
-}
-
-/* Arrow Spacer - For consistent spacing in navigation */
-.arrow-spacer {
-    width: 40px;
-}
 

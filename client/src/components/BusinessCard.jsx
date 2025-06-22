@@ -183,7 +183,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
           </div>
         )}
         <button 
-          className={`favorite-button ${isFavorite ? 'active' : ''}`}
+          className={`action-button favorite ${isFavorite ? 'active' : ''}`}
           onClick={handleToggleFavorite}
           aria-label={isFavorite ? 'הסר ממועדפים' : 'הוסף למועדפים'}
         >
@@ -230,7 +230,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
               <>
                 {localActive && (
                   <button
-                    className="action-button admin edit-button"
+                    className="action-button edit"
                     onClick={(e) => handleEdit(e)}
                     title="עריכה"
                   >
@@ -241,14 +241,14 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                   confirmDelete ? (
                     <>
                       <button
-                        className="action-button admin confirm-delete"
+                        className="action-button confirm"
                         onClick={(e) => handleDeleteConfirmed(e)}
                         title="אישור מחיקה"
                       >
                         <span>✔</span>
                       </button>
                       <button
-                        className="action-button admin cancel-delete"
+                        className="action-button cancel"
                         onClick={(e) => {
                           e.stopPropagation();
                           setConfirmDelete(false);
@@ -260,7 +260,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                     </>
                   ) : (
                     <button
-                      className="action-button admin delete-button"
+                      className="action-button delete"
                       onClick={(e) => {
                         e.stopPropagation();
                         setConfirmDelete(true);
@@ -272,7 +272,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                   )
                 ) : (
                   <button
-                    className="action-button admin restore-button"
+                    className="action-button restore"
                     onClick={(e) => handleRestore(e)}
                     title="שחזור"
                   >

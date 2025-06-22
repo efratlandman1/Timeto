@@ -159,101 +159,7 @@
   gap: 8px;
 }
 
-.action-button {
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
-}
-
-/* Colored action buttons */
-.action-button.email {
-  background: #ea4335;
-}
-
-.action-button.whatsapp {
-  background: #25d366;
-}
-
-.action-button.phone {
-  background: #0088cc;
-}
-
-.action-button.email svg,
-.action-button.whatsapp svg,
-.action-button.phone svg {
-  color: white;
-}
-
-.action-button.email:hover {
-  background: #d93126;
-}
-
-.action-button.whatsapp:hover {
-  background: #20bd5a;
-}
-
-.action-button.phone:hover {
-  background: #0077b3;
-}
-
-.action-button.admin {
-  color: white;
-}
-
-.action-button.admin[title*="עריכה"],
-.action-button.admin:has(.tooltip:contains("עריכה")) {
-  background: #4a90e2;
-}
-
-.action-button.admin[title*="עריכה"]:hover,
-.action-button.admin:has(.tooltip:contains("עריכה")):hover {
-  background: #357abd;
-}
-
-.action-button.admin[title*="מחיקה"],
-.action-button.admin:has(.tooltip:contains("מחיקה")),
-.action-button.admin:has(.tooltip:contains("אישור מחיקה")) {
-  background: #e74c3c;
-}
-
-.action-button.admin[title*="מחיקה"]:hover,
-.action-button.admin:has(.tooltip:contains("מחיקה")):hover,
-.action-button.admin:has(.tooltip:contains("אישור מחיקה")):hover {
-  background: #c0392b;
-}
-
-.action-button.admin[title*="ביטול"],
-.action-button.admin:has(.tooltip:contains("ביטול")) {
-  background: #95a5a6;
-}
-
-.action-button.admin[title*="ביטול"]:hover,
-.action-button.admin:has(.tooltip:contains("ביטול")):hover {
-  background: #7f8c8d;
-}
-
-.action-button.admin[title*="שחזור"],
-.action-button.admin:has(.tooltip:contains("שחזור")) {
-  background: #2ecc71;
-}
-
-.action-button.admin[title*="שחזור"]:hover,
-.action-button.admin:has(.tooltip:contains("שחזור")):hover {
-  background: #27ae60;
-}
-
-.action-button.admin svg,
-.action-button.admin span {
-  color: white;
-  font-size: 0.9rem;
-}
+/* Action button styles moved to global/buttons.css */
 
 .business-card-badge {
   position: absolute;
@@ -281,7 +187,7 @@
   position: relative;
 }
 
-.business-card.inactive .action-button:not(.restore-button) {
+.business-card.inactive .action-button:not(.restore) {
   pointer-events: none;
   opacity: 0.5;
 }
@@ -301,14 +207,91 @@
   pointer-events: none;
 }
 
-/* Remove the custom tooltip styles */
-.action-button .tooltip {
-  display: none;
+
+/* Colored Action Button Variants */
+/* Communication Buttons */
+.action-button.email {
+  background: #ea4335;
 }
 
-.action-button:hover .tooltip {
-  display: none;
+.action-button.email:hover {
+  background: #d93126;
 }
+
+.action-button.whatsapp {
+  background: #25d366;
+}
+
+.action-button.whatsapp:hover {
+  background: #20bd5a;
+}
+
+.action-button.phone {
+  background: #0088cc;
+}
+
+.action-button.phone:hover {
+  background: #0077b3;
+}
+
+/* Favorite Button */
+.action-button.favorite {
+  /* Override specific properties for favorite button */
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #ccc;
+  z-index: 2;
+}
+
+.action-button.favorite:hover {
+  background: white;
+  transform: scale(1.1);
+}
+
+.action-button.favorite.active {
+  background: #fff;
+  color: #ff4b4b;
+}
+
+.action-button.favorite svg {
+  width: 20px;
+  height: 20px;
+  color: inherit;
+}
+
+/* Admin Action Buttons */
+.action-button.edit {
+  background: #4a90e2;
+}
+
+.action-button.edit:hover {
+  background: #357abd;
+}
+
+.action-button.delete,
+.action-button.confirm {
+  background: #e74c3c;
+}
+
+.action-button.delete:hover,
+.action-button.confirm:hover {
+  background: #c0392b;
+}
+
+.action-button.restore,
+.action-button.cancel {
+  background: #2ecc71;
+}
+
+.action-button.restore:hover,
+.action-button.cancel:hover {
+  background: #27ae60;
+}
+
 
 /* Responsive Design */
 @media (max-width: 1200px) {
@@ -328,81 +311,4 @@
   }
 }
 
-.favorite-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  z-index: 2;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.favorite-button svg {
-  width: 20px;
-  height: 20px;
-  color: #ccc;
-  transition: all 0.3s ease;
-}
-
-.favorite-button:hover {
-  transform: scale(1.1);
-  background: white;
-}
-
-.favorite-button.active {
-  background: #fff;
-}
-
-.favorite-button.active svg {
-  color: #ff4b4b;
-}
-
-/* Update action button colors */
-.action-button.admin.edit-button {
-  background: #4a90e2;
-}
-
-.action-button.admin.edit-button:hover {
-  background: #357abd;
-}
-
-.action-button.admin.delete-button {
-  background: #e74c3c;
-}
-
-.action-button.admin.delete-button:hover {
-  background: #c0392b;
-}
-
-.action-button.admin.confirm-delete {
-  background: #4a90e2;
-}
-
-.action-button.admin.confirm-delete:hover {
-  background: #357abd;
-}
-
-.action-button.admin.cancel-delete {
-  background: #e74c3c;
-}
-
-.action-button.admin.cancel-delete:hover {
-  background: #c0392b;
-}
-
-.action-button.admin.restore-button {
-  background: #2ecc71;
-}
-
-.action-button.admin.restore-button:hover {
-  background: #27ae60;
-}
+/* Favorite button styles moved to global/buttons.css */

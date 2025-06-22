@@ -418,8 +418,8 @@ const AdminPanelPage = () => {
                             </td>
                             <td>{category.name}</td>
                             <td className="actions-cell">
-                                <button onClick={() => handleEdit(category)} className="edit-button">✏️</button>
-                                <button onClick={() => handleDelete(category._id)} className="delete-button">🗑️</button>
+                                <button onClick={() => handleEdit(category)} className="action-button">✏️</button>
+                                <button onClick={() => handleDelete(category._id)} className="action-button">🗑️</button>
                             </td>
                         </tr>
                     ))}
@@ -456,8 +456,8 @@ const AdminPanelPage = () => {
                                 <tr key={service._id}>
                                     <td>{service.name}</td>
                                     <td className="actions-cell">
-                                        <button onClick={() => handleEdit(service)} className="edit-button">✏️</button>
-                                        <button onClick={() => handleDelete(service._id)} className="delete-button">🗑️</button>
+                                        <button onClick={() => handleEdit(service)} className="action-button">✏️</button>
+                                        <button onClick={() => handleDelete(service._id)} className="action-button">🗑️</button>
                                     </td>
                                 </tr>
                             ))}
@@ -487,8 +487,8 @@ const AdminPanelPage = () => {
                             <td>{roleTranslations[user.role] || user.role}</td>
                             <td>{user.active ? 'כן' : 'לא'}</td>
                             <td className="actions-cell">
-                                <button onClick={() => handleEdit(user)} className="edit-button">✏️</button>
-                                <button onClick={() => handleDelete(user._id)} className="delete-button">🗑️</button>
+                                <button onClick={() => handleEdit(user)} className="action-button">✏️</button>
+                                <button onClick={() => handleDelete(user._id)} className="action-button">🗑️</button>
                             </td>
                         </tr>
                     ))}
