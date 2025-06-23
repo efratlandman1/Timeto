@@ -62,7 +62,7 @@ const MyFavoritesPage = () => {
                 {favorites.length === 0 ? (
                     <div className="empty-state">
                         <p>עדיין לא סימנת עסקים כמועדפים</p>
-                        <button className="primary-button" onClick={() => navigate('/')}>
+                        <button className="add-button" onClick={() => navigate('/')}>
                             חפש עסקים
                         </button>
                     </div>
