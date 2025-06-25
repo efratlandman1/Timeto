@@ -438,31 +438,6 @@
   border-color: #ddd;
 }
 
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-}
-
-.modal-content {
-  background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  width: 90%;
-  max-width: 600px;
-  position: relative;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-}
-
 /* Responsive Design */
 @media (max-width: 1024px) {
   .contact-grid {

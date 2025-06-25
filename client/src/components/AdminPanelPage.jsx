@@ -597,7 +597,7 @@ const AdminPanelPage = () => {
                         </div>
                      </>
                 )}
-                <div className="modal-actions">
+                <div className="actions-container">
                     <button type="submit" className="btn btn-solid btn-primary">שמור</button>
                     <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-ghost">ביטול</button>
                 </div>
@@ -657,15 +657,13 @@ const AdminPanelPage = () => {
             </div>
 
             {isModalOpen && (
-                <div className="modal-backdrop">
+                <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
+                        <button onClick={() => setIsModalOpen(false)} className="btn btn-ghost btn-circle btn-sm btn-close">&times;</button>
                         <div className="modal-header">
                             <h2>{editingItem?._id ? `ערוך ${getContextName(activeTab)}` : `הוסף ${getContextName(activeTab)}`}</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="btn btn-ghost btn-circle btn-sm">&times;</button>
                         </div>
-                        <div className="modal-body">
-                            {renderForm()}
-                        </div>
+                        {renderForm()}
                     </div>
                 </div>
             )}

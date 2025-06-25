@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaRegStar, FaStar, FaArrowRight } from 'react-icons/fa';
-import ReactDOM from 'react-dom';
 import '../styles/FeedbackPage.css';
 import {getToken} from "../utils/auth";
 import { useNavigate } from 'react-router-dom';
@@ -101,101 +100,97 @@ const FeedbackPage = ({ businessId, onClose }) => {
     }
     };
 
+  if (isLoading) {
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div className="feedback-page-loader">טוען חוות דעת...</div>
+        </div>
+      </div>
+    );
+  }
 
-  const modalRoot = document.getElementById('modal-root');
-  if (!modalRoot) return null;
-
-  return ReactDOM.createPortal(
+  return (
     <>
-    {isLoading ? (
-        <div className="feedback-page-loader">טוען חוות דעת...</div>
-        ) : (
-        <>
-            <div className="feedback-page-modal-overlay" onClick={onClose}>
-                <div className="feedback-page-modal">
-                    <div className="feedback-page-content"
-                    dir="rtl"
-                    onClick={(e) => e.stopPropagation()}
-                    >
-                    <button className="btn btn-ghost btn-circle btn-sm btn-close" onClick={onClose}>×</button>
-                    <h2 className="feedback-page-title">
-                        חוות דעת על {businessName || 'העסק'}
-                    </h2>
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content" dir="rtl" onClick={(e) => e.stopPropagation()}>
+          <button className="btn btn-ghost btn-circle btn-sm btn-close" onClick={onClose}>×</button>
+          <h2 className="feedback-page-title">
+            חוות דעת על {businessName || 'העסק'}
+          </h2>
 
-                    <div className="form-group rating-group">
-                        <label>דרג את העסק</label>
-                        <div className="star-rating">
-                            {[1, 2, 3, 4, 5].map(star => (
-                                <span
-                                    key={star}
-                                    className={`star ${star <= (hover || rating) ? "filled" : ""}`}
-                                    onClick={() => handleStarClick(star)}
-                                    onMouseEnter={() => setHover(star)}
-                                    onMouseLeave={() => setHover(0)}
-                                >
-                                    {star <= (hover || rating) ? <FaStar size={36} /> : <FaRegStar size={36} />}
-                                </span>
-                            ))}
-                        </div>
-                        {rating > 0 && (
-                            <div className="rating-text">
-                                {rating} כוכבים
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="form-group">
-                        <label>כתוב את חוות דעתך</label>
-                        <textarea
-                        placeholder="הסבר בקצרה את החוויה שלך..."
-                        value={comment}
-                        onChange={e => setComment(e.target.value)}
-                        rows={5}
-                        className="feedback-page-textarea-input"
-                        />
-                    </div>
-
-                    <button type="submit" className="btn btn-solid btn-primary" onClick={handleSubmit}>
-                        שלח משוב
-                    </button>
-
-                    <div className="feedback-page-feedback-list">
-                        <h3>חוות דעת קודמות</h3>
-                        {previousFeedbacks.length === 0 && <p className="no-feedbacks">עדיין אין חוות דעת, תהיה הראשון!</p>}
-                        {previousFeedbacks.map((fb, idx) => (
-                        <div key={idx} className="feedback-page-feedback-item">
-                            <div className="feedback-page-feedback-header">
-                            <span className="feedback-name">{fb.user_id?.nickname || 'אנונימי'}</span>
-                            <span className="feedback-date">{new Date(fb.createdAt).toLocaleDateString()}</span>
-                            </div>
-                            <div className="feedback-page-feedback-stars">
-                                {[1, 2, 3, 4, 5].map(i => (
-                                    <span
-                                        key={i}
-                                        className={`star ${i <= fb.rating ? "filled" : ""}`}
-                                    >
-                                        {i <= fb.rating ? <FaStar size={20} /> : <FaRegStar size={20} />}
-                                    </span>
-                                ))}
-                            </div>
-                            <p className="feedback-page-feedback-comment">{fb.comment}</p>
-                        </div>
-                        ))}
-                    </div>
-                    </div>
-                </div>
+          <div className="form-group rating-group">
+            <label>דרג את העסק</label>
+            <div className="star-rating">
+              {[1, 2, 3, 4, 5].map(star => (
+                <span
+                  key={star}
+                  className={`star ${star <= (hover || rating) ? "filled" : ""}`}
+                  onClick={() => handleStarClick(star)}
+                  onMouseEnter={() => setHover(star)}
+                  onMouseLeave={() => setHover(0)}
+                >
+                  {star <= (hover || rating) ? <FaStar size={36} /> : <FaRegStar size={36} />}
+                </span>
+              ))}
             </div>
-            {toast && (
-                <Toast
-                message={toast.message}
-                isError={toast.isError}
-                onClose={() => setToast(null)}
-                />
+            {rating > 0 && (
+              <div className="rating-text">
+                {rating} כוכבים
+              </div>
             )}
-        </>
-    )}
-    </>,
-    modalRoot
+          </div>
+
+          <div className="form-group">
+            <label>כתוב את חוות דעתך</label>
+            <textarea
+              placeholder="הסבר בקצרה את החוויה שלך..."
+              value={comment}
+              onChange={e => setComment(e.target.value)}
+              rows={5}
+              className="feedback-page-textarea-input"
+            />
+          </div>
+
+          <div className="actions-container">
+            <button type="submit" className="btn btn-solid btn-primary" onClick={handleSubmit}>
+              שלח משוב
+            </button>
+          </div>
+
+          <div className="feedback-page-feedback-list">
+            <h3>חוות דעת קודמות</h3>
+            {previousFeedbacks.length === 0 && <p className="no-feedbacks">עדיין אין חוות דעת, תהיה הראשון!</p>}
+            {previousFeedbacks.map((fb, idx) => (
+              <div key={idx} className="feedback-page-feedback-item">
+                <div className="feedback-page-feedback-header">
+                  <span className="feedback-name">{fb.user_id?.nickname || 'אנונימי'}</span>
+                  <span className="feedback-date">{new Date(fb.createdAt).toLocaleDateString()}</span>
+                </div>
+                <div className="feedback-page-feedback-stars">
+                  {[1, 2, 3, 4, 5].map(i => (
+                    <span
+                      key={i}
+                      className={`star ${i <= fb.rating ? "filled" : ""}`}
+                    >
+                      {i <= fb.rating ? <FaStar size={20} /> : <FaRegStar size={20} />}
+                    </span>
+                  ))}
+                </div>
+                <p className="feedback-page-feedback-comment">{fb.comment}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          isError={toast.isError}
+          onClose={() => setToast(null)}
+        />
+      )}
+    </>
   );
 };
 

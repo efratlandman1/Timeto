@@ -45,6 +45,13 @@
     margin: 0 auto;
 }
 
+/* Actions Container - for all main action buttons (modals & pages) */
+.actions-container {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
 
 /* Responsive Design */
 @media (max-width: 768px) {

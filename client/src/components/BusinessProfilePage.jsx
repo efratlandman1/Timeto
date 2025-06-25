@@ -285,14 +285,10 @@ const BusinessProfilePage = () => {
       </div>
 
       {showFeedbackModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <FeedbackPage
-              businessId={business._id}
-              onClose={handleFeedbackClose}
-            />
-          </div>
-        </div>
+        <FeedbackPage
+          businessId={business._id}
+          onClose={handleFeedbackClose}
+        />
       )}
     </div>
   );

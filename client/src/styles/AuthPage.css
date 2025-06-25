@@ -1,40 +1,4 @@
-.auth-page-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.auth-modal {
-    background-color: #fff;
-    padding: 32px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    width: 100%;
-    max-width: 420px;
-    position: relative;
-    text-align: center;
-    animation: fadeIn 0.3s ease-out;
-}
-
-
-.auth-modal h2 {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: #2d3436;
-}
-
-.auth-modal p {
-    color: #636e72;
-    margin-bottom: 24px;
-}
+/* מחקתי את .auth-page-overlay, .auth-modal, .auth-modal h2, .auth-modal p כי עברו ל-global/components/modals.css */
 
 .social-login-button {
     width: 100%;

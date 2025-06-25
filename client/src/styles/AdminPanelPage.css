@@ -118,42 +118,7 @@
 }
 
 /* Modal Styles */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background: white;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
-    position: relative;
-    overflow: hidden;
-}
-
-.modal-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-header h2 {
-    margin: 0;
-    color: #333;
-    font-size: 1.5rem;
-}
-
+/* מחקתי את .modal-overlay, .modal-content, .modal-header, .modal-header h2, .modal-actions כי עברו ל-global/components/modals.css */
 
 /* Form Styles */
 .admin-form {
@@ -212,15 +177,6 @@
     border-radius: 8px;
 }
 
-/* Modal Actions */
-.modal-actions {
-    padding: 1.5rem;
-    border-top: 1px solid #eee;
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-}
-
 /* Loading Spinner */
 .loading-spinner {
     display: flex;
@@ -265,12 +221,6 @@
     color: #333;
 }
 
-.modal-actions {
-    display: flex;
-    justify-content: center; /* Center the single button */
-    padding: 15px;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .admin-panel {
@@ -297,14 +247,14 @@
         padding: 0.75rem;
     }
 
-    .modal-content {
+    /* .modal-content {
         width: 95%;
         margin: 1rem;
-    }
+    } */
 
-    .modal-header h2 {
+    /* .modal-header h2 {
         font-size: 1.25rem;
-    }
+    } */
 }
 
 .admin-table .category-group .category-header-row th {

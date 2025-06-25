@@ -271,16 +271,14 @@ const SearchResultPage = () => {
                     </div>
 
                     {showFilters && (
-                        <div className="modal-overlay">
-                            <AdvancedSearchModal
-                                isOpen={showFilters}
-                                onClose={() => setShowFilters(false)}
-                                filters={activeFilters}
-                                onFilterChange={(key, value) => {
-                                    handleFilterChange(key, value);
-                                }}
-                            />
-                        </div>
+                        <AdvancedSearchModal
+                            isOpen={showFilters}
+                            onClose={() => setShowFilters(false)}
+                            filters={activeFilters}
+                            onFilterChange={(key, value) => {
+                                handleFilterChange(key, value);
+                            }}
+                        />
                     )}
                 </div>
 

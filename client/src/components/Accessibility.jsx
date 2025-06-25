@@ -84,8 +84,8 @@ const Accessibility = () => {
       </button>
 
       {isOpen && (
-        <div className="accessibility-modal-overlay" onClick={() => setIsOpen(false)}>
-          <div className="accessibility-modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={() => setIsOpen(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
             <button 
               className="btn btn-ghost btn-circle btn-sm btn-close"
               onClick={() => setIsOpen(false)}

@@ -281,16 +281,3 @@
   text-decoration: underline;
 }
 
-/* Overlay */
-.filter-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 999;
-  backdrop-filter: blur(2px);
-}
-
-.filter-overlay.open {
-  display: block;
-} 

@@ -48,13 +48,13 @@ const ResetPasswordPage = () => {
     };
 
     return (
-        <div className="auth-page-overlay">
+        <div className="modal-overlay">
             {isLoading && (
                 <div className="spinner-overlay">
                     <div className="spinner"></div>
                 </div>
             )}
-            <div className="auth-modal" style={{ opacity: isLoading ? 0.7 : 1 }}>
+            <div className="modal-content" style={{ opacity: isLoading ? 0.7 : 1 }}>
                 <Link to="/auth" className="btn btn-ghost btn-circle btn-sm">×</Link>
 
                 {message.type === 'success' ? (
@@ -94,9 +94,11 @@ const ResetPasswordPage = () => {
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
                             </div>
-                            <button type="submit" className="btn btn-solid btn-primary" disabled={isLoading}>
-                                אפס סיסמה
-                            </button>
+                            <div className="actions-container">
+                                <button type="submit" className="btn btn-solid btn-primary" disabled={isLoading}>
+                                    אפס סיסמה
+                                </button>
+                            </div>
                         </form>
                         {message.type === 'error' && <p className="auth-message error-message">{message.text}</p>}
                     </>

@@ -1,37 +1,5 @@
 /* FeedbackPage.css */
 
-.feedback-page-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-}
-
-.feedback-page-modal {
-  width: 90%;
-  max-width: 500px;
-  margin: 2rem auto;
-  animation: modalSlideIn 0.3s ease-out;
-}
-
-.feedback-page-content {
-  position: relative;
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  max-height: calc(100vh - 4rem);
-  overflow-y: auto;
-}
-
-
 .feedback-page-title {
   font-size: 1.5rem;
   color: var(--text-color);
@@ -186,17 +154,6 @@
   font-size: 0.9rem;
 }
 
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes slideDown {
   from {
     transform: translate(-50%, -100%);
@@ -218,16 +175,6 @@
 
 /* Mobile Responsiveness */
 @media (max-width: 480px) {
-  .feedback-page-modal {
-    width: 95%;
-    margin: 1rem auto;
-  }
-
-  .feedback-page-content {
-    padding: 1.5rem;
-    border-radius: 12px;
-  }
-
   .feedback-page-title {
     font-size: 1.25rem;
     padding: 0 1.5rem;

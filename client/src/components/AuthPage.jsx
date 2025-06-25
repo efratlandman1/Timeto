@@ -86,14 +86,14 @@ const AuthPage = () => {
 
     return (
         <GoogleOAuthProvider clientId={clientId}>
-            <div className="auth-page-overlay">
+            <div className="modal-overlay">
                 {isLoading && (
                     <div className="spinner-overlay">
                         <div className="spinner"></div>
                     </div>
                 )}
-                <div className="auth-modal" style={{ opacity: isLoading ? 0.7 : 1 }}>
-                    <button onClick={handleClose} className="btn btn-ghost btn-circle btn-sm">×</button>
+                <div className="modal-content" style={{ opacity: isLoading ? 0.7 : 1 }}>
+                    <button onClick={handleClose} className="btn btn-ghost btn-circle btn-sm btn-close">×</button>
                     <h2>בואו ניכנס</h2>
                     <p> הצטרפו עכשיו והתחילו לגלות דברים מעניינים סביבכם</p>
                     
@@ -134,10 +134,12 @@ const AuthPage = () => {
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
                             </div>
-                            <button type="submit" className="btn btn-solid btn-primary" disabled={isLoading}>המשך</button>
-                             <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password');}} className="forgot-password-link">
-                             יצירת סיסמה חדשה
-                        </a>
+                            <div className="actions-container">
+                                <button type="submit" className="btn btn-solid btn-primary" disabled={isLoading}>המשך</button>
+                            </div>
+                            <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password');}} className="forgot-password-link">
+                                יצירת סיסמה חדשה
+                            </a>
                             {message.text && (
                                 <p className={`auth-message ${message.type === 'success' ? 'success-message' : 'error-message'}`}>
                                     {message.text}

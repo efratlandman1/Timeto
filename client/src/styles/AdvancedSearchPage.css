@@ -1,53 +1,5 @@
 /* AdvancedSearchPage.css */
 
-/* רקע כהה חצי שקוף מאחורי המודל */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(4px);
-}
-
-/* תוכן המודל */
-.modal-content {
-    background-color: #fff;
-    padding: 24px;
-    border-radius: 12px;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    position: relative;
-    direction: rtl;
-    height: 600px;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
-}
-
-/* אזור התוכן עם גלילה */
-.modal-scroll-content {
-    flex: 1;
-    overflow-y: auto;
-    padding-right: 4px;
-    margin-right: -4px;
-}
-
-
-/* כותרת */
-.modal-content h2 {
-    margin: 0 0 24px;
-    font-size: 20px;
-    color: #333;
-    text-align: right;
-}
-
 /* עיצוב שדות הטופס */
 .form-group {
     margin-bottom: 28px;
@@ -195,23 +147,12 @@ input[type="range"] {
     display: none;
 }
 
-/* מכולת הכפתורים בתחתית */
-.modal-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #e0e0e0;
-    background: #fff;
-}
-
 @media (max-width: 480px) {
-    .modal-content {
+    /* .modal-content {
         padding: 12px;
-    }
-    .modal-actions {
+    } */
+    /* .modal-actions {
         flex-direction: column;
         gap: 10px;
-    }  
+    }   */
 }

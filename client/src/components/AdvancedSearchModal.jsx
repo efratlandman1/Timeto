@@ -164,7 +164,6 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
         </button>
         <h2>חיפוש מורחב</h2>
         
-        <div className="modal-scroll-content">
           <div className="form-group">
             <label>קטגוריה</label>
             <select
@@ -215,9 +214,8 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
               <span className="distance-value">{distance} ק"מ</span>
             </div>
           </div>
-        </div>
 
-        <div className="modal-actions">
+        <div className="actions-container">
           <button className="btn btn-ghost" onClick={handleClearAll}>נקה הכל</button>
           <button className="btn btn-solid btn-primary" onClick={handleSubmit}>הצג תוצאות</button>
         </div>

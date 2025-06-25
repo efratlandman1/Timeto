@@ -29,34 +29,6 @@
   box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.5);
 }
 
-/* Modal */
-.accessibility-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1001;
-  direction: rtl;
-}
-
-.accessibility-modal {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-
 .accessibility-title {
   display: flex;
   align-items: center;
@@ -144,11 +116,6 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .accessibility-modal {
-    width: 95%;
-    padding: 1.5rem;
-  }
-
   .button-group {
     flex-direction: column;
   }
