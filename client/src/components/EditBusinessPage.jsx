@@ -166,7 +166,7 @@ const MySteps = ({
       <NavigationButtons businessData={businessData} />
       {/* {current === 3 && isValidOpeningHours(businessData.openingHours) &&  ( */}
       {current === 3  &&  (
-        <button onClick={handleSubmit} className="btn btn-solid btn-primary btn-lg save-button">
+        <button onClick={handleSubmit} className="btn btn-solid btn-primary btn-lg">
           {selectedBusiness ? <FaEdit /> : <FaPlus />}
           {selectedBusiness ? 'עדכן פרטי עסק' : 'צור עסק חדש'}
         </button>

@@ -296,7 +296,7 @@ const SearchResultPage = () => {
                         <div className="filters-header">
                             <div className="filters-title">סינונים פעילים:</div>
                             <button 
-                                className="btn btn-ghost"
+                                className="btn-clear-all"
                                 onClick={handleClearFilters}
                             >
                                 נקה הכל

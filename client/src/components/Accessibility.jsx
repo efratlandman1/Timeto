@@ -87,7 +87,7 @@ const Accessibility = () => {
         <div className="accessibility-modal-overlay" onClick={() => setIsOpen(false)}>
           <div className="accessibility-modal" onClick={e => e.stopPropagation()}>
             <button 
-              className="close-button"
+              className="btn btn-ghost btn-circle btn-sm btn-close"
               onClick={() => setIsOpen(false)}
               aria-label="סגור הגדרות נגישות"
             >
@@ -195,7 +195,7 @@ const Accessibility = () => {
                 </div>
               </div>
 
-              <button className="reset-button" onClick={resetSettings}>
+              <button className="btn btn-solid btn-primary" onClick={resetSettings}>
                 אפס הגדרות
               </button>
             </div>

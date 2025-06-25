@@ -2,10 +2,10 @@
     /* Primary Colors */
     --primary-color: #ff4d4d;
     --primary-light: #ffeaea;
-    --primary-dark: #ff3333;
+    --primary-dark: #e53935;
     
     /* Text Colors */
-    --text-primary: #333;
+    --text-primary: #111;
     --text-secondary: #666;
     --text-light: #999;
     
@@ -13,6 +13,7 @@
     --bg-primary: #ffffff;
     --bg-secondary: #f8f9fa;
     --bg-light: #f0f0f0;
+    --background-light: #f2f2f2;
     
     /* Border Colors */
     --border-color: #e0e0e0;

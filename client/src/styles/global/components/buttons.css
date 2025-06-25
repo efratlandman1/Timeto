@@ -58,31 +58,32 @@
 /* Solid Variant */
 .btn-solid {
     --btn-color: var(--button-text-white);
-    --btn-bg: var(--btn-bg-color, var(--primary-color));
-    --btn-border: var(--btn-bg-color, var(--primary-color));
+    --btn-bg: var(--primary-color);
+    --btn-border: var(--primary-color);
 }
 .btn-solid:hover {
-    --btn-bg: var(--btn-bg-hover-color, var(--primary-dark));
-    --btn-border: var(--btn-bg-hover-color, var(--primary-dark));
+    --btn-bg: var(--primary-dark);
+    --btn-border: var(--primary-dark);
 }
 
 /* Outline Variant */
 .btn-outline {
   background: #fff;
-  color: #111;
-  border: 1px solid #111;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
 .btn-outline svg,
 .btn-outline i {
-  color: #111;
+  color: var(--text-primary);
   transition: color 0.2s;
 }
 
 .btn-outline:hover {
   color: var(--primary-color);
   border-color: var(--primary-color);
+  background: var(--primary-light);
 }
 
 .btn-outline:hover svg,
@@ -93,19 +94,19 @@
 /* Ghost Variant */
 .btn-ghost {
   background: #fff;
-  color: #111;
+  color: var(--text-primary);
   border: none;
   transition: background 0.2s, color 0.2s;
 }
 
 .btn-ghost svg,
 .btn-ghost i {
-  color: #111;
+  color: var(--text-primary);
   transition: color 0.2s;
 }
 
 .btn-ghost:hover {
-  background: #f2f2f2;
+  background: var(--background-light);
   color: var(--primary-color);
 }
 
@@ -142,16 +143,26 @@
 /* ------------------------------------
    Color Modifiers
    ------------------------------------ */
-.btn-primary { --btn-bg-color: var(--primary-color); --btn-bg-hover-color: var(--primary-dark); --btn-text-color: var(--primary-color); --btn-border-color: var(--primary-color); }
-.btn-secondary { --btn-bg-color: var(--text-light); --btn-bg-hover-color: var(--text-secondary); --btn-text-color: var(--text-secondary); --btn-border-color: var(--text-light); }
-.btn-edit { --btn-bg-color: var(--action-edit); --btn-bg-hover-color: var(--action-edit-hover); --btn-text-color: var(--action-edit); --btn-border-color: var(--action-edit); }
-.btn-delete { --btn-bg-color: var(--action-delete); --btn-bg-hover-color: var(--action-delete-hover); --btn-text-color: var(--action-delete); --btn-border-color: var(--action-delete); }
-.btn-confirm { --btn-bg-color: var(--action-confirm); --btn-bg-hover-color: var(--action-confirm-hover); --btn-text-color: var(--action-confirm); --btn-border-color: var(--action-confirm); }
-.btn-restore { --btn-bg-color: var(--action-restore); --btn-bg-hover-color: var(--action-restore-hover); --btn-text-color: var(--action-restore); --btn-border-color: var(--action-restore); }
-.btn-cancel { --btn-bg-color: var(--action-cancel); --btn-bg-hover-color: var(--action-cancel-hover); --btn-text-color: var(--action-cancel); --btn-border-color: var(--action-cancel); }
-.btn-whatsapp { --btn-bg-color: var(--brand-whatsapp); --btn-bg-hover-color: var(--brand-whatsapp-hover); --btn-text-color: var(--brand-whatsapp); --btn-border-color: var(--brand-whatsapp); }
-.btn-email { --btn-bg-color: var(--brand-email); --btn-bg-hover-color: var(--brand-email-hover); --btn-text-color: var(--brand-email); --btn-border-color: var(--brand-email); }
-.btn-phone { --btn-bg-color: var(--brand-phone); --btn-bg-hover-color: var(--brand-phone-hover); --btn-text-color: var(--brand-phone); --btn-border-color: var(--brand-phone); }
+.btn-primary { --btn-bg: var(--primary-color); --btn-color: white; --btn-border: var(--primary-color); }
+.btn-secondary { --btn-bg: var(--text-light); --btn-color: var(--text-secondary); --btn-border: var(--text-light); }
+.btn-edit { --btn-bg: var(--action-edit); --btn-color: white; --btn-border: var(--action-edit); }
+.btn-delete { --btn-bg: var(--action-delete); --btn-color: white; --btn-border: var(--action-delete); }
+.btn-confirm { --btn-bg: var(--action-confirm); --btn-color: white; --btn-border: var(--action-confirm); }
+.btn-restore { --btn-bg: var(--action-restore); --btn-color: white; --btn-border: var(--action-restore); }
+.btn-cancel { --btn-bg: var(--action-cancel); --btn-color: white; --btn-border: var(--action-cancel); }
+.btn-whatsapp { --btn-bg: var(--brand-whatsapp); --btn-color: white; --btn-border: var(--brand-whatsapp); }
+.btn-email { --btn-bg: var(--brand-email); --btn-color: white; --btn-border: var(--brand-email); }
+.btn-phone { --btn-bg: var(--brand-phone); --btn-color: white; --btn-border: var(--brand-phone); }
+
+/* Hover states for color modifiers */
+.btn-edit:hover { --btn-bg: var(--action-edit-hover); --btn-border: var(--action-edit-hover); }
+.btn-delete:hover { --btn-bg: var(--action-delete-hover); --btn-border: var(--action-delete-hover); }
+.btn-confirm:hover { --btn-bg: var(--action-confirm-hover); --btn-border: var(--action-confirm-hover); }
+.btn-restore:hover { --btn-bg: var(--action-restore-hover); --btn-border: var(--action-restore-hover); }
+.btn-cancel:hover { --btn-bg: var(--action-cancel-hover); --btn-border: var(--action-cancel-hover); }
+.btn-whatsapp:hover { --btn-bg: var(--brand-whatsapp-hover); --btn-border: var(--brand-whatsapp-hover); }
+.btn-email:hover { --btn-bg: var(--brand-email-hover); --btn-border: var(--brand-email-hover); }
+.btn-phone:hover { --btn-bg: var(--brand-phone-hover); --btn-border: var(--brand-phone-hover); }
 
 /* ------------------------------------
    Size Modifiers
@@ -209,7 +220,6 @@
 
 /* Close button positioning - always on the left in RTL, right in LTR */
 .btn-close,
-.close-button,
 [class*="close"] {
     position: absolute;
     top: 1rem;
@@ -220,7 +230,6 @@
 
 /* For LTR languages, position on the right */
 [dir="ltr"] .btn-close,
-[dir="ltr"] .close-button,
 [dir="ltr"] [class*="close"] {
     left: auto;
     right: 1rem;
@@ -253,6 +262,38 @@
 .btn-favorite.active {
     --btn-bg: white;
     --btn-color: var(--primary-color);
+}
+
+/* Clear All Button */
+.btn-clear-all {
+  background: #fff;
+  color: var(--primary-color);
+  border: 1.5px solid var(--primary-color);
+  border-radius: 999px;
+  font-weight: 500;
+  padding: 0.35em 1.2em 0.35em 0.9em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.btn-clear-all svg,
+.btn-clear-all i {
+  color: var(--primary-color);
+  font-size: 1.1em;
+  transition: color 0.2s;
+}
+
+.btn-clear-all:hover {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+.btn-clear-all:hover svg,
+.btn-clear-all:hover i {
+  color: #fff;
 }
 
 

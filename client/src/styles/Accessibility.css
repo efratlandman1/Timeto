@@ -118,22 +118,6 @@
   border-color: #2196F3;
 }
 
-.reset-button {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  background: #f44336;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-}
-
-.reset-button:hover {
-  background: #d32f2f;
-}
-
 /* High Contrast Mode */
 .high-contrast {
   background: black !important;
