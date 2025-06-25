@@ -96,7 +96,7 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
             <div className="day-header">
               <span className="day-name">{hebDay}</span>
               <button
-                className={`closed-button ${day.closed ? 'active' : ''}`}
+                className={`btn btn-sm ${day.closed ? 'btn-solid btn-secondary' : 'btn-outline btn-primary'}`}
                 onClick={() => toggleClosed(dayIndex)}
               >
                 {day.closed ? 'סגור' : 'פתוח'}
@@ -127,7 +127,7 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
 
                   {rangeIndex === day.ranges.length - 1 && (
                     <button
-                      className="add-range-btn"
+                      className="btn btn-outline btn-primary btn-circle btn-sm"
                       onClick={() => addRange(dayIndex)}
                       title="הוסף טווח נוסף"
                     >
@@ -137,7 +137,7 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
 
                   {day.ranges.length > 1 && (
                     <button
-                      className="delete-range-btn"
+                      className="btn btn-outline btn-delete btn-circle btn-sm"
                       onClick={() => removeTimeRange(dayIndex, rangeIndex)}
                       title="מחק טווח"
                     >

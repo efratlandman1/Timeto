@@ -129,14 +129,14 @@ const NavigationButtons = ({ businessData }) => {
   return (
     <div className="edit-business-navigation-buttons">
       {current > 1 ? (
-        <button onClick={prev} className="arrow-button" aria-label="Previous step">
+        <button onClick={prev} className="btn btn-outline btn-circle" aria-label="Previous step">
           →
         </button>
       ) : (
         <div className="arrow-spacer" />
       )}
       {current < total ? (
-        <button onClick={handleNext} className="arrow-button" aria-label="Next step">
+        <button onClick={handleNext} className="btn btn-outline btn-circle" aria-label="Next step">
           ←
         </button>
       ) : (
@@ -166,7 +166,7 @@ const MySteps = ({
       <NavigationButtons businessData={businessData} />
       {/* {current === 3 && isValidOpeningHours(businessData.openingHours) &&  ( */}
       {current === 3  &&  (
-        <button onClick={handleSubmit} className="save-button">
+        <button onClick={handleSubmit} className="btn btn-solid btn-primary btn-lg save-button">
           {selectedBusiness ? <FaEdit /> : <FaPlus />}
           {selectedBusiness ? 'עדכן פרטי עסק' : 'צור עסק חדש'}
         </button>
@@ -356,24 +356,21 @@ const EditBusinessPage = () => {
   };
 
   return (
-    <div className="narrow-page-container">
-      <div className="narrow-page-content">
-        <button className="nav-button above-header" onClick={() => navigate('/my-businesses')}>
-          <FaArrowRight className="icon" />
-          חזרה לעסקים שלי
-        </button>
-        
-        <div className="page-header">
-          <div className="page-header__content vertical">
-            <h1>{selectedBusiness ? 'עריכת עסק' : 'הוספת עסק חדש'}</h1>
-            <p>מלא את הפרטים הבאים כדי {selectedBusiness ? 'לערוך' : 'להוסיף'} את העסק שלך</p>
+    <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} libraries={GOOGLE_MAPS_LIBRARIES}>
+      <div className="narrow-page-container">
+        <div className="narrow-page-content">
+          <button className="btn btn-ghost" onClick={() => navigate('/')}>
+            <FaArrowRight className="icon" />
+            חזרה לדף הבית
+          </button>
+          
+          <div className="page-header">
+            <div className="page-header__content vertical">
+              <h1>{selectedBusiness ? 'עריכת עסק' : 'הוספת עסק חדש'}</h1>
+              <p>מלא את הפרטים הבאים כדי {selectedBusiness ? 'לערוך' : 'להוסיף'} את העסק שלך</p>
+            </div>
           </div>
-        </div>
 
-        <LoadScript
-          googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
-          libraries={GOOGLE_MAPS_LIBRARIES}
-        >
           <StepsProvider>
             <MySteps
               businessData={businessData}
@@ -383,10 +380,10 @@ const EditBusinessPage = () => {
               selectedBusiness={selectedBusiness}
             />
           </StepsProvider>
-        </LoadScript>
-        <ToastContainer position="bottom-center" rtl={true} />
+          <ToastContainer position="bottom-center" rtl={true} />
+        </div>
       </div>
-    </div>
+    </LoadScript>
   );
 };
 

@@ -134,41 +134,6 @@
     }
 }
 
-/* Banner Navigation */
-.banner-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: rgba(255, 255, 255, 0.2);
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    opacity: 0;
-}
-
-.banner-container:hover .banner-nav {
-    opacity: 1;
-}
-
-.banner-nav:hover {
-    background-color: rgba(255, 255, 255, 0.4);
-}
-
-.banner-nav.prev {
-    right: 20px;
-}
-
-.banner-nav.next {
-    left: 20px;
-}
-
 /* Search Section */
 .search-section {
     text-align: center;

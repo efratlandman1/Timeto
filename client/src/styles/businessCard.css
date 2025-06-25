@@ -187,7 +187,7 @@
   position: relative;
 }
 
-.business-card.inactive .action-button:not(.restore) {
+.business-card.inactive .btn:not(.btn-restore) {
   pointer-events: none;
   opacity: 0.5;
 }
@@ -207,107 +207,18 @@
   pointer-events: none;
 }
 
-
-/* Colored Action Button Variants */
-/* Communication Buttons */
-.action-button.email {
-  background: #ea4335;
-}
-
-.action-button.email:hover {
-  background: #d93126;
-}
-
-.action-button.whatsapp {
-  background: #25d366;
-}
-
-.action-button.whatsapp:hover {
-  background: #20bd5a;
-}
-
-.action-button.phone {
-  background: #0088cc;
-}
-
-.action-button.phone:hover {
-  background: #0077b3;
-}
-
-/* Favorite Button */
-.action-button.favorite {
-  /* Override specific properties for favorite button */
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #ccc;
-  z-index: 2;
-}
-
-.action-button.favorite:hover {
-  background: white;
-  transform: scale(1.1);
-}
-
-.action-button.favorite.active {
-  background: #fff;
-  color: #ff4b4b;
-}
-
-.action-button.favorite svg {
-  width: 20px;
-  height: 20px;
-  color: inherit;
-}
-
-/* Admin Action Buttons */
-.action-button.edit {
-  background: #4a90e2;
-}
-
-.action-button.edit:hover {
-  background: #357abd;
-}
-
-.action-button.delete,
-.action-button.confirm {
-  background: #e74c3c;
-}
-
-.action-button.delete:hover,
-.action-button.confirm:hover {
-  background: #c0392b;
-}
-
-.action-button.restore,
-.action-button.cancel {
-  background: #2ecc71;
-}
-
-.action-button.restore:hover,
-.action-button.cancel:hover {
-  background: #27ae60;
-}
-
-
 /* Responsive Design */
 @media (max-width: 1200px) {
   .business-cards-container {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-
 @media (max-width: 768px) {
   .business-cards-container {
-    grid-template-columns: 1fr;
-    padding: 0 16px;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
-
   .business-card {
-    height: 260px;
+    height: auto;
   }
 }
 

@@ -43,7 +43,7 @@ const UserBusinessesPage = () => {
     return (
         <div className='wide-page-container'>
             <div className='wide-page-content'>
-                <button className="nav-button above-header" onClick={() => navigate('/')}>
+                <button className="btn btn-ghost" onClick={() => navigate('/')}>
                     <FaArrowRight className="icon" />
                     חזרה לדף הבית
                 </button>
@@ -55,7 +55,7 @@ const UserBusinessesPage = () => {
                     </div>
                     <div className="page-header__action">
                         <button 
-                            className="add-button"
+                            className="btn btn-solid btn-primary"
                             onClick={() => navigate('/edit')}
                         >
                             <FaPlus />

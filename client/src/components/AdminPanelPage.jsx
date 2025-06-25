@@ -143,8 +143,8 @@ const AdminPanelPage = () => {
                             console.error('Error deleting item:', error);
                             toast.error(error.response?.data?.message || `שגיאה במחיקת ${contextName}`);
                         }
-                    }}>כן, מחק</button>
-                    <button onClick={() => toast.dismiss(toastId)}>ביטול</button>
+                    }} className="btn btn-solid btn-delete">כן, מחק</button>
+                    <button onClick={() => toast.dismiss(toastId)} className="btn btn-ghost">ביטול</button>
                 </div>
             </div>,
             { autoClose: false, closeButton: false, position: "top-center" }
@@ -380,8 +380,8 @@ const AdminPanelPage = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"
                 />
-                <button onClick={() => expandAll(businesses, true)} className="tree-button"><FaExpandArrowsAlt /> Expand All</button>
-                <button onClick={() => expandAll(businesses, false)} className="tree-button"><FaCompressArrowsAlt/> Collapse All</button>
+                <button onClick={() => expandAll(businesses, true)} className="btn btn-outline"><FaExpandArrowsAlt /> Expand All</button>
+                <button onClick={() => expandAll(businesses, false)} className="btn btn-outline"><FaCompressArrowsAlt/> Collapse All</button>
             </div>
             <div className="tree-container">
                 {renderTree(businesses)}
@@ -391,7 +391,7 @@ const AdminPanelPage = () => {
 
     const renderCategoriesTab = () => (
         <div className="admin-table-container">
-            <button className="add-button" onClick={() => {
+            <button className="btn btn-solid btn-primary" onClick={() => {
                 setEditingItem({});
                 setPreviewUrl('');
                 setIsModalOpen(true);
@@ -418,8 +418,8 @@ const AdminPanelPage = () => {
                             </td>
                             <td>{category.name}</td>
                             <td className="actions-cell">
-                                <button onClick={() => handleEdit(category)} className="action-button">✏️</button>
-                                <button onClick={() => handleDelete(category._id)} className="action-button">🗑️</button>
+                                <button onClick={() => handleEdit(category)} className="btn btn-ghost btn-circle btn-sm">✏️</button>
+                                <button onClick={() => handleDelete(category._id)} className="btn btn-ghost btn-circle btn-sm">🗑️</button>
                             </td>
                         </tr>
                     ))}
@@ -440,7 +440,7 @@ const AdminPanelPage = () => {
 
         return (
             <div className="admin-table-container">
-                <button className="add-button" onClick={() => {
+                <button className="btn btn-solid btn-primary" onClick={() => {
                     setEditingItem({});
                     setIsModalOpen(true);
                 }}>
@@ -456,8 +456,8 @@ const AdminPanelPage = () => {
                                 <tr key={service._id}>
                                     <td>{service.name}</td>
                                     <td className="actions-cell">
-                                        <button onClick={() => handleEdit(service)} className="action-button">✏️</button>
-                                        <button onClick={() => handleDelete(service._id)} className="action-button">🗑️</button>
+                                        <button onClick={() => handleEdit(service)} className="btn btn-ghost btn-circle btn-sm">✏️</button>
+                                        <button onClick={() => handleDelete(service._id)} className="btn btn-ghost btn-circle btn-sm">🗑️</button>
                                     </td>
                                 </tr>
                             ))}
@@ -487,8 +487,8 @@ const AdminPanelPage = () => {
                             <td>{roleTranslations[user.role] || user.role}</td>
                             <td>{user.active ? 'כן' : 'לא'}</td>
                             <td className="actions-cell">
-                                <button onClick={() => handleEdit(user)} className="action-button">✏️</button>
-                                <button onClick={() => handleDelete(user._id)} className="action-button">🗑️</button>
+                                <button onClick={() => handleEdit(user)} className="btn btn-ghost btn-circle btn-sm">✏️</button>
+                                <button onClick={() => handleDelete(user._id)} className="btn btn-ghost btn-circle btn-sm">🗑️</button>
                             </td>
                         </tr>
                     ))}
@@ -598,8 +598,8 @@ const AdminPanelPage = () => {
                      </>
                 )}
                 <div className="modal-actions">
-                    <button type="submit" className="save-button">שמור</button>
-                    <button type="button" onClick={() => setIsModalOpen(false)} className="cancel-button">ביטול</button>
+                    <button type="submit" className="btn btn-solid btn-primary">שמור</button>
+                    <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-ghost">ביטול</button>
                 </div>
             </form>
         );
@@ -623,28 +623,28 @@ const AdminPanelPage = () => {
             
             <div className="tabs">
                 <button 
-                    className={`tab ${activeTab === 'categories' ? 'active' : ''}`}
+                    className={`btn btn-ghost ${activeTab === 'categories' ? 'active' : ''}`}
                     onClick={() => setActiveTab('categories')}
                 >
                     <FaTags />
                     קטגוריות
                 </button>
                 <button 
-                    className={`tab ${activeTab === 'services' ? 'active' : ''}`}
+                    className={`btn btn-ghost ${activeTab === 'services' ? 'active' : ''}`}
                     onClick={() => setActiveTab('services')}
                 >
                     <FaCogs />
                     שירותים
                 </button>
                 <button 
-                    className={`tab ${activeTab === 'users' ? 'active' : ''}`}
+                    className={`btn btn-ghost ${activeTab === 'users' ? 'active' : ''}`}
                     onClick={() => setActiveTab('users')}
                 >
                     <FaUsers />
                     משתמשים
                 </button>
                 <button 
-                    className={`tab ${activeTab === 'businesses' ? 'active' : ''}`}
+                    className={`btn btn-ghost ${activeTab === 'businesses' ? 'active' : ''}`}
                     onClick={() => setActiveTab('businesses')}
                 >
                     <FaBuilding />
@@ -661,7 +661,7 @@ const AdminPanelPage = () => {
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>{editingItem?._id ? `ערוך ${getContextName(activeTab)}` : `הוסף ${getContextName(activeTab)}`}</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="close-button">&times;</button>
+                            <button onClick={() => setIsModalOpen(false)} className="btn btn-ghost btn-circle btn-sm">&times;</button>
                         </div>
                         <div className="modal-body">
                             {renderForm()}

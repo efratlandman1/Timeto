@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaRegStar, FaStar } from 'react-icons/fa';
+import { FaRegStar, FaStar, FaArrowRight } from 'react-icons/fa';
 import ReactDOM from 'react-dom';
 import '../styles/FeedbackPage.css';
 import {getToken} from "../utils/auth";
+import { useNavigate } from 'react-router-dom';
 
 const Toast = ({ message, isError, onClose }) => {
   useEffect(() => {
@@ -40,6 +41,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
   const [businessName, setBusinessName] = useState('');
   const [toast, setToast] = useState(null); // { message, isError }
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
     useEffect(() => {
     if (businessId) {
@@ -115,7 +117,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
                     dir="rtl"
                     onClick={(e) => e.stopPropagation()}
                     >
-                    <button className="close-button" onClick={onClose}>×</button>
+                    <button className="btn btn-ghost btn-circle btn-sm close-button" onClick={onClose}>×</button>
                     <h2 className="feedback-page-title">
                         חוות דעת על {businessName || 'העסק'}
                     </h2>
@@ -153,7 +155,9 @@ const FeedbackPage = ({ businessId, onClose }) => {
                         />
                     </div>
 
-                    <button className="confirm-button" onClick={handleSubmit}>שלח פידבק</button>
+                    <button type="submit" className="btn btn-solid btn-primary" onClick={handleSubmit}>
+                        שלח משוב
+                    </button>
 
                     <div className="feedback-page-feedback-list">
                         <h3>חוות דעת קודמות</h3>

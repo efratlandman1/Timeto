@@ -234,7 +234,7 @@ const SearchResultPage = () => {
                         </div>
                         <div className="search-controls__actions">
                             <button 
-                                className="filter-button"
+                                className="btn btn-outline"
                                 onClick={() => setShowFilters(!showFilters)}
                                 aria-expanded={showFilters}
                             >
@@ -243,19 +243,19 @@ const SearchResultPage = () => {
                             </button>
                             <div className="sort-control" ref={sortDropdownRef}>
                                 <button 
-                                    className="sort-button"
+                                    className="btn btn-outline"
                                     onClick={() => setShowSortDropdown(!showSortDropdown)}
                                     aria-expanded={showSortDropdown}
                                 >
-                                    <span >{SORT_OPTIONS[sortOption]}</span>
-                                    <FaSort  />
+                                    <span>{SORT_OPTIONS[sortOption]}</span>
+                                    <FaSort />
                                 </button>
                                 {showSortDropdown && (
                                     <div className="sort-dropdown">
                                         {Object.entries(SORT_OPTIONS).map(([value, label]) => (
                                             <button
                                                 key={value}
-                                                className={`sort-option ${sortOption === value ? 'selected' : ''}`}
+                                                className={`btn btn-ghost ${sortOption === value ? 'selected' : ''}`}
                                                 onClick={() => {
                                                     handleSortChange(value);
                                                     setShowSortDropdown(false);
@@ -296,7 +296,7 @@ const SearchResultPage = () => {
                         <div className="filters-header">
                             <div className="filters-title">סינונים פעילים:</div>
                             <button 
-                                className="clear-all-filters"
+                                className="btn btn-ghost"
                                 onClick={handleClearFilters}
                             >
                                 נקה הכל
@@ -313,7 +313,7 @@ const SearchResultPage = () => {
                                              key === 'rating' ? `${v} כוכבים ומעלה` :
                                              key === 'services' ? `שירות: ${v}` :
                                              key === 'maxDistance' ? `עד מרחק של: ${v} ק"מ` : v}
-                                            <button onClick={() => handleRemoveFilter(key, v)}>
+                                            <button className="btn btn-ghost btn-circle btn-sm" onClick={() => handleRemoveFilter(key, v)}>
                                                 <FaTimes />
                                             </button>
                                         </div>
@@ -324,7 +324,7 @@ const SearchResultPage = () => {
                                          key === 'rating' ? `${value} כוכבים ומעלה` :
                                          key === 'services' ? `שירות: ${value}` :
                                          key === 'maxDistance' ? `עד מרחק של: ${value} ק"מ` : value}
-                                        <button onClick={() => handleRemoveFilter(key)}>
+                                        <button className="btn btn-ghost btn-circle btn-sm" onClick={() => handleRemoveFilter(key)}>
                                             <FaTimes />
                                         </button>
                                     </div>

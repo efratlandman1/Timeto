@@ -93,7 +93,7 @@ const AuthPage = () => {
                     </div>
                 )}
                 <div className="auth-modal" style={{ opacity: isLoading ? 0.7 : 1 }}>
-                    <button onClick={handleClose} className="close-button">×</button>
+                    <button onClick={handleClose} className="btn btn-ghost btn-circle btn-sm">×</button>
                     <h2>בואו ניכנס</h2>
                     <p> הצטרפו עכשיו והתחילו לגלות דברים מעניינים סביבכם</p>
                     
@@ -134,7 +134,7 @@ const AuthPage = () => {
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
                             </div>
-                            <button type="submit" className="confirm-button" disabled={isLoading}>המשך</button>
+                            <button type="submit" className="btn btn-solid btn-primary" disabled={isLoading}>המשך</button>
                              <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password');}} className="forgot-password-link">
                              יצירת סיסמה חדשה
                         </a>

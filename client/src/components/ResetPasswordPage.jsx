@@ -55,7 +55,7 @@ const ResetPasswordPage = () => {
                 </div>
             )}
             <div className="auth-modal" style={{ opacity: isLoading ? 0.7 : 1 }}>
-                <Link to="/auth" className="close-button">×</Link>
+                <Link to="/auth" className="btn btn-ghost btn-circle btn-sm">×</Link>
 
                 {message.type === 'success' ? (
                     <div className="success-view">
@@ -94,7 +94,7 @@ const ResetPasswordPage = () => {
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
                             </div>
-                            <button type="submit" className="confirm-button" disabled={isLoading}>
+                            <button type="submit" className="btn btn-solid btn-primary" disabled={isLoading}>
                                 אפס סיסמה
                             </button>
                         </form>

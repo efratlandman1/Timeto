@@ -23,6 +23,24 @@
     --warning-color: #ffc107;
     --error-color: #dc3545;
     
+    /* Action & Brand Colors */
+    --action-edit: #4a90e2; /* Blue */
+    --action-edit-hover: #357abd;
+    --action-delete: #e74c3c; /* Red */
+    --action-delete-hover: #c0392b;
+    --action-confirm: #e74c3c; /* Red */
+    --action-confirm-hover: #c0392b;
+    --action-restore: #2ecc71; /* Green */
+    --action-restore-hover: #27ae60;
+    --action-cancel: #2ecc71; /* Green */
+    --action-cancel-hover: #27ae60;
+    --brand-whatsapp: #25d366;
+    --brand-whatsapp-hover: #20bd5a;
+    --brand-email: #ea4335;
+    --brand-email-hover: #d93126;
+    --brand-phone: #0088cc;
+    --brand-phone-hover: #0077b3;
+    
     /* Button Colors */
     --button-text-white: #ffffff;
     --button-bg-transparent: transparent;

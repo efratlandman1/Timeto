@@ -47,7 +47,7 @@ const MyFavoritesPage = () => {
     return (
         <div className="wide-page-container">
             <div className="wide-page-content">
-                <button className="nav-button above-header" onClick={() => navigate('/')}>
+                <button className="btn btn-ghost" onClick={() => navigate('/')}>
                     <FaArrowRight className="icon" />
                     חזרה לדף הבית
                 </button>
@@ -62,7 +62,7 @@ const MyFavoritesPage = () => {
                 {favorites.length === 0 ? (
                     <div className="empty-state">
                         <p>עדיין לא סימנת עסקים כמועדפים</p>
-                        <button className="add-button" onClick={() => navigate('/')}>
+                        <button className="btn btn-solid btn-primary" onClick={() => navigate('/')}>
                             חפש עסקים
                         </button>
                     </div>

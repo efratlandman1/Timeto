@@ -189,7 +189,7 @@ const MainPage = () => {
 
                                 {/* Navigation Arrows */}
                                 <button 
-                                    className="banner-nav prev" 
+                                    className="btn btn-ghost btn-circle btn-sm" 
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         handlePrevSlide();
@@ -198,7 +198,7 @@ const MainPage = () => {
                                     <FaChevronRight />
                                 </button>
                                 <button 
-                                    className="banner-nav next" 
+                                    className="btn btn-ghost btn-circle btn-sm" 
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         handleNextSlide();
@@ -259,7 +259,7 @@ const MainPage = () => {
                     <div className="categories-header">
                         <h2>קטגוריות פופולריות</h2>
                     </div>
-                    <button className="arrow-button" onClick={() => handleScroll('right')}>
+                    <button className="btn btn-outline btn-circle" onClick={() => handleScroll('right')}>
                         <FaChevronRight />
                     </button>
                     <div className="categories">
@@ -276,7 +276,7 @@ const MainPage = () => {
                             </div>
                         ))}
                     </div>
-                    <button className="arrow-button" onClick={() => handleScroll('left')}>
+                    <button className="btn btn-outline btn-circle" onClick={() => handleScroll('left')}>
                         <FaChevronLeft />
                     </button>
                     
@@ -326,8 +326,8 @@ const MainPage = () => {
                     <div className="bottom-banner-content">
                         <h2>הצטרף לקהילת זמן</h2>
                         <p>הוסף את העסק שלך והתחיל לקבל לקוחות חדשים עוד היום</p>
-                        <button className="add-button" onClick={() => navigate('/edit')}>
-                            הוסף עסק חינם
+                        <button className="btn btn-solid btn-primary" onClick={() => navigate('/edit')}>
+                            הוסף את העסק שלך בחינם
                         </button>
                     </div>
                 </section>

@@ -178,7 +178,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
       </div>
 
       <div className="form-group-logo">
-        <label htmlFor="logo" className="upload-logo-button">
+        <label htmlFor="logo" className="btn btn-dashed btn-primary">
           <FaUpload className="icon" />
           {'בחירת לוגו'}
           <input
@@ -204,7 +204,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
               }}
             />
             <button
-              className="remove-logo-button"
+              className="btn btn-solid btn-delete btn-circle btn-sm remove-logo-button"
               onClick={removeLogo}
               title="הסר לוגו"
             >

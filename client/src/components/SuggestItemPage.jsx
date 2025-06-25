@@ -88,7 +88,7 @@ const SuggestItemPage = () => {
   return (
     <div className="narrow-page-container">
       <div className="narrow-page-content">
-        <button className="nav-button above-header" onClick={() => navigate('/')}>
+        <button className="btn btn-ghost" onClick={() => navigate('/')}>
           <FaArrowRight className="icon" />
           חזרה לדף הבית
         </button>
@@ -195,7 +195,7 @@ const SuggestItemPage = () => {
             />
           </div>
 
-          <button type="submit" className="confirm-button">
+          <button type="submit" className="btn btn-solid btn-primary">
             {/* <FaPaperPlane /> */}
             שלח הצעה
           </button>

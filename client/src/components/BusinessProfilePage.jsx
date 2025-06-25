@@ -207,7 +207,7 @@ const BusinessProfilePage = () => {
       <div className="feedback-section">
         <div className="feedback-header">
           <h2>דירוגים ופידבקים</h2>
-          <button className="add-button" onClick={() => setShowFeedbackModal(true)}>
+          <button className="btn btn-solid btn-primary" onClick={() => setShowFeedbackModal(true)}>
             <FaRegStar />
             הוסף פידבק
           </button>
@@ -263,7 +263,7 @@ const BusinessProfilePage = () => {
                 </div>
                 {shouldShowToggle && (
                   <button 
-                    className="feedback-comment-toggle"
+                    className="btn btn-ghost"
                     onClick={() => toggleComment(feedback._id)}
                   >
                     {isExpanded ? 'הצג פחות' : 'הצג הכל'}
@@ -276,7 +276,7 @@ const BusinessProfilePage = () => {
 
         {feedbacks.length > 6 && !showAllFeedbacks && (
           <button 
-            className="show-more-button"
+            className="btn btn-outline"
             onClick={() => setShowAllFeedbacks(true)}
           >
             הצג עוד ביקורות ({feedbacks.length - 6})

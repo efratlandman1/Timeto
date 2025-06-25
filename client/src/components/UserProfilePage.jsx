@@ -140,7 +140,7 @@ const UserProfilePage = () => {
             <input className="login-input" type={showPassword ? "text" : "password"} name="confirmPassword" placeholder="אישור סיסמה חדשה" value={formData.confirmPassword} onChange={handleChange} />
           </div>
 
-          <button className="confirm-button" type="submit">שמור שינויים</button>
+          <button className="btn btn-solid btn-primary" type="submit">שמור שינויים</button>
         </form>
       </div>
     </div>

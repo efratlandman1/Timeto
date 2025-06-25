@@ -113,7 +113,7 @@ const AdvancedSearchPanel = ({
       {isMobile && (
         <div className="panel-header">
           <h2>סינון ומיון</h2>
-          <button className="close-button" onClick={onClose}>
+          <button className="btn btn-ghost btn-circle btn-sm" onClick={onClose}>
             <FaTimes />
           </button>
         </div>
@@ -219,7 +219,7 @@ const AdvancedSearchPanel = ({
                   {selectedCategories.map((categoryName) => (
                     <div key={categoryName} className="selected-category">
                       <span>{categoryName}</span>
-                      <button onClick={() => handleRemoveCategory(categoryName)}>
+                      <button className="btn btn-ghost btn-circle btn-sm" onClick={() => handleRemoveCategory(categoryName)}>
                         <FaTimes />
                       </button>
                     </div>
@@ -233,7 +233,7 @@ const AdvancedSearchPanel = ({
 
       {isMobile && (
         <div className="panel-footer">
-          <button className="apply-filters-button" onClick={onClose}>
+          <button className="btn btn-solid btn-primary" onClick={onClose}>
             החל סינון
           </button>
         </div>

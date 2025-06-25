@@ -195,7 +195,7 @@ const Header = () => {
                     <div style={{ position: 'relative', display: 'inline-block' }}>
                         <button
                             onClick={() => setShowPopover(!showPopover)}
-                            className="refresh-location-btn styled-location-btn"
+                            className="btn btn-outline"
                             title="המיקום שלי"
                             type="button"
                         >
@@ -206,7 +206,7 @@ const Header = () => {
                             <div ref={popoverRef} className="location-popover">
                                 <div className="popover-header">
                                     <span>המיקום הנוכחי שלך</span>
-                                    <button className="close-popover-btn" onClick={() => setShowPopover(false)}><FaTimes /></button>
+                                    <button className="btn btn-ghost btn-circle btn-sm" onClick={() => setShowPopover(false)}><FaTimes /></button>
                                 </div>
                                 <div className="popover-content">
                                     {addressLoading || loading ? (
@@ -220,7 +220,7 @@ const Header = () => {
                                     )}
                                 </div>
                                 <div className="popover-actions">
-                                    <button className="refresh-popover-btn" onClick={handleRefreshLocation} disabled={loading || addressLoading} title="רענן מיקום">
+                                    <button className="btn btn-ghost" onClick={handleRefreshLocation} disabled={loading || addressLoading} title="רענן מיקום">
                                         <FaSyncAlt className={loading ? 'spin' : ''} />
                                         רענן מיקום
                                     </button>
@@ -233,28 +233,28 @@ const Header = () => {
                 <div className="nav-center">
                     <div className="nav-links">
                         <button 
-                            className={`nav-button ${isActive("/") ? "active" : ""}`} 
+                            className={`btn btn-ghost ${isActive("/") ? "active" : ""}`} 
                             onClick={() => navigate("/")}
                         >
                             <FaHome />
                             {t('header.home')}
                         </button>
                         <button 
-                            className={`nav-button ${isActive("/search-results") ? "active" : ""}`} 
+                            className={`btn btn-ghost ${isActive("/search-results") ? "active" : ""}`} 
                             onClick={() => navigate("/search-results")}
                         >
                             <FaSearch />
                             {t('header.search')}
                         </button>
                         <button 
-                            className={`nav-button ${isActive("/edit") ? "active" : ""}`} 
+                            className={`btn btn-ghost ${isActive("/edit") ? "active" : ""}`} 
                             onClick={() => navigate("/edit")}
                         >
                             <FaPlusCircle />
                             {t('header.addBusiness')}
                         </button>
                         <button 
-                            className={`nav-button ${isActive("/suggest") ? "active" : ""}`} 
+                            className={`btn btn-ghost ${isActive("/suggest") ? "active" : ""}`} 
                             onClick={() => navigate("/suggest")}
                         >
                             <FaLightbulb />
@@ -281,7 +281,7 @@ const Header = () => {
                     {username ? (
                         <div className="user-menu" ref={userMenuRef}>
                             <button 
-                                className="nav-button with-hover" 
+                                className="btn btn-ghost" 
                                 onClick={() => setShowUserMenu(!showUserMenu)}
                                 ref={userButtonRef}
                                 aria-expanded={showUserMenu}
@@ -297,7 +297,7 @@ const Header = () => {
                                     aria-labelledby="user-menu-button"
                                 >
                                     <button 
-                                        className="dropdown-item" 
+                                        className="btn btn-ghost" 
                                         onClick={() => handleMenuItemClick("/profile")}
                                         role="menuitem"
                                     >
@@ -305,7 +305,7 @@ const Header = () => {
                                         {"פרופיל אישי"}  
                                     </button>
                                     <button 
-                                        className="dropdown-item" 
+                                        className="btn btn-ghost" 
                                         onClick={() => handleMenuItemClick("/my-businesses")}
                                         role="menuitem"
                                     >
@@ -313,7 +313,7 @@ const Header = () => {
                                         {t('header.myBusinesses')}
                                     </button>
                                     <button 
-                                        className="dropdown-item" 
+                                        className="btn btn-ghost" 
                                         onClick={() => handleMenuItemClick("/my-favorites")}
                                         role="menuitem"
                                     >
@@ -322,7 +322,7 @@ const Header = () => {
                                     </button>
                                     {isAdmin && (
                                         <button 
-                                            className="dropdown-item" 
+                                            className="btn btn-ghost" 
                                             onClick={() => handleMenuItemClick("/admin")}
                                             role="menuitem"
                                         >
@@ -331,7 +331,7 @@ const Header = () => {
                                         </button>
                                     )}
                                     <button 
-                                        className="dropdown-item" 
+                                        className="btn btn-ghost" 
                                         onClick={handleLogout}
                                         role="menuitem"
                                     >
@@ -342,7 +342,7 @@ const Header = () => {
                             )}
                         </div>
                     ) : (
-                            <button className="nav-button" onClick={() => navigate("/auth")}>
+                            <button className="btn btn-ghost" onClick={() => navigate("/auth")}>
                                 <FaSignInAlt />
                                 הרשמה / כניסה
                             </button>

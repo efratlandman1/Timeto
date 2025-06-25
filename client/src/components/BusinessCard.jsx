@@ -183,7 +183,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
           </div>
         )}
         <button 
-          className={`action-button favorite ${isFavorite ? 'active' : ''}`}
+          className={`btn btn-circle btn-favorite ${isFavorite ? 'active' : ''}`}
           onClick={handleToggleFavorite}
           aria-label={isFavorite ? 'הסר ממועדפים' : 'הוסף למועדפים'}
         >
@@ -230,7 +230,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
               <>
                 {localActive && (
                   <button
-                    className="action-button edit"
+                    className="btn btn-solid btn-circle btn-sm btn-edit"
                     onClick={(e) => handleEdit(e)}
                     title="עריכה"
                   >
@@ -241,14 +241,14 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                   confirmDelete ? (
                     <>
                       <button
-                        className="action-button confirm"
+                        className="btn btn-solid btn-circle btn-sm btn-confirm"
                         onClick={(e) => handleDeleteConfirmed(e)}
                         title="אישור מחיקה"
                       >
                         <span>✔</span>
                       </button>
                       <button
-                        className="action-button cancel"
+                        className="btn btn-solid btn-circle btn-sm btn-cancel"
                         onClick={(e) => {
                           e.stopPropagation();
                           setConfirmDelete(false);
@@ -260,7 +260,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                     </>
                   ) : (
                     <button
-                      className="action-button delete"
+                      className="btn btn-solid btn-circle btn-sm btn-delete"
                       onClick={(e) => {
                         e.stopPropagation();
                         setConfirmDelete(true);
@@ -272,7 +272,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                   )
                 ) : (
                   <button
-                    className="action-button restore"
+                    className="btn btn-solid btn-circle btn-sm btn-restore"
                     onClick={(e) => handleRestore(e)}
                     title="שחזור"
                   >
@@ -282,24 +282,24 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
               </>
             ) : (
               <>
-                <button 
-                  className="action-button email"
-                  onClick={(e) => handleActionClick(e, () => window.location.href = `mailto:${business.email}`)}
-                  title="שליחת אימייל"
+                <button
+                  className="btn btn-solid btn-circle btn-sm btn-email"
+                  onClick={(e) => handleActionClick(e, () => window.location.href = `mailto:${business.contact.email}`)}
+                  title="שלח אימייל"
                 >
                   <FaEnvelope />
                 </button>
-                <button 
-                  className="action-button whatsapp"
-                  onClick={(e) => handleActionClick(e, () => window.location.href = `https://wa.me/${business.phone}`)}
-                  title="וואטסאפ"
+                <button
+                  className="btn btn-solid btn-circle btn-sm btn-whatsapp"
+                  onClick={(e) => handleActionClick(e, () => window.open(`https://wa.me/${business.contact.phone}`, '_blank'))}
+                  title="שלח וואטסאפ"
                 >
                   <FaWhatsapp />
                 </button>
-                <button 
-                  className="action-button phone"
-                  onClick={(e) => handleActionClick(e, () => window.location.href = `tel:${business.phone}`)}
-                  title="התקשרות"
+                <button
+                  className="btn btn-solid btn-circle btn-sm btn-phone"
+                  onClick={(e) => handleActionClick(e, () => window.location.href = `tel:${business.contact.phone}`)}
+                  title="חייג"
                 >
                   <FaPhone />
                 </button>
