@@ -70,7 +70,13 @@
   animation: spin 1s linear infinite;
 
 }
-
+/* Loading Spinner */
+.loading-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff4d4d;
+}
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
