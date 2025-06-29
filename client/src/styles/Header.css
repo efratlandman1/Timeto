@@ -100,6 +100,87 @@
     display: inline-block;
 }
 
+.location-popover .popover-header,
+.location-popover .popover-content,
+.location-popover .popover-actions {
+    position: static;
+}
+
+.location-popover {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    min-width: 320px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1.5px 8px rgba(0,0,0,0.10);
+    z-index: 2000;
+    padding: 0;
+    margin-top: 0.5rem;
+    animation: fadeIn 0.25s cubic-bezier(.68,-0.55,.27,1.55);
+    border: 1px solid #eee;
+}
+
+.location-popover .popover-header {
+    border-bottom: 1px solid #eee;
+    padding: 1.2rem 1.2rem 0.7rem 1.2rem;
+    border-radius: 18px 18px 0 0;
+    background: #fff;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.5rem;
+}
+
+.location-popover .popover-header .btn-ghost,
+.location-popover .popover-header .btn-close {
+    position: absolute;
+    top: 50%;
+    left: 1.2rem;
+    right: auto;
+    z-index: 2;
+    transform: translateY(-50%);
+}
+
+[dir="ltr"] .location-popover .popover-header .btn-ghost,
+[dir="ltr"] .location-popover .popover-header .btn-close {
+    left: auto;
+    right: 1.2rem;
+}
+
+.location-popover .popover-header span {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.08rem;
+    margin: 0;
+}
+
+.location-popover .popover-content {
+    padding: 1.2rem 1.2rem 0.5rem 1.2rem;
+    background: #fff;
+    text-align: right;
+}
+
+.address-text {
+    padding: 0.2rem 0 0.7rem 0;
+    font-size: 1.05rem;
+    color: #222;
+}
+
+.location-popover .popover-actions {
+    padding: 0.5rem 1.2rem 1rem 1.2rem;
+    border-radius: 0 0 18px 18px;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+}
+
+.location-popover .popover-actions .btn {
+    min-width: 120px;
+}
+
 .location-popover .btn-outline {
     border: 1px solid #ddd;
     background: white;
@@ -149,17 +230,6 @@
 
 .address-error {
     color: #d32f2f;
-}
-
-.address-text {
-    margin-bottom: 1rem;
-}
-
-.popover-actions {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-    margin-top: 1rem;
 }
 
 .spin {
