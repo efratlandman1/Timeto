@@ -142,6 +142,19 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.stat-box {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-radius: 8px;
+    background: #f8f9fa;
+    transition: transform 0.2s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-2px);
+}
 
 .stat-icon-wrapper {
     width: 48px;
@@ -212,6 +225,12 @@
         0 2px 6px rgba(0, 0, 0, 0.08);
 } */
 
+.categories-wrapper {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    position: relative;
+}
 
 .categories-header {
     display: flex;
@@ -275,21 +294,37 @@
     text-align: center;
 }
 
-/* Arrow buttons are now styled globally in buttons.css */
-/* The .arrow-button class from buttons.css will be used */
 
-/* Responsive design for categories */
-@media (max-width: 768px) {
+.category-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) scale(1); 
+    /* width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: white;
+    border: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); */
+}
 
-    
-    .categories {
-        margin: 0 0.5rem;
-    }
-    
-    .categories-header {
-        left: 1rem;
-        right: 1rem;
-    }
+
+
+.category-arrow:active {
+    transform: translateY(-50%) scale(1) !important; 
+    /* Override the button active state */
+}
+
+.category-arrow.left {
+    left: 0;
+}
+
+.category-arrow.right {
+    right: 0;
 }
 
 /* Business Groups */

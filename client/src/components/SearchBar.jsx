@@ -364,7 +364,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
       className={`search-bar-container ${isMainPage ? 'main-page' : 'results-page'}`}
       ref={wrapperRef}
     >
-      <form onSubmit={handleSubmit} className="search-bar-wrapper">
+      <form onSubmit={handleSubmit}>
         <div className="input-with-icon-container">
           <input
             ref={inputRef}

@@ -3,18 +3,18 @@
    ===================== */
 
    .time-range input[type="time"] {
-    padding: 8px 12px;
-    border: 1.5px solid #ddd;
-    border-radius: 8px;
-    font-size: 0.9rem;
+    padding: var(--spacing-lg) var(--spacing-md);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    font-size: var(--font-size-sm);
     width: 120px;
-    background: white;
-    color: #333;
+    background: var(--bg-primary);
+    color: var(--text-primary);
     transition: all 0.3s ease;
   }
 
   .time-range input[type="time"]:focus {
-    border-color: #d32f2f;
+    border-color: var(--primary-dark);
     box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15);
   }
 
@@ -25,8 +25,8 @@
 
     hr {
       width: 100%;
-      border: 1px solid #eee;
-      margin: 20px 0;
+      border: 1px solid var(--border-color);
+      margin: var(--spacing-xl) 0;
     }
     
 /* =====================
@@ -34,8 +34,8 @@
  ===================== */
  
     .required-mark {
-      color: red;
-      margin-left: 4px;
+      color: var(--error-color);
+      margin-left: var(--spacing-sm);
     }
 
 

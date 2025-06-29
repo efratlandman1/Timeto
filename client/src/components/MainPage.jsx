@@ -259,7 +259,7 @@ const MainPage = () => {
                     <div className="categories-header">
                         <h2>קטגוריות פופולריות</h2>
                     </div>
-                    <button className="btn btn-outline btn-circle" onClick={() => handleScroll('right')}>
+                    <button className="btn btn-outline btn-circle category-arrow right" onClick={() => handleScroll('right')}>
                         <FaChevronRight />
                     </button>
                     <div className="categories">
@@ -276,7 +276,7 @@ const MainPage = () => {
                             </div>
                         ))}
                     </div>
-                    <button className="btn btn-outline btn-circle" onClick={() => handleScroll('left')}>
+                    <button className="btn btn-outline btn-circle category-arrow left" onClick={() => handleScroll('left')}>
                         <FaChevronLeft />
                     </button>
                     

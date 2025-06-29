@@ -180,7 +180,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
               id="logo"
               name="logo"
               onChange={handleChange}
-              style="display: none"
+              style={{display: "none"}}
               accept="image/*"
             />
           </label>

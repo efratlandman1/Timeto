@@ -4,10 +4,10 @@
 
 textarea {
   width: 100%;
-  padding: 0.875rem;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 8px;
-  font-size: 0.9rem;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-sm);
   resize: vertical;
   min-height: 100px;
   font-family: inherit;
@@ -16,6 +16,6 @@ textarea {
 
 textarea:focus {
   outline: none;
-  border-color: var(--primary-color, #ff4d4d);
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.1);
 } 

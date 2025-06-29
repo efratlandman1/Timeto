@@ -94,7 +94,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
           חוות דעת על {businessName || 'העסק'}
         </h2>
 
-        <div className="form-field-container rating-group">
+        <div className="form-field-container">
           <label>דרג את העסק</label>
           <div className="star-rating-container">
             {[1, 2, 3, 4, 5].map(star => (
