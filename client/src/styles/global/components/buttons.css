@@ -264,6 +264,30 @@
     --btn-color: var(--primary-color);
 }
 
+:root {
+  --btn-close-size: 2.5rem;
+  --btn-close-font-size: 1.5rem;
+}
+
+.btn-close {
+  width: var(--btn-close-size);
+  height: var(--btn-close-size);
+  min-width: var(--btn-close-size);
+  min-height: var(--btn-close-size);
+  max-width: var(--btn-close-size);
+  max-height: var(--btn-close-size);
+  font-size: var(--btn-close-font-size);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-close svg, .btn-close i {
+  font-size: var(--btn-close-font-size);
+  width: var(--btn-close-font-size);
+  height: var(--btn-close-font-size);
+}
+
 
 
 
