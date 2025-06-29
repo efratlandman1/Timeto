@@ -10,8 +10,7 @@ import StepBusinessServices from './StepBusinessServices';
 import StepBusinessHours from './StepBusinessHours';
 import '../styles/EditBusinessPage.css';
 import { setSelectedBusiness } from '../redux/businessSlice';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 import { Steps, StepsProvider, useSteps } from 'react-step-builder';
 import { getToken } from "../utils/auth";
 
@@ -88,7 +87,7 @@ const ProgressBar = ({ businessData }) => {
           <div
             key={index}
             onClick={() => handleJump(stepNumber)}
-            className={`edit-business-progress-step ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
+            className={`progress-step ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
           >
             <div
               className={`edit-business-progress-circle ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
@@ -96,7 +95,7 @@ const ProgressBar = ({ businessData }) => {
             >
               {stepNumber}
             </div>
-            <span className="edit-business-step-label">{label}</span>
+            <span className="step-label">{label}</span>
           </div>
         );
       })}
@@ -330,17 +329,14 @@ const EditBusinessPage = () => {
     if (businessData.id) {
       formData.append('id', businessData.id);
     }
-
+ 
     try {
       const token = getToken();
       await uploadBusiness(token, formData);
-      toast.success(`העסק ${selectedBusiness ? 'עודכן' : 'נוצר'} בהצלחה!`, {
-        position: 'top-center',
-        className: 'custom-toast',
-      });
+      toast.success(`העסק ${selectedBusiness ? 'עודכן' : 'נוצר'} בהצלחה`);
       setTimeout(() => {
         navigate('/my-businesses');
-      }, 1500);
+      }, 3000);
     } catch (error) {
       toast.error('אירעה שגיאה בעת שמירת העסק');
     } finally {
@@ -382,7 +378,6 @@ const EditBusinessPage = () => {
               selectedBusiness={selectedBusiness}
             />
           </StepsProvider>
-          <ToastContainer position="bottom-center" rtl={true} />
         </div>
       </div>
     </LoadScript>

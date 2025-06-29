@@ -45,24 +45,7 @@
   gap: 1.5rem;
 }
 
-.option-group {
-  border-bottom: 1px solid #eee;
-  padding-bottom: 1.5rem;
-}
-
-.option-group:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.option-group h3 {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.1rem;
-  color: #333;
-  margin-bottom: 1rem;
-}
+/* Option group styles moved to global ui-elements.css */
 
 .button-group {
   display: flex;

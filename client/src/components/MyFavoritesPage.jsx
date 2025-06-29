@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BusinessCard from './BusinessCard';
-import '../styles/userBusinesses.css';
+// import '../styles/userBusinesses.css';
 import { FaArrowRight } from "react-icons/fa";
 import { getToken } from "../utils/auth";
 
@@ -67,7 +67,7 @@ const MyFavoritesPage = () => {
                         </button>
                     </div>
                 ) : (
-                    <div className="business-cards-grid">
+                    <div className="business-cards-container">
                         {favorites.map((business) => (
                             <BusinessCard
                                 key={business._id}

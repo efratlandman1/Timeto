@@ -106,7 +106,7 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
 
             {!day.closed &&
               day.ranges.map((range, rangeIndex) => (
-                <div key={rangeIndex} className="time-range" >
+                <div key={rangeIndex} className="time-range-container" >
                   <input
                     type="time"
                     id='open'

@@ -41,18 +41,6 @@
   padding: 2rem;
 }
 
-.business-hero-content {
-  background: rgba(255, 255, 255, 0.92);
-  padding: 2rem 3rem;
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-  max-width: 800px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  animation: fadeInUp 0.6s ease-out;
-}
 
 .business-hero-title {
   color: #2d3436;
@@ -127,32 +115,7 @@
   border-radius: 2px;
 }
 
-/* Service Tags */
-.service-tag {
-  background: #f8f9fa;
-  color: #2d3436;
-  padding: 0.75rem 1.25rem;
-  border-radius: 25px;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
 
-.service-tag:hover {
-  background: #ff4d4d;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 77, 77, 0.2);
-}
-
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
 
 /* Contact Section */
 .contact-section {
@@ -212,16 +175,6 @@
   height: 20px;
 }
 
-.contact-label {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.contact-value {
-  font-size: 0.9rem;
-  color: #333;
-  word-break: break-word;
-}
 
 /* Two Column Section */
 .two-column-section {
@@ -314,11 +267,6 @@
   margin-bottom: 0.5rem;
 }
 
-.stat-label {
-  color: #666;
-  font-size: 0.875rem;
-}
-
 .feedback-list {
   display: flex;
   flex-direction: column;
@@ -384,15 +332,7 @@
   margin-bottom: 0.75rem;
 }
 
-.feedback-rating .stars {
-  display: flex;
-  gap: 2px;
-}
-
-.star {
-  color: #ffd700;
-  font-size: 0.9rem;
-}
+/* Star rating styles moved to global ui-elements.css */
 
 .feedback-comment {
   color: #555;
@@ -458,10 +398,6 @@
     height: 250px;
   }
 
-  .business-hero-content {
-    padding: 1.5rem 2rem;
-    width: 95%;
-  }
 
   .business-hero-title {
     font-size: 2.2rem;
@@ -481,9 +417,6 @@
     height: 200px;
   }
 
-  .business-hero-content {
-    padding: 1rem 1.5rem;
-  }
 
   .business-hero-title {
     font-size: 1.8rem;
@@ -491,34 +424,5 @@
 
   .business-hero-category {
     font-size: 1rem;
-  }
-}
-
-/* Toast */
-.toast {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  background: #4caf50;
-  color: white;
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  animation: slideIn 0.3s ease;
-}
-
-.toast.error {
-  background: #f44336;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
   }
 }

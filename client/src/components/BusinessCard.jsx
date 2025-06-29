@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import FeedbackPage from './FeedbackPage';
 import {
@@ -11,6 +11,7 @@ import { setSelectedBusiness } from '../redux/businessSlice';
 import '../styles/businessCard.css';
 import { getToken } from "../utils/auth";
 import { roundRating, renderStars } from '../utils/ratingUtils';
+import { toast } from 'react-toastify';
 
 const BusinessCard = ({ business, fromUserBusinesses }) => {
   const dispatch = useDispatch();
@@ -213,16 +214,9 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
 
         <div className="business-card-footer">
           <div className="business-card-rating">
-            <div className="rating-stars">
+            <div className="star-rating-container">
               {renderRatingStars(business.rating)}
             </div>
-            {business.rating !== null && business.rating !== undefined ? (
-              <span className="rating-number">
-                {roundRating(business.rating)}
-              </span>
-            ) : (
-              <span className="rating-number new">חדש</span>
-            )}
           </div>
 
           <div className="business-card-actions">
@@ -320,11 +314,11 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
 };
 
 function showToast(message, isError = false) {
-  const toast = document.createElement('div');
-  toast.className = `toast ${isError ? 'error' : 'success'}`;
-  toast.innerText = message;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+  if (isError) {
+    toast.error(message, { autoClose: 3000 });
+  } else {
+    toast.success(message, { autoClose: 3000 });
+  }
 }
 
 export default BusinessCard;

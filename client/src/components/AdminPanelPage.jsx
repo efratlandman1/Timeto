@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTags, FaCogs, FaUsers, FaBuilding, FaExpandArrowsAlt, FaCompressArrowsAlt } from 'react-icons/fa';
+import { FaTags, FaCogs, FaUsers, FaBuilding, FaExpandArrowsAlt, FaCompressArrowsAlt, FaUpload } from 'react-icons/fa';
 import axios from 'axios';
 import '../styles/AdminPanelPage.css';
 import { toast } from 'react-toastify';
@@ -378,7 +378,6 @@ const AdminPanelPage = () => {
                     placeholder="Search..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input"
                 />
                 <button onClick={() => expandAll(businesses, true)} className="btn btn-outline"><FaExpandArrowsAlt /> Expand All</button>
                 <button onClick={() => expandAll(businesses, false)} className="btn btn-outline"><FaCompressArrowsAlt/> Collapse All</button>
@@ -508,8 +507,8 @@ const AdminPanelPage = () => {
             <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
                 {isCategory && (
                     <>
-                        <div className="form-group">
-                            <label htmlFor="name">שם קטגוריה</label>
+                        <div className="form-field-container">
+                            <label>שם קטגוריה</label>
                             <input
                                 id="name"
                                 name="name"
@@ -519,23 +518,50 @@ const AdminPanelPage = () => {
                                 required
                             />
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="logo-upload">לוגו</label>
-                            <input
-                                id="logo-upload"
-                                name="logo"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileChange}
-                            />
-                            {previewUrl && <img src={previewUrl} alt="Preview" className="logo-preview" />}
+                        <div className="form-field-container">
+                            <label htmlFor="logo">לוגו</label>
+                            <div className="logo-container">
+                                <label htmlFor="logo-upload" className="btn btn-dashed btn-primary">
+                                    <FaUpload />
+                                    {'בחירת לוגו'}
+                                    <input
+                                        type="file"
+                                        id="logo-upload"
+                                        name="logo"
+                                        onChange={handleFileChange}
+                                        style={{ display: 'none' }}
+                                        accept="image/*"
+                                    />
+                                </label>
+                                {previewUrl && (
+                                    <div className="logo-preview-wrapper">
+                                        <img
+                                            src={previewUrl}
+                                            alt="תצוגת לוגו"
+                                            className="logo-preview"
+                                        />
+                                        <button
+                                            className="btn btn-solid btn-delete btn-circle btn-sm remove-logo-button"
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedFile(null);
+                                                setPreviewUrl('');
+                                                setEditingItem(prev => ({ ...prev, logo: null }));
+                                            }}
+                                            title="הסר לוגו"
+                                        >
+                                            &times;
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </>
                 )}
                 {isService && (
                     <>
-                        <div className="form-group">
-                            <label htmlFor="name">שם שירות</label>
+                        <div className="form-field-container">
+                            <label>שם שירות</label>
                             <input
                                 id="name"
                                 name="name"
@@ -545,8 +571,8 @@ const AdminPanelPage = () => {
                                 required
                             />
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="categoryId">קטגוריה</label>
+                        <div className="form-field-container">
+                            <label>קטגוריה</label>
                             <select
                                 id="categoryId"
                                 name="categoryId"
@@ -564,16 +590,16 @@ const AdminPanelPage = () => {
                 )}
                 {isUser && (
                      <>
-                        <div className="form-group">
+                        <div className="form-field-container">
                             <label>שם</label>
                             <input type="text" value={`${editingItem.firstName || ''} ${editingItem.lastName || ''}`} readOnly />
                         </div>
-                        <div className="form-group">
+                        <div className="form-field-container">
                             <label>Email</label>
                             <input type="email" value={editingItem.email || ''} readOnly />
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="role">תפקיד</label>
+                        <div className="form-field-container">
+                            <label>תפקיד</label>
                             <select
                                 id="role"
                                 name="role"
@@ -585,8 +611,8 @@ const AdminPanelPage = () => {
                                 ))}
                             </select>
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="active">פעיל</label>
+                        <div className="form-field-container">
+                            <label>פעיל</label>
                             <input
                                 type="checkbox"
                                 id="active"

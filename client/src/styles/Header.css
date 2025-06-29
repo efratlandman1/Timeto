@@ -1,85 +1,16 @@
-/* עיצוב כללי לכותרת */
+/* =====================
+   Header Component Styles
+   ===================== */
+
 .header-container {
-    background-color: white;
-    /* position: fixed; */
-    position: static;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
     top: 0;
-    width: 100%;
-    z-index: 100;
+    z-index: 1000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    height: 60px;
 }
 
-/* עיצוב הניווט */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.25rem 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    direction: rtl;
-    height: 100%;
-}
-
-.nav-right,
-.nav-center,
-.nav-left {
-    display: flex;
-    align-items: center;
-}
-
-.nav-right {
-    gap: 1rem;
-}
-
-.nav-center {
-    flex: 1;
-    justify-content: center;
-}
-
-.nav-left {
-    flex: 0 0 auto;
-    gap: 1.5rem;
-    margin-right: 3rem;
-}
-
-/* Logo styling */
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 8px;
-    transition: background-color 0.2s;
-}
-
-.logo:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-.logo-icon {
-    font-size: 2rem;
-    color: #e53935;
-}
-
-.logo-text {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.logo-text-main {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #333;
-}
-
-.logo-text-sub {
-    font-size: 0.875rem;
-    color: #666;
-}
 
 /* Navigation buttons */
 .nav-links {
@@ -109,45 +40,48 @@
     transform: rotate(180deg);
 }
 
-/* Common dropdown styles */
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    min-width: 200px;
-    z-index: 1000;
-    padding: 8px;
-    margin-top: 4px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.dropdown-menu .btn-ghost {
-    justify-content: flex-start;
-    width: 100%;
-    padding: 10px 12px;
-}
-
-.dropdown-menu .btn-ghost:hover {
-    background-color: #f5f5f5;
-}
+/* Common dropdown styles - העיצוב מוגדר גלובלית ב-ui-elements.css */
 
 .user-menu {
     position: relative;
 }
 
-/* Language menu specific */
-.lang-menu {
-    position: relative;
-}
 
-.lang-dropdown {
-    min-width: 120px;
-}
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s ease;
+  }
+  
+  .header-logo:hover {
+    opacity: 0.8;
+  }
+  
+  .header-logo-icon {
+    font-size: 1.5rem;
+    color: #ff4d4d;
+  }
+
+.header-logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+  
+  .header-logo-text-main {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2d3436;
+  }
+  
+  .header-logo-text-sub {
+    font-size: 0.8rem;
+    color: #636e72;
+    font-weight: 400;
+  }
 
 @keyframes fadeIn {
     from {
@@ -160,167 +94,72 @@
     }
 }
 
-@media (max-width: 1024px) {
-    .nav-center {
-        display: none;
-    }
-
-    .navbar {
-        padding: 0.25rem 1rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .logo {
-        gap: 0.5rem;
-    }
-
-    .logo-icon {
-        font-size: 1.5rem;
-    }
-
-    .logo span {
-        font-size: 0.9rem;
-    }
-
-    .logo-text-sub {
-        display: none;
-    }
-}
-
-/* Language Switch */
-.lang-switch {
-    margin-right: 1rem;
-}
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 30px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 4px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 24px;
-    width: 24px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-    z-index: 1;
-}
-
-input:checked + .slider {
-    background-color: #2196F3;
-}
-
-input:checked + .slider:before {
-    transform: translateX(30px);
-}
-
-.lang-label {
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-    z-index: 0;
-}
-
-.lang-label.he {
-    margin-right: 4px;
-}
-
-.lang-label.en {
-    margin-left: 4px;
-}
-
 /* Location Popover */
 .location-popover {
-    position: absolute;
-    top: 110%;
-    right: 0;
-    min-width: 320px;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 24px rgba(229, 57, 53, 0.13);
-    border: 1.5px solid #ffeaea;
-    z-index: 1000;
-    padding: 18px 20px 14px 20px;
-    direction: rtl;
-    color: #b71c1c;
-    font-size: 15px;
+    position: relative;
+    display: inline-block;
 }
 
 .location-popover .btn-outline {
-    --btn-border-color: #e53935;
-    --btn-text-color: #e53935;
+    border: 1px solid #ddd;
+    background: white;
+    color: #333;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
 }
+
 .location-popover .btn-outline:hover {
-    --btn-bg: #e53935;
-    --btn-color: white;
+    border-color: #ff4d4d;
+    color: #ff4d4d;
 }
+
 .location-popover .btn-ghost {
-    color: #e53935;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
 }
+
 .location-popover .btn-ghost:hover {
-    background-color: #ffeaea;
+    background-color: #f5f5f5;
 }
 
 .popover-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
     font-weight: 600;
-    margin-bottom: 10px;
-    color: #e53935;
+    color: #333;
 }
 
 .popover-content {
-    margin-bottom: 12px;
-    min-height: 24px;
-    color: #b71c1c;
-    word-break: break-word;
+    padding: 1rem;
+    max-width: 300px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #666;
 }
 
 .address-loading {
-    color: #b71c1c;
+    color: #666;
     font-style: italic;
 }
+
 .address-error {
-    color: #e53935;
+    color: #d32f2f;
 }
+
 .address-text {
-    font-weight: 500;
+    margin-bottom: 1rem;
 }
 
 .popover-actions {
     display: flex;
+    gap: 0.5rem;
     justify-content: flex-end;
-    gap: 8px;
+    margin-top: 1rem;
 }
 
 .spin {
@@ -328,5 +167,7 @@ input:checked + .slider:before {
 }
 
 @keyframes spin {
-    100% { transform: rotate(360deg); }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
+

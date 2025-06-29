@@ -54,8 +54,8 @@ const ResetPasswordPage = () => {
                     <div className="spinner"></div>
                 </div>
             )}
-            <div className="modal-content" style={{ opacity: isLoading ? 0.7 : 1 }}>
-                <Link to="/auth" className="btn btn-ghost btn-circle btn-sm">×</Link>
+            <div className="modal-content" /*style={{ opacity: isLoading ? 0.7 : 1 }}*/>
+                <Link to="/auth" className="btn btn-ghost btn-circle btn-sm  btn-close">×</Link>
 
                 {message.type === 'success' ? (
                     <div className="success-view">
@@ -68,29 +68,27 @@ const ResetPasswordPage = () => {
                         <h2>איפוס סיסמה</h2>
                         <p>הגדירו סיסמה חדשה לחשבונכם</p>
                         <form className="email-form" onSubmit={handleSubmit}>
-                            <div className="password-input-wrapper">
+                            <div className="input-with-icon-container">
                                 <input
-                                    className="form-input"
                                     type={showPassword ? "text" : "password"}
                                     placeholder="סיסמה חדשה"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
-                                <span className="password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
+                                <span className="input-icon" onClick={() => setShowPassword(!showPassword)}>
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
                             </div>
-                            <div className="password-input-wrapper">
-                               <input
-                                    className="form-input"
+                            <div className="input-with-icon-container">
+                                <input
                                     type={showPassword ? "text" : "password"}
                                     placeholder="אימות סיסמה"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                     required
                                 />
-                                 <span className="password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
+                                <span className="input-icon" onClick={() => setShowPassword(!showPassword)}>
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
                             </div>

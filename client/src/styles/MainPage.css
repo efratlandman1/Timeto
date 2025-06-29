@@ -1,13 +1,3 @@
-/* מיכל ראשי */
-.main-page-container {
-    width: 100%;
-    margin: 0 auto;
-    padding-top: 4.5rem;
-    direction: rtl;
-    background-color: white;
-    min-height: 100vh;
-}
-
 /* Hero Section */
 .hero-section {
     background-color: #f8f9fa;
@@ -15,11 +5,6 @@
     margin-bottom: 2rem;
 }
 
-.hero-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-}
 
 /* Banner Container */
 .banner-container {
@@ -66,19 +51,6 @@
     margin: 0 auto;
 }
 
-.banner-title {
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
-    color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.banner-description {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 1rem;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
 
 /* Story Indicators */
 .story-indicators {
@@ -170,19 +142,6 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.stat-box {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    border-radius: 8px;
-    background: #f8f9fa;
-    transition: transform 0.2s ease;
-}
-
-.stat-box:hover {
-    transform: translateY(-2px);
-}
 
 .stat-icon-wrapper {
     width: 48px;
@@ -213,32 +172,7 @@
 
 }
 
-.stat-label {
-    font-size: 14px;
-    color: #666;
-    margin-top: 4px;
-      text-align: center;
-
-}
-
-/* Update star colors */
-.star.filled svg {
-    color: #ffd700 !important;
-}
-
-.star svg {
-    color: #ffd700 !important;
-}
-
-/* Business card styling */
-.business-card {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
+/* 
 .business-card::before {
     content: '';
     position: absolute;
@@ -254,9 +188,7 @@
     pointer-events: none;
 }
 
-.business-card:hover {
-    transform: translateY(-4px);
-}
+
 
 .business-card:hover::before {
     background: linear-gradient(135deg, #ff4d4d20, #ff6b6b20);
@@ -278,38 +210,8 @@
     box-shadow: 
         0 8px 24px rgba(0, 0, 0, 0.1),
         0 2px 6px rgba(0, 0, 0, 0.08);
-}
+} */
 
-/* Star Rating Default State */
-.rating-stars .star svg {
-    color: #e0e0e0 !important;
-    transition: color 0.2s ease;
-}
-
-.rating-stars .star.filled svg,
-.rating-stars .star:hover svg,
-.rating-stars .star:hover ~ .star svg {
-    color: #ffd700 !important;
-}
-
-.rating-stars:hover .star svg {
-    color: #ffd700 !important;
-}
-
-.rating-stars:hover .star:hover ~ .star svg {
-    color: #e0e0e0 !important;
-}
-
-/* Categories Section */
-.categories-wrapper {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 2rem;
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
 
 .categories-header {
     display: flex;
@@ -378,10 +280,7 @@
 
 /* Responsive design for categories */
 @media (max-width: 768px) {
-    .categories-wrapper {
-        padding: 0 1rem;
-        gap: 0.5rem;
-    }
+
     
     .categories {
         margin: 0 0.5rem;
@@ -433,11 +332,7 @@
     color: #ff6666;
 }
 
-.card-slider {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
-}
+/* Card slider styles moved to global/containers.css */
 
 /* Bottom Banner */
 .bottom-banner {
@@ -485,13 +380,8 @@
         max-width: 90%;
     }
 
-    .banner-title {
-        font-size: 1.4rem;
-    }
 
-    .banner-description {
-        font-size: 0.9rem;
-    }
+
 
     .search-section h1 {
         font-size: 2rem;

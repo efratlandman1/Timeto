@@ -1,30 +1,4 @@
-/* מחקתי את .auth-page-overlay, .auth-modal, .auth-modal h2, .auth-modal p כי עברו ל-global/components/modals.css */
 
-.social-login-button {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    background-color: #fff;
-    margin-bottom: 12px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: background-color 0.2s;
-}
-
-.social-login-button:hover {
-    background-color: #f7f7f7;
-}
-
-.social-login-button img {
-    width: 20px;
-    height: 20px;
-}
 
 .divider {
     display: flex;
@@ -54,36 +28,6 @@
     position: relative;
 }
 
-.password-input-wrapper {
-    position: relative;
-    width: 100%;
-    display: flex;
-    align-items: center;
-}
-
-.password-toggle-icon {
-    position: absolute;
-    left: 14px; /* Adjust for RTL */
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #999;
-}
-
-[dir="ltr"] .password-toggle-icon {
-    left: auto;
-    right: 14px;
-}
-
-.email-form .form-input {
-    width: 100%;
-    padding: 14px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
-    margin-bottom: 16px;
-    text-align: right; /* Default to RTL */
-}
 
 .forgot-password-link {
     display: block;
@@ -115,28 +59,3 @@
     border-color: #badbcc;
 }
 
-.verification-sent-view {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.verification-sent-view h3 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #2d3436;
-    margin-bottom: 16px;
-}
-
-.verification-text {
-    font-size: 16px;
-    color: #636e72;
-    line-height: 1.6;
-    max-width: 380px;
-    margin-bottom: 24px;
-}
-
-.resend-text {
-    font-size: 0.9rem;
-} 

@@ -1,36 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaRegStar, FaStar, FaArrowRight } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 import '../styles/FeedbackPage.css';
 import {getToken} from "../utils/auth";
 import { useNavigate } from 'react-router-dom';
-
-const Toast = ({ message, isError, onClose }) => {
-  useEffect(() => {
-    const timer = setTimeout(onClose, 3000);
-    return () => clearTimeout(timer);
-  }, [onClose]);
-
-  return (
-    <div
-      role="alert"
-      aria-live="assertive"
-      className={`business-card-toast ${isError ? 'error' : 'success'}`}
-      style={{
-        borderLeft: `5px solid ${isError ? 'red' : 'green'}`,
-        padding: '10px 15px',
-        backgroundColor: isError ? '#ffe6e6' : '#e6ffe6',
-        color: isError ? '#900' : '#060',
-        fontWeight: 'bold',
-        margin: '10px 0',
-        borderRadius: 4,
-      }}
-    >
-      {message}
-    </div>
-  );
-};
-
 
 const FeedbackPage = ({ businessId, onClose }) => {
   const [rating, setRating] = useState(0);
@@ -38,11 +12,10 @@ const FeedbackPage = ({ businessId, onClose }) => {
   const [comment, setComment] = useState('');
   const [previousFeedbacks, setPreviousFeedbacks] = useState([]);
   const [businessName, setBusinessName] = useState('');
-  const [toast, setToast] = useState(null); // { message, isError }
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-    useEffect(() => {
+  useEffect(() => {
     if (businessId) {
         setIsLoading(true); // להתחיל טעינה
         axios
@@ -57,17 +30,20 @@ const FeedbackPage = ({ businessId, onClose }) => {
     }
     }, [businessId]);
 
-
   const handleStarClick = (value) => {
     setRating(value);
     setHover(0);
   };
 
   const showToast = (message, isError = false) => {
-    setToast({ message, isError });
+    if (isError) {
+      toast.error(message, { autoClose: 3000 });
+    } else {
+      toast.success(message, { autoClose: 3000 });
+    }
   };
 
-    const handleSubmit = async () => {
+  const handleSubmit = async () => {
     try {
         const token = getToken();
 
@@ -98,7 +74,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
         console.error('Failed to submit feedback:', errorMessage);
         showToast(`שגיאה בשליחת הפידבק: ${errorMessage}`, true);
     }
-    };
+  };
 
   if (isLoading) {
     return (
@@ -111,86 +87,72 @@ const FeedbackPage = ({ businessId, onClose }) => {
   }
 
   return (
-    <>
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content" dir="rtl" onClick={(e) => e.stopPropagation()}>
-          <button className="btn btn-ghost btn-circle btn-sm btn-close" onClick={onClose}>×</button>
-          <h2 className="feedback-page-title">
-            חוות דעת על {businessName || 'העסק'}
-          </h2>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" dir="rtl" onClick={(e) => e.stopPropagation()}>
+        <button className="btn btn-ghost btn-circle btn-sm btn-close" onClick={onClose}>×</button>
+        <h2 className="feedback-page-title">
+          חוות דעת על {businessName || 'העסק'}
+        </h2>
 
-          <div className="form-group rating-group">
-            <label>דרג את העסק</label>
-            <div className="star-rating">
-              {[1, 2, 3, 4, 5].map(star => (
-                <span
-                  key={star}
-                  className={`star ${star <= (hover || rating) ? "filled" : ""}`}
-                  onClick={() => handleStarClick(star)}
-                  onMouseEnter={() => setHover(star)}
-                  onMouseLeave={() => setHover(0)}
-                >
-                  {star <= (hover || rating) ? <FaStar size={36} /> : <FaRegStar size={36} />}
-                </span>
-              ))}
-            </div>
-            {rating > 0 && (
-              <div className="rating-text">
-                {rating} כוכבים
-              </div>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label>כתוב את חוות דעתך</label>
-            <textarea
-              placeholder="הסבר בקצרה את החוויה שלך..."
-              value={comment}
-              onChange={e => setComment(e.target.value)}
-              rows={5}
-              className="feedback-page-textarea-input"
-            />
-          </div>
-
-          <div className="actions-container">
-            <button type="submit" className="btn btn-solid btn-primary" onClick={handleSubmit}>
-              שלח משוב
-            </button>
-          </div>
-
-          <div className="feedback-page-feedback-list">
-            <h3>חוות דעת קודמות</h3>
-            {previousFeedbacks.length === 0 && <p className="no-feedbacks">עדיין אין חוות דעת, תהיה הראשון!</p>}
-            {previousFeedbacks.map((fb, idx) => (
-              <div key={idx} className="feedback-page-feedback-item">
-                <div className="feedback-page-feedback-header">
-                  <span className="feedback-name">{fb.user_id?.nickname || 'אנונימי'}</span>
-                  <span className="feedback-date">{new Date(fb.createdAt).toLocaleDateString()}</span>
-                </div>
-                <div className="feedback-page-feedback-stars">
-                  {[1, 2, 3, 4, 5].map(i => (
-                    <span
-                      key={i}
-                      className={`star ${i <= fb.rating ? "filled" : ""}`}
-                    >
-                      {i <= fb.rating ? <FaStar size={20} /> : <FaRegStar size={20} />}
-                    </span>
-                  ))}
-                </div>
-                <p className="feedback-page-feedback-comment">{fb.comment}</p>
-              </div>
+        <div className="form-field-container rating-group">
+          <label>דרג את העסק</label>
+          <div className="star-rating-container">
+            {[1, 2, 3, 4, 5].map(star => (
+              <span
+                key={star}
+                className={`star ${star <= (hover || rating) ? "filled" : ""}`}
+                onClick={() => handleStarClick(star)}
+                onMouseEnter={() => setHover(star)}
+                onMouseLeave={() => setHover(0)}
+              >
+                {star <= (hover || rating) ? <FaStar size={36} /> : <FaRegStar size={36} />}
+              </span>
             ))}
           </div>
+
+        </div>
+
+        <div className="form-field-container">
+          <label>כתוב את חוות דעתך</label>
+          <textarea
+            placeholder="הסבר בקצרה את החוויה שלך..."
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            rows={5}
+          />
+        </div>
+
+        <div className="actions-container">
+          <button type="submit" className="btn btn-solid btn-primary" onClick={handleSubmit}>
+            שלח משוב
+          </button>
+        </div>
+
+        <div className="feedback-page-feedback-list">
+          <h3>חוות דעת קודמות</h3>
+          {previousFeedbacks.length === 0 && <p className="no-feedbacks">עדיין אין חוות דעת, תהיה הראשון!</p>}
+          {previousFeedbacks.map((fb, idx) => (
+            <div key={idx} className="feedback-page-feedback-item">
+              <div className="feedback-page-feedback-header">
+                <span className="feedback-name">{fb.user_id?.nickname || 'אנונימי'}</span>
+                <span className="feedback-date">{new Date(fb.createdAt).toLocaleDateString()}</span>
+              </div>
+              <div className="star-rating-container">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <span
+                    key={i}
+                    className={`star ${i <= fb.rating ? "filled" : ""}`}
+                  >
+                    {i <= fb.rating ? <FaStar size={20} /> : <FaRegStar size={20} />}
+                  </span>
+                ))}
+              </div>
+              <p className="feedback-page-feedback-comment">{fb.comment}</p>
+            </div>
+          ))}
         </div>
       </div>
-      {toast && (
-        <Toast
-          message={toast.message}
-          isError={toast.isError}
-          onClose={() => setToast(null)}
-        />
-      )}
-    </>
+    </div>
   );
 };
 

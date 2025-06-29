@@ -183,172 +183,158 @@ const Header = () => {
 
     return (
         <div className="header-container">
-            <nav className="navbar">
-                <div className="nav-right">
-                    <div className="logo" onClick={() => navigate("/")}>
-                        <FaMapMarkerAlt className="logo-icon" />
-                        <div className="logo-text">
-                            <span className="logo-text-main">{t('header.logo.main')}</span>
-                            <span className="logo-text-sub">{t('header.logo.sub')}</span>
-                        </div>
-                    </div>
-                    <div style={{ position: 'relative', display: 'inline-block' }}>
-                        <button
-                            onClick={() => setShowPopover(!showPopover)}
-                            className="btn btn-outline"
-                            title="המיקום שלי"
-                            type="button"
-                        >
-                            <FaMapMarkerAlt style={{ marginLeft: 6, fontSize: 18 }} />
-                            המיקום שלי
-                        </button>
-                        {showPopover && (
-                            <div ref={popoverRef} className="location-popover">
-                                <div className="popover-header">
-                                    <span>המיקום הנוכחי שלך</span>
-                                    <button className="btn btn-ghost btn-circle btn-sm" onClick={() => setShowPopover(false)}><FaTimes /></button>
-                                </div>
-                                <div className="popover-content">
-                                    {addressLoading || loading ? (
-                                        <span className="address-loading">טוען כתובת...</span>
-                                    ) : addressError ? (
-                                        <span className="address-error">{addressError}</span>
-                                    ) : address ? (
-                                        <span className="address-text">{formatAddress(address)}</span>
-                                    ) : (
-                                        <span className="address-error">לא נמצא מיקום</span>
-                                    )}
-                                </div>
-                                <div className="popover-actions">
-                                    <button className="btn btn-ghost" onClick={handleRefreshLocation} disabled={loading || addressLoading} title="רענן מיקום">
-                                        <FaSyncAlt className={loading ? 'spin' : ''} />
-                                        רענן מיקום
-                                    </button>
-                                </div>
+            <div className="wide-page-container" style={{padding: 0, background: 'none', boxShadow: 'none', minHeight: 'unset'}}>
+                <div className="form-field-vertical-container" style={{alignItems: 'center', justifyContent: 'space-between', width: '100%'}}>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+                        <div className="header-logo" onClick={() => navigate("/")}> 
+                            <FaMapMarkerAlt className="header-logo-icon" />
+                            <div className="header-logo-text">
+                                <span className="header-logo-text-main">{t('header.logo.main')}</span>
+                                <span className="header-logo-text-sub">{t('header.logo.sub')}</span>
                             </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="nav-center">
-                    <div className="nav-links">
-                        <button 
-                            className={`btn btn-ghost ${isActive("/") ? "active" : ""}`} 
-                            onClick={() => navigate("/")}
-                        >
-                            <FaHome />
-                            {t('header.home')}
-                        </button>
-                        <button 
-                            className={`btn btn-ghost ${isActive("/search-results") ? "active" : ""}`} 
-                            onClick={() => navigate("/search-results")}
-                        >
-                            <FaSearch />
-                            {t('header.search')}
-                        </button>
-                        <button 
-                            className={`btn btn-ghost ${isActive("/edit") ? "active" : ""}`} 
-                            onClick={() => navigate("/edit")}
-                        >
-                            <FaPlusCircle />
-                            {t('header.addBusiness')}
-                        </button>
-                        <button 
-                            className={`btn btn-ghost ${isActive("/suggest") ? "active" : ""}`} 
-                            onClick={() => navigate("/suggest")}
-                        >
-                            <FaLightbulb />
-                            {t('header.suggest')}
-                        </button>
-                    </div>
-                </div>
-
-                <div className="nav-left">
-                    {/* <div className="lang-switch">
-                        <label className="switch">
-                            <input
-                                type="checkbox"
-                                checked={i18n.language === 'en'}
-                                onChange={handleLanguageToggle}
-                            />
-                            <span className="slider">
-                                <span className="lang-label he">עב</span>
-                                <span className="lang-label en">EN</span>
-                            </span>
-                        </label>
-                    </div> */}
-
-                    {username ? (
-                        <div className="user-menu" ref={userMenuRef}>
-                            <button 
-                                className="btn btn-ghost" 
-                                onClick={() => setShowUserMenu(!showUserMenu)}
-                                ref={userButtonRef}
-                                aria-expanded={showUserMenu}
-                                aria-haspopup="true"
+                        </div>
+                        <div style={{ position: 'relative', display: 'inline-block' }}>
+                            <button
+                                onClick={() => setShowPopover(!showPopover)}
+                                className="btn btn-outline"
+                                title="המיקום שלי"
+                                type="button"
                             >
-                                <FaUserCircle />
-                                <span>{greeting} <span className="username">{username}</span></span>
+                                <FaMapMarkerAlt style={{ marginLeft: 6, fontSize: 18 }} />
+                                <span>המיקום שלי</span>
                             </button>
-                            {showUserMenu && (
-                                <div 
-                                    className="dropdown-menu"
-                                    role="menu"
-                                    aria-labelledby="user-menu-button"
-                                >
-                                    <button 
-                                        className="btn btn-ghost" 
-                                        onClick={() => handleMenuItemClick("/profile")}
-                                        role="menuitem"
-                                    >
-                                        <FaIdCard />
-                                        {"פרופיל אישי"}  
-                                    </button>
-                                    <button 
-                                        className="btn btn-ghost" 
-                                        onClick={() => handleMenuItemClick("/my-businesses")}
-                                        role="menuitem"
-                                    >
-                                        <FaStore />
-                                        {t('header.myBusinesses')}
-                                    </button>
-                                    <button 
-                                        className="btn btn-ghost" 
-                                        onClick={() => handleMenuItemClick("/my-favorites")}
-                                        role="menuitem"
-                                    >
-                                        <FaHeart />
-                                        {t('header.myFavorites')}
-                                    </button>
-                                    {isAdmin && (
-                                        <button 
-                                            className="btn btn-ghost" 
-                                            onClick={() => handleMenuItemClick("/admin")}
-                                            role="menuitem"
-                                        >
-                                            <FaCog />
-                                            {t('header.adminPanel')}
+                            {showPopover && (
+                                <div ref={popoverRef} className="location-popover">
+                                    <div className="popover-header">
+                                        <span>המיקום הנוכחי שלך</span>
+                                        <button className="btn btn-ghost btn-circle btn-sm" onClick={() => setShowPopover(false)}><FaTimes /></button>
+                                    </div>
+                                    <div className="popover-content">
+                                        {addressLoading || loading ? (
+                                            <span className="address-loading">טוען כתובת...</span>
+                                        ) : addressError ? (
+                                            <span className="address-error">{addressError}</span>
+                                        ) : address ? (
+                                            <span className="address-text">{formatAddress(address)}</span>
+                                        ) : (
+                                            <span className="address-error">לא נמצא מיקום</span>
+                                        )}
+                                    </div>
+                                    <div className="popover-actions">
+                                        <button className="btn btn-ghost" onClick={handleRefreshLocation} disabled={loading || addressLoading} title="רענן מיקום">
+                                            <FaSyncAlt className={loading ? 'spin' : ''} />
+                                            רענן מיקום
                                         </button>
-                                    )}
-                                    <button 
-                                        className="btn btn-ghost" 
-                                        onClick={handleLogout}
-                                        role="menuitem"
-                                    >
-                                        <FaSignOutAlt />
-                                        {t('header.logout')}
-                                    </button>
+                                    </div>
                                 </div>
                             )}
                         </div>
-                    ) : (
-                            <button className="btn btn-ghost" onClick={() => navigate("/auth")}>
+                    </div>
+                    <div style={{flex: 1, display: 'flex', justifyContent: 'center'}}>
+                        <div className="nav-links">
+                            <button 
+                                className={`btn btn-ghost ${isActive("/") ? "active" : ""}`} 
+                                onClick={() => navigate("/")}
+                            >
+                                <FaHome />
+                                {t('header.home')}
+                            </button>
+                            <button 
+                                className={`btn btn-ghost ${isActive("/search-results") ? "active" : ""}`} 
+                                onClick={() => navigate("/search-results")}
+                            >
+                                <FaSearch />
+                                {t('header.search')}
+                            </button>
+                            <button 
+                                className={`btn btn-ghost ${isActive("/edit") ? "active" : ""}`} 
+                                onClick={() => navigate("/edit")}
+                            >
+                                <FaPlusCircle />
+                                {t('header.addBusiness')}
+                            </button>
+                            <button 
+                                className={`btn btn-ghost ${isActive("/suggest") ? "active" : ""}`} 
+                                onClick={() => navigate("/suggest")}
+                            >
+                                <FaLightbulb />
+                                {t('header.suggest')}
+                            </button>
+                        </div>
+                    </div>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+                        {username ? (
+                            <div className="user-menu" ref={userMenuRef}>
+                                <button 
+                                    className="btn btn-ghost" 
+                                    onClick={() => setShowUserMenu(!showUserMenu)}
+                                    ref={userButtonRef}
+                                    aria-expanded={showUserMenu}
+                                    aria-haspopup="true"
+                                >
+                                    <FaUserCircle />
+                                    <span>{greeting} <span className="username">{username}</span></span>
+                                </button>
+                                {showUserMenu && (
+                                    <div 
+                                        className="dropdown-menu"
+                                        role="menu"
+                                        aria-labelledby="user-menu-button"
+                                    >
+                                        <button 
+                                            className="btn btn-ghost" 
+                                            onClick={() => handleMenuItemClick("/profile")}
+                                            role="menuitem"
+                                        >
+                                            <FaIdCard />
+                                            {"פרופיל אישי"}  
+                                        </button>
+                                        <button 
+                                            className="btn btn-ghost" 
+                                            onClick={() => handleMenuItemClick("/my-businesses")}
+                                            role="menuitem"
+                                        >
+                                            <FaStore />
+                                            {t('header.myBusinesses')}
+                                        </button>
+                                        <button 
+                                            className="btn btn-ghost" 
+                                            onClick={() => handleMenuItemClick("/my-favorites")}
+                                            role="menuitem"
+                                        >
+                                            <FaHeart />
+                                            {t('header.myFavorites')}
+                                        </button>
+                                        {isAdmin && (
+                                            <button 
+                                                className="btn btn-ghost" 
+                                                onClick={() => handleMenuItemClick("/admin")}
+                                                role="menuitem"
+                                            >
+                                                <FaCog />
+                                                {t('header.adminPanel')}
+                                            </button>
+                                        )}
+                                        <button 
+                                            className="btn btn-ghost" 
+                                            onClick={handleLogout}
+                                            role="menuitem"
+                                        >
+                                            <FaSignOutAlt />
+                                            {t('header.logout')}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <button className="btn btn-ghost" onClick={() => navigate("/auth")}> 
                                 <FaSignInAlt />
                                 הרשמה / כניסה
                             </button>
-                    )}
+                        )}
+                    </div>
                 </div>
-            </nav>
+            </div>
         </div>
     );
 };

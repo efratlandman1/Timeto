@@ -264,36 +264,8 @@
     --btn-color: var(--primary-color);
 }
 
-/* Clear All Button */
-.btn-clear-all {
-  background: #fff;
-  color: var(--primary-color);
-  border: 1.5px solid var(--primary-color);
-  border-radius: 999px;
-  font-weight: 500;
-  padding: 0.35em 1.2em 0.35em 0.9em;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
-}
 
-.btn-clear-all svg,
-.btn-clear-all i {
-  color: var(--primary-color);
-  font-size: 1.1em;
-  transition: color 0.2s;
-}
 
-.btn-clear-all:hover {
-  background: var(--primary-color);
-  color: #fff;
-  border-color: var(--primary-color);
-}
 
-.btn-clear-all:hover svg,
-.btn-clear-all:hover i {
-  color: #fff;
-}
 
 

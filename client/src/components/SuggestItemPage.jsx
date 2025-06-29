@@ -4,7 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import '../styles/SuggestItemPage.css';
+// import '../styles/SuggestItemPage.css';
 
 const SuggestItemPage = () => {
   const navigate = useNavigate();
@@ -83,7 +83,7 @@ const SuggestItemPage = () => {
     }
   };
 
-  const RequiredMark = () => <span style={{ color: '#d32f2f', marginRight: '4px' }}>*</span>;
+  const RequiredMark = () => <span className="required-mark">*</span>;
 
   return (
     <div className="narrow-page-container">
@@ -101,11 +101,11 @@ const SuggestItemPage = () => {
         </div>
 
         <form className="suggest-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">
+          <div className="form-field-container">
+            <label>
               סוג הצעה<RequiredMark />
             </label>
-            <div className="radio-group">
+            <div className="form-field-vertical-container">
               <label className="radio-label">
                 <input
                   type="radio"
@@ -129,8 +129,8 @@ const SuggestItemPage = () => {
             </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="name_he" className="form-label">
+          <div className="form-field-container">
+            <label htmlFor="name_he">
               שם בעברית<RequiredMark />
             </label>
             <input
@@ -144,8 +144,8 @@ const SuggestItemPage = () => {
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="name_en" className="form-label">
+          <div className="form-field-container">
+            <label htmlFor="name_en">
               שם באנגלית<RequiredMark />
             </label>
             <input
@@ -160,8 +160,8 @@ const SuggestItemPage = () => {
           </div>
 
           {formData.type === 'service' && categories.length > 0 && (
-            <div className="form-group">
-              <label htmlFor="parent_category_id" className="form-label">
+            <div className="form-field-container">
+              <label htmlFor="parent_category_id">
                 קטגוריית אב<RequiredMark />
               </label>
               <select
@@ -181,8 +181,8 @@ const SuggestItemPage = () => {
             </div>
           )}
 
-          <div className="form-group">
-            <label htmlFor="reason" className="form-label">
+          <div className="form-field-container">
+            <label htmlFor="reason">
               סיבה או תיאור קצר
             </label>
             <textarea

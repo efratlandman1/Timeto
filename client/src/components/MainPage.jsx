@@ -220,7 +220,7 @@ const MainPage = () => {
                                                 <>{stats.users > 0 && '+ '}{stats.users}</>
                                             )}
                                         </div>
-                                        <div className="stat-label">משתמשים רשומים</div>
+                                        <div className="center-label">משתמשים רשומים</div>
                                     </div>
                                 </div>
                                 <div className="stat-box">
@@ -233,7 +233,7 @@ const MainPage = () => {
                                                 <>{stats.reviews > 0 && '+ '}{stats.reviews}</>
                                             )}
                                         </div>
-                                        <div className="stat-label">ביקורות מאומתות</div>
+                                        <div className="center-label">ביקורות מאומתות</div>
                                     </div>
                                 </div>
                                 <div className="stat-box">
@@ -246,7 +246,7 @@ const MainPage = () => {
                                                 <>{stats.businesses > 0 && '+ '}{stats.businesses}</>
                                             )}
                                         </div>
-                                        <div className="stat-label">עסקים רשומים</div>
+                                        <div className="center-label">עסקים רשומים</div>
                                     </div>
                                 </div>
                             </div>
@@ -289,7 +289,7 @@ const MainPage = () => {
                             <h3>עסקים חדשים</h3>
                             <a href="/search-results?sort=newest" className="view-all">הצג הכל</a>
                         </div>
-                        <div className="card-slider">
+                        <div className="business-cards-container">
                             {newBusinesses.map((business) => (
                                 <BusinessCard key={business._id} business={business} />
                             ))}
@@ -301,7 +301,7 @@ const MainPage = () => {
                             <h3>פופולרי באזורך</h3>
                             <a href="/search-results?sort=popular_nearby" className="view-all">הצג הכל</a>
                         </div>
-                        <div className="card-slider">
+                        <div className="business-cards-container">
                             {popularBusinesses.map((business) => (
                                 <BusinessCard key={business._id} business={business} />
                             ))}
@@ -313,7 +313,7 @@ const MainPage = () => {
                             <h3>עסקים מומלצים</h3>
                             <a href="/search-results?sort=rating" className="view-all">הצג הכל</a>
                         </div>
-                        <div className="card-slider">
+                        <div className="business-cards-container">
                             {recommendedBusinesses.map((business) => (
                                 <BusinessCard key={business._id} business={business} />
                             ))}

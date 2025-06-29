@@ -8,69 +8,10 @@
   padding: 0 2rem;
 }
 
-/* Rating Stars */
-.rating-group {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.star-rating {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  margin: 1rem 0;
-}
-
-.star {
-  cursor: pointer;
-  color: #e0e0e0;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.star:hover {
-  transform: scale(1.1);
-}
-
-.star.filled {
-  color: #ffd700;
-}
-
-.rating-text {
-  color: #666;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
+/* Star rating styles moved to global ui-elements.css */
 
 /* Form Elements */
-.form-group {
-  margin-bottom: 1.25rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--text-color);
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-
-.feedback-page-textarea-input {
-  width: 100%;
-  padding: 0.875rem;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 0.9rem;
-  resize: vertical;
-  min-height: 100px;
-  font-family: inherit;
-  transition: all 0.2s ease;
-}
-
-.feedback-page-textarea-input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.1);
-}
+/* Remove duplicate .form-group and .form-group label - they are in global forms.css */
 
 /* Previous Feedbacks */
 .feedback-page-feedback-list {
@@ -118,19 +59,6 @@
   color: var(--text-light);
 }
 
-.feedback-page-feedback-stars {
-  display: flex;
-  gap: 0.25rem;
-  margin: 0.5rem 0;
-}
-
-.feedback-page-feedback-stars .star {
-  cursor: default;
-}
-
-.feedback-page-feedback-stars .star:hover {
-  transform: none;
-}
 
 .feedback-page-feedback-comment {
   color: var(--text-color);
@@ -138,31 +66,6 @@
   margin: 0;
   white-space: pre-line;
   font-size: 0.85rem;
-}
-
-/* Toast */
-.business-card-toast {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 500;
-  z-index: 1000;
-  animation: slideDown 0.3s ease;
-  font-size: 0.9rem;
-}
-
-@keyframes slideDown {
-  from {
-    transform: translate(-50%, -100%);
-    opacity: 0;
-  }
-  to {
-    transform: translate(-50%, 0);
-    opacity: 1;
-  }
 }
 
 /* Loader */
@@ -179,10 +82,6 @@
     font-size: 1.25rem;
     padding: 0 1.5rem;
     margin-bottom: 1.25rem;
-  }
-
-  .star {
-    font-size: 1.75rem;
   }
 
   .feedback-page-feedback-item {

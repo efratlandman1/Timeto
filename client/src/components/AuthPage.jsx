@@ -92,7 +92,7 @@ const AuthPage = () => {
                         <div className="spinner"></div>
                     </div>
                 )}
-                <div className="modal-content" style={{ opacity: isLoading ? 0.7 : 1 }}>
+                <div className="modal-content" /*style={{ opacity: isLoading ? 0.7 : 1 }}*/>
                     <button onClick={handleClose} className="btn btn-ghost btn-circle btn-sm btn-close">×</button>
                     <h2>בואו ניכנס</h2>
                     <p> הצטרפו עכשיו והתחילו לגלות דברים מעניינים סביבכם</p>
@@ -118,19 +118,17 @@ const AuthPage = () => {
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="כתובת מייל"
                                 required
-                                className="form-input"
                                 autoFocus
                             />
-                            <div className="password-input-wrapper">
+                            <div className="input-with-icon-container">
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="סיסמה"
                                     required
-                                    className="form-input"
                                 />
-                                <span onClick={() => setShowPassword(!showPassword)} className="password-toggle-icon">
+                                <span onClick={() => setShowPassword(!showPassword)} className="input-icon">
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
                             </div>

@@ -37,14 +37,14 @@ const ForgotPasswordPage = () => {
                     <div className="spinner"></div>
                 </div>
             )}
-            <div className="modal-content" style={{ opacity: isLoading ? 0.7 : 1 }}>
+            <div className="modal-content" /*style={{ opacity: isLoading ? 0.7 : 1 }}*/>
                 <Link to="/auth" className="btn btn-ghost btn-circle btn-sm">×</Link>
 
                 {message.type === 'success' ? (
                     <div className="success-view">
                         <h2>בקשה נשלחה!</h2>
                         <p>{message.text}</p>
-                        <Link to="/auth" className="btn btn-solid btn-primary" style={{textDecoration: 'none', marginTop: '1rem'}}>חזרה להתחברות</Link>
+                        <Link to="/auth" className="btn btn-solid btn-primary" /*style={{textDecoration: 'none', marginTop: '1rem'}}*/>חזרה להתחברות</Link>
                     </div>
                 ) : (
                     <>
@@ -53,7 +53,6 @@ const ForgotPasswordPage = () => {
                         <form className="email-form" onSubmit={handleSubmit}>
                             <div className="input-wrapper">
                                 <input
-                                    className="form-input"
                                     type="email"
                                     placeholder="אימייל"
                                     value={email}

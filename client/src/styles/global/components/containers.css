@@ -45,6 +45,15 @@
     margin: 0 auto;
 }
 
+.business-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 300px); /* גודל קבוע של 280px */
+  gap: 1.5rem;
+  padding: 1rem 0;
+  width: 100%;
+  /* justify-content: center;  */
+}
+
 /* Actions Container - for all main action buttons (modals & pages) */
 .actions-container {
   display: flex;
@@ -52,6 +61,60 @@
   gap: var(--spacing-md);
   margin-top: var(--spacing-lg);
 }
+
+/* Form Field Container - for organizing individual form fields (label + input) */
+.form-field-container {
+  margin-bottom: var(--spacing-lg, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field-vertical-container {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+.input-with-icon-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  
+  }
+
+.active-filters-container {
+    display: flex;
+    gap: 8px;
+  }
+
+  .star-rating-container {
+    display: flex;
+    gap: 0.2rem;
+    justify-content: center;
+    direction: rtl;
+    /* margin: 1rem 0; */
+  }
+  .logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  } 
+  .start-container {
+    align-items: flex-start;
+  }
+  .ltr-container {
+    direction: ltr;
+  }
+  .time-range-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0.5rem 0;
+  }
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -66,4 +129,8 @@
         margin: 0;
         border-radius: 0;
     }
-} 
+
+
+
+
+}

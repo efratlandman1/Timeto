@@ -251,7 +251,7 @@ const SearchResultPage = () => {
                                     <FaSort />
                                 </button>
                                 {showSortDropdown && (
-                                    <div className="sort-dropdown">
+                                    <div className="dropdown-menu">
                                         {Object.entries(SORT_OPTIONS).map(([value, label]) => (
                                             <button
                                                 key={value}
@@ -283,46 +283,68 @@ const SearchResultPage = () => {
                 </div>
 
                 {(sortOption === 'distance' || sortOption === 'popular_nearby') && !userLocation && !locationError && (
-                    <div style={{ color: 'gray', margin: '1rem 0', textAlign: 'center' }}>טוען מיקום...</div>
+                    <div className="location-result-loading-message">טוען מיקום...</div>
                 )}
                 {locationError && (sortOption === 'distance' || sortOption === 'popular_nearby') && (
-                    <div style={{ color: 'red', margin: '1rem 0', textAlign: 'center' }}>{locationError}</div>
+                    <div className="location-result-error-message">{locationError}</div>
                 )}
 
                 {Object.keys(activeFilters).length > 0 && (
                     <div className="filters-area">
                         <div className="filters-header">
                             <div className="filters-title">סינונים פעילים:</div>
-                            <button 
-                                className="btn-clear-all"
-                                onClick={handleClearFilters}
-                            >
-                                נקה הכל
-                                <FaTimes />
-                            </button>
+                            <div className="tag">
+                                <span>נקה הכל</span>
+                                <button 
+                                    className="btn-filter-remove"
+                                    onClick={handleClearFilters}
+                                    aria-label="נקה הכל"
+                                    type="button"
+                                >
+                                    <FaTimes />
+                                </button>
+                            </div>
                         </div>
-
                         <div className="active-filters-container">
+                            <div className="filter-tag-clearall-space">
+                                {/* <span>נקה הכל</span>
+                                <button
+                                    className="btn-filter-remove"
+                                    onClick={handleClearFilters}
+                                    aria-label="נקה הכל"
+                                    type="button"
+                                >
+                                    <FaTimes />
+                                </button> */}
+                            </div>
                             {Object.entries(activeFilters).map(([key, value]) => (
                                 Array.isArray(value) ? (
                                     value.map((v, idx) => (
-                                        <div key={`${key}-${idx}`} className="filter-tag">
+                                        <div key={`${key}-${idx}`} className="tag">
                                             {key === 'categoryName' ? `קטגוריה: ${v}` :
                                              key === 'rating' ? `${v} כוכבים ומעלה` :
                                              key === 'services' ? `שירות: ${v}` :
                                              key === 'maxDistance' ? `עד מרחק של: ${v} ק"מ` : v}
-                                            <button className="btn btn-ghost btn-circle btn-sm" onClick={() => handleRemoveFilter(key, v)}>
+                                            <button
+                                                className="btn-filter-remove"
+                                                onClick={() => handleRemoveFilter(key, v)}
+                                                aria-label="הסר פילטר"
+                                            >
                                                 <FaTimes />
                                             </button>
                                         </div>
                                     ))
                                 ) : (
-                                    <div key={key} className="filter-tag">
+                                    <div key={key} className="tag">
                                         {key === 'categoryName' ? `קטגוריה: ${value}` :
                                          key === 'rating' ? `${value} כוכבים ומעלה` :
                                          key === 'services' ? `שירות: ${value}` :
                                          key === 'maxDistance' ? `עד מרחק של: ${value} ק"מ` : value}
-                                        <button className="btn btn-ghost btn-circle btn-sm" onClick={() => handleRemoveFilter(key)}>
+                                        <button
+                                            className="btn-filter-remove"
+                                            onClick={() => handleRemoveFilter(key)}
+                                            aria-label="הסר פילטר"
+                                        >
                                             <FaTimes />
                                         </button>
                                     </div>
@@ -334,8 +356,7 @@ const SearchResultPage = () => {
 
                 {/* תוצאות חיפוש */}
                 {businesses.length > 0 && (
-                    <div className="search-results-layout">
-                        <div className="business-cards-grid">
+                        <div className="business-cards-container">
                             {businesses.map((business, index) => {
                                 if (businesses.length === index + 1) {
                                     return (
@@ -348,7 +369,6 @@ const SearchResultPage = () => {
                                 }
                             })}
                         </div>
-                    </div>
                 )}
 
                 {/* לוודר */}

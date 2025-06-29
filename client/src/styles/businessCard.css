@@ -1,28 +1,18 @@
-/* Modern Business Card Styles */
-.business-cards-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-  padding: 0 24px;
-  width: 100%;
-  box-sizing: border-box;
-}
+/* =====================
+   Business Card Component Styles
+   ===================== */
+
 
 .business-card {
-  width: 100%;
-  max-width: 100%;
-  position: relative;
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  height: 280px;
   display: flex;
   flex-direction: column;
-  cursor: pointer;
+  height: 320px;
+  position: relative;
 }
 
 .business-card:hover {
@@ -105,28 +95,6 @@
   max-width: calc(100% - 20px);
 }
 
-/* Unused classes - can be removed */
-/* .business-card-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  font-size: 0.85rem;
-  color: #737373;
-}
-
-.price-range {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.delivery-time {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-} */
-
 .business-card-footer {
   margin-top: auto;
   display: flex;
@@ -142,17 +110,7 @@
   gap: 6px;
 }
 
-.rating-stars {
-  color: #ffd700;
-  display: flex;
-  gap: 1px;
-  font-size: 0.85rem;
-}
-
-.rating-number {
-  font-size: 0.85rem;
-  color: #737373;
-}
+/* Rating styles moved to global ui-elements.css */
 
 .business-card-actions {
   display: flex;
@@ -207,16 +165,8 @@
   pointer-events: none;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .business-cards-container {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
+
 @media (max-width: 768px) {
-  .business-cards-container {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
   .business-card {
     height: auto;
   }

@@ -8,7 +8,7 @@
   margin: 0 auto;
   position: relative;
 }
-
+/* 
 .search-input-wrapper {
   position: relative;
   width: 100%;
@@ -37,7 +37,7 @@
   outline: none;
   border-color: #ff4d4d;
   box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.2);
-}
+} */
 
 .search-icon {
   position: absolute;
@@ -50,57 +50,9 @@
   z-index: 2;
 }
 
-/* Dropdown styles */
-.search-results-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  right: 0;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  max-height: 400px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  z-index: 1000;
-  border: 1px solid #e2e8f0;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 #f8fafc;
-  padding: 0;
-  margin: 0;
-}
+/* Dropdown styles - העיצוב מוגדר גלובלית ב-ui-elements.css */
 
-.search-results-dropdown::-webkit-scrollbar {
-  width: 8px;
-}
-
-.search-results-dropdown::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 4px;
-}
-
-.search-results-dropdown::-webkit-scrollbar-thumb {
-  background-color: #ff4d4d;
-  border-radius: 4px;
-  border: 2px solid #f0f0f0;
-}
-
-.search-result-item {
-  padding: 16px;
-  cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
-  transition: all 0.2s ease;
-}
-
-.search-result-item:last-child {
-  border-bottom: none;
-}
-
-.search-result-item:hover,
-.search-result-item.highlighted {
-  background-color: #f8fafc;
-}
-
+/* Business info styling - עיצוב ספציפי לתוכן */
 .search-result-header {
   display: flex;
   flex-direction: column;
@@ -130,8 +82,8 @@
 
 /* Fix highlighted text spacing */
 .business-name strong,
-.business-address strong,
-.tag strong {
+.business-address strong
+{
   color: #ff4d4d;
   font-weight: 600;
   display: inline;
@@ -140,27 +92,6 @@
   padding: 0;
 }
 
-/* Tags styling */
-.business-tags {
-  display: inline-flex;
-  flex-direction: row;
-  gap: 6px;
-  align-items: center;
-  justify-content: flex-end;
-  flex-shrink: 0;
-}
-
-.tag {
-  font-size: 12px;
-  color: #64748b;
-  padding: 2px 8px;
-  background: #f1f5f9;
-  border-radius: 4px;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  text-align: right;
-}
 
 .business-services {
   display: flex;
@@ -318,7 +249,7 @@ body.blurred::before {
   margin: 2rem auto;
   padding: 0 1.5rem;
 }
-
+/* 
 .search-bar-wrapper {
   background: white;
   border-radius: 16px;
@@ -333,7 +264,7 @@ body.blurred::before {
 .search-bar-wrapper:focus-within {
   border-color: #d32f2f;
   box-shadow: 0 8px 30px rgba(211, 47, 47, 0.15);
-}
+} */
 
 /* Search input and icon container */
 .search-input-container {
@@ -345,7 +276,7 @@ body.blurred::before {
   position: relative;
 }
 
-.search-input {
+/* .search-input {
   width: 100%;
   padding: 14px 48px 14px 16px;
   font-size: 16px;
@@ -356,20 +287,20 @@ body.blurred::before {
   transition: all 0.2s ease;
   text-align: right;
   direction: rtl;
-}
+} */
 
-.main-page .search-input {
+/* .main-page .search-input {
   font-size: 1.2rem;
   text-indent: 2.5rem;
-}
+} */
 
-.search-input:focus {
+/* .search-input:focus {
   outline: none;
 }
 
 .search-input::placeholder {
   color: #a0a0a0;
-}
+} */
 
 .search-icon {
   position: absolute;
@@ -394,9 +325,9 @@ body.blurred::before {
 
 
 /* Main page specific styles */
-.main-page .search-bar-wrapper {
+/* .main-page .search-bar-wrapper {
   padding: 1.5rem;
-}
+} */
 
 /* Results page specific styles */
 .results-page .search-bar-container {
@@ -415,17 +346,17 @@ body.blurred::before {
     gap: 0.75rem;
   }
 
-  .main-page .search-bar-wrapper {
+  /* .main-page .search-bar-wrapper {
     padding: 1rem;
-  }
+  } */
 
-  .search-input {
+  /* .search-input {
     font-size: 1rem;
-  }
+  } */
 
-  .main-page .search-input {
+  /* .main-page .search-input {
     font-size: 1.1rem;
-  }
+  } */
 
   .search-icon {
     font-size: 1.2rem;
@@ -455,14 +386,14 @@ body.blurred::before {
 }
 
 /* Make sure all highlighted text has consistent spacing */
-.search-result-item strong {
+/* .search-result-item strong {
   color: #ff4d4d;
   font-weight: 600;
   display: inline;
   margin: 0;
   padding: 0;
   white-space: pre-wrap;
-}
+} */
 
 /* Scroll observer */
 .scroll-observer {

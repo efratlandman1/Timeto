@@ -125,57 +125,9 @@
     padding: 1.5rem;
 }
 
-.form-group {
-    margin-bottom: 1.5rem;
-}
 
-.form-group:last-child {
-    margin-bottom: 0;
-}
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #333;
-    font-weight: 500;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: #ff4d4d;
-    box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.1);
-}
-
-.form-group textarea {
-    min-height: 100px;
-    resize: vertical;
-}
-
-.logo-upload {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.logo-preview {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 8px;
-}
+/* Logo styles moved to global ui-elements.css */
 
 /* Loading Spinner */
 .loading-spinner {
@@ -279,13 +231,6 @@
     margin-bottom: 20px;
 }
 
-.search-input {
-    flex-grow: 1;
-    padding: 8px 12px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-}
-
 .tree-button {
     background-color: #007bff;
     color: white;
@@ -318,17 +263,6 @@
 .tree-node {
     margin-right: 20px;
     margin-left: 0;
-}
-
-.tree-node-label {
-    cursor: pointer;
-    padding: 5px;
-    display: flex;
-    align-items: center;
-}
-
-.tree-node-label:hover {
-    background-color: #eee;
 }
 
 .tree-node-content {

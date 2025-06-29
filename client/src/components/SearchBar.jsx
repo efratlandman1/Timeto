@@ -278,7 +278,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
 
     return (
       <ul 
-        className="search-results-dropdown" 
+        className="dropdown-menu" 
         ref={listRef}
         role="listbox"
         aria-label="תוצאות חיפוש"
@@ -319,7 +319,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
                         {renderHighlightedText(business.address)}
                       </div>
                     </div>
-                    <div className="business-tags">
+                    <div className="form-field-vertical-container">
                       {business.categoryName && (
                         <span className="tag">
                           {renderHighlightedText(business.categoryName)}
@@ -365,29 +365,30 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
       ref={wrapperRef}
     >
       <form onSubmit={handleSubmit} className="search-bar-wrapper">
-        <input
-          ref={inputRef}
-          type="text"
-          className="search-input"
-          placeholder="חפש עסק או שירות..."
-          value={searchQuery}
-          onChange={handleInputChange}
-          onFocus={() => {
-            if (isMainPage || document.activeElement === inputRef.current) {
-              setShowDropdown(results.length > 0);
-            }
-          }}
-          onKeyDown={handleKeyDown}
-          aria-expanded={showDropdown}
-          aria-controls="search-results"
-          aria-autocomplete="list"
-          role="combobox"
-        />
-        <FaSearch 
-          className="search-icon"
-          onClick={handleSubmit}
-          aria-label="חפש"
-        />
+        <div className="input-with-icon-container">
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="חפש עסק או שירות..."
+            value={searchQuery}
+            onChange={handleInputChange}
+            onFocus={() => {
+              if (isMainPage || document.activeElement === inputRef.current) {
+                setShowDropdown(results.length > 0);
+              }
+            }}
+            onKeyDown={handleKeyDown}
+            aria-expanded={showDropdown}
+            aria-controls="search-results"
+            aria-autocomplete="list"
+            role="combobox"
+          />
+          <FaSearch 
+            className="input-icon"
+            onClick={handleSubmit}
+            aria-label="חפש"
+          />
+        </div>
       </form>
       {renderSearchResults()}
     </div>

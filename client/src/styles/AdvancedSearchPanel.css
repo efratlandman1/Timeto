@@ -89,118 +89,20 @@
 }
 
 /* Sort Select */
-.sort-select {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #333;
-  background-color: white;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: left 12px center;
-  padding-left: 32px;
-  direction: rtl;
-}
-
-.sort-select:focus {
-  outline: none;
-  border-color: #ff4d4d;
-  box-shadow: 0 0 0 1px #ff4d4d;
-}
-
-.sort-select option {
-  padding: 8px;
-  direction: rtl;
-}
+/* העיצוב מוגדר גלובלית ב-ui-elements.css */
 
 /* Remove old sort styles */
 .sort-list {
   display: none;
 }
 
-.sort-option {
-  display: none;
-}
 
-/* Rating Options */
-.rating-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
 
-.rating-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
-}
-
-.rating-option:hover {
-  background-color: #f8f9fa;
-}
-
-.rating-option.selected {
-  border-color: #ff4d4d;
-  background-color: #fff;
-}
-
-.rating-option.selected .rating-stars {
-  color: #ffd700;
-}
-
-.rating-stars {
-  color: #ffd700;
-  display: flex;
-  gap: 2px;
-}
-
-.rating-text {
-  font-size: 14px;
-  color: #444;
-}
-
-.rating-option.selected .rating-text {
-  color: #ff4d4d;
-  font-weight: 500;
-}
+/* Rating and tag styles moved to global ui-elements.css */
 
 /* Category Select */
-.category-select {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #333;
-  background-color: white;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: left 12px center;
-  padding-left: 32px;
-}
-
-.category-select:focus {
-  outline: none;
-  border-color: #ff4d4d;
-}
-
-.category-select option {
-  padding: 8px;
-}
-
+/* העיצוב מוגדר גלובלית ב-ui-elements.css */
+/* 
 .selected-categories {
   display: flex;
   flex-wrap: wrap;
@@ -217,9 +119,9 @@
   border-radius: 4px;
   font-size: 13px;
   color: #444;
-}
+} */
 
-.selected-category button {
+/* .selected-category button {
   background: none;
   border: none;
   color: #666;
@@ -232,7 +134,7 @@
 
 .selected-category button:hover {
   color: #ff4d4d;
-}
+} */
 
 /* Panel Footer (Mobile) */
 .panel-footer {
@@ -257,27 +159,5 @@
 .apply-filters-button:hover {
   background: #ff3333;
   transform: translateY(-1px);
-}
-
-/* Active Filter Tags */
-.active-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.clear-all-filters {
-  background: none;
-  border: none;
-  color: #ff4d4d;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 6px 12px;
-  margin-right: auto;
-}
-
-.clear-all-filters:hover {
-  text-decoration: underline;
 }
 

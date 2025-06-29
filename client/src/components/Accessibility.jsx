@@ -99,7 +99,7 @@ const Accessibility = () => {
             </h2>
 
             <div className="accessibility-options">
-              <div className="option-group">
+              <div className="form-field-vertical-container">
                 <h3><FaFont /> גודל טקסט</h3>
                 <div className="button-group">
                   <button 
@@ -123,7 +123,7 @@ const Accessibility = () => {
                 </div>
               </div>
 
-              <div className="option-group">
+              <div className="form-field-vertical-container">
                 <h3><FaAdjust /> ניגודיות</h3>
                 <div className="button-group">
                   <button 
@@ -141,7 +141,7 @@ const Accessibility = () => {
                 </div>
               </div>
 
-              <div className="option-group">
+              <div className="form-field-vertical-container">
                 <h3><FaMousePointer /> גודל סמן</h3>
                 <div className="button-group">
                   <button 
@@ -159,7 +159,7 @@ const Accessibility = () => {
                 </div>
               </div>
 
-              <div className="option-group">
+              <div className="form-field-vertical-container">
                 <h3><FaAlignRight /> יישור טקסט</h3>
                 <div className="button-group">
                   <button 
@@ -183,7 +183,7 @@ const Accessibility = () => {
                 </div>
               </div>
 
-              <div className="option-group">
+              <div className="form-field-vertical-container">
                 <h3><FaKeyboard /> ניווט מקלדת</h3>
                 <div className="button-group">
                   <button 
@@ -194,10 +194,11 @@ const Accessibility = () => {
                   </button>
                 </div>
               </div>
-
-              <button className="btn btn-solid btn-primary" onClick={resetSettings}>
-                אפס הגדרות
-              </button>
+              <div className="actions-container">
+                  <button className="btn btn-solid btn-primary" onClick={resetSettings}>
+                    אפס הגדרות
+                  </button>
+             </div>
             </div>
           </div>
         </div>

@@ -50,7 +50,7 @@
     transition: width 0.4s ease-in-out;
 }
 
-.edit-business-progress-step {
+.progress-step {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -61,9 +61,10 @@
     transition: all 0.3s ease;
 }
 
-.edit-business-progress-step:hover {
+.progress-step:hover {
     transform: translateY(-2px);
 }
+
 
 .edit-business-progress-circle {
     width: 40px;
@@ -88,19 +89,6 @@
     box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
 }
 
-.edit-business-step-label {
-    font-size: 14px;
-    color: #666;
-    font-weight: 500;
-    user-select: none;
-    transition: all 0.3s ease;
-}
-
-.edit-business-progress-step.active .edit-business-step-label {
-    color: #d32f2f;
-    font-weight: 600;
-}
-
 .edit-business-navigation-buttons {
     display: flex;
     justify-content: center;
@@ -113,67 +101,6 @@
     to { transform: rotate(360deg); }
 }
 
-/* Toast Customization */
-.Toastify__toast-container {
-    width: auto !important;
-    min-width: 300px;
-    max-width: 400px;
-}
-
-.Toastify__toast {
-    margin: 8px;
-    padding: 16px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    font-family: inherit;
-    background: white;
-    color: #333;
-    border: 1px solid #eee;
-}
-
-.Toastify__toast--success {
-    background: #f6ffed;
-    border: 1px solid #b7eb8f;
-    color: #52c41a;
-}
-
-.Toastify__toast--error {
-    background: #fff2f0;
-    border: 1px solid #ffccc7;
-    color: #ff4d4f;
-}
-
-.Toastify__toast-body {
-    padding: 0;
-    margin: 0;
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-.Toastify__progress-bar {
-    height: 3px;
-    opacity: 0.8;
-}
-
-.Toastify__progress-bar--success {
-    background: linear-gradient(90deg, #52c41a, #73d13d);
-}
-
-.Toastify__progress-bar--error {
-    background: linear-gradient(90deg, #ff4d4f, #ff7875);
-}
-
-.Toastify__close-button {
-    color: inherit;
-    opacity: 0.6;
-}
-
-.Toastify__close-button:hover {
-    opacity: 1;
-}
-
-
-
 /* Responsive Design */
 @media (max-width: 768px) {
     
@@ -184,10 +111,4 @@
   
 }
 
-/* Input Focus States */
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-    border-color: #d32f2f !important;
-    box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15) !important;
-}
+/* Remove duplicate form focus styles - they are in global forms.css */

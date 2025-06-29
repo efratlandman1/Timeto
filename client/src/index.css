@@ -30,7 +30,7 @@ a, button, [role="button"], input[type="submit"], input[type="button"], input[ty
 }
 
 input[type="text"], input[type="password"], input[type="email"], input[type="tel"],
-textarea, select {
+textarea {
   cursor: text;
 }
 

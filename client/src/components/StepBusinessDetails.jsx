@@ -58,12 +58,12 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
         : URL.createObjectURL(businessData.logo))
     : null;
 
-  const RequiredMark = () => <span style={{ color: 'red', marginLeft: 4 }}> * </span>;
+  const RequiredMark = () => <span className="required-mark"> * </span>;
 
   return (
     <div className="step-business-details">
-      <div className="form-group">
-        <label htmlFor="name" className="form-label">
+      <div className="form-field-container">
+        <label htmlFor="name">
           שם העסק<RequiredMark />
         </label>
         <input
@@ -72,13 +72,12 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
           name="name"
           value={businessData.name || ''}
           onChange={handleChange}
-          className="form-input"
           required
         />
       </div>
 
-      <div className="form-group">
-        <label htmlFor="address" className="form-label">
+      <div className="form-field-container">
+        <label htmlFor="address">
           כתובת<RequiredMark />
         </label>
         <Autocomplete
@@ -91,25 +90,23 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
             name="address"
             value={businessData.address || ''}
             onChange={handleChange}
-            className="form-input"
             required
           />
         </Autocomplete>
       </div>
 
-      <div className="form-group" style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-        <label htmlFor="phonePrefix" className="form-label" style={{ flexShrink: 0, marginTop: '6px' }}>
+      <div className="form-field-container start-container">
+        <label htmlFor="phonePrefix">
           טלפון<RequiredMark />
         </label>
 
-        <div style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: "ltr" }}>
+        <div className="active-filters-container ltr-container">
           <select
             id="phonePrefix"
             name="prefix"
             value={businessData.prefix || ''}
             onChange={handleChange}
-            className="form-input"
-            style={{ width: '80px', textAlign: 'center' }}
+            className="narrow-select"
             required
           >
             {phonePrefixes.map(prefix => (
@@ -123,16 +120,14 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
             name="phone"
             value={businessData.phone || ''}
             onChange={handleChange}
-            className="form-input"
-            style={{ flexGrow: 1 }}
             inputMode="numeric"
             maxLength={7}
           />
         </div>
       </div>
 
-      <div className="form-group">
-        <label htmlFor="email" className="form-label">
+      <div className="form-field-container">
+        <label htmlFor="email">
           כתובת דואר אלקטרונית<RequiredMark />
         </label>
         <input
@@ -141,13 +136,12 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
           name="email"
           value={businessData.email || ''}
           onChange={handleChange}
-          className="form-input"
           required
         />
       </div>
 
-      <div className="form-group">
-        <label htmlFor="categoryId" className="form-label">
+      <div className="form-field-container">
+        <label htmlFor="categoryId">
           תחום שירות<RequiredMark />
         </label>
         <select
@@ -155,7 +149,6 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
           name="categoryId"
           value={businessData.categoryId || ''}
           onChange={handleChange}
-          className="form-select"
           required
         >
           <option value="">בחר תחום</option>
@@ -165,53 +158,55 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
         </select>
       </div>
 
-      <div className="form-group">
-        <label htmlFor="description" className="form-label">תיאור העסק</label>
+      <div className="form-field-container">
+        <label htmlFor="description">תיאור העסק</label>
         <input
           type="text"
           id="description"
           name="description"
           value={businessData.description || ''}
           onChange={handleChange}
-          className="form-input"
         />
       </div>
 
-      <div className="form-group-logo">
-        <label htmlFor="logo" className="btn btn-dashed btn-primary">
-          <FaUpload className="icon" />
-          {'בחירת לוגו'}
-          <input
-            type="file"
-            id="logo"
-            name="logo"
-            onChange={handleChange}
-            style={{ display: 'none' }}
-            accept="image/*"
-          />
-        </label>
-
-        {logoPreviewUrl && (
-          <div className="logo-preview-wrapper">
-            <img
-              src={logoPreviewUrl}
-              alt="תצוגת לוגו"
-              className="business-logo-preview"
-              onLoad={() => {
-                if (typeof businessData.logo !== 'string') {
-                  URL.revokeObjectURL(logoPreviewUrl);
-                }
-              }}
+      <div className="form-field-container">
+        <label htmlFor="logo">לוגו העסק</label>
+        <div className="logo-container">
+          <label htmlFor="logo" className="btn btn-dashed btn-primary">
+            <FaUpload  />
+            {'בחירת לוגו'}
+            <input
+              type="file"
+              id="logo"
+              name="logo"
+              onChange={handleChange}
+              className="file-input-hidden"
+              accept="image/*"
             />
-            <button
-              className="btn btn-solid btn-delete btn-circle btn-sm remove-logo-button"
-              onClick={removeLogo}
-              title="הסר לוגו"
-            >
-              &times;
-            </button>
-          </div>
-        )}
+          </label>
+
+          {logoPreviewUrl && (
+            <div className="logo-preview-wrapper">
+              <img
+                src={logoPreviewUrl}
+                alt="תצוגת לוגו"
+                className="logo-preview"
+                onLoad={() => {
+                  if (typeof businessData.logo !== 'string') {
+                    URL.revokeObjectURL(logoPreviewUrl);
+                  }
+                }}
+              />
+              <button
+                className="btn btn-solid btn-delete btn-circle btn-sm remove-logo-button"
+                onClick={removeLogo}
+                title="הסר לוגו"
+              >
+                &times;
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

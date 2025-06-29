@@ -136,21 +136,19 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
 
   const renderStarRating = () => {
     return (
-      <div className="rating-selector">
-        <div className="rating-stars-row">
-          <div className="stars-wrapper">
+     
+          <div className="star-rating-container">
             {[1, 2, 3, 4, 5].map((star) => (
               <FaStar
                 key={star}
-                className={`rating-star ${star <= (hoveredRating || rating) ? 'active' : ''}`}
+                className={`star ${star <= (hoveredRating || rating) ? 'filled' : ''}`}
                 onClick={() => setRating(star === rating ? 0 : star)}
                 onMouseEnter={() => setHoveredRating(star)}
                 onMouseLeave={() => setHoveredRating(0)}
               />
             ))}
           </div>
-        </div>
-      </div>
+
     );
   };
 
@@ -164,7 +162,7 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
         </button>
         <h2>חיפוש מורחב</h2>
         
-          <div className="form-group">
+          <div className="form-field-container">
             <label>קטגוריה</label>
             <select
               value={selectedCategory}
@@ -178,9 +176,9 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
           </div>
 
           {services.length > 0 && (
-            <div className="form-group tags-section">
+            <div className="form-field-container">
               <label>שירותים</label>
-              <div className="tags-container">
+              <div className="form-field-vertical-container">
                 {services.map((service) => (
                   <div
                     key={service._id}
@@ -194,12 +192,12 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
             </div>
           )}
 
-          <div className="form-group">
+          <div className="form-field-container">
             <label>דירוג מינימלי</label>
             {renderStarRating()}
           </div>
 
-          <div className="form-group">
+          <div className="form-field-container">
             <label htmlFor="distance-slider">מרחק מקסימלי (ק"מ)</label>
             <div className="distance-slider-row">
               <input

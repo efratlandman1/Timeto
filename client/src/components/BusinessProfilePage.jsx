@@ -118,8 +118,8 @@ const BusinessProfilePage = () => {
               <div className="contact-icon">
                 <FaMapMarkerAlt />
               </div>
-              <span className="contact-label">כתובת</span>
-              <span className="contact-value">{business.address}</span>
+              <span >כתובת</span>
+              <span >{business.address}</span>
             </a>
           </div>
           
@@ -128,8 +128,8 @@ const BusinessProfilePage = () => {
               <div className="contact-icon">
                 <FaPhoneAlt />
               </div>
-              <span className="contact-label">טלפון</span>
-              <span className="contact-value">{business.phone}</span>
+              <span>טלפון</span>
+              <span>{business.phone}</span>
             </a>
           </div>
 
@@ -140,8 +140,8 @@ const BusinessProfilePage = () => {
               <div className="contact-icon">
                 <FaWhatsapp />
               </div>
-              <span className="contact-label">WhatsApp</span>
-              <span className="contact-value">{business.phone}</span>
+              <span>WhatsApp</span>
+              <span>{business.phone}</span>
             </a>
           </div>
 
@@ -151,8 +151,8 @@ const BusinessProfilePage = () => {
                 <div className="contact-icon">
                   <FaEnvelope />
                 </div>
-                <span className="contact-label">אימייל</span>
-                <span className="contact-value">{business.email}</span>
+                <span>אימייל</span>
+                <span>{business.email}</span>
               </a>
             </div>
           )}
@@ -193,9 +193,9 @@ const BusinessProfilePage = () => {
             <FaTags />
             <h3 className="info-card-title">שירותים</h3>
           </div>
-          <div className="services-grid">
+          <div className="form-field-vertical-container">
             {business.services?.map((service, index) => (
-              <div key={index} className="service-tag">
+              <div key={index} className="tag">
                 {service.name}
               </div>
             ))}
@@ -218,20 +218,20 @@ const BusinessProfilePage = () => {
             {averageRating !== null && averageRating !== undefined ? (
               <>
                 <div className="stat-number">{roundRating(averageRating)}</div>
-                <div className="rating-stars">{renderRatingStars(averageRating)}</div>
-                <div className="stat-label">דירוג ממוצע</div>
+                <div className="star-rating-container">{renderRatingStars(averageRating)}</div>
+                <div className="center-label">דירוג ממוצע</div>
               </>
             ) : (
               <>
                 <div className="stat-number">-</div>
-                <div className="rating-stars">{renderRatingStars(0)}</div>
-                <div className="stat-label">אין דירוג עדיין</div>
+                <div className="star-rating-container">{renderRatingStars(0)}</div>
+                <div className="center-label">אין דירוג עדיין</div>
               </>
             )}
           </div>
           <div className="stat-card">
             <div className="stat-number">{totalReviews}</div>
-            <div className="stat-label">סך הכל ביקורות</div>
+            <div className="center-label">סך הכל ביקורות</div>
           </div>
         </div>
 
@@ -254,9 +254,7 @@ const BusinessProfilePage = () => {
                   </span>
                 </div>
                 <div className="feedback-rating">
-                  <div className="stars">
                     {renderRatingStars(feedback.rating)}
-                  </div>
                 </div>
                 <div className={`feedback-comment ${isExpanded ? 'expanded' : ''}`}>
                   {comment}
