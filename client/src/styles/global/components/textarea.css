@@ -1,0 +1,21 @@
+/* =====================
+   Textarea Elements
+   ===================== */
+
+textarea {
+  width: 100%;
+  padding: 0.875rem;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--primary-color, #ff4d4d);
+  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.1);
+} 

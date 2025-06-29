@@ -1,0 +1,71 @@
+/* =====================
+   Dropdown Elements
+   ===================== */
+
+/* Global Dropdown Styling - עיצוב אחיד לכל dropdown elements */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  z-index: 1000;
+  padding: 0;
+  margin: 0;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  text-align: right;
+  direction: rtl;
+}
+
+/* Dropdown items styling */
+.dropdown-menu .btn-ghost,
+.dropdown-menu .search-result-item {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  color: var(--text-primary, #222);
+  font-size: 1rem;
+  text-align: right;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+  justify-content: flex-start ;
+  
+}
+
+.dropdown-menu .btn-ghost:hover,
+.dropdown-menu .search-result-item:hover,
+.dropdown-menu .search-result-item.highlighted {
+  background-color: #f8fafc;
+  color: #ff4d4d;
+}
+
+.dropdown-menu .btn-ghost.active,
+.dropdown-menu .btn-ghost.selected {
+  background-color: #fff0f0;
+  color: #ff4d4d;
+  font-weight: 600;
+}
+
+/* Dropdown scrollbar styling */
+.dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+  background-color: #ff4d4d;
+  border-radius: 4px;
+  border: 2px solid #f0f0f0;
+} 

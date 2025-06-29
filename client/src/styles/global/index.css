@@ -8,7 +8,16 @@
 @import './components/containers.css';
 @import './components/modals.css';
 @import './components/toasts.css';
-@import './components/ui-elements.css';
+@import './components/general.css';
+
+/* Import UI Component Styles */
+@import './components/select.css';
+@import './components/dropdown.css';
+@import './components/star.css';
+@import './components/tag.css';
+@import './components/logo.css';
+@import './components/label.css';
+@import './components/textarea.css';
 
 /* Reset and Base Styles */
 * {

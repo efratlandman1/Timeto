@@ -1,0 +1,26 @@
+/* =====================
+   Star Rating Elements
+   ===================== */
+
+.star {
+  cursor: pointer;
+  color: #e0e0e0;
+  transition: color 0.2s ease, transform 0.2s ease;
+  font-size: 1.5rem;
+}
+
+.star:hover {
+  transform: scale(1.1);
+}
+
+.star.filled {
+  color: #ffd700;
+}
+
+.star.filled svg {
+  color: #ffd700;
+}
+
+.star svg {
+  color: #e0e0e0;
+} 

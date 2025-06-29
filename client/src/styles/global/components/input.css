@@ -1,0 +1,40 @@
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]) {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: #f9f9f9;
+    color: var(--text-primary, #222);
+    text-align: right;
+    
+  }
+  
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):focus {
+    outline: none;
+    border-color: #ff4d4d;
+    box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.1);
+    background: white;
+  }
+  
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"])::placeholder {
+    color: #bbb;
+    opacity: 1;
+  }
+  
+.input-with-icon-container .input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #d32f2f;
+    font-size: 1.2em;
+    cursor: pointer;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    opacity: 0.8;
+  }
+  
