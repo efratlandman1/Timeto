@@ -18,6 +18,8 @@
 @import './components/logo.css';
 @import './components/label.css';
 @import './components/textarea.css';
+@import './components/input.css';
+
 
 /* Reset and Base Styles */
 * {
