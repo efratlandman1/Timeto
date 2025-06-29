@@ -55,6 +55,7 @@ body {
     color: var(--text-primary);
     background-color: var(--bg-secondary);
     text-align: var(--text-align);
+    background-color: var(--background-color);
 }
 
 /* Direction-aware margins and paddings */
@@ -78,14 +79,7 @@ body {
 .pe-3 { padding-inline-end: var(--spacing-lg); }
 .pe-4 { padding-inline-end: var(--spacing-xl); }
 
-/* Direction-aware flexbox */
-.flex-row {
-    flex-direction: row;
-}
 
-[dir="rtl"] .flex-row {
-    flex-direction: row-reverse;
-}
 
 /* Direction-aware text alignment */
 .text-start { text-align: var(--start); }
@@ -238,19 +232,7 @@ a:hover {
   }
 }
 
-/* Global Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 
-body {
-  background-color: var(--background-color);
-  color: var(--text-color);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  line-height: 1.5;
-}
 
 /* Global Loading and Error States */
 .loading {
@@ -269,31 +251,3 @@ body {
   margin: 1rem 0;
   text-align: center;
 }
-
-/* Spinner Styles */
-.spinner-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.spinner {
-  border: 8px solid #f3f3f3; /* Light grey */
-  border-top: 8px solid #3498db; /* Blue */
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1.5s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-} 

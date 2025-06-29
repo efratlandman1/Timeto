@@ -129,15 +129,7 @@
 
 /* Logo styles moved to global ui-elements.css */
 
-/* Loading Spinner */
-.loading-spinner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-    color: #666;
-    font-size: 1.1rem;
-}
+
 
 /* Delete Confirmation Toast */
 .delete-confirmation {

@@ -10,6 +10,7 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type=
     color: var(--text-primary, #222);
     text-align: right;
     
+    
   }
   
   input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):focus {
