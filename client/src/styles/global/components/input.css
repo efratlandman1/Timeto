@@ -33,7 +33,7 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type=
     color: #d32f2f;
     font-size: 1.2em;
     cursor: pointer;
-    z-index: 2;
+    z-index: var(--z-index-input-icon);
     display: flex;
     align-items: center;
     opacity: 0.8;

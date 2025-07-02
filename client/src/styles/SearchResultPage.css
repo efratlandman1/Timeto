@@ -120,22 +120,6 @@
   }
 
 
-/* =====================
-   Loading and Error States
-   ===================== */
-
-   .location-result-loading-message {
-    color: gray;
-    margin: 1rem 0;
-    text-align: center;
-  }
-  
-  .location-result-error-message {
-    color: red;
-    margin: 1rem 0;
-    text-align: center;
-  }
-  
 @media (max-width: 768px) {
     .search-controls-wrapper {
         flex-direction: column;

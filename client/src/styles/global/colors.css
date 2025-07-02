@@ -13,16 +13,33 @@
     --bg-primary: #ffffff;
     --bg-secondary: #f8f9fa;
     --bg-light: #f0f0f0;
-    --background-light: #f2f2f2;
+    --bg-lighter: #f7f7fa;
+    --bg-disabled: #f9f9f9;
     
     /* Border Colors */
     --border-color: #e0e0e0;
     --border-light: #f0f0f0;
+    --border-disabled: #ddd;
     
     /* Status Colors */
     --success-color: #28a745;
+    --success-light: #1a7f3c;
+    --success-bg: #e0ffe6;
+    --success-bg-light: #f7fff7;
+    
     --warning-color: #ffc107;
+    --warning-light: #b26a00;
+    --warning-bg: #fff7e0;
+    --warning-bg-light: #fffdf7;
+    
     --error-color: #dc3545;
+    --error-light: #d32f2f;
+    --error-bg: #ffe0e0;
+    --error-bg-light: #fff7f7;
+    
+    --info-color: #1769aa;
+    --info-bg: #e0f0ff;
+    --info-bg-light: #f7fbff;
     
     /* Action & Brand Colors */
     --action-edit: #4a90e2; /* Blue */
@@ -46,8 +63,22 @@
     --button-text-white: #ffffff;
     --button-bg-transparent: transparent;
     
-    /* Shadow */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    /* Shadow Colors */
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --shadow-color-light: rgba(0, 0, 0, 0.08);
+    --shadow-color-medium: rgba(0, 0, 0, 0.15);
+    --shadow-color-dark: rgba(0, 0, 0, 0.18);
+    --shadow-color-darker: rgba(0, 0, 0, 0.22);
+    
+    /* Overlay Colors */
+    --overlay-dark: rgba(0, 0, 0, 0.7);
+    --overlay-light: rgba(255, 255, 255, 0.7);
+    
+    /* Spinner Colors */
+    --spinner-bg: #f3f3f3;
+    --spinner-color: #3498db;
+    
+    /* Placeholder Colors */
+    --placeholder-color: #bbb;
+    
 } 

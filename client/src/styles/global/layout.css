@@ -15,47 +15,10 @@
     --border-radius-md: 6px;
     --border-radius-lg: 8px;
     
-    /* Button Spacing */
-    --button-gap-xs: 0.25rem;
-    --button-gap-sm: 0.3rem;
-    --button-gap-md: 0.4rem;
-    --button-gap-lg: 0.5rem;
-    --button-gap-xl: 0.6rem;
-    --button-gap-2xl: 0.75rem;
-    
-    /* Button Padding */
-    --button-padding-xs: 0.35rem 0.7rem;
-    --button-padding-sm: 0.4rem 0.8rem;
-    --button-padding-md: 0.5rem 0.75rem;
-    --button-padding-lg: 0.5rem 0.875rem;
-    --button-padding-xl: 0.6rem 1rem;
-    --button-padding-xxl: 0.75rem 1.25rem;
-    --button-padding-2xl: 0.875rem 1.5rem;
-    --button-padding-3xl: 1rem 2rem;
-    
-    /* Button Font Sizes */
-    --button-font-xs: 0.8rem;
-    --button-font-sm: 0.85rem;
-    --button-font-md: 0.9rem;
-    --button-font-lg: 1rem;
-    --button-font-xl: 1.1rem;
-    --button-font-2xl: 1.25rem;
-    
-    /* Button Icon Sizes */
-    --button-icon-xs: 0.9rem;
-    --button-icon-sm: 1rem;
-    --button-icon-md: 1.1rem;
-    --button-icon-lg: 1.25rem;
-    --button-icon-xl: 1.4rem;
-    --button-icon-2xl: 1.6rem;
-    
-    /* Button Margins */
-    --button-margin-xs: 0.5rem;
-    --button-margin-sm: 0.75rem;
-    --button-margin-md: 1rem;
-    --button-margin-lg: 1.25rem;
-    --button-margin-xl: 1.5rem;
-    --button-margin-2xl: 2rem;
+    /* Shadow */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
     
     /* Z-index layers */
     --z-index-dropdown: 1000;
@@ -64,6 +27,10 @@
     --z-index-modal: 1040;
     --z-index-popover: 1050;
     --z-index-tooltip: 1060;
+    --z-index-close: 1070;
+    --z-index-toast: 9999;
+    --z-index-spinner: 9999;
+    --z-index-input-icon: 2;
 }
 
 /* Media Query Breakpoints */
@@ -76,13 +43,6 @@ xl: 1280px - Wide desktops
 2xl: 1536px - 4K and ultra-wide displays
 */
 
-/* Container */
-.container {
-    max-width: var(--container-max-width);
-    margin: 0 auto;
-    padding: 0 var(--container-padding);
-    width: 100%;
-}
 
 /* Grid System */
 .grid {

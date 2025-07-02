@@ -1,0 +1,46 @@
+
+/* =====================
+   ERROR STATES
+   ===================== */
+
+/* Global Error Container */
+.error {
+    color: var(--error-color);
+    padding: 1rem;
+    border-radius: 8px;
+    background: var(--error-bg);
+    margin: 1rem 0;
+    text-align: center;
+  }
+  
+  /* Error Message - Standard */
+  .error-message {
+    color: var(--error-color);
+    background: var(--error-bg);
+    border: 1px solid var(--error-color);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    margin: var(--spacing-md) 0;
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  
+  /* Auth Error Message */
+  .auth-message.error-message {
+    color: var(--error-color);
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+  }
+  
+  /* Specific Error States */
+  .location-result-error-message {
+    color: var(--error-color);
+    margin: 1rem 0;
+    text-align: center;
+  }
+  
+  .address-error {
+    color: var(--error-color);
+  }
+  

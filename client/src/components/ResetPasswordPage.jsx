@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/AuthPage.css'; // Use the new unified styles
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaTimes } from 'react-icons/fa';
 
 const ResetPasswordPage = () => {
     const [searchParams] = useSearchParams();
@@ -55,7 +55,9 @@ const ResetPasswordPage = () => {
                 </div>
             )}
             <div className="modal-content" /*style={{ opacity: isLoading ? 0.7 : 1 }}*/>
-                <Link to="/auth" className="btn btn-ghost btn-circle btn-sm  btn-close">×</Link>
+                <Link to="/auth" className="btn btn-ghost btn-circle btn-sm btn-close">
+                    <FaTimes />
+                </Link>
 
                 {message.type === 'success' ? (
                     <div className="success-view">

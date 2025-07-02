@@ -1,4 +1,11 @@
 /* Global Container Styles */
+/* Container */
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+  width: 100%;
+}
 
 /* Wide Container - for pages that need full width
    Used for: MainPage, SearchPage, UserBusinessPage */

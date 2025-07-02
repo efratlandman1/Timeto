@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaRegStar, FaStar, FaArrowRight } from 'react-icons/fa';
+import { FaRegStar, FaStar, FaArrowRight, FaTimes } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import '../styles/FeedbackPage.css';
 import {getToken} from "../utils/auth";
@@ -89,7 +89,9 @@ const FeedbackPage = ({ businessId, onClose }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" dir="rtl" onClick={(e) => e.stopPropagation()}>
-        <button className="btn btn-ghost btn-circle btn-sm btn-close" onClick={onClose}>×</button>
+        <button className="btn btn-ghost btn-circle btn-sm btn-close" onClick={onClose}>
+          <FaTimes />
+        </button>
         <h2 className="feedback-page-title">
           חוות דעת על {businessName || 'העסק'}
         </h2>

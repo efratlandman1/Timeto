@@ -2,6 +2,74 @@
    Buttons v2.0 - Composable Button System
    ========================================================================== */
 
+:root {
+    /* Button Gap (em-based) */
+    --btn-gap: 0.5em;
+
+    /* Button Gap by Size */
+    --btn-gap-xs: 0.3em;
+    --btn-gap-sm: 0.4em;
+    --btn-gap-md: 0.5em;
+    --btn-gap-lg: 0.6em;
+    --btn-gap-xl: 0.7em;
+    --btn-gap-2xl: 0.8em;
+    --btn-gap-3xl: 1em;
+
+    /* Button Padding X (horizontal) */
+    --btn-padding-x-xs: 0.7rem;
+    --btn-padding-x-sm: 0.8rem;
+    --btn-padding-x-md: 0.75rem;
+    --btn-padding-x-lg: 0.875rem;
+    --btn-padding-x-xl: 1rem;
+    --btn-padding-x-2xl: 1.25rem;
+    --btn-padding-x-3xl: 2rem;
+
+    /* Button Padding Y (vertical) */
+    --btn-padding-y-xs: 0.35rem;
+    --btn-padding-y-sm: 0.4rem;
+    --btn-padding-y-md: 0.5rem;
+    --btn-padding-y-lg: 0.5rem;
+    --btn-padding-y-xl: 0.6rem;
+    --btn-padding-y-2xl: 0.75rem;
+    --btn-padding-y-3xl: 1rem;
+
+    /* Button Font Sizes */
+    --btn-font-xs: 0.8rem;
+    --btn-font-sm: 0.85rem;
+    --btn-font-md: 0.9rem;
+    --btn-font-lg: 1rem;
+    --btn-font-xl: 1.1rem;
+    --btn-font-2xl: 1.25rem;
+
+    /* Button Icon Sizes */
+    --btn-icon-xs: 0.9rem;
+    --btn-icon-sm: 1rem;
+    --btn-icon-md: 1.1rem;
+    --btn-icon-lg: 1.25rem;
+    --btn-icon-xl: 1.4rem;
+    --btn-icon-2xl: 1.6rem;
+
+    /* Button Margins */
+    --btn-margin-xs: 0.5rem;
+    --btn-margin-sm: 0.75rem;
+    --btn-margin-md: 1rem;
+    --btn-margin-lg: 1.25rem;
+    --btn-margin-xl: 1.5rem;
+    --btn-margin-2xl: 2rem;
+
+    /* Button Border Radius */
+    --btn-radius-xs: 3px;
+    --btn-radius-sm: 4px;
+    --btn-radius-md: 6px;
+    --btn-radius-lg: 8px;
+    --btn-radius-xl: 10px;
+    --btn-radius-2xl: 12px;
+
+    /* Close Button */
+    --btn-close-size: 2.5rem;
+    --btn-close-font-size: 1.5rem;
+}
+
 /* ------------------------------------
    Base Button (.btn)
    ------------------------------------ */
@@ -13,7 +81,7 @@
     vertical-align: middle;
     border: 1px solid transparent;
     padding: var(--btn-padding-y) var(--btn-padding-x);
-    gap: 0.5em;
+    gap: var(--btn-gap);
     
     /* Typography */
     font-size: var(--btn-font-size);
@@ -68,64 +136,33 @@
 
 /* Outline Variant */
 .btn-outline {
-  background: #fff;
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
-}
-
-.btn-outline svg,
-.btn-outline i {
-  color: var(--text-primary);
-  transition: color 0.2s;
+  --btn-bg: var(--bg-primary);
+  --btn-color: var(--text-primary);
+  --btn-border: var(--border-color);
 }
 
 .btn-outline:hover {
-  color: var(--primary-color);
-  border-color: var(--primary-color);
-  background: var(--primary-light);
-}
-
-.btn-outline:hover svg,
-.btn-outline:hover i {
-  color: var(--primary-color);
+  --btn-color: var(--primary-color);
+  --btn-border: var(--primary-color);
+  --btn-bg: var(--primary-light);
 }
 
 /* Ghost Variant */
 .btn-ghost {
-  background: #fff;
-  color: var(--text-primary);
-  border: none;
-  transition: background 0.2s, color 0.2s;
-}
-
-.btn-ghost svg,
-.btn-ghost i {
-  color: var(--text-primary);
-  transition: color 0.2s;
+  --btn-bg: var(--bg-primary);
+  --btn-color: var(--text-primary);
+  --btn-border: transparent;
 }
 
 .btn-ghost:hover {
-  background: var(--background-light);
-  color: var(--primary-color);
-}
-
-.btn-ghost:hover svg,
-.btn-ghost:hover i {
-  color: var(--primary-color);
+  --btn-bg: var(--bg-light);
+  --btn-color: var(--primary-color);
 }
 
 .btn-ghost.active,
 .btn-ghost:active {
-  background: var(--primary-light);
-  color: var(--primary-color);
-}
-
-.btn-ghost.active svg,
-.btn-ghost.active i,
-.btn-ghost:active svg,
-.btn-ghost:active i {
-  color: var(--primary-color);
+  --btn-bg: var(--primary-light);
+  --btn-color: var(--primary-color);
 }
 
 /* Dashed Variant (for uploads) */
@@ -169,28 +206,66 @@
    ------------------------------------ */
 /* Default Size (md) */
 .btn {
-    --btn-padding-x: 1.25rem;
-    --btn-padding-y: 0.625rem;
-    --btn-font-size: 1rem;
-    --btn-border-radius: 8px;
+    --btn-padding-x: var(--btn-padding-x-md);
+    --btn-padding-y: var(--btn-padding-y-md);
+    --btn-font-size: var(--btn-font-md);
+    --btn-border-radius: var(--btn-radius-md);
+    --btn-gap: var(--btn-gap-md);
 }
 
 /* Small Size (sm) */
 .btn-sm {
-    --btn-padding-x: 0.75rem;
-    --btn-padding-y: 0.375rem;
-    --btn-font-size: 0.875rem;
-    --btn-border-radius: 6px;
+    --btn-padding-x: var(--btn-padding-x-sm);
+    --btn-padding-y: var(--btn-padding-y-sm);
+    --btn-font-size: var(--btn-font-sm);
+    --btn-border-radius: var(--btn-radius-sm);
+    --btn-gap: var(--btn-gap-sm);
 }
 
 /* Large Size (lg) */
 .btn-lg {
-    --btn-padding-x: 1.5rem;
-    --btn-padding-y: 0.75rem;
-    --btn-font-size: 1.125rem;
-    --btn-border-radius: 10px;
+    --btn-padding-x: var(--btn-padding-x-lg);
+    --btn-padding-y: var(--btn-padding-y-lg);
+    --btn-font-size: var(--btn-font-lg);
+    --btn-border-radius: var(--btn-radius-lg);
+    --btn-gap: var(--btn-gap-lg);
 }
 
+/* Extra Small Size (xs) */
+.btn-xs {
+    --btn-padding-x: var(--btn-padding-x-xs);
+    --btn-padding-y: var(--btn-padding-y-xs);
+    --btn-font-size: var(--btn-font-xs);
+    --btn-border-radius: var(--btn-radius-xs);
+    --btn-gap: var(--btn-gap-xs);
+}
+
+/* Extra Large Size (xl) */
+.btn-xl {
+    --btn-padding-x: var(--btn-padding-x-xl);
+    --btn-padding-y: var(--btn-padding-y-xl);
+    --btn-font-size: var(--btn-font-xl);
+    --btn-border-radius: var(--btn-radius-xl);
+    --btn-gap: var(--btn-gap-xl);
+}
+
+/* 2XL Size */
+.btn-2xl {
+    --btn-padding-x: var(--btn-padding-x-2xl);
+    --btn-padding-y: var(--btn-padding-y-2xl);
+    --btn-font-size: var(--btn-font-2xl);
+    --btn-border-radius: var(--btn-radius-2xl);
+    --btn-gap: var(--btn-gap-2xl);
+}
+
+/* 3XL Size */
+.btn-3xl {
+    --btn-padding-x: var(--btn-padding-x-3xl);
+    --btn-padding-y: var(--btn-padding-y-3xl);
+    --btn-font-size: var(--btn-font-2xl);
+    --btn-border-radius: var(--btn-radius-2xl);
+    --btn-gap: var(--btn-gap-3xl);
+}
 
 /* ------------------------------------
    Shape Modifiers
@@ -203,10 +278,11 @@
 /* Circle Shape (for icons) */
 .btn-circle {
     --btn-border-radius: 50%;
-    /* Ensure circle is a circle */
-    padding: var(--btn-padding-y); /* Use Y padding for all sides */
-    width: calc(var(--btn-font-size) * var(--btn-line-height, 1.5) + var(--btn-padding-y) * 2 + 2px); /* Calculate width to match height */
-    height: calc(var(--btn-font-size) * var(--btn-line-height, 1.5) + var(--btn-padding-y) * 2 + 2px);
+    /* Use dedicated circle size variables */
+    --btn-circle-size: calc(2 * var(--btn-padding-y) + 1.5em);
+    width: var(--btn-circle-size);
+    height: var(--btn-circle-size);
+    padding: 0; /* Reset padding to use fixed size */
 }
 
 /* ------------------------------------
@@ -225,7 +301,7 @@
     top: 1rem;
     left: 1rem; /* For RTL layout */
     right: auto; /* Reset right positioning */
-    z-index: 10;
+    z-index: var(--z-index-close);
 }
 
 /* For LTR languages, position on the right */
@@ -243,30 +319,22 @@
     position: absolute;
     top: 10px;
     right: 10px;
-    z-index: 2;
     
     /* Overrides for favorite */
-    --btn-bg: rgba(255, 255, 255, 0.9);
-    --btn-color: #ccc;
+    --btn-bg: var(--bg-primary);
     --btn-border: transparent;
-    --btn-padding-x: 0.5rem;
-    --btn-padding-y: 0.5rem;
-    --btn-font-size: 1.25rem; /* Larger icon */
+    box-shadow: 0 2px 8px var(--shadow-color-medium);
 }
 
 .btn-favorite:hover {
-    --btn-bg: white;
+    --btn-color: var(--primary-color);
     transform: scale(1.1);
 }
 
 .btn-favorite.active {
-    --btn-bg: white;
+    --btn-bg: var(--bg-primary);
     --btn-color: var(--primary-color);
-}
-
-:root {
-  --btn-close-size: 2.5rem;
-  --btn-close-font-size: 1.5rem;
+    box-shadow: 0 4px 12px rgba(255, 77, 77, 0.3);
 }
 
 .btn-close {

@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/userSlice';
 import '../styles/AuthPage.css';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaTimes } from 'react-icons/fa';
 
 const AuthPage = () => {
     const [email, setEmail] = useState('');
@@ -93,7 +93,9 @@ const AuthPage = () => {
                     </div>
                 )}
                 <div className="modal-content" /*style={{ opacity: isLoading ? 0.7 : 1 }}*/>
-                    <button onClick={handleClose} className="btn btn-ghost btn-circle btn-sm btn-close">×</button>
+                    <button onClick={handleClose} className="btn btn-ghost btn-circle btn-sm btn-close">
+                        <FaTimes />
+                    </button>
                     <h2>בואו ניכנס</h2>
                     <p> הצטרפו עכשיו והתחילו לגלות דברים מעניינים סביבכם</p>
                     

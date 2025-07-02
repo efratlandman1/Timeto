@@ -28,7 +28,44 @@
       border: 1px solid var(--border-color);
       margin: var(--spacing-xl) 0;
     }
+
+/* =====================
+   Links
+   ===================== */ 
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--primary-dark);
+    }
+ 
     
+/* =====================
+   Lists
+   ===================== */ 
+
+    ul, ol {
+      padding-inline-start: 20px;
+    }
+
+/* =====================
+   Tables
+   ===================== */
+  table {
+    text-align: var(--text-align);
+  }
+
+
+/* =====================
+   Images
+   ===================== */
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
 /* =====================
      Required Mark
  ===================== */
@@ -52,7 +89,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: var(--z-index-spinner);
 
 }
 
@@ -70,13 +107,7 @@
   animation: spin 1s linear infinite;
 
 }
-/* Loading Spinner */
-.loading-spinner {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #ff4d4d;
-}
+
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
