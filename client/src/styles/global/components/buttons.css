@@ -86,7 +86,7 @@
     /* Typography */
     font-size: var(--btn-font-size);
     font-weight: var(--btn-font-weight, 500);
-    line-height: var(--btn-line-height, 1.5);
+    line-height: var(--line-height-relaxed, 1.5);
     text-align: center;
     white-space: nowrap;
     text-decoration: none;
@@ -164,18 +164,16 @@
   --btn-bg: var(--primary-light);
   --btn-color: var(--primary-color);
 }
-
 /* Dashed Variant (for uploads) */
 .btn-dashed {
-    --btn-color: var(--btn-text-color, var(--primary-color));
+    --btn-color: var(--text-primary, var(--primary-color));
     --btn-bg: transparent;
-    --btn-border: var(--btn-border-color, var(--primary-color));
+    --btn-border: var(--primary-color);
     border-style: dashed;
 }
 .btn-dashed:hover {
     background-color: var(--primary-light);
 }
-
 
 /* ------------------------------------
    Color Modifiers
@@ -280,8 +278,8 @@
     --btn-border-radius: 50%;
     /* Use dedicated circle size variables */
     --btn-circle-size: calc(2 * var(--btn-padding-y) + 1.5em);
-    width: var(--btn-circle-size);
-    height: var(--btn-circle-size);
+    inline-size: var(--btn-circle-size);
+    block-size: var(--btn-circle-size);
     padding: 0; /* Reset padding to use fixed size */
 }
 
@@ -290,25 +288,17 @@
    ------------------------------------ */
 .btn svg {
     /* Set icon size relative to button font size */
-    width: 1.2em;
-    height: 1.2em;
+    inline-size: 1.2em;
+    block-size: 1.2em;
 }
 
-/* Close button positioning - always on the left in RTL, right in LTR */
+/* Close button positioning - using logical properties */
 .btn-close,
 [class*="close"] {
     position: absolute;
-    top: 1rem;
-    left: 1rem; /* For RTL layout */
-    right: auto; /* Reset right positioning */
+    inset-block-start: 1rem;
+    inset-inline-end: 1rem;
     z-index: var(--z-index-close);
-}
-
-/* For LTR languages, position on the right */
-[dir="ltr"] .btn-close,
-[dir="ltr"] [class*="close"] {
-    left: auto;
-    right: 1rem;
 }
 
 /* ------------------------------------
@@ -317,8 +307,8 @@
 /* Favorite Button */
 .btn-favorite {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    inset-block-start: 10px;
+    inset-inline-start: 10px;
     
     /* Overrides for favorite */
     --btn-bg: var(--bg-primary);
@@ -338,22 +328,23 @@
 }
 
 .btn-close {
-  width: var(--btn-close-size);
-  height: var(--btn-close-size);
-  min-width: var(--btn-close-size);
-  min-height: var(--btn-close-size);
-  max-width: var(--btn-close-size);
-  max-height: var(--btn-close-size);
+  inline-size: var(--btn-close-size);
+  block-size: var(--btn-close-size);
+  min-inline-size: var(--btn-close-size);
+  min-block-size: var(--btn-close-size);
+  max-inline-size: var(--btn-close-size);
+  max-block-size: var(--btn-close-size);
   font-size: var(--btn-close-font-size);
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .btn-close svg, .btn-close i {
   font-size: var(--btn-close-font-size);
-  width: var(--btn-close-font-size);
-  height: var(--btn-close-font-size);
+  inline-size: var(--btn-close-font-size);
+  block-size: var(--btn-close-font-size);
 }
 
 

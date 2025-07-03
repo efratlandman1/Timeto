@@ -1,6 +1,5 @@
-
-input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]) {
-    width: 100%;
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="time"]) {
+    inline-size: 100%;
     padding: 1rem 1rem 1rem 3rem;
     border: 1px solid #ddd;
     border-radius: 12px;
@@ -8,27 +7,24 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type=
     transition: all 0.2s ease;
     background: #f9f9f9;
     color: var(--text-primary, #222);
-    text-align: right;
-    
-    
-  }
-  
-  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):focus {
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="time"]):focus {
     outline: none;
     border-color: #ff4d4d;
     box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.1);
     background: white;
-  }
-  
-  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"])::placeholder {
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="time"])::placeholder {
     color: #bbb;
     opacity: 1;
-  }
-  
+}
+
 .input-with-icon-container .input-icon {
     position: absolute;
-    left: 1rem;
-    top: 50%;
+    inset-inline-end: 1rem;
+    inset-block-start: 50%;
     transform: translateY(-50%);
     color: #d32f2f;
     font-size: 1.2em;
@@ -37,5 +33,23 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type=
     display: flex;
     align-items: center;
     opacity: 0.8;
+}
+/* =====================
+   Time Input Elements
+   ===================== */
+
+   .time-range-container input[type="time"] {
+    padding: var(--spacing-md) var(--spacing-md);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    font-size: var(--font-size-sm);
+    inline-size: 120px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
   }
-  
+
+  .time-range-container input[type="time"]:focus {
+    border-color: var(--primary-dark);
+    box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15);
+  }

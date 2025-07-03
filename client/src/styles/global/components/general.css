@@ -1,22 +1,3 @@
-/* =====================
-   Time Input Elements
-   ===================== */
-
-   .time-range input[type="time"] {
-    padding: var(--spacing-lg) var(--spacing-md);
-    border: 1.5px solid var(--border-color);
-    border-radius: var(--border-radius-lg);
-    font-size: var(--font-size-sm);
-    width: 120px;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    transition: all 0.3s ease;
-  }
-
-  .time-range input[type="time"]:focus {
-    border-color: var(--primary-dark);
-    box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15);
-  }
 
 
 /* =====================
@@ -24,7 +5,7 @@
    ===================== */
 
     hr {
-      width: 100%;
+      inline-size: 100%;
       border: 1px solid var(--border-color);
       margin: var(--spacing-xl) 0;
     }
@@ -54,7 +35,7 @@
    Tables
    ===================== */
   table {
-    text-align: var(--text-align);
+    text-align: start;
   }
 
 
@@ -62,8 +43,8 @@
    Images
    ===================== */
     img {
-      max-width: 100%;
-      height: auto;
+      max-inline-size: 100%;
+      block-size: auto;
     }
 
 /* =====================
@@ -72,7 +53,7 @@
  
     .required-mark {
       color: var(--error-color);
-      margin-left: var(--spacing-sm);
+      margin-inline-start: var(--spacing-sm);
     }
 
 /* =====================
@@ -81,10 +62,7 @@
 
  .spinner-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background-color: rgba(255, 255, 255, 0.7);
   display: flex;
   justify-content: center;
@@ -95,19 +73,17 @@
 
 .spinner {
   border: 8px solid #f3f3f3; /* Light grey */
-  border-top: 8px solid #3498db; /* Blue */
+  border-block-start: 8px solid #3498db; /* Blue */
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
+  inline-size: 60px;
+  block-size: 60px;
   animation: spin 1.5s linear infinite;
 }
+
 .spinner-icon {
   animation: spin 1s linear infinite;
   font-size: 20px;
-  animation: spin 1s linear infinite;
-
 }
-
 
 @keyframes spin {
   0% { transform: rotate(0deg); }

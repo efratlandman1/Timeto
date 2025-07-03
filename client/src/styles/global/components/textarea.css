@@ -3,13 +3,13 @@
    ===================== */
 
 textarea {
-  width: 100%;
+  inline-size: 100%;
   padding: var(--spacing-md);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-lg);
   font-size: var(--font-size-sm);
   resize: vertical;
-  min-height: 100px;
+  min-block-size: 100px;
   font-family: inherit;
   transition: all 0.2s ease;
 }

@@ -22,7 +22,6 @@
 @import './components/textarea.css';
 @import './components/input.css';
 
-
 /* Reset and Base Styles */
 * {
     margin: 0;
@@ -30,57 +29,37 @@
     box-sizing: border-box;
 }
 
-/* RTL/LTR Support */
-[dir="rtl"] {
-    --start: right;
-    --end: left;
-    --margin-start: margin-right;
-    --margin-end: margin-left;
-    --padding-start: padding-right;
-    --padding-end: padding-left;
-    --text-align: right;
-}
-
-[dir="ltr"] {
-    --start: left;
-    --end: right;
-    --margin-start: margin-left;
-    --margin-end: margin-right;
-    --padding-start: padding-left;
-    --padding-end: padding-right;
-    --text-align: left;
-}
-
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.5;
     color: var(--text-primary);
     background-color: var(--bg-secondary);
-    text-align: var(--text-align);
+    text-align: start;
     background-color: var(--background-color);
 }
 
-/* Direction-aware text alignment */
-.text-start { text-align: var(--start); }
-.text-end { text-align: var(--end); }
-.text-center {  text-align: center;}
-/* Direction-aware positioning */
-.float-start { float: var(--start); }
-.float-end { float: var(--end); }
+/* Direction-aware text alignment using logical properties */
+.text-start { text-align: start; }
+.text-end { text-align: end; }
+.text-center { text-align: center; }
 
-.position-start { left: var(--start); }
-.position-end { right: var(--end); }
+/* Direction-aware positioning using logical properties */
+.float-start { float: inline-start; }
+.float-end { float: inline-end; }
 
-/* Existing utility classes */
-.mt-1 { margin-top: var(--spacing-sm); }
-.mt-2 { margin-top: var(--spacing-md); }
-.mt-3 { margin-top: var(--spacing-lg); }
-.mt-4 { margin-top: var(--spacing-xl); }
+.position-start { inset-inline-start: 0; }
+.position-end { inset-inline-end: 0; }
 
-.mb-1 { margin-bottom: var(--spacing-sm); }
-.mb-2 { margin-bottom: var(--spacing-md); }
-.mb-3 { margin-bottom: var(--spacing-lg); }
-.mb-4 { margin-bottom: var(--spacing-xl); }
+/* Utility classes using logical properties */
+.mt-1 { margin-block-start: var(--spacing-sm); }
+.mt-2 { margin-block-start: var(--spacing-md); }
+.mt-3 { margin-block-start: var(--spacing-lg); }
+.mt-4 { margin-block-start: var(--spacing-xl); }
+
+.mb-1 { margin-block-end: var(--spacing-sm); }
+.mb-2 { margin-block-end: var(--spacing-md); }
+.mb-3 { margin-block-end: var(--spacing-lg); }
+.mb-4 { margin-block-end: var(--spacing-xl); }
 
 .p-1 { padding: var(--spacing-sm); }
 .p-2 { padding: var(--spacing-md); }
@@ -93,11 +72,8 @@ body {
 .justify-content-center { justify-content: center; }
 .justify-content-between { justify-content: space-between; }
 
-.w-100 { width: 100%; }
-.h-100 { height: 100%; }
-
-
-
+.w-100 { inline-size: 100%; }
+.h-100 { block-size: 100%; }
 
 /* Global Animation Classes */
 .fade-in {

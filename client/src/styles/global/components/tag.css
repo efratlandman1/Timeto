@@ -14,7 +14,7 @@
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
-  text-align: right;
+  text-align: end;
 }
 
 .tag.selectable {
@@ -53,10 +53,10 @@
   border: none;
   color: var(--primary-color);
   font-size: 1.1em;
-  width: 20px;
-  height: 20px;
+  inline-size: 20px;
+  block-size: 20px;
   border-radius: 50%;
-  margin-right: var(--spacing-sm);
+  margin-inline-end: var(--spacing-sm);
   cursor: pointer;
   display: flex;
   align-items: center;

@@ -5,7 +5,7 @@
 label {
   font-weight: var(--font-weight-medium);
   color: var(--text-primary);
-  margin-bottom: var(--spacing-xs);
+  margin-block-end: var(--spacing-xs);
   font-size: var(--font-size-md);
 }
 

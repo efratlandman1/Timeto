@@ -5,10 +5,7 @@
 /* Base Modal Styles - Use these for all modals */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
@@ -21,13 +18,12 @@
   background: var(--bg-primary);
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-xl) var(--spacing-lg);
-  width: 90%;
-  max-width: 500px;
+  inline-size: 90%;
+  max-inline-size: 500px;
   position: relative;
   box-shadow: var(--shadow-lg);
-  direction: rtl;
-  height: auto;
-  max-height: 80vh;
+  block-size: auto;
+  max-block-size: 80vh;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -37,7 +33,7 @@
 
 .modal-header {
   padding: 0 0 var(--spacing-lg) 0;
-  border-bottom: none;
+  border-block-end: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -48,7 +44,7 @@
   color: var(--text-primary);
   font-size: 1.5rem;
   font-weight: bold;
-  text-align: right;
+  text-align: end;
 }
 /* 
 .modal-actions {
@@ -56,8 +52,8 @@
   justify-content: center;
   gap: var(--spacing-md);
   padding: 0;
-  margin-top: var(--spacing-lg);
-  border-top: none;
+  margin-block-start: var(--spacing-lg);
+  border-block-start: none;
 } */
 
 /* Modal Animations */
@@ -74,7 +70,7 @@
 
 /* Modal Scrollbar Styling */
 .modal-content::-webkit-scrollbar {
-  width: 8px;
+  inline-size: 8px;
 }
 
 .modal-content::-webkit-scrollbar-track {

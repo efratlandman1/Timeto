@@ -5,9 +5,9 @@
 /* Global Dropdown Styling - עיצוב אחיד לכל dropdown elements */
 .dropdown-menu {
   position: absolute;
-  top: calc(100% + var(--spacing-lg));
-  left: 0;
-  right: 0;
+  /* inset-block-start: calc(100% + var(--spacing-xs)); */
+  inset-block-start:100% ;
+  inset-inline: 0;
   background: var(--bg-primary);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
@@ -16,28 +16,26 @@
   z-index: var(--z-index-dropdown);
   padding: 0;
   margin: 0;
-  max-height: 400px;
+  max-block-size: 400px;
   overflow-y: auto;
   overflow-x: hidden;
-  text-align: right;
-  direction: rtl;
+  text-align: end;
 }
 
 /* Dropdown items styling */
 .dropdown-menu .btn-ghost,
 .dropdown-menu .search-result-item {
-  width: 100%;
+  inline-size: 100%;
   padding: var(--spacing-md) var(--spacing-lg);
   border: none;
   background: none;
   color: var(--text-primary);
   font-size: var(--font-size-md);
-  text-align: right;
+  text-align: end;
   cursor: pointer;
   transition: all 0.2s ease;
-  border-bottom: 1px solid var(--border-light);
-  justify-content: flex-start ;
-  
+  border-block-end: 1px solid var(--border-light);
+  justify-content: start;
 }
 
 .dropdown-menu .btn-ghost:hover,
@@ -56,7 +54,7 @@
 
 /* Dropdown scrollbar styling */
 .dropdown-menu::-webkit-scrollbar {
-  width: var(--spacing-lg);
+  inline-size: var(--spacing-md);
 }
 
 .dropdown-menu::-webkit-scrollbar-track {
@@ -65,7 +63,7 @@
 }
 
 .dropdown-menu::-webkit-scrollbar-thumb {
-  background-color: var(--primary-color);
-  border-radius: var(--border-radius-sm);
-  border: 2px solid var(--border-light);
+  background-color: var(--text-secondary);
+  border-radius: var(--border-radius-xs);
+  border: var(--border-light);
 } 

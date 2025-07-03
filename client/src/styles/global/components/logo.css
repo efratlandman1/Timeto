@@ -4,7 +4,7 @@
 
 .logo-preview-wrapper {
   position: relative;
-  margin-top: var(--spacing-md);
+  margin-block-start: var(--spacing-md);
 }
 
 .logo-upload {
@@ -14,8 +14,8 @@
 }
 
 .logo-preview {
-  max-width: 200px;
-  max-height: 200px;
+  max-inline-size: 200px;
+  max-block-size: 200px;
   border-radius: var(--border-radius-lg);
   object-fit: contain;
   border: 2px solid var(--border-color);
@@ -26,6 +26,6 @@
 
 .remove-logo-button {
   position: absolute;
-  top: -10px;
-  right: -10px;
+  inset-block-start: -10px;
+  inset-inline-end: -10px;
 } 
