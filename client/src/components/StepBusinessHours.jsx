@@ -83,7 +83,7 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
   };
 
   return (
-    <div className="step-business-details">
+    <div /*className="step-business-details"*/>
       {/* <h2 className="step-title">
         <FaClock className="icon" />
         שעות פעילות

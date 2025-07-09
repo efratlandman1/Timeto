@@ -290,8 +290,8 @@ const SearchResultPage = () => {
 
                 {Object.keys(activeFilters).length > 0 && (
                     <div className="filters-area">
-                        <div className="filters-header">
-                            <div className="filters-title">סינונים פעילים:</div>
+                        {/* <div className="filters-header"> */}
+                            <div>סינונים פעילים:</div>
                             <div className="tag">
                                 <span>נקה הכל</span>
                                 <button 
@@ -303,18 +303,9 @@ const SearchResultPage = () => {
                                     <FaTimes />
                                 </button>
                             </div>
-                        </div>
+                        {/* </div> */}
                         <div className="active-filters-container">
                             <div className="filter-tag-clearall-space">
-                                {/* <span>נקה הכל</span>
-                                <button
-                                    className="btn-filter-remove"
-                                    onClick={handleClearFilters}
-                                    aria-label="נקה הכל"
-                                    type="button"
-                                >
-                                    <FaTimes />
-                                </button> */}
                             </div>
                             {Object.entries(activeFilters).map(([key, value]) => (
                                 Array.isArray(value) ? (

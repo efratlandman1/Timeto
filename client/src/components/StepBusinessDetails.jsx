@@ -61,7 +61,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
   const RequiredMark = () => <span className="required-mark"> * </span>;
 
   return (
-    <div className="step-business-details">
+    <div /*className="step-business-details"*/>
       <div className="form-field-container">
         <label htmlFor="name">
           שם העסק<RequiredMark />

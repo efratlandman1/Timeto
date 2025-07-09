@@ -185,46 +185,6 @@
 
 }
 
-/* 
-.business-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 12px;
-    padding: 1px;
-    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
-    -webkit-mask: 
-        linear-gradient(#fff 0 0) content-box, 
-        linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-}
-
-
-
-.business-card:hover::before {
-    background: linear-gradient(135deg, #ff4d4d20, #ff6b6b20);
-}
-
-.business-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 12px;
-    box-shadow: 
-        0 4px 12px rgba(0, 0, 0, 0.05),
-        0 1px 3px rgba(0, 0, 0, 0.1);
-    pointer-events: none;
-    transition: all 0.3s ease;
-}
-
-.business-card:hover::after {
-    box-shadow: 
-        0 8px 24px rgba(0, 0, 0, 0.1),
-        0 2px 6px rgba(0, 0, 0, 0.08);
-} */
-
 .categories-wrapper {
     max-width: 1200px;
     margin: 2rem auto;
@@ -237,7 +197,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
-    position: absolute;
+    /* position: absolute; */
     top: -3rem;
     left: 2rem;
     right: 2rem;
@@ -327,12 +287,7 @@
     right: 0;
 }
 
-/* Business Groups */
-.business-groups {
-    max-width: 1200px;
-    margin: 3rem auto;
-    padding: 0 2rem;
-}
+
 
 .business-row {
     background-color: white;
@@ -356,16 +311,6 @@
     margin: 0;
 }
 
-.view-all {
-    color: #ff4d4d;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s ease;
-}
-
-.view-all:hover {
-    color: #ff6666;
-}
 
 /* Card slider styles moved to global/containers.css */
 
@@ -430,9 +375,7 @@
         width: 100%;
     }
 
-    .business-groups {
-        padding: 0 1rem;
-    }
+
 
     .bottom-banner {
         padding: 2rem 0;

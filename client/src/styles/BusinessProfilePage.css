@@ -1,15 +1,4 @@
-/* BusinessProfilePage.css */
 
-/* Modern Business Profile Page Styles */
-/* Container styles moved to global/containers.css */
-
-.header-line {
-  width: 60px;
-  height: 4px;
-  background: linear-gradient(to right, #ff4d4d, #ff8080);
-  margin: 0 auto;
-  border-radius: 2px;
-}
 
 /* Hero Section */
 .business-hero {
@@ -114,8 +103,6 @@
   background: linear-gradient(45deg, #ff4d4d, #ff8080);
   border-radius: 2px;
 }
-
-
 
 /* Contact Section */
 .contact-section {

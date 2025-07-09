@@ -39,10 +39,8 @@ const StepBusinessServices = ({ businessData, setBusinessData }) => {
   };
 
   return (
-    <div className="step-business-details">
-      <h2 className="step-title">
-        <FaTags/> שירותים שהעסק מספק
-      </h2>
+    <div /*className="step-business-details"*/>
+      
       <div className="form-field-vertical-container">
         {availableServices.map(service => (
           <div

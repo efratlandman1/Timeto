@@ -308,7 +308,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
                 className={`search-result-item ${index === highlightedIndex ? 'highlighted' : ''}`}
                 onClick={() => handleSelectResult(business)}
               >
-                <div className="search-result-header">
+                {/* <div className="search-result-header"> */}
                   <div className="business-info">
                     <div className="business-main-info">
                       <div className="business-name">
@@ -328,7 +328,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
                       {renderServices(business)}
                     </div>
                   </div>
-                </div>
+                {/* </div> */}
               </li>
             ))}
             {isLoadingMore && (

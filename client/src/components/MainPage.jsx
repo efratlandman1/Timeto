@@ -283,11 +283,11 @@ const MainPage = () => {
                 </div>
 
                 {/* Business Groups */}
-                <div className="business-groups">
+                <div>
                     <div className="business-row">
                         <div className="business-row-header">
                             <h3>עסקים חדשים</h3>
-                            <a href="/search-results?sort=newest" className="view-all">הצג הכל</a>
+                            <a href="/search-results?sort=newest">הצג הכל</a>
                         </div>
                         <div className="business-cards-container">
                             {newBusinesses.map((business) => (
@@ -299,7 +299,7 @@ const MainPage = () => {
                     <div className="business-row">
                         <div className="business-row-header">
                             <h3>פופולרי באזורך</h3>
-                            <a href="/search-results?sort=popular_nearby" className="view-all">הצג הכל</a>
+                            <a href="/search-results?sort=popular_nearby">הצג הכל</a>
                         </div>
                         <div className="business-cards-container">
                             {popularBusinesses.map((business) => (
@@ -311,7 +311,7 @@ const MainPage = () => {
                     <div className="business-row">
                         <div className="business-row-header">
                             <h3>עסקים מומלצים</h3>
-                            <a href="/search-results?sort=rating" className="view-all">הצג הכל</a>
+                            <a href="/search-results?sort=rating">הצג הכל</a>
                         </div>
                         <div className="business-cards-container">
                             {recommendedBusinesses.map((business) => (
