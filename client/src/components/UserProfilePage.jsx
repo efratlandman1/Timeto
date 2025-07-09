@@ -3,7 +3,6 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setUser as setReduxUser } from '../redux/userSlice';
-import '../styles/LoginPage.css'; // Reusing the same styles for a consistent look
 import { FaUser, FaLock, FaEnvelope, FaPhone, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { getToken } from '../utils/auth';
 import { toast } from 'react-toastify'; // Import toast
@@ -42,8 +41,7 @@ const UserProfilePage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
+  const handleUpdate = async () => {
   
     if (formData.password && formData.password.length < 8) {
       toast.error('הסיסמה חייבת להכיל לפחות 8 תווים.');
@@ -93,61 +91,159 @@ const UserProfilePage = () => {
     }
   };
 
+  const RequiredMark = () => <span className="required-mark"> * </span>;
+
   return (
     <div className="narrow-page-container">
       <div className="narrow-page-content">
-        <form className="login-form" onSubmit={handleUpdate}>
-          <h1 className="login-title">עריכת פרופיל</h1>
+        
 
-          <div className="input-with-icon-container">
-            <FaUser className="input-icon" />
-            <input type="text" name="firstName" placeholder="שם פרטי" value={formData.firstName} onChange={handleChange} required />
+         <div className="page-header">
+            {/* <div className="page-header__content vertical"> */}
+              <h1>עריכת פרופיל</h1>
+            {/* </div> */}
           </div>
 
+        <div className="form-field-container">
+          <label htmlFor="firstName">
+            שם פרטי<RequiredMark />
+          </label>
           <div className="input-with-icon-container">
             <FaUser className="input-icon" />
-            <input type="text" name="lastName" placeholder="שם משפחה" value={formData.lastName} onChange={handleChange} required />
+            <input 
+              type="text" 
+              id="firstName"
+              name="firstName" 
+              placeholder="שם פרטי" 
+              value={formData.firstName} 
+              onChange={handleChange} 
+              required 
+            />
           </div>
+        </div>
 
+        <div className="form-field-container">
+          <label htmlFor="lastName">
+            שם משפחה<RequiredMark />
+          </label>
+          <div className="input-with-icon-container">
+            <FaUser className="input-icon" />
+            <input 
+              type="text" 
+              id="lastName"
+              name="lastName" 
+              placeholder="שם משפחה" 
+              value={formData.lastName} 
+              onChange={handleChange} 
+              required 
+            />
+          </div>
+        </div>
+
+        <div className="form-field-container">
+          <label htmlFor="phone">
+            טלפון<RequiredMark />
+          </label>
           <div className="input-with-icon-container">
             <FaPhone className="input-icon" />
-            <input type="tel" name="phone" placeholder="טלפון" value={formData.phone} onChange={handleChange} required />
+            <input 
+              type="tel" 
+              id="phone"
+              name="phone" 
+              placeholder="טלפון" 
+              value={formData.phone} 
+              onChange={handleChange} 
+              required 
+            />
           </div>
+        </div>
 
+        <div className="form-field-container">
+          <label htmlFor="email">
+            דואר אלקטרוני<RequiredMark />
+          </label>
           <div className="input-with-icon-container">
             <FaEnvelope className="input-icon" />
-            <input type="email" name="email" placeholder="דואר אלקטרוני" value={formData.email} onChange={handleChange} required />
+            <input 
+              type="email" 
+              id="email"
+              name="email" 
+              placeholder="דואר אלקטרוני" 
+              value={formData.email} 
+              onChange={handleChange} 
+              required 
+            />
           </div>
-          
+        </div>
+        
+        <div className="form-field-container">
+          <label htmlFor="nickname">
+            כינוי באפליקציה<RequiredMark />
+          </label>
           <div className="input-with-icon-container">
             <FaUser className="input-icon" />
-            <input type="text" name="nickname" placeholder="כינוי באפליקציה" value={formData.nickname} onChange={handleChange} required />
+            <input 
+              type="text" 
+              id="nickname"
+              name="nickname" 
+              placeholder="כינוי באפליקציה" 
+              value={formData.nickname} 
+              onChange={handleChange} 
+              required 
+            />
           </div>
-          
-          <hr/>
-          <p>שנה סיסמה (אופציונלי)</p>
+        </div>
+        
+        <hr/>
+        <p>שנה סיסמה (אופציונלי)</p>
 
+        <div className="form-field-container">
+          <label htmlFor="password">
+            סיסמה חדשה
+          </label>
           <div className="input-with-icon-container">
-            {/* <FaLock className="input-icon" /> */}
-            <input type={showPassword ? "text" : "password"} name="password" placeholder="סיסמה חדשה" value={formData.password} onChange={handleChange} />
+            <input 
+              type={showPassword ? "text" : "password"} 
+              id="password"
+              name="password" 
+              placeholder="סיסמה חדשה" 
+              value={formData.password} 
+              onChange={handleChange} 
+            />
             <span className="input-icon" onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
+        </div>
 
+        <div className="form-field-container">
+          <label htmlFor="confirmPassword">
+            אישור סיסמה חדשה
+          </label>
           <div className="input-with-icon-container">
-            <input type={showPassword ? "text" : "password"} name="confirmPassword" placeholder="אישור סיסמה חדשה" value={formData.confirmPassword} onChange={handleChange} />
+            <input 
+              type={showPassword ? "text" : "password"} 
+              id="confirmPassword"
+              name="confirmPassword" 
+              placeholder="אישור סיסמה חדשה" 
+              value={formData.confirmPassword} 
+              onChange={handleChange} 
+            />
             <span className="input-icon" onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
+        </div>
 
-          <div className="actions-container">
-            <button className="btn btn-solid btn-primary" type="submit">
-              שמור שינויים
-            </button>
-          </div>
-        </form>
+        <div className="actions-container">
+          <button 
+            className="btn btn-solid btn-primary" 
+            type="button"
+            onClick={handleUpdate}
+          >
+            שמור שינויים
+          </button>
+        </div>
       </div>
     </div>
   );

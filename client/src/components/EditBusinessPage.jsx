@@ -363,10 +363,10 @@ const EditBusinessPage = () => {
           </button>
           
           <div className="page-header">
-            <div className="page-header__content vertical">
+            {/* <div className="page-header__content vertical"> */}
               <h1>{selectedBusiness ? 'עריכת עסק' : 'הוספת עסק חדש'}</h1>
               <p>מלא את הפרטים הבאים כדי {selectedBusiness ? 'לערוך' : 'להוסיף'} את העסק שלך</p>
-            </div>
+            {/* </div> */}
           </div>
 
           <StepsProvider>

@@ -220,10 +220,10 @@ const SearchResultPage = () => {
         <div className='wide-page-container'>
             <div className='wide-page-content'>
                 <div className="page-header">
-                    <div className="page-header__content">
+                    {/* <div className="page-header__content"> */}
                         <h1>חיפוש עסקים</h1>
                         <p>מצא את העסק המתאים לך</p>
-                    </div>
+                    {/* </div> */}
                 </div>
                 
                 <div className="search-controls">

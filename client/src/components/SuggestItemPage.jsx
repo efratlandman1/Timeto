@@ -94,10 +94,10 @@ const SuggestItemPage = () => {
         </button>
 
         <div className="page-header">
-          <div className="page-header__content">
+          {/* <div className="page-header__content"> */}
             <h1>הצעת עסק חדש</h1>
             <p>מלא את הפרטים הבאים כדי להציע עסק חדש</p>
-          </div>
+          {/* </div> */}
         </div>
 
         <form className="suggest-form" onSubmit={handleSubmit}>

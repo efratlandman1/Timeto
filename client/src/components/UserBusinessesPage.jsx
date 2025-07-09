@@ -49,10 +49,10 @@ const UserBusinessesPage = () => {
                 </button>
                 
                 <div className="page-header">
-                    <div className="page-header__content">
+                    {/* <div className="page-header__content"> */}
                         <h1>העסקים שלי</h1>
                         <p>נהל את העסקים שהוספת למדריך</p>
-                    </div>
+                    {/* </div> */}
                     <div className="page-header__action">
                         <button 
                             className="btn btn-solid btn-primary"

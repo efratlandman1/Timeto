@@ -53,10 +53,10 @@ const MyFavoritesPage = () => {
                 </button>
                 
                 <div className="page-header">
-                    <div className="page-header__content vertical">
+                    {/* <div className="page-header__content vertical"> */}
                         <h1>העסקים המועדפים שלי</h1>
                         <p>כל העסקים שסימנת כמועדפים במקום אחד</p>
-                    </div>
+                    {/* </div> */}
                 </div>
 
                 {favorites.length === 0 ? (

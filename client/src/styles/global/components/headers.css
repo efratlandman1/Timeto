@@ -1,15 +1,16 @@
 /* Page Header Component */
 .page-header {
-    display: flex;
-    justify-content: space-between;
+    /* display: flex;
+    justify-content: space-between; */
     align-items: start;
+    text-align: start;
     padding: 2rem 3rem 2rem;
     position: relative;
 }
 
-.page-header__content {
-    text-align: end;
-}
+/* .page-header__content {
+    text-align: start;
+} */
 
 .page-header h1 {
     font-size: var(--font-size-2xl);
@@ -17,7 +18,23 @@
     margin-block-end: var(--spacing-xs);
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-tight);
+    position: relative;
+    display: inline-block;
 }
+
+
+/* .login-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #d32f2f, #ff4444);
+    transform: translateX(-50%);
+    border-radius: 2px;
+} */
+
 
 .page-header p {
     font-size: var(--font-size-md);
@@ -29,6 +46,7 @@
 .page-header__action {
     margin-inline-end: var(--spacing-lg);
 }
+
 
 /* Card Header Component */
 .card-header {
@@ -44,10 +62,8 @@
     line-height: var(--line-height-tight);
 }
 
-/* Header Variants */
-.page-header--center {
-    text-align: center;
-}
+
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -71,6 +87,7 @@
     .page-header p {
         font-size: var(--font-size-sm);
     }
+
 }
 
 /* Print Styles */
