@@ -67,7 +67,7 @@ exports.getUserFavorites = async (req, res) => {
       path: 'business_id',
       select: 'name address prefix phone email logo rating categoryId services active',
       populate: [
-        { path: 'categoryId', select: 'name' },
+        { path: 'categoryId', select: 'name color' },
         { path: 'services', select: 'name' }
       ]
     })

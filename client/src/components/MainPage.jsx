@@ -264,14 +264,19 @@ const MainPage = () => {
                     </button>
                     <div className="categories">
                         {categories.map((category) => (
-                            <div key={category._id} 
-                                className="category-business" 
+                            <div key={category._id}
+                                className="category-business"
+                                style={{ background: category.color || '#fff' }}
                                 onClick={() => handleFilterChange(category.name)}>
-                                <img
-                                    src={`${process.env.REACT_APP_API_DOMAIN}${category.logo}`}
-                                    alt={category.name}
-                                    className="category-logo"
-                                />
+                                {category.logo ? (
+                                    <img
+                                        src={`${process.env.REACT_APP_API_DOMAIN}${category.logo}`}
+                                        alt={category.name}
+                                        className="category-logo"
+                                    />
+                                ) : (
+                                    <span className="category-initial">{category.name?.charAt(0)}</span>
+                                )}
                                 <span>{category.name}</span>
                             </div>
                         ))}

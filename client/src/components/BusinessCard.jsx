@@ -167,15 +167,20 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
       onClick={handleCardClick}
     >
       <div className="business-card-image-container">
-        <img
-          className="business-card-image"
-          src={
-            business.logo
-              ? `${process.env.REACT_APP_API_DOMAIN}/uploads/${business.logo.split('/').pop()}`
-              : `${process.env.REACT_APP_API_DOMAIN}/uploads/default-logo.png`
-          }
-          alt={business.name}
-        />
+        {business.logo ? (
+          <img
+            className="business-card-image"
+            src={`${process.env.REACT_APP_API_DOMAIN}/uploads/${business.logo.split('/').pop()}`}
+            alt={business.name}
+          />
+        ) : (
+          <span
+            className="business-card-placeholder"
+            style={{ background: business.categoryId?.color || '#bdbdbd' }}
+          >
+            {business.name}
+          </span>
+        )}
         <div className="business-card-overlay" />
         {localActive && (
           <div className={`business-card-badge ${isBusinessOpen() ? 'badge-open' : 'badge-closed'}`}>
