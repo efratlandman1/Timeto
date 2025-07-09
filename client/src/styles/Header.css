@@ -32,13 +32,6 @@
     font-weight: 700;
 }
 
-.chevron-icon {
-    transition: transform 0.2s ease-in-out;
-}
-
-.chevron-icon.open {
-    transform: rotate(180deg);
-}
 
 /* Common dropdown styles - העיצוב מוגדר גלובלית ב-ui-elements.css */
 
@@ -221,15 +214,5 @@
     font-size: 0.9rem;
     line-height: 1.4;
     color: #666;
-}
-
-
-.spin {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
 }
 

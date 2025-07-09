@@ -4,7 +4,6 @@ import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/userSlice';
-import '../styles/AuthPage.css';
 import { FaEye, FaEyeSlash, FaTimes } from 'react-icons/fa';
 
 const AuthPage = () => {
@@ -30,8 +29,7 @@ const AuthPage = () => {
         }
     }, [searchParams, navigate]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
         setMessage({ text: '', type: '' });
 
         if (password.length < 8) {
@@ -84,6 +82,8 @@ const AuthPage = () => {
         navigate('/');
     };
 
+    const RequiredMark = () => <span className="required-mark"> * </span>;
+
     return (
         <GoogleOAuthProvider clientId={clientId}>
             <div className="modal-overlay">
@@ -92,61 +92,82 @@ const AuthPage = () => {
                         <div className="spinner"></div>
                     </div>
                 )}
-                <div className="modal-content" /*style={{ opacity: isLoading ? 0.7 : 1 }}*/>
+                <div className="modal-content modal-center" /*style={{ opacity: isLoading ? 0.7 : 1 }}*/>
                     <button onClick={handleClose} className="btn btn-ghost btn-circle btn-sm btn-close">
                         <FaTimes />
                     </button>
                     <h2>בואו ניכנס</h2>
                     <p> הצטרפו עכשיו והתחילו לגלות דברים מעניינים סביבכם</p>
                     
-                    <div className="auth-content">
-                        <GoogleLogin
-                            onSuccess={responseGoogle}
-                            onError={() => {
-                                setMessage({
-                                    text: 'התחברות גוגל נכשלה.',
-                                    type: 'error'
-                                });
-                            }}
-                            useOneTap
-                            shape="pill"
-                            width="350px"
+                    <GoogleLogin
+                        onSuccess={responseGoogle}
+                        onError={() => {
+                            setMessage({
+                                text: 'התחברות גוגל נכשלה.',
+                                type: 'error'
+                            });
+                        }}
+                        useOneTap
+                        shape="pill"
+                        width="350px"
+                    />
+                    
+                    <div className="form-field-container">
+                        <label htmlFor="email">
+                            כתובת דואר אלקטרונית<RequiredMark />
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="כתובת מייל"
+                            required
+                            autoFocus
                         />
-                        <div className="divider">התחברות פשוטה עם כתובת המייל שלכם</div>
-                        <form onSubmit={handleSubmit} className="email-form">
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="כתובת מייל"
-                                required
-                                autoFocus
-                            />
-                            <div className="input-with-icon-container">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="סיסמה"
-                                    required
-                                />
-                                <span onClick={() => setShowPassword(!showPassword)} className="input-icon">
-                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                </span>
-                            </div>
-                            <div className="actions-container">
-                                <button type="submit" className="btn btn-solid btn-primary" disabled={isLoading}>המשך</button>
-                            </div>
-                            <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password');}} className="forgot-password-link">
-                                יצירת סיסמה חדשה
-                            </a>
-                            {message.text && (
-                                <p className={`auth-message ${message.type === 'success' ? 'success-message' : 'error-message'}`}>
-                                    {message.text}
-                                </p>
-                            )}
-                        </form>
                     </div>
+
+                    <div className="form-field-container">
+                        <label htmlFor="password">
+                            סיסמה<RequiredMark />
+                        </label>
+                        <div className="input-with-icon-container">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                id="password"
+                                name="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="סיסמה"
+                                required
+                            />
+                            <span onClick={() => setShowPassword(!showPassword)} className="input-icon">
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="actions-container">
+                        <button 
+                            type="button" 
+                            className="btn btn-solid btn-primary" 
+                            disabled={isLoading}
+                            onClick={handleSubmit}
+                        >
+                            המשך
+                        </button>
+                    </div>
+                    
+                    <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password');}} className="forgot-password-link">
+                        יצירת סיסמה חדשה
+                    </a>
+                    
+                    {message.text && (
+                        <p className={`auth-message ${message.type === 'success' ? 'success-message' : 'error-message'}`}>
+                            {message.text}
+                        </p>
+                    )}
                 </div>
             </div>
         </GoogleOAuthProvider>

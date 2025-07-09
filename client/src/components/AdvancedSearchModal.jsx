@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaStar, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
-import '../styles/AdvancedSearchPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const MAX_DISTANCE_KM = 100;
@@ -209,7 +208,7 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
                 onChange={e => setDistance(Number(e.target.value))}
                 step={1}
               />
-              <span className="distance-value">{distance} ק"מ</span>
+              <span>{distance} ק"מ</span>
             </div>
           </div>
 

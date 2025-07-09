@@ -3,7 +3,6 @@ import BusinessCard from './BusinessCard';
 import AdvancedSearchModal from './AdvancedSearchModal';
 import axios from 'axios';
 import '../styles/SearchResultPage.css';
-import '../styles/AdvancedSearchPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchBar from './SearchBar';
 import { FaFilter, FaTimes, FaChevronDown, FaSort } from 'react-icons/fa';

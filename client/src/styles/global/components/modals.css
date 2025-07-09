@@ -31,6 +31,7 @@
   color: var(--text-primary);
 }
 
+
 .modal-header {
   padding: 0 0 var(--spacing-lg) 0;
   border-block-end: none;
@@ -66,6 +67,14 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Modal Content Centering */
+.modal-center {
+  /* Additional centering properties */
+  align-items: center;
+  gap: 2rem;
+  margin-block-start: 1.5rem;
 }
 
 /* Modal Scrollbar Styling */

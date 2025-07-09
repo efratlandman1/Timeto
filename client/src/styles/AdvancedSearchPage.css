@@ -1,9 +1,0 @@
-input[type="range"] {
-    flex: 1;
-    direction: rtl;
-}
-
-.distance-value {
-    min-width: 60px;
-    text-align: right;
-}

@@ -10,7 +10,7 @@
 @import './components/toasts.css';
 @import './components/general.css';
 @import './components/loading.css';
-@import './components/errors.css';
+@import './components/messages.css';
 
 /* Import UI Component Styles */
 @import './components/select.css';

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import '../styles/AuthPage.css'; // Use the new unified styles
 import { FaEye, FaEyeSlash, FaTimes } from 'react-icons/fa';
 
 const ResetPasswordPage = () => {
@@ -15,8 +14,7 @@ const ResetPasswordPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
         if (password !== confirmPassword) {
             setMessage({ text: 'הסיסמאות אינן תואמות.', type: 'error' });
             return;
@@ -47,6 +45,8 @@ const ResetPasswordPage = () => {
         }
     };
 
+    const RequiredMark = () => <span className="required-mark"> * </span>;
+
     return (
         <div className="modal-overlay">
             {isLoading && (
@@ -54,7 +54,7 @@ const ResetPasswordPage = () => {
                     <div className="spinner"></div>
                 </div>
             )}
-            <div className="modal-content" /*style={{ opacity: isLoading ? 0.7 : 1 }}*/>
+            <div className="modal-content modal-center" /*style={{ opacity: isLoading ? 0.7 : 1 }}*/>
                 <Link to="/auth" className="btn btn-ghost btn-circle btn-sm btn-close">
                     <FaTimes />
                 </Link>
@@ -69,37 +69,58 @@ const ResetPasswordPage = () => {
                     <>
                         <h2>איפוס סיסמה</h2>
                         <p>הגדירו סיסמה חדשה לחשבונכם</p>
-                        <form className="email-form" onSubmit={handleSubmit}>
-                            <div className="input-with-icon-container">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="סיסמה חדשה"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                                <span className="input-icon" onClick={() => setShowPassword(!showPassword)}>
-                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                </span>
+                        {/* <div className="email-form"> */}
+                            <div className="form-field-container">
+                                <label htmlFor="password">
+                                    סיסמה חדשה<RequiredMark />
+                                </label>
+                                <div className="input-with-icon-container">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        id="password"
+                                        name="password"
+                                        placeholder="סיסמה חדשה"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                    <span className="input-icon" onClick={() => setShowPassword(!showPassword)}>
+                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                    </span>
+                                </div>
                             </div>
-                            <div className="input-with-icon-container">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="אימות סיסמה"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    required
-                                />
-                                <span className="input-icon" onClick={() => setShowPassword(!showPassword)}>
-                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                </span>
+
+                            <div className="form-field-container">
+                                <label htmlFor="confirmPassword">
+                                    אימות סיסמה<RequiredMark />
+                                </label>
+                                <div className="input-with-icon-container">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        placeholder="אימות סיסמה"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        required
+                                    />
+                                    <span className="input-icon" onClick={() => setShowPassword(!showPassword)}>
+                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                    </span>
+                                </div>
                             </div>
+
                             <div className="actions-container">
-                                <button type="submit" className="btn btn-solid btn-primary" disabled={isLoading}>
+                                <button 
+                                    type="button" 
+                                    className="btn btn-solid btn-primary" 
+                                    disabled={isLoading}
+                                    onClick={handleSubmit}
+                                >
                                     אפס סיסמה
                                 </button>
                             </div>
-                        </form>
+                        {/* </div> */}
                         {message.type === 'error' && <p className="auth-message error-message">{message.text}</p>}
                     </>
                 )}

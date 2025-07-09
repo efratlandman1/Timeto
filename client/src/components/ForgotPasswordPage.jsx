@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import '../styles/AuthPage.css'; // Use the new unified styles
+import { FaTimes } from 'react-icons/fa';
 
 const ForgotPasswordPage = () => {
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
         setIsLoading(true);
         setMessage({ text: '', type: '' });
         try {
@@ -30,6 +29,8 @@ const ForgotPasswordPage = () => {
         }
     };
 
+    const RequiredMark = () => <span className="required-mark"> * </span>;
+
     return (
         <div className="modal-overlay">
             {isLoading && (
@@ -37,8 +38,10 @@ const ForgotPasswordPage = () => {
                     <div className="spinner"></div>
                 </div>
             )}
-            <div className="modal-content" /*style={{ opacity: isLoading ? 0.7 : 1 }}*/>
-                <Link to="/auth" className="btn btn-ghost btn-circle btn-sm">×</Link>
+            <div className="modal-content modal-center" /*style={{ opacity: isLoading ? 0.7 : 1 }}*/>
+                <Link to="/auth" className="btn btn-ghost btn-circle btn-close">
+                    <FaTimes />
+                </Link>
 
                 {message.type === 'success' ? (
                     <div className="success-view">
@@ -50,10 +53,14 @@ const ForgotPasswordPage = () => {
                     <>
                         <h2>איפוס סיסמה</h2>
                         <p>הזינו את כתובת האימייל שלכם ונשלח קישור לאיפוס הסיסמה</p>
-                        <form className="email-form" onSubmit={handleSubmit}>
-                            <div className="input-wrapper">
+                            <div className="form-field-container">
+                                <label htmlFor="email">
+                                    כתובת דואר אלקטרונית<RequiredMark />
+                                </label>
                                 <input
                                     type="email"
+                                    id="email"
+                                    name="email"
                                     placeholder="אימייל"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -61,11 +68,15 @@ const ForgotPasswordPage = () => {
                                 />
                             </div>
                             <div className="actions-container">
-                                <button type="submit" className="btn btn-solid btn-primary" disabled={isLoading}>
+                                <button 
+                                    type="button" 
+                                    className="btn btn-solid btn-primary" 
+                                    disabled={isLoading}
+                                    onClick={handleSubmit}
+                                >
                                     שלח קישור איפוס
                                 </button>
                             </div>
-                        </form>
                         {message.type === 'error' && <p className="auth-message error-message">{message.text}</p>}
                     </>
                 )}
