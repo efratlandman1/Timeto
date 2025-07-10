@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaUserFriends, FaStar, FaCalendarCheck } from 'react-icons/fa';
 import { buildQueryUrl } from '../utils/buildQueryUrl';
 import { useSelector } from 'react-redux';
+import { getToken } from '../utils/auth';
 
 const MainPage = () => {
     const [businesses, setBusinesses] = useState([]);
@@ -79,12 +80,19 @@ const MainPage = () => {
 
     const fetchBusinesses = async () => {
         try {
+            // הוספת headers עם טוקן אם המשתמש מחובר
+            const headers = {};
+            const token = getToken();
+            if (token) {
+                headers.Authorization = `Bearer ${token}`;
+            }
+
             // Fetch new businesses
             const newBusinessesUrl = buildQueryUrl(
                 `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`,
                 { sort: 'newest', limit: 3 }
             );
-            const newBusinessesResponse = await axios.get(newBusinessesUrl);
+            const newBusinessesResponse = await axios.get(newBusinessesUrl, { headers });
             console.log('New businesses response:', newBusinessesResponse.data);
             setNewBusinesses(newBusinessesResponse.data.data);
 
@@ -94,7 +102,7 @@ const MainPage = () => {
                 { sort: 'popular_nearby', limit: 3 },
                 userLocation
             );
-            const popularNearbyResponse = await axios.get(popularNearbyUrl);
+            const popularNearbyResponse = await axios.get(popularNearbyUrl, { headers });
             console.log('Popular nearby response:', popularNearbyResponse.data);
             setPopularBusinesses(popularNearbyResponse.data.data);
 
@@ -103,7 +111,7 @@ const MainPage = () => {
                 `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`,
                 { sort: 'rating', limit: 3 }
             );
-            const recommendedResponse = await axios.get(recommendedUrl);
+            const recommendedResponse = await axios.get(recommendedUrl, { headers });
             console.log('Recommended response:', recommendedResponse.data);
             setRecommendedBusinesses(recommendedResponse.data.data);
 

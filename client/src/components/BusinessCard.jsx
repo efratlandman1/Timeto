@@ -18,30 +18,9 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [localActive, setLocalActive] = useState(business.active);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(business.isFavorite || false);
 
-  useEffect(() => {
-    const checkFavoriteStatus = async () => {
-      try {
-        const token = getToken();
-        if (!token) return;
-
-        const response = await fetch(
-          `${process.env.REACT_APP_API_DOMAIN}/api/v1/favorites/status/${business._id}`,
-          { headers: { 'Authorization': `Bearer ${token}` } }
-        );
-        
-        if (response.ok) {
-          const { isFavorite } = await response.json();
-          setIsFavorite(isFavorite);
-        }
-      } catch (error) {
-        console.error('Error checking favorite status:', error);
-      }
-    };
-
-    checkFavoriteStatus();
-  }, [business._id]);
+  // הסרת useEffect לבדיקת סטטוס מועדפים - עכשיו זה מגיע מהשרת
 
   const handleToggleFavorite = async (e) => {
     e.stopPropagation();

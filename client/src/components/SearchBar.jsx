@@ -3,6 +3,7 @@ import { FaSearch, FaFilter, FaFolder, FaMapMarkerAlt } from 'react-icons/fa';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/SearchBar.css';
+import { getToken } from '../utils/auth';
 
 const ITEMS_PER_PAGE = 10;
 const DEBOUNCE_DELAY = 300;
@@ -43,11 +44,19 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
     }
     
     try {
+      // הוספת headers עם טוקן אם המשתמש מחובר
+      const headers = {};
+      const token = getToken();
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const res = await fetch(
         `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses?` +
         `q=${encodeURIComponent(query)}&` +
         `page=${pageNum}&` +
-        `limit=${ITEMS_PER_PAGE}`
+        `limit=${ITEMS_PER_PAGE}`,
+        { headers }
       );
       
       if (!res.ok) throw new Error('Search request failed');

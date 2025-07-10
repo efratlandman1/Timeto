@@ -9,6 +9,7 @@ import SearchBar from './SearchBar';
 import { FaFilter, FaTimes, FaChevronDown, FaSort } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { buildQueryUrl } from '../utils/buildQueryUrl';
+import { getToken } from '../utils/auth';
 
 const ITEMS_PER_PAGE = 8;
 
@@ -156,7 +157,14 @@ const SearchResultPage = () => {
         
         console.log('SearchResultPage - Final URL:', url);
         
-        axios.get(url)
+        // הוספת headers עם טוקן אם המשתמש מחובר
+        const headers = {};
+        const token = getToken();
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
+        
+        axios.get(url, { headers })
             .then(res => {
                 const newBusinesses = res.data.data || [];
                 setBusinesses(prevBusinesses => 

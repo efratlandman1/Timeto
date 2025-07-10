@@ -368,6 +368,17 @@ exports.getItems = async (req, res) => {
         const limitNum = Number(limit) || DEFAULT_ITEMS_PER_PAGE;
         const skip = (pageNum - 1) * limitNum;
 
+        // בדיקה אם המשתמש מחובר
+        let userId = null;
+        try {
+            const token = req.headers['authorization']?.split(' ')[1];
+            if (token) {
+                userId = AuthUtils.extractUserId(token);
+            }
+        } catch (error) {
+            console.log('User not authenticated or invalid token');
+        }
+
         let query = q ? 
             await buildSearchQuery(q) : 
             await buildFilterQuery(categoryName, services, rating);
@@ -414,8 +425,39 @@ exports.getItems = async (req, res) => {
                 Business.countDocuments(query)
             ]);
 
+            // הוספת סטטוס מועדפים אם המשתמש מחובר
+            let businessesWithFavorites = businesses;
+            if (userId) {
+                const businessIds = businesses.map(b => b._id);
+                const Favorite = require('../models/favorite');
+                const userFavorites = await Favorite.find({ 
+                    user_id: userId, 
+                    business_id: { $in: businessIds },
+                    active: true 
+                }).select('business_id');
+                
+                const favoriteMap = new Map();
+                businessIds.forEach(id => {
+                    favoriteMap.set(id.toString(), false);
+                });
+                
+                userFavorites.forEach(fav => {
+                    favoriteMap.set(fav.business_id.toString(), true);
+                });
+                
+                businessesWithFavorites = businesses.map(business => ({
+                    ...business,
+                    isFavorite: favoriteMap.get(business._id.toString()) || false
+                }));
+            } else {
+                businessesWithFavorites = businesses.map(business => ({
+                    ...business,
+                    isFavorite: false
+                }));
+            }
+
             result = {
-                data: businesses,
+                data: businessesWithFavorites,
                 pagination: {
                     total,
                     page: pageNum,
@@ -451,8 +493,39 @@ exports.getItems = async (req, res) => {
                 Business.countDocuments(query)
             ]);
 
+            // הוספת סטטוס מועדפים אם המשתמש מחובר
+            let businessesWithFavorites = businesses;
+            if (userId) {
+                const Favorite = require('../models/favorite');
+                const businessIds = businesses.map(b => b._id);
+                const userFavorites = await Favorite.find({ 
+                    user_id: userId, 
+                    business_id: { $in: businessIds },
+                    active: true 
+                }).select('business_id');
+                
+                const favoriteMap = new Map();
+                businessIds.forEach(id => {
+                    favoriteMap.set(id.toString(), false);
+                });
+                
+                userFavorites.forEach(fav => {
+                    favoriteMap.set(fav.business_id.toString(), true);
+                });
+                
+                businessesWithFavorites = businesses.map(business => ({
+                    ...business,
+                    isFavorite: favoriteMap.get(business._id.toString()) || false
+                }));
+            } else {
+                businessesWithFavorites = businesses.map(business => ({
+                    ...business,
+                    isFavorite: false
+                }));
+            }
+
             result = {
-                data: businesses,
+                data: businessesWithFavorites,
                 pagination: {
                     total,
                     page: pageNum,

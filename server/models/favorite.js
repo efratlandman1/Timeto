@@ -8,4 +8,9 @@ const favoriteSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// אינדקסים לביצועים טובים יותר
+favoriteSchema.index({ user_id: 1, active: 1 }); // לשליפת מועדפים של משתמש
+favoriteSchema.index({ user_id: 1, business_id: 1 }, { unique: true }); // למניעת כפילויות
+favoriteSchema.index({ business_id: 1, active: 1 }); // לסטטיסטיקות עסקים
+
 module.exports = mongoose.model("favorites", favoriteSchema); 
