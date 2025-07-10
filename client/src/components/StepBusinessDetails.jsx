@@ -2,12 +2,7 @@ import React, { useState } from 'react';
 import { FaUpload } from 'react-icons/fa';
 import { Autocomplete } from '@react-google-maps/api';
 import '../styles/StepsStyle.css';
-
-const phonePrefixes = [
-  '050', '052', '053', '054', '055', '057', '058',
-  '02', '03', '04', '08', '09',
-  '072', '073', '074', '076',
-].sort((a, b) => Number(a) - Number(b));
+import { PHONE_PREFIXES, PHONE_NUMBER_MAX_LENGTH } from '../constants/globals';
 
 const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
   const [autocomplete, setAutocomplete] = useState(null);
@@ -112,7 +107,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
             style={{ width: '80px', textAlign: 'center' }}
             required
           >
-            {phonePrefixes.map(prefix => (
+            {PHONE_PREFIXES.map(prefix => (
               <option key={prefix} value={prefix}>{prefix}</option>
             ))}
           </select>
@@ -126,7 +121,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
             className="form-input"
             style={{ flexGrow: 1 }}
             inputMode="numeric"
-            maxLength={7}
+            maxLength={PHONE_NUMBER_MAX_LENGTH}
           />
         </div>
       </div>

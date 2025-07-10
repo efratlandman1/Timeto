@@ -7,12 +7,7 @@ import '../styles/LoginPage.css'; // Reusing the same styles for a consistent lo
 import { FaUser, FaLock, FaEnvelope, FaPhone, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { getToken } from '../utils/auth';
 import { toast } from 'react-toastify'; // Import toast
-
-const phonePrefixes = [
-  '050', '052', '053', '054', '055', '057', '058',
-  '02', '03', '04', '08', '09',
-  '072', '073', '074', '076',
-].sort((a, b) => Number(a) - Number(b));
+import { PHONE_PREFIXES, PHONE_NUMBER_MAX_LENGTH } from '../constants/globals';
 
 const UserProfilePage = () => {
   const [formData, setFormData] = useState({
@@ -133,7 +128,7 @@ const UserProfilePage = () => {
                 className="phone-prefix-select"
               >
                 <option value="">קידומת</option>
-                {phonePrefixes.map(prefix => (
+                {PHONE_PREFIXES.map(prefix => (
                   <option key={prefix} value={prefix}>{prefix}</option>
                 ))}
               </select>
@@ -146,7 +141,7 @@ const UserProfilePage = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 inputMode="numeric"
-                maxLength={7}
+                maxLength={PHONE_NUMBER_MAX_LENGTH}
               />
             </div>
           </div>
