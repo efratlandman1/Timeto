@@ -144,6 +144,9 @@ const AuthPage = () => {
                                 </p>
                             )}
                         </form>
+                        <button className="cancel-button" type="button" onClick={handleClose} style={{marginTop: '1rem'}}>
+                            ביטול
+                        </button>
                     </div>
                 </div>
             </div>

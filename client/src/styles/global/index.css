@@ -351,3 +351,58 @@ body {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 } 
+
+/* Global Modal Close Button */
+.close-button {
+  position: absolute;
+  top: 1rem;
+  inset-inline-end: 1rem;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #666;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+.close-button:hover, .close-button:focus {
+  background: #f0f0f0;
+  color: #333;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.close-button:active {
+  background: #e0e0e0;
+}
+
+/* Global Modal Cancel Button */
+.cancel-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 2.5rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--background-color, #fff);
+  color: var(--primary-color, #ff4d4d);
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-block-start: 1rem;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.cancel-button:hover, .cancel-button:focus {
+  background: var(--primary-color, #ff4d4d);
+  color: #fff;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(255,77,77,0.12);
+}
+.cancel-button:active {
+  background: var(--primary-dark, #ff1a1a);
+} 

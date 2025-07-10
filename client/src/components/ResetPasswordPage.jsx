@@ -55,7 +55,7 @@ const ResetPasswordPage = () => {
                 </div>
             )}
             <div className="auth-modal" style={{ opacity: isLoading ? 0.7 : 1 }}>
-                <Link to="/auth" className="close-button">×</Link>
+                <button onClick={() => navigate('/auth')} className="close-button">×</button>
 
                 {message.type === 'success' ? (
                     <div className="success-view">
@@ -98,6 +98,9 @@ const ResetPasswordPage = () => {
                                 אפס סיסמה
                             </button>
                         </form>
+                        <button className="cancel-button" type="button" onClick={() => navigate('/auth')} style={{marginTop: '1rem'}}>
+                            ביטול
+                        </button>
                         {message.type === 'error' && <p className="auth-message error-message">{message.text}</p>}
                     </>
                 )}

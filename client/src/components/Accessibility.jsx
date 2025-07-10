@@ -90,8 +90,9 @@ const Accessibility = () => {
               className="close-button"
               onClick={() => setIsOpen(false)}
               aria-label="סגור הגדרות נגישות"
+              style={{left: 'unset', right: '16px', top: '16px'}}
             >
-              <FaTimes />
+              ×
             </button>
 
             <h2 className="accessibility-title">
@@ -197,6 +198,9 @@ const Accessibility = () => {
 
               <button className="reset-button" onClick={resetSettings}>
                 אפס הגדרות
+              </button>
+              <button className="cancel-button" type="button" onClick={() => setIsOpen(false)} style={{marginTop: '1.5rem', width: '100%'}}>
+                ביטול
               </button>
             </div>
           </div>

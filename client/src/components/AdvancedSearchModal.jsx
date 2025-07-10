@@ -159,9 +159,7 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <button className="close-button" onClick={onClose}>
-          <FaTimes />
-        </button>
+        <button className="close-button" onClick={onClose}>×</button>
         <h2>חיפוש מורחב</h2>
         
         <div className="modal-scroll-content">
@@ -220,6 +218,11 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
         <div className="modal-actions">
           <button className="clear-button" onClick={handleClearAll}>נקה הכל</button>
           <button className="submit-button" onClick={handleSubmit}>הצג תוצאות</button>
+        </div>
+        <div style={{display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem'}}>
+          <button className="cancel-button" type="button" onClick={onClose}>
+            ביטול
+          </button>
         </div>
       </div>
     </div>

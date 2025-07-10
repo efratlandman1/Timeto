@@ -38,7 +38,7 @@ const ForgotPasswordPage = () => {
                 </div>
             )}
             <div className="auth-modal" style={{ opacity: isLoading ? 0.7 : 1 }}>
-                <Link to="/auth" className="close-button">×</Link>
+                <button onClick={() => window.location.href = '/auth'} className="close-button">×</button>
 
                 {message.type === 'success' ? (
                     <div className="success-view">
@@ -65,6 +65,9 @@ const ForgotPasswordPage = () => {
                                 שלח קישור איפוס
                             </button>
                         </form>
+                        <button className="cancel-button" type="button" onClick={() => window.location.href = '/auth'} style={{marginTop: '1rem'}}>
+                            ביטול
+                        </button>
                         {message.type === 'error' && <p className="auth-message error-message">{message.text}</p>}
                     </>
                 )}

@@ -115,7 +115,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
                     dir="rtl"
                     onClick={(e) => e.stopPropagation()}
                     >
-                    <button className="feedback-page-close-button" onClick={onClose}>×</button>
+                    <button className="feedback-page-close-button close-button" onClick={onClose}>×</button>
                     <h2 className="feedback-page-title">
                         חוות דעת על {businessName || 'העסק'}
                     </h2>
@@ -154,6 +154,9 @@ const FeedbackPage = ({ businessId, onClose }) => {
                     </div>
 
                     <button className="confirm-button" onClick={handleSubmit}>שלח פידבק</button>
+                    <button className="cancel-button" type="button" onClick={onClose} style={{marginTop: '1.5rem', width: '100%'}}>
+                      ביטול
+                    </button>
 
                     <div className="feedback-page-feedback-list">
                         <h3>חוות דעת קודמות</h3>
