@@ -168,7 +168,7 @@ const buildLookupPipeline = (skip, limit) => {
                 foreignField: '_id',
                 as: 'categoryId',
                 pipeline: [
-                  { $project: { name: 1, color: 1 } }
+                  { $project: { name: 1, color: 1, logo: 1 } }
                 ]
             }
         },
@@ -192,7 +192,7 @@ const buildLookupPipeline = (skip, limit) => {
 exports.getAllBusinesses = async (req, res) => {
     try {
         const businesses = await Business.find({})
-            .populate('categoryId', 'name color')
+            .populate('categoryId', 'name color logo')
             .populate('services', 'name')
             .populate('userId', 'firstName lastName');
 
@@ -441,7 +441,7 @@ exports.getItems = async (req, res) => {
             const [businesses, total] = await Promise.all([
                 Business.find(query)
                     .select(q ? { score: { $meta: "textScore" } } : {})
-                    .populate('categoryId', 'name color')
+                    .populate('categoryId', 'name color logo')
                     .populate('services', 'name')
                     .populate('userId', 'firstName lastName')
                     .sort(sortOption)
@@ -480,7 +480,7 @@ exports.getBusinessById = async (req, res) => {
     //  console.log("AuthUtils.extractUserId",userId);
      
     const business = await Business.findById(req.params.id)
-      .populate('categoryId', 'name color')
+      .populate('categoryId', 'name color logo')
       .populate('services');
 
     if (!business) {

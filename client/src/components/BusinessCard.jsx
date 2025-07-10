@@ -166,7 +166,14 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
       className={`business-card ${!localActive ? 'inactive' : ''}`}
       onClick={handleCardClick}
     >
-      <div className="business-card-image-container">
+      <div
+        className="business-card-image-container"
+        style={{
+          background: !business.logo && business.categoryId?.color
+            ? business.categoryId.color
+            : '#f8f8f8'
+        }}
+      >
         {business.logo ? (
           <img
             className="business-card-image"
@@ -174,11 +181,15 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
             alt={business.name}
           />
         ) : (
-          <span
-            className="business-card-placeholder"
-            style={{ background: business.categoryId?.color || '#bdbdbd' }}
-          >
-            {business.name}
+          <span className="business-card-placeholder">
+            {business.categoryId?.logo && (
+              <img
+                src={`${process.env.REACT_APP_API_DOMAIN}${business.categoryId.logo}`}
+                alt={business.categoryId?.name}
+                className="category-logo-in-placeholder"
+              />
+            )}
+            <span className="business-placeholder-name">{business.name}</span>
           </span>
         )}
         <div className="business-card-overlay" />
@@ -221,13 +232,6 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
             <div className="rating-stars">
               {renderRatingStars(business.rating)}
             </div>
-            {business.rating !== null && business.rating !== undefined ? (
-              <span className="rating-number">
-                {roundRating(business.rating)}
-              </span>
-            ) : (
-              <span className="rating-number new">חדש</span>
-            )}
           </div>
 
           <div className="business-card-actions">
