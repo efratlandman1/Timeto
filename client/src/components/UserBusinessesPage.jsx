@@ -56,7 +56,7 @@ const UserBusinessesPage = () => {
                     <div className="page-header__action">
                         <button 
                             className="add-business-button"
-                            onClick={() => navigate('/edit')}
+                            onClick={() => navigate('/business')}
                         >
                             <FaPlus className="add-business-icon" />
                             הוספת עסק חדש

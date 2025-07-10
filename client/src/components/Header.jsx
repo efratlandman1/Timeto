@@ -247,15 +247,15 @@ const Header = () => {
                             {t('header.search')}
                         </button>
                         <button 
-                            className={`nav-button ${isActive("/edit") ? "active" : ""}`} 
-                            onClick={() => navigate("/edit")}
+                            className={`nav-button ${isActive("/business") ? "active" : ""}`} 
+                            onClick={() => navigate("/business")}
                         >
                             <FaPlusCircle />
                             {t('header.addBusiness')}
                         </button>
                         <button 
-                            className={`nav-button ${isActive("/suggest") ? "active" : ""}`} 
-                            onClick={() => navigate("/suggest")}
+                            className={`nav-button ${isActive("/suggest-item") ? "active" : ""}`} 
+                            onClick={() => navigate("/suggest-item")}
                         >
                             <FaLightbulb />
                             {t('header.suggest')}
@@ -298,7 +298,7 @@ const Header = () => {
                                 >
                                     <button 
                                         className="dropdown-item" 
-                                        onClick={() => handleMenuItemClick("/profile")}
+                                        onClick={() => handleMenuItemClick("/user-profile")}
                                         role="menuitem"
                                     >
                                         <FaIdCard />
@@ -306,7 +306,7 @@ const Header = () => {
                                     </button>
                                     <button 
                                         className="dropdown-item" 
-                                        onClick={() => handleMenuItemClick("/my-businesses")}
+                                        onClick={() => handleMenuItemClick("/user-businesses")}
                                         role="menuitem"
                                     >
                                         <FaStore />
@@ -314,7 +314,7 @@ const Header = () => {
                                     </button>
                                     <button 
                                         className="dropdown-item" 
-                                        onClick={() => handleMenuItemClick("/my-favorites")}
+                                        onClick={() => handleMenuItemClick("/user-favorites")}
                                         role="menuitem"
                                     >
                                         <FaHeart />

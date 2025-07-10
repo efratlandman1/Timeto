@@ -338,7 +338,7 @@ const MainPage = () => {
                     <div className="bottom-banner-content">
                         <h2>הצטרף לקהילת זמן</h2>
                         <p>הוסף את העסק שלך והתחיל לקבל לקוחות חדשים עוד היום</p>
-                        <button className="banner-button" onClick={() => navigate('/edit')}>
+                        <button className="banner-button" onClick={() => navigate('/business')}>
                             הוסף עסק חינם
                         </button>
                     </div>
@@ -358,7 +358,7 @@ const MainPage = () => {
                             <h3>קישורים מהירים</h3>
                             <ul className="quick-links">
                                 <li><a href="/search">חיפוש</a></li>
-                                <li><a href="/suggest">הצע פריט</a></li>
+                                <li><a href="/suggest-item">הצע פריט</a></li>
                                 <li><a href="/terms" onClick={(e) => {
                                     e.preventDefault();
                                     // Show terms modal or navigate to terms page when ready

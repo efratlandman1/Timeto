@@ -113,7 +113,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
   const handleEdit = (e) => {
     e.stopPropagation(); // Prevent card navigation
     dispatch(setSelectedBusiness(business));
-    navigate(`/edit/${business._id}`);
+    navigate(`/business/${business._id}`);
   };
 
   const handleCardClick = () => {

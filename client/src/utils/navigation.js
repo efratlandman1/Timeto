@@ -1,14 +1,15 @@
-// מיפוי שמות העמודים
-const PAGE_NAMES = {
-    '/': 'דף הבית',
-    '/search': 'חיפוש עסקים',
-    '/edit': 'הוספת עסק',
-    '/my-businesses': 'עסקים שלי',
-    '/business': 'פרופיל עסק',
-    '/suggest': 'הצעת פריט',
-    '/feedback': 'משוב'//,
-    // '/login': 'התחברות'//,
-    // '/register': 'הרשמה'
+export const routeNames = {
+  '/': 'דף הבית',
+  '/auth': 'התחברות',
+  '/business': 'הוספת עסק',
+  '/user-businesses': 'העסקים שלי',
+  '/user-favorites': 'המועדפים שלי',
+  '/user-profile': 'הפרופיל שלי',
+  '/admin': 'ניהול מערכת',
+  '/search-results': 'תוצאות חיפוש',
+  '/suggest-item': 'הצע פריט',
+  '/feedback': 'משוב',
+  '/terms': 'תנאי שימוש'
 };
 
 /**
@@ -17,7 +18,7 @@ const PAGE_NAMES = {
 export const getPageName = (path) => {
     // מנקה פרמטרים מה-URL
     const cleanPath = path.split('?')[0];
-    return PAGE_NAMES[cleanPath] || 'דף הבית';
+    return routeNames[cleanPath] || 'דף הבית';
 };
 
 /**

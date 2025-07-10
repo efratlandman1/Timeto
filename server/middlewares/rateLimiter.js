@@ -12,7 +12,7 @@ const generalLimiter = rateLimit({
 // Stricter limiter for sensitive actions like login and password reset
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 200,//5, // Limit each IP to 5 login/reset attempts per window
+    max: 5,//5, // Limit each IP to 5 login/reset attempts per window
     standardHeaders: true,
     legacyHeaders: false,
     message: 'Too many login or password reset attempts from this IP, please try again after 15 minutes',

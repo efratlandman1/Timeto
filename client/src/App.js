@@ -67,20 +67,20 @@ function App() {
                 />
                 <Routes>
                     <Route path="/" element={<MainPage />} />
-                    <Route path="/edit" element={<EditBusinessPage />} />
-                    <Route path="/edit/:id" element={<EditBusinessPage />} />
-                    <Route path="/my-businesses" element={<UserBusinessPage />} />
-                    <Route path="/my-favorites" element={<MyFavoritesPage />} />
+                    <Route path="/business" element={<EditBusinessPage />} />
+                    <Route path="/business/:id" element={<EditBusinessPage />} />
+                    <Route path="/user-businesses" element={<UserBusinessPage />} />
+                    <Route path="/user-favorites" element={<MyFavoritesPage />} />
                     <Route path="/auth" element={<AuthPage />} />
                     {/* <Route path="/login" element={<AuthPage />} /> */}
                     {/* <Route path="/register" element={<AuthPage />} /> */}
                     {/* <Route path="/login" element={<LoginPage />} /> */}
                     {/* <Route path="/register" element={<RegistrationPage />} /> */}
-                    <Route path="/profile" element={<UserProfilePage />} />
+                    <Route path="/user-profile" element={<UserProfilePage />} />
                     <Route path="/search-results" element={<SearchResultPage />} />
-                    <Route path="/feedback-page" element={<FeedbackPage />} />
+                    <Route path="/feedback" element={<FeedbackPage />} />
                     <Route path="/business-profile/:id" element={<BusinessProfilePage />} />
-                    <Route path="/suggest" element={<SuggestItemPage />} />
+                    <Route path="/suggest-item" element={<SuggestItemPage />} />
                     <Route path="/terms" element={<TermsPage />} />
                     <Route path="/admin" element={<AdminPanelPage />} />
                     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
