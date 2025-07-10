@@ -55,6 +55,7 @@ exports.handleAuth = async (req, res) => {
                     lastName: user.lastName,
                     email: user.email,
                     role: user.role,
+                    phonePrefix: user.phonePrefix,
                     phone: user.phone,
                     nickname:user.nickname
                     
@@ -180,6 +181,7 @@ exports.googleLogin = async (req, res) => {
             lastName: user.lastName,
             email: user.email,
             role: user.role,
+            phonePrefix: user.phonePrefix,
             phone: user.phone,
             nickname:user.nickname
         };

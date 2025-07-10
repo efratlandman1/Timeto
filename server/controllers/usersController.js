@@ -105,8 +105,9 @@ exports.updateUser = async (req, res) => {
             lastName: updatedUser.lastName,
             email: updatedUser.email,
             role: updatedUser.role, 
-            phone : updatedUser.phone,
-            nickname : updatedUser.nickname
+            phonePrefix: updatedUser.phonePrefix,
+            phone: updatedUser.phone,
+            nickname: updatedUser.nickname
         };
         // res.json(userData);
         res.status(200).json({ user:userData });

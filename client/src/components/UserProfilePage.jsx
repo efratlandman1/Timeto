@@ -8,17 +8,25 @@ import { FaUser, FaLock, FaEnvelope, FaPhone, FaEye, FaEyeSlash } from 'react-ic
 import { getToken } from '../utils/auth';
 import { toast } from 'react-toastify'; // Import toast
 
+const phonePrefixes = [
+  '050', '052', '053', '054', '055', '057', '058',
+  '02', '03', '04', '08', '09',
+  '072', '073', '074', '076',
+].sort((a, b) => Number(a) - Number(b));
+
 const UserProfilePage = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    phonePrefix: '',
     phone: '',
     nickname: '',
     password: '',
     confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -30,6 +38,7 @@ const UserProfilePage = () => {
         firstName: user.firstName || '',
         lastName: user.lastName || '',
         email: user.email || '',
+        phonePrefix: user.phonePrefix || '',
         phone: user.phone || '',
         nickname: user.nickname || '',
         password: '',
@@ -110,13 +119,36 @@ const UserProfilePage = () => {
           </div>
 
           <div className="login-input-wrapper">
-            <FaPhone className="login-input-icon" />
-            <input className="login-input" type="tel" name="phone" placeholder="טלפון" value={formData.phone} onChange={handleChange} required />
-          </div>
-
-          <div className="login-input-wrapper">
             <FaEnvelope className="login-input-icon" />
             <input className="login-input" type="email" name="email" placeholder="דואר אלקטרוני" value={formData.email} onChange={handleChange} required />
+          </div>
+          
+          <div className="login-input-wrapper phone-split">
+            <FaPhone className="login-input-icon" />
+            <div className="phone-inputs-container">
+              <select
+                name="phonePrefix"
+                value={formData.phonePrefix}
+                onChange={handleChange}
+                className="phone-prefix-select"
+              >
+                <option value="">קידומת</option>
+                {phonePrefixes.map(prefix => (
+                  <option key={prefix} value={prefix}>{prefix}</option>
+                ))}
+              </select>
+
+              <input
+                className="phone-number-input"
+                type="text"
+                name="phone"
+                placeholder="מספר טלפון"
+                value={formData.phone}
+                onChange={handleChange}
+                inputMode="numeric"
+                maxLength={7}
+              />
+            </div>
           </div>
           
           <div className="login-input-wrapper">
@@ -128,7 +160,6 @@ const UserProfilePage = () => {
           <p style={{textAlign: 'center', color: '#666'}}>שנה סיסמה (אופציונלי)</p>
 
           <div className="login-input-wrapper">
-            <FaLock className="login-input-icon" />
             <input className="login-input" type={showPassword ? "text" : "password"} name="password" placeholder="סיסמה חדשה" value={formData.password} onChange={handleChange} />
             <span className="login-password-toggle" onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -136,8 +167,10 @@ const UserProfilePage = () => {
           </div>
 
           <div className="login-input-wrapper">
-            <FaLock className="login-input-icon" />
-            <input className="login-input" type={showPassword ? "text" : "password"} name="confirmPassword" placeholder="אישור סיסמה חדשה" value={formData.confirmPassword} onChange={handleChange} />
+            <input className="login-input" type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder="אישור סיסמה חדשה" value={formData.confirmPassword} onChange={handleChange} />
+            <span className="login-password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
           </div>
 
           <button className="login-button" type="submit">שמור שינויים</button>
