@@ -1,16 +1,16 @@
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
+const crypto = require('crypto');
 const User = require('../models/user');
 const PasswordResetToken = require('../models/PasswordResetToken');
 const sendEmail = require('../utils/SendEmail/sendEmail');
-const { emailTemplates } = require('../utils/SendEmail/emailTemplates'); // אם אתה משתמש ב-export במקום module.exports
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
-const crypto = require('crypto');
 
+const emailTemplates = require('../utils/SendEmail/emailTemplates');
+const { generateToken } = require('../utils/authUtils');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
 /**
  * Handles user login and registration with a single endpoint.
  * This function is called when a user tries to log in or register using an email and password.
@@ -47,7 +47,7 @@ exports.handleAuth = async (req, res) => {
 
                 // Login successful
                 
-            const token = jwt.sign({ userId: user._id, email: user.email, role: user.role ,firstName: user.firstName,lastName: user.lastName}, process.env.JWT_SECRET, { expiresIn: '1h' });
+            const token = generateToken({ userId: user._id, email: user.email, role: user.role ,firstName: user.firstName,lastName: user.lastName});
 
                 const userData = {
                     id: user._id,
@@ -168,12 +168,11 @@ exports.googleLogin = async (req, res) => {
         }
         
         await user.save();
-        const token = jwt.sign({ userId: user._id, 
+        const token = generateToken({ userId: user._id, 
                                  email: user.email, 
                                  role: user.role ,
                                  firstName: user.firstName,
-                                 lastName: user.lastName}, 
-                    process.env.JWT_SECRET, { expiresIn: '1h' });
+                                 lastName: user.lastName});
 
         const userData = {
             id: user._id,

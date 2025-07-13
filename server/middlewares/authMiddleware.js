@@ -1,6 +1,7 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const { verifyToken } = require('../utils/authUtils');
 
 /**
  * פונקציה פנימית לאימות - לא מחזירה שגיאה אם אין טוקן
@@ -14,7 +15,7 @@ const _authenticateUser = async (req) => {
     }
   
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = verifyToken(token);
       const user = await User.findById(decoded.userId).select('-password');
   
       if (!user) {

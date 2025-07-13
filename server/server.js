@@ -7,7 +7,17 @@ const app = express();
 require('dotenv').config();
 
 // Validate critical environment variables
-const requiredEnvVars = ['MONGO_URI', 'CLIENT_URL'];
+const requiredEnvVars = [
+  'MONGO_URL', 
+  'CLIENT_URL', 
+  'JWT_SECRET',
+  'GOOGLE_CLIENT_ID',
+  'GOOGLE_MAPS_API_KEY',
+  'EMAIL_SERVICE',
+  'EMAIL_USER',
+  'EMAIL_PASS',
+  'SERVER_URL'
+];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
