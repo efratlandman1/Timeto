@@ -8,18 +8,19 @@ const {
   deleteService
 } = require('../controllers/serviceController');
 const { requireAdmin, publicRoute } = require('../middlewares/authMiddleware'); // Import the new admin middleware
+const { writeLimiter, generalLimiter } = require('../middlewares/rateLimiter');
 
 // כל השירותים
-router.get('/', publicRoute, getAllServices);
+router.get('/', publicRoute, generalLimiter, getAllServices);
 
 // שירותים לפי קטגוריה
-router.get('/byCategory/:categoryId', publicRoute, getServicesByCategory);
+router.get('/byCategory/:categoryId', publicRoute, generalLimiter, getServicesByCategory);
 
 // יצירת שירות חדש
-router.post('/', requireAdmin, createService);
+router.post('/', requireAdmin, writeLimiter, createService);
 
 // New CRUD routes
-router.put('/:id', requireAdmin, updateService);
-router.delete('/:id', requireAdmin, deleteService);
+router.put('/:id', requireAdmin, writeLimiter, updateService);
+router.delete('/:id', requireAdmin, writeLimiter, deleteService);
 
 module.exports = router;

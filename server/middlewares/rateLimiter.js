@@ -1,24 +1,34 @@
 const rateLimit = require('express-rate-limit');
 
-// General limiter for most API requests
+// General limiter - applied only to routes without specific limiters
 const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per window
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    max: 250, // Limit each IP to 250 requests per window
+    standardHeaders: true,
+    legacyHeaders: false,
     message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 
-// Stricter limiter for sensitive actions like login and password reset
+// Auth limiter for sensitive authentication actions
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5,//5, // Limit each IP to 5 login/reset attempts per window
+    max: 5, // Limit each IP to 5 auth attempts per window
     standardHeaders: true,
     legacyHeaders: false,
-    message: 'Too many login or password reset attempts from this IP, please try again after 15 minutes',
+    message: 'Too many authentication attempts from this IP, please try again after 15 minutes',
+});
+
+// Write limiter for all data modification operations (create, update, delete)
+const writeLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 40, // Limit each IP to 40 write operations per window
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: 'Too many data modification attempts from this IP, please try again after 15 minutes',
 });
 
 module.exports = {
     generalLimiter,
     authLimiter,
+    writeLimiter
 }; 
