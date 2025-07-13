@@ -7,19 +7,19 @@ const {
   updateService,
   deleteService
 } = require('../controllers/serviceController');
-const adminAuth = require('../middlewares/adminAuth'); // Import the admin middleware
+const { requireAdmin, publicRoute } = require('../middlewares/authMiddleware'); // Import the new admin middleware
 
 // כל השירותים
-router.get('/', getAllServices);
+router.get('/', publicRoute, getAllServices);
 
 // שירותים לפי קטגוריה
-router.get('/byCategory/:categoryId', getServicesByCategory);
+router.get('/byCategory/:categoryId', publicRoute, getServicesByCategory);
 
 // יצירת שירות חדש
-router.post('/', adminAuth, createService);
+router.post('/', requireAdmin, createService);
 
 // New CRUD routes
-router.put('/:id', adminAuth, updateService);
-router.delete('/:id', adminAuth, deleteService);
+router.put('/:id', requireAdmin, updateService);
+router.delete('/:id', requireAdmin, deleteService);
 
 module.exports = router;

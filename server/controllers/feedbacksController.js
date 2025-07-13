@@ -1,17 +1,10 @@
 // controllers/feedbackController.js
 const Feedback = require("../models/feedback");
-const AuthUtils = require('../utils/authUtils');
 const mongoose = require('mongoose');
 
 exports.createFeedback = async (req, res) => {
   try {
-    const token = req.headers['authorization']?.split(' ')[1];
-    const userId = AuthUtils.extractUserId(token);
-
-    if (!userId) {
-      return res.status(401).json({ error: "לא זוהתה הרשאה תקינה. אנא התחבר מחדש." });
-    }
-
+    const userId = req.user._id;
     const { business_id, rating, comment } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(business_id)) {
@@ -57,11 +50,7 @@ exports.getFeedbacksForBusiness = async (req, res) => {
 
 exports.deleteFeedback = async (req, res) => {
   try {
-    const token = req.headers['authorization']?.split(' ')[1];
-    const userId = AuthUtils.extractUserId(token);
-    if (!userId) {
-      return res.status(401).json({ error: "לא זוהתה הרשאה תקינה. אנא התחבר מחדש." });
-    }
+    const userId = req.user._id;
     const feedbackId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(feedbackId)) {

@@ -14,7 +14,6 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const serviceRoutes = require('./routes/serviceRoutes');
 const feedbackRoutes  = require('./routes/feedbacksRoutes');
 const favoritesRoutes = require('./routes/favoritesRoutes');
-const jwtAuthMiddleware = require("./middlewares/authMiddleware");
 const suggestionRouter = require('./routes/suggestionRoutes');
 const statsRoutes = require('./routes/stats');
 
@@ -23,7 +22,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const path = require('path');
 
-
 // Serve static files for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'config', 'uploads')));
 
@@ -31,9 +29,7 @@ mongoose.connect(MONGO_URI)
    .then(() => console.log('MongoDB connected'))
    .catch(err => console.error(err));
 
-// Apply JWT middleware before protected routes
-app.use(jwtAuthMiddleware)
-
+// Routes - כל ראוטר יקבל את המידלוור המתאים בתוך הקובץ שלו
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/businesses', businessesRouter);
 app.use("/api/v1/categories", categoryRoutes);

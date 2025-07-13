@@ -1,17 +1,10 @@
 const Favorite = require("../models/favorite");
-const AuthUtils = require('../utils/authUtils');
 const mongoose = require('mongoose');
 
 // Toggle favorite status for a business
 exports.toggleFavorite = async (req, res) => {
   try {
-    const token = req.headers['authorization']?.split(' ')[1];
-    const userId = AuthUtils.extractUserId(token);
-
-    if (!userId) {
-      return res.status(401).json({ error: "לא זוהתה הרשאה תקינה. אנא התחבר מחדש." });
-    }
-
+    const userId = req.user._id;
     const { business_id } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(business_id)) {
@@ -52,12 +45,7 @@ exports.toggleFavorite = async (req, res) => {
 // Get all favorite businesses for a user
 exports.getUserFavorites = async (req, res) => {
   try {
-    const token = req.headers['authorization']?.split(' ')[1];
-    const userId = AuthUtils.extractUserId(token);
-
-    if (!userId) {
-      return res.status(401).json({ error: "לא זוהתה הרשאה תקינה. אנא התחבר מחדש." });
-    }
+    const userId = req.user._id;
 
     const favorites = await Favorite.find({ 
       user_id: userId,
@@ -86,13 +74,8 @@ exports.getUserFavorites = async (req, res) => {
 // Check if a business is favorited by the user
 exports.checkFavoriteStatus = async (req, res) => {
   try {
-    const token = req.headers['authorization']?.split(' ')[1];
-    const userId = AuthUtils.extractUserId(token);
+    const userId = req.user._id;
     const businessId = req.params.businessId;
-
-    if (!userId) {
-      return res.status(401).json({ error: "לא זוהתה הרשאה תקינה." });
-    }
 
     const favorite = await Favorite.findOne({
       user_id: userId,

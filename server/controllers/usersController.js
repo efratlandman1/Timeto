@@ -86,6 +86,14 @@ exports.getAllUsers = async (req, res) => {
 exports.updateUser = async (req, res) => {
     try {
         console.log("updateUser");
+        const currentUserId = req.user._id;
+        const targetUserId = req.params.id;
+        
+        // בדיקה אם המשתמש מעדכן את הפרופיל שלו או שהוא אדמין
+        if (currentUserId.toString() !== targetUserId && req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'אין לך הרשאה לעדכן משתמש זה' });
+        }
+        
         const updateData = { ...req.body };
         if (updateData.password && updateData.password.length > 0) {
             updateData.password = await bcryptjs.hash(updateData.password, 10);
@@ -93,7 +101,7 @@ exports.updateUser = async (req, res) => {
             // Ensure the password is not overwritten with an empty value
             delete updateData.password;
         }
-        const updatedUser = await User.findByIdAndUpdate(req.params.id, updateData, { new: true }).select('-password');
+        const updatedUser = await User.findByIdAndUpdate(targetUserId, updateData, { new: true }).select('-password');
        
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });

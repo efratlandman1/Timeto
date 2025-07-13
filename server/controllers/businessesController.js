@@ -215,8 +215,7 @@ exports.getAllBusinesses = async (req, res) => {
 
 exports.uploadBusinesses = async (req, res) => {
     try {
-        const token = req.headers['authorization']?.split(' ')[1];
-        let userId = AuthUtils.extractUserId(token);
+        const userId = req.user._id;
 
         if (req.body.id) {
             return updateBusiness(req, res, userId);
@@ -331,8 +330,7 @@ const updateBusiness = async (req, res, userId) => {
 
 exports.getUserBusinesses = async (req, res) => {
     try {
-         const token = req.headers['authorization']?.split(' ')[1];
-        let userId = AuthUtils.extractUserId(token);
+        const userId = req.user._id;
         const businesses = await Business.find({ userId: userId }).sort({ active: -1 });
         res.status(200).json(businesses);
     } catch (err) {
@@ -369,15 +367,7 @@ exports.getItems = async (req, res) => {
         const skip = (pageNum - 1) * limitNum;
 
         // בדיקה אם המשתמש מחובר
-        let userId = null;
-        try {
-            const token = req.headers['authorization']?.split(' ')[1];
-            if (token) {
-                userId = AuthUtils.extractUserId(token);
-            }
-        } catch (error) {
-            console.log('User not authenticated or invalid token');
-        }
+        const userId = req.user ? req.user._id : null;
 
         let query = q ? 
             await buildSearchQuery(q) : 
@@ -547,11 +537,6 @@ exports.getItems = async (req, res) => {
 //no needed auth
 exports.getBusinessById = async (req, res) => {
   try {
-    //  const token = req.headers['authorization']?.split(' ')[1];
-    //  console.log("token",token);
-    //  let userId = AuthUtils.extractUserId(token);
-    //  console.log("AuthUtils.extractUserId",userId);
-     
     const business = await Business.findById(req.params.id)
       .populate('categoryId', 'name color logo')
       .populate('services');
@@ -559,11 +544,6 @@ exports.getBusinessById = async (req, res) => {
     if (!business) {
       return res.status(404).json({ error: 'Business not found' });
     }
-    // let businessUser = business.userId.toString();
-    // console.log("req.body.userId.toString()",businessUser);  
-    //  if (businessUser !== userId) {
-    //   return res.status(403).json({ error: 'Unauthorized to edit this business' });
-    // }
 
     res.status(200).json(business);
   } catch (error) {
@@ -575,8 +555,7 @@ exports.getBusinessById = async (req, res) => {
 exports.deleteBusiness = async (req, res) => {
   try {
     console.log("deleteBusiness :");
-    const token = req.headers['authorization']?.split(' ')[1];
-    const userId = AuthUtils.extractUserId(token);
+    const userId = req.user._id;
     const businessId = req.params.id;
     console.log("deleteBusiness businessId:",businessId);
     const business = await Business.findById(businessId);
@@ -600,8 +579,7 @@ exports.deleteBusiness = async (req, res) => {
 
 exports.restoreBusiness = async (req, res) => {
   try {
-    const token = req.headers['authorization']?.split(' ')[1];
-    const userId = AuthUtils.extractUserId(token);
+    const userId = req.user._id;
     const businessId = req.params.id;
 
     const business = await Business.findById(businessId);

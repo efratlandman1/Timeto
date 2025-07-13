@@ -7,11 +7,11 @@ const {
     deleteCategory
 } = require("../controllers/categoryController");
 const upload = require('../config/multerConfig');
-const adminAuth = require('../middlewares/adminAuth');
+const { requireAdmin, publicRoute } = require('../middlewares/authMiddleware');
 
-router.get("/", getAllCategories);
-router.post("/", adminAuth, upload.single('logo'), createCategory);
-router.put("/:id", adminAuth, upload.single('logo'), updateCategory);
-router.delete("/:id", adminAuth, deleteCategory);
+router.get("/", publicRoute, getAllCategories);
+router.post("/", requireAdmin, upload.single('logo'), createCategory);
+router.put("/:id", requireAdmin, upload.single('logo'), updateCategory);
+router.delete("/:id", requireAdmin, deleteCategory);
 
 module.exports = router;

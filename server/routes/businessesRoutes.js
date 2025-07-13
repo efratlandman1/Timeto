@@ -2,30 +2,31 @@ const express = require('express');
 const businessesController = require('../controllers/businessesController');
 const router = express.Router();
 const upload = require('../config/multerConfig');
+const { requireAuth, optionalAuth } = require('../middlewares/authMiddleware');
 
 router
     .route('/')
-    .get(businessesController.getItems)
-    .post(upload.single('logo'), businessesController.uploadBusinesses);
+    .get(optionalAuth, businessesController.getItems)
+    .post(requireAuth, upload.single('logo'), businessesController.uploadBusinesses);
 
 router
     .route('/all')
-    .get(businessesController.getAllBusinesses);
+    .get(optionalAuth, businessesController.getAllBusinesses);
     
 router
     .route('/user-businesses')
-    .get(businessesController.getUserBusinesses);
+    .get(requireAuth, businessesController.getUserBusinesses);
 
 // router
 //     .get('/search', businessesController.searchBusinesses);
 
 router
   .route('/:id')
-  .get(businessesController.getBusinessById)
-  .delete(businessesController.deleteBusiness);
+  .get(optionalAuth, businessesController.getBusinessById)
+  .delete(requireAuth, businessesController.deleteBusiness);
 
 router
-  .patch('/restore/:id', businessesController.restoreBusiness);
+  .patch('/restore/:id', requireAuth, businessesController.restoreBusiness);
 
   
 module.exports = router;

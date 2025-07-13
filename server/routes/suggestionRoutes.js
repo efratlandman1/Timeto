@@ -1,21 +1,22 @@
 const express = require('express');
 
 const suggestionController = require("../controllers/suggestionController");
+const { requireAuth, requireAdmin } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
-router.post('/', suggestionController.createSuggestion);
+router.post('/', requireAuth, suggestionController.createSuggestion);
 
-router.get('/my-suggestions', suggestionController.getUserSuggestions);
+router.get('/my-suggestions', requireAuth, suggestionController.getUserSuggestions);
 
 router
   .route('/')
-  .get(suggestionController.getAllSuggestions);
+  .get(requireAdmin, suggestionController.getAllSuggestions);
 
 router
   .route('/:id')
-  .get(suggestionController.getSuggestion)
-  .patch(suggestionController.updateSuggestionStatus)
-  .delete(suggestionController.deleteSuggestion);
+  .get(requireAdmin, suggestionController.getSuggestion)
+  .patch(requireAdmin, suggestionController.updateSuggestionStatus)
+  .delete(requireAdmin, suggestionController.deleteSuggestion);
 
 module.exports = router; 

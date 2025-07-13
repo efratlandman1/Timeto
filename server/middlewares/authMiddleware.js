@@ -2,71 +2,103 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-
-// פונקציה לבדיקת התאמה של מסלול עם פרמטרים דינמיים
-const matchPath = (path, routePattern) => {
-  const routeRegex = new RegExp('^' + routePattern.replace(/:[^\/]+/g, '[^/]+') + '$');
-  return routeRegex.test(path);
-};
-
-const jwtAuthMiddleware = async (req, res, next) => {
-    const openRoutes = [
-        '/api/v1/login',
-        '/api/v1/google',
-        '/api/v1/request-password-reset',
-        '/api/v1/reset-password',
-        '/api/v1/auth',
-        '/api/v1/set-password',
-        // '/api/v1/users/register',
-        '/api/v1/verify-email',
-        '/api/v1/businesses',
-        '/api/v1/categories',
-        '/api/v1/services',
-        '/api/v1/businesses/:id',
-        '/api/v1/services/byCategory/:categoryId',
-        '/api/v1/feedbacks/business/:businessId',
-        '/api/v1/suggestions', //check how to limit to post only
-        '/api/v1/stats/home'
-    ];
-
-    // if (openRoutes.includes(req.path) 
-    // ) {  //delete!!!!!!!!!!!!!!
-    //     return next(); // Allow access to open routes
-    // }
-    console.log("req.path",req.path);
-    const isOpen = openRoutes.some((route) => matchPath(req.path, route));
-    console.log("isOpen",isOpen);
-    if (isOpen) {
-        return next(); // פתוח – לא צריך טוקן
-    }
-    
-
-
-    const token = req.header('Authorization')?.split(' ')[1]; // Expect "Bearer <token>"
-
+/**
+ * פונקציה פנימית לאימות - לא מחזירה שגיאה אם אין טוקן
+ */
+const _authenticateUser = async (req) => {
+    const token = req.header('Authorization')?.split(' ')[1];
+  
     if (!token) {
-        return res.status(401).json({ message: 'Access denied. No token provided.' });
+      // החזרה עדינה – אין טוקן
+      return { user: null, error: 'NO_TOKEN' };
     }
-
+  
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log("decoded",decoded);
-        console.log("decoded.userId",decoded.userId);
-        const user = await User.findById(decoded.userId).select('-password');
-        
-        if (!user) {
-            return res.status(401).json({ message: 'Authorization failed, user not found.' });
-        }
-        
-        if (!user.is_verified) {
-            return res.status(403).json({ message: 'Please verify your email to access this resource.' });
-        }
-
-        req.user = user;
-        next();
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.userId).select('-password');
+  
+      if (!user) {
+        return { user: null, error: 'USER_NOT_FOUND' };
+      }
+  
+      if (!user.is_verified) {
+        return { user: null, error: 'EMAIL_NOT_VERIFIED' };
+      }
+  
+      return { user, error: null };
     } catch (err) {
-        return res.status(403).json({ message: 'Invalid or expired token.' });
+      console.error('JWT Error:', err); // לוג מלא פנימי
+      return { user: null, error: 'INVALID_TOKEN' };
     }
+  };
+  
+
+/**
+ * מידלוור לאימות משתמש רגיל - דורש טוקן תקין ומשתמש מאומת
+ */
+const requireAuth = async (req, res, next) => {
+    const { user, error } = await _authenticateUser(req);
+  
+    if (!user) {
+      switch (error) {
+        case 'NO_TOKEN':
+          return res.status(401).json({ message: 'Access denied. Token missing.' });
+        case 'INVALID_TOKEN':
+          return res.status(403).json({ message: 'Access denied. Invalid or expired token.' });
+        case 'USER_NOT_FOUND':
+          return res.status(401).json({ message: 'Access denied. User not found.' });
+        case 'EMAIL_NOT_VERIFIED':
+          return res.status(403).json({ message: 'Access denied. Please verify your email.' });
+        default:
+          return res.status(401).json({ message: 'Access denied.' });
+      }
+    }
+  
+    req.user = user;
+    next();
+  };
+  
+
+/**
+ * מידלוור לאימות אדמין - דורש משתמש מאומת עם הרשאות אדמין
+ */
+const requireAdmin = async (req, res, next) => {
+    const { user, error } = await _authenticateUser(req);
+  
+    if (!user) {
+      return res.status(401).json({ message: 'Access denied.' }); // או לוגיקה מורחבת כמו ב־requireAuth
+    }
+  
+    if (user.role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+    }
+  
+    req.user = user;
+    next();
+  };
+  
+
+
+/**
+ * מידלוור לאימות אופציונלי - מאפשר גישה עם או בלי טוקן
+ */
+const optionalAuth = async (req, res, next) => {
+  const { user }  = await _authenticateUser(req);
+    req.user = user; // null אם אין משתמש תקין
+    next();
 };
 
-module.exports = jwtAuthMiddleware;
+/**
+ * מידלוור לראוטים ציבוריים - לא דורש אימות
+ */
+const publicRoute = (req, res, next) => {
+    // תמיד ממשיכים ללא אימות
+    next();
+};
+
+module.exports = {
+    requireAuth,
+    requireAdmin,
+    optionalAuth,
+    publicRoute
+};
