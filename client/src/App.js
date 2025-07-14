@@ -20,7 +20,7 @@ import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
 // import SetPasswordPage from './components/SetPasswordPage';
 import { useDispatch } from 'react-redux';
-import { setUser } from './redux/userSlice';
+import { setUser, logout } from './redux/userSlice';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Accessibility from './components/Accessibility';
@@ -28,15 +28,31 @@ import './styles/global/index.css';
 import './i18n';
 import { useTranslation } from 'react-i18next';
 import { fetchUserLocation } from './redux/locationSlice';
+import { getToken } from './utils/auth';
 
 function App() {
     const dispatch = useDispatch();
     const { i18n } = useTranslation();
     
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
+        let user = null;
+        try {
+            const userData = localStorage.getItem('user');
+            user = userData ? JSON.parse(userData) : null;
+        } catch (error) {
+            console.error('Error parsing user data from localStorage:', error);
+            localStorage.removeItem('user');
+        }
+        
+        const token = getToken(); // Now checks validity automatically
+        
+        // Only set user if token is valid
+        if (user && token) {
             dispatch(setUser(user));
+        } else if (user && !token) {
+            // Clear invalid user data
+            localStorage.removeItem('user');
+            dispatch(logout());
         }
     }, [dispatch]);
 

@@ -81,12 +81,16 @@ const Header = () => {
     }, []);
 
     useEffect(() => {
-        const token = getToken();
+        const token = getToken(); // Now getToken checks validity automatically
         if (token && loginUser) {
             setUsername(loginUser.firstName || loginUser.email);
             setGreeting(getGreeting());
         } else {
             setUsername(null);
+            // Clear user data if token is invalid
+            if (loginUser && !token) {
+                dispatch(logout());
+            }
         }
 
         const intervalId = setInterval(() => {
@@ -94,7 +98,35 @@ const Header = () => {
         }, 60000);
 
         return () => clearInterval(intervalId);
-    }, [loginUser, t]);
+    }, [loginUser, t, dispatch]);
+
+    // Periodic token validation check
+    useEffect(() => {
+        const checkTokenValidity = () => {
+            const token = getToken(); // This now checks validity automatically
+            if (!token && loginUser) {
+                // Token is expired, clear user data
+                dispatch(logout());
+                setUsername(null);
+                setShowUserMenu(false);
+            }
+        };
+
+        // Check token validity every 30 seconds
+        const tokenCheckInterval = setInterval(checkTokenValidity, 30000);
+        
+        // Also check on page focus (when user returns to tab)
+        const handleFocus = () => {
+            checkTokenValidity();
+        };
+        
+        window.addEventListener('focus', handleFocus);
+        
+        return () => {
+            clearInterval(tokenCheckInterval);
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [loginUser, dispatch]);
 
     const handleLogout = () => {
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
