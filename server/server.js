@@ -89,9 +89,32 @@ const path = require('path');
 // Serve static files for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'config', 'uploads')));
 
-mongoose.connect(MONGO_URI)
-   .then(() => console.log('MongoDB connected'))
-   .catch(err => console.error(err));
+// Ensure NODE_ENV is set
+if (!process.env.NODE_ENV) {
+  console.error('❌ NODE_ENV is not set! Please set NODE_ENV to "dev", "prod" or "test".');
+  process.exit(1);
+}
+
+// Secure mongoose connection options
+const mongooseOptions = {
+  maxPoolSize: 10,
+  minPoolSize: 2,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  connectTimeoutMS: 10000,
+  retryWrites: true,
+  retryReads: true,
+  // ssl: process.env.NODE_ENV === 'prod', // Enable if you want SSL in production
+  // sslValidate: true,
+  // authSource: 'admin', // Enable if you use a separate auth DB
+};
+
+mongoose.connect(MONGO_URI, mongooseOptions)
+   .then(() => console.log('✅ MongoDB connected successfully'))
+   .catch(err => {
+     console.error('❌ MongoDB connection failed:', err.message);
+     process.exit(1);
+   });
 
 // Routes - כל ראוטר יקבל את המידלוור המתאים בתוך הקובץ שלו
 app.use('/api/v1/users', usersRouter);
