@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const NodeClam = require('clamscan');
 
 // Allowed file types and their MIME types
 const ALLOWED_FILE_TYPES = {
@@ -12,6 +13,87 @@ const ALLOWED_FILE_TYPES = {
 
 // Maximum file size (5MB)
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+// ClamAV configuration
+let clamscan = null;
+let clamAvailable = false;
+
+// Initialize ClamAV only if in production
+const isProduction = process.env.NODE_ENV === 'prod' ;
+
+(async () => {
+    if (isProduction) {
+        try {
+            clamscan = await new NodeClam().init({
+                removeInfected: false,
+                quarantineInfected: false,
+                scanLog: null,
+                debugMode: false,
+                clamscan: {
+                    path: process.platform === 'win32'
+                        ? 'C:\\Program Files\\ClamAV\\clamscan.exe'
+                        : '/usr/bin/clamscan',
+                },
+            });
+            clamAvailable = true;
+            console.log('✅ ClamAV initialized and ready for virus scanning');
+        } catch (err) {
+            clamAvailable = false;
+            console.warn('⚠️ ClamAV not available. Virus scanning is disabled:', err.message);
+        }
+    }
+})();
+
+// Virus scanning middleware
+const virusScan = async (req, res, next) => {
+    if (!req.file) {
+        return next();
+    }
+
+    // Skip virus scan in development
+    if (!isProduction) {
+        console.log('🟡 Skipping virus scan (development environment)');
+        return next();
+    }
+
+    // Skip if ClamAV is not available
+    if (!clamAvailable) {
+        console.warn('⚠️ ClamAV not available. Skipping virus scan.');
+        return next();
+    }
+
+    try {
+        const { isInfected, viruses } = await clamscan.isInfected(req.file.path);
+        if (isInfected) {
+            // Delete the infected file
+            if (req.file.path && fs.existsSync(req.file.path)) {
+                fs.unlinkSync(req.file.path);
+            }
+            
+            return res.status(400).json({
+                success: false,
+                message: 'File failed virus scan',
+                details: `Virus detected: ${viruses.join(', ')}`
+            });
+        }
+        
+        console.log('✅ File passed virus scan');
+        next();
+    } catch (err) {
+        console.error('Virus scan error:', err);
+        
+        // Delete the file if scan failed
+        if (req.file.path && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
+        
+        return res.status(500).json({
+            success: false,
+            message: 'Virus scan failed',
+            details: 'Unable to scan file for viruses'
+        });
+    }
+};
 
 // Validate file type
 const validateFileType = (req, res, next) => {
@@ -137,7 +219,8 @@ const fileUploadSecurity = [
     validateFileType,
     validateFileSize,
     sanitizeFileName,
-    checkFileContent
+    checkFileContent,
+    virusScan  // Add virus scanning to the chain
 ];
 
 module.exports = {
@@ -145,5 +228,6 @@ module.exports = {
     validateFileSize,
     sanitizeFileName,
     checkFileContent,
+    virusScan,
     fileUploadSecurity
 }; 
