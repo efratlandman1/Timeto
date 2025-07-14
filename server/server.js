@@ -93,8 +93,21 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+// Request body size limits to prevent memory attacks
+const MAX_BODY_SIZE = '10mb'; // 10MB limit for JSON payloads
+const MAX_URLENCODED_SIZE = '5mb'; // 5MB limit for URL-encoded data
+
+app.use(express.json({ 
+  limit: MAX_BODY_SIZE,
+  strict: true // Reject malformed JSON
+}));
+
+app.use(express.urlencoded({ 
+  extended: true, 
+  limit: MAX_URLENCODED_SIZE,
+  parameterLimit: 1000 // Limit number of parameters
+}));
 
 const path = require('path');
 
@@ -138,6 +151,39 @@ app.use('/api/v1/favorites', favoritesRoutes);
 app.use('/api/v1/suggestions', suggestionRouter);
 app.use('/api/v1', authRouter);
 app.use('/api/v1/stats', statsRoutes);
+
+// Global error handler for oversized requests and other errors
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ 
+      error: 'Invalid JSON payload',
+      message: 'The request body contains malformed JSON'
+    });
+  }
+  
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ 
+      error: 'File too large',
+      message: 'The uploaded file exceeds the size limit'
+    });
+  }
+  
+  if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+    return res.status(400).json({ 
+      error: 'Unexpected file field',
+      message: 'An unexpected file field was detected'
+    });
+  }
+  
+  // Log the error for debugging
+  console.error('Server error:', err);
+  
+  // Generic error response
+  res.status(500).json({ 
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'dev' ? err.message : 'Something went wrong'
+  });
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
