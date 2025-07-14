@@ -18,7 +18,11 @@ const mapsUtils = {
 
       return response.data.results[0].geometry.location;
     } catch (error) {
-      console.error('Error geocoding address:', error);
+      // Sanitized error logging - don't expose API keys or sensitive data
+      console.error('Error geocoding address:', error.message);
+      if (error.response?.status) {
+        console.error('Google Maps API status:', error.response.status);
+      }
       throw error;
     }
   },
@@ -38,7 +42,11 @@ const mapsUtils = {
         duration: response.data.rows[0].elements[0].duration
       };
     } catch (error) {
-      console.error('Error getting distance:', error);
+      // Sanitized error logging - don't expose API keys or sensitive data
+      console.error('Error getting distance:', error.message);
+      if (error.response?.status) {
+        console.error('Google Maps API status:', error.response.status);
+      }
       throw error;
     }
   }

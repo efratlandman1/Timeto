@@ -18,6 +18,7 @@ const requiredEnvVars = [
   'EMAIL_PASS',
   'SERVER_URL'
 ];
+
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
@@ -25,6 +26,17 @@ if (missingEnvVars.length > 0) {
   console.error('Please check your .env file');
   process.exit(1);
 }
+
+// Additional API key validation
+const apiKeysToValidate = ['JWT_SECRET', 'GOOGLE_MAPS_API_KEY', 'GOOGLE_CLIENT_ID', 'EMAIL_PASS'];
+const invalidApiKeys = apiKeysToValidate.filter(key => process.env[key] && process.env[key].length < 10);
+
+if (invalidApiKeys.length > 0) {
+  console.error('❌ Invalid API keys (too short):', invalidApiKeys.join(', '));
+  process.exit(1);
+}
+
+console.log('✅ All environment variables and API keys are valid');
 
 const PORT = 5050;
 const MONGO_URI = process.env.MONGO_URI;
