@@ -10,6 +10,7 @@
     "@react-google-maps/api": "^2.20.6",
     "@react-oauth/google": "^0.12.2",
     "@reduxjs/toolkit": "^2.6.1",
+    "@sentry/node": "^9.39.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
