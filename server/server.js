@@ -50,6 +50,7 @@ const feedbackRoutes  = require('./routes/feedbacksRoutes');
 const favoritesRoutes = require('./routes/favoritesRoutes');
 const suggestionRouter = require('./routes/suggestionRoutes');
 const statsRoutes = require('./routes/stats');
+const loggingMiddleware = require('./middlewares/loggingMiddleware');
 
 // Security middleware with environment-based settings
 const isDevelopment = process.env.NODE_ENV === 'dev';
@@ -71,6 +72,7 @@ const helmetConfig = {
 };
 
 app.use(helmet(helmetConfig));
+app.use(loggingMiddleware);
 
 // CORS configuration with environment variables
 const corsOptions = {
