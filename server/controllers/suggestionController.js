@@ -1,114 +1,314 @@
 const Suggestion = require('../models/suggestion');
 const Category = require('../models/category');
+const mongoose = require('mongoose');
+const { successResponse, errorResponse, getRequestMeta } = require("../utils/errorUtils");
+const logger = require("../logger");
+const Sentry = require("@sentry/node");
+const messages = require("../messages");
 
 // Create a new suggestion
-const createSuggestion = async (req, res, next) => {
-  const { type, name_he, name_en, parent_category_id, reason } = req.body;
+const createSuggestion = async (req, res) => {
+  const logSource = 'suggestionController.createSuggestion';
+  const meta = getRequestMeta(req, logSource);
+  
+  logger.info({ ...meta }, `${logSource} enter`);
+  
+  try {
+    const { type, name_he, name_en, parent_category_id, reason } = req.body;
 
-  // If type is service, verify that parent_category_id exists
-  if (type === 'service' && parent_category_id) {
-    const categoryExists = await Category.findById(parent_category_id);
-    if (!categoryExists) {
-      return next(new AppError('Parent category not found', 404));
+    // If type is service, verify that parent_category_id exists
+    if (type === 'service' && parent_category_id) {
+      const categoryExists = await Category.findById(parent_category_id);
+      if (!categoryExists) {
+        logger.warn({ ...meta, parent_category_id }, messages.SUGGESTION_MESSAGES.PARENT_CATEGORY_NOT_FOUND);
+        return errorResponse({
+          res,
+          req,
+          status: 404,
+          message: messages.SUGGESTION_MESSAGES.PARENT_CATEGORY_NOT_FOUND,
+          logSource
+        });
+      }
     }
+
+    // Create suggestion
+    const suggestion = await Suggestion.create({
+      type,
+      name_he,
+      name_en,
+      parent_category_id: type === 'service' ? parent_category_id : undefined,
+      reason,
+      user: req.user ? req.user._id : undefined
+    });
+
+    logger.info({ ...meta, suggestionId: suggestion._id }, `${logSource} complete`);
+    
+    return successResponse({
+      res,
+      req,
+      data: { suggestion },
+      message: messages.SUGGESTION_MESSAGES.CREATE_SUCCESS,
+      status: 201,
+      logSource
+    });
+  } catch (error) {
+    logger.error({ ...meta, error }, `${logSource} error`);
+    Sentry.captureException(error);
+    return errorResponse({
+      res,
+      req,
+      message: messages.SUGGESTION_MESSAGES.CREATE_ERROR,
+      logSource
+    });
   }
-
-  // Create suggestion
-  const suggestion = await Suggestion.create({
-    type,
-    name_he,
-    name_en,
-    parent_category_id: type === 'service' ? parent_category_id : undefined,
-    reason,
-    user: req.user ? req.user._id : undefined
-  });
-
-  res.status(201).json({
-    status: 'success',
-    data: suggestion
-  });
 };
 
 // Get all suggestions (admin only)
-const getAllSuggestions = async (req, res, next) => {
-  const suggestions = await Suggestion.find()
-    .populate('user', 'firstName lastName email')
-    .populate('parent_category_id', 'name_he name_en');
+const getAllSuggestions = async (req, res) => {
+  const logSource = 'suggestionController.getAllSuggestions';
+  const meta = getRequestMeta(req, logSource);
+  
+  logger.info({ ...meta }, `${logSource} enter`);
+  
+  try {
+    const suggestions = await Suggestion.find()
+      .populate('user', 'firstName lastName email')
+      .populate('parent_category_id', 'name_he name_en');
 
-  res.status(200).json({
-    status: 'success',
-    results: suggestions.length,
-    data: suggestions
-  });
+    logger.info({ ...meta, count: suggestions.length }, `${logSource} complete`);
+    
+    return successResponse({
+      res,
+      req,
+      data: { suggestions },
+      message: messages.SUGGESTION_MESSAGES.GET_ALL_SUCCESS,
+      logSource
+    });
+  } catch (error) {
+    logger.error({ ...meta, error }, `${logSource} error`);
+    Sentry.captureException(error);
+    return errorResponse({
+      res,
+      req,
+      message: messages.SUGGESTION_MESSAGES.GET_ALL_ERROR,
+      logSource
+    });
+  }
 };
 
 // Get suggestion by ID (admin only)
-const getSuggestion = async (req, res, next) => {
-  const suggestion = await Suggestion.findById(req.params.id)
-    .populate('user', 'firstName lastName email')
-    .populate('parent_category_id', 'name_he name_en');
+const getSuggestion = async (req, res) => {
+  const logSource = 'suggestionController.getSuggestion';
+  const meta = getRequestMeta(req, logSource);
+  
+  logger.info({ ...meta, suggestionId: req.params.id }, `${logSource} enter`);
+  
+  try {
+    // בדיקת תקפות של suggestionId
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      logger.warn({ ...meta, suggestionId: req.params.id }, messages.SUGGESTION_MESSAGES.INVALID_ID);
+      return errorResponse({
+        res,
+        req,
+        status: 400,
+        message: messages.SUGGESTION_MESSAGES.INVALID_ID,
+        logSource
+      });
+    }
 
-  if (!suggestion) {
-    return next(new AppError('No suggestion found with that ID', 404));
+    const suggestion = await Suggestion.findById(req.params.id)
+      .populate('user', 'firstName lastName email')
+      .populate('parent_category_id', 'name_he name_en');
+
+    if (!suggestion) {
+      logger.warn({ ...meta, suggestionId: req.params.id }, messages.SUGGESTION_MESSAGES.NOT_FOUND);
+      return errorResponse({
+        res,
+        req,
+        status: 404,
+        message: messages.SUGGESTION_MESSAGES.NOT_FOUND,
+        logSource
+      });
+    }
+
+    logger.info({ ...meta, suggestionId: req.params.id }, `${logSource} complete`);
+    
+    return successResponse({
+      res,
+      req,
+      data: { suggestion },
+      message: messages.SUGGESTION_MESSAGES.GET_SUCCESS,
+      logSource
+    });
+  } catch (error) {
+    logger.error({ ...meta, error }, `${logSource} error`);
+    Sentry.captureException(error);
+    return errorResponse({
+      res,
+      req,
+      message: messages.SUGGESTION_MESSAGES.GET_ERROR,
+      logSource
+    });
   }
-
-  res.status(200).json({
-    status: 'success',
-    data: suggestion
-  });
 };
 
 // Update suggestion status (admin only)
-const updateSuggestionStatus = async (req, res, next) => {
-  const { status } = req.body;
-
-  if (!['pending', 'approved', 'rejected'].includes(status)) {
-    return next(new AppError('Invalid status value', 400));
-  }
-
-  const suggestion = await Suggestion.findByIdAndUpdate(
-    req.params.id,
-    { status },
-    {
-      new: true,
-      runValidators: true
+const updateSuggestionStatus = async (req, res) => {
+  const logSource = 'suggestionController.updateSuggestionStatus';
+  const meta = getRequestMeta(req, logSource);
+  
+  logger.info({ ...meta, suggestionId: req.params.id }, `${logSource} enter`);
+  
+  try {
+    // בדיקת תקפות של suggestionId
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      logger.warn({ ...meta, suggestionId: req.params.id }, messages.SUGGESTION_MESSAGES.INVALID_ID);
+      return errorResponse({
+        res,
+        req,
+        status: 400,
+        message: messages.SUGGESTION_MESSAGES.INVALID_ID,
+        logSource
+      });
     }
-  );
 
-  if (!suggestion) {
-    return next(new AppError('No suggestion found with that ID', 404));
+    const { status } = req.body;
+
+    if (!['pending', 'approved', 'rejected'].includes(status)) {
+      logger.warn({ ...meta, status }, messages.SUGGESTION_MESSAGES.INVALID_STATUS);
+      return errorResponse({
+        res,
+        req,
+        status: 400,
+        message: messages.SUGGESTION_MESSAGES.INVALID_STATUS,
+        logSource
+      });
+    }
+
+    const suggestion = await Suggestion.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    if (!suggestion) {
+      logger.warn({ ...meta, suggestionId: req.params.id }, messages.SUGGESTION_MESSAGES.NOT_FOUND);
+      return errorResponse({
+        res,
+        req,
+        status: 404,
+        message: messages.SUGGESTION_MESSAGES.NOT_FOUND,
+        logSource
+      });
+    }
+
+    logger.info({ ...meta, suggestionId: req.params.id, status }, `${logSource} complete`);
+    
+    return successResponse({
+      res,
+      req,
+      data: { suggestion },
+      message: messages.SUGGESTION_MESSAGES.UPDATE_SUCCESS,
+      logSource
+    });
+  } catch (error) {
+    logger.error({ ...meta, error }, `${logSource} error`);
+    Sentry.captureException(error);
+    return errorResponse({
+      res,
+      req,
+      message: messages.SUGGESTION_MESSAGES.UPDATE_ERROR,
+      logSource
+    });
   }
-
-  res.status(200).json({
-    status: 'success',
-    data: suggestion
-  });
 };
 
 // Delete suggestion (admin only)
-const deleteSuggestion = async (req, res, next) => {
-  const suggestion = await Suggestion.findByIdAndDelete(req.params.id);
+const deleteSuggestion = async (req, res) => {
+  const logSource = 'suggestionController.deleteSuggestion';
+  const meta = getRequestMeta(req, logSource);
+  
+  logger.info({ ...meta, suggestionId: req.params.id }, `${logSource} enter`);
+  
+  try {
+    // בדיקת תקפות של suggestionId
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      logger.warn({ ...meta, suggestionId: req.params.id }, messages.SUGGESTION_MESSAGES.INVALID_ID);
+      return errorResponse({
+        res,
+        req,
+        status: 400,
+        message: messages.SUGGESTION_MESSAGES.INVALID_ID,
+        logSource
+      });
+    }
 
-  if (!suggestion) {
-    return next(new AppError('No suggestion found with that ID', 404));
+    const suggestion = await Suggestion.findByIdAndDelete(req.params.id);
+
+    if (!suggestion) {
+      logger.warn({ ...meta, suggestionId: req.params.id }, messages.SUGGESTION_MESSAGES.NOT_FOUND);
+      return errorResponse({
+        res,
+        req,
+        status: 404,
+        message: messages.SUGGESTION_MESSAGES.NOT_FOUND,
+        logSource
+      });
+    }
+
+    logger.info({ ...meta, suggestionId: req.params.id }, `${logSource} complete`);
+    
+    return successResponse({
+      res,
+      req,
+      message: messages.SUGGESTION_MESSAGES.DELETE_SUCCESS,
+      logSource
+    });
+  } catch (error) {
+    logger.error({ ...meta, error }, `${logSource} error`);
+    Sentry.captureException(error);
+    return errorResponse({
+      res,
+      req,
+      message: messages.SUGGESTION_MESSAGES.DELETE_ERROR,
+      logSource
+    });
   }
-
-  res.status(204).json({
-    status: 'success',
-    data: null
-  });
 };
 
 // Get user's suggestions
-const getUserSuggestions = async (req, res, next) => {
-  const suggestions = await Suggestion.find({ user: req.user._id })
-    .populate('parent_category_id', 'name_he name_en');
+const getUserSuggestions = async (req, res) => {
+  const logSource = 'suggestionController.getUserSuggestions';
+  const meta = getRequestMeta(req, logSource);
+  
+  logger.info({ ...meta, userId: req.user._id }, `${logSource} enter`);
+  
+  try {
+    const suggestions = await Suggestion.find({ user: req.user._id })
+      .populate('parent_category_id', 'name_he name_en');
 
-  res.status(200).json({
-    status: 'success',
-    results: suggestions.length,
-    data: suggestions
-  });
+    logger.info({ ...meta, userId: req.user._id, count: suggestions.length }, `${logSource} complete`);
+    
+    return successResponse({
+      res,
+      req,
+      data: { suggestions },
+      message: messages.SUGGESTION_MESSAGES.GET_USER_SUCCESS,
+      logSource
+    });
+  } catch (error) {
+    logger.error({ ...meta, error }, `${logSource} error`);
+    Sentry.captureException(error);
+    return errorResponse({
+      res,
+      req,
+      message: messages.SUGGESTION_MESSAGES.GET_USER_ERROR,
+      logSource
+    });
+  }
 };
 
 module.exports = {

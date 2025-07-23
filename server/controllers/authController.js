@@ -5,6 +5,9 @@ const User = require('../models/user');
 const PasswordResetToken = require('../models/PasswordResetToken');
 const sendEmail = require('../utils/SendEmail/sendEmail');
 const { v4: uuidv4 } = require('uuid');
+const { successResponse, errorResponse, getRequestMeta } = require("../utils/errorUtils");
+const logger = require("../logger");
+const messages = require("../messages");
 require('dotenv').config();
 
 const emailTemplates = require('../utils/SendEmail/emailTemplates');
@@ -20,13 +23,31 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
  * 3. New user: Creates the user, and sends a verification email.
  */
 exports.handleAuth = async (req, res) => {
-    console.log('Entering handleAuth function');
+    const logSource = 'authController.handleAuth';
+    const meta = getRequestMeta(req, logSource);
+    
+    logger.info({ ...meta }, `${logSource} enter`);
+    
     const { email, password } = req.body;
     if (!email || !password) {
-        return res.status(400).json({ error: "נדרשים אימייל וסיסמה." });
+        logger.warn({ ...meta }, messages.AUTH_MESSAGES.MISSING_CREDENTIALS);
+        return errorResponse({
+            res,
+            req,
+            status: 400,
+            message: messages.AUTH_MESSAGES.MISSING_CREDENTIALS,
+            logSource
+        });
     }
     if (password.length < 8) {
-        return res.status(400).json({ error: "הסיסמה חייבת להכיל לפחות 8 תווים." });
+        logger.warn({ ...meta }, messages.AUTH_MESSAGES.INVALID_PASSWORD);
+        return errorResponse({
+            res,
+            req,
+            status: 400,
+            message: messages.AUTH_MESSAGES.INVALID_PASSWORD,
+            logSource
+        });
     }
 
     try {
@@ -37,17 +58,29 @@ exports.handleAuth = async (req, res) => {
             if (user.is_verified) {
                 // Case 1: User exists and is verified -> Standard login attempt.
                 if (!user.password) {
-                    // This can happen if the user signed up via a social provider (like Google) first.
-                    return res.status(409).json({ error: 'כבר יש חשבון עם כתובת האימייל הזו, אך לא הוגדרה לו סיסמה. תוכל להמשיך על ידי הגדרת סיסמה חדשה' });
+                    logger.warn({ ...meta, email }, messages.AUTH_MESSAGES.EMAIL_EXISTS);
+                    return errorResponse({
+                        res,
+                        req,
+                        status: 409,
+                        message: messages.AUTH_MESSAGES.EMAIL_EXISTS,
+                        logSource
+                    });
                 }
                 const isMatch = await bcryptjs.compare(password, user.password);
                 if (!isMatch) {
-                    return res.status(401).json({ error: 'סיסמה לא תקינה. אנא נסה שוב.' });
+                    logger.warn({ ...meta, email }, messages.AUTH_MESSAGES.INVALID_CREDENTIALS);
+                    return errorResponse({
+                        res,
+                        req,
+                        status: 401,
+                        message: messages.AUTH_MESSAGES.INVALID_CREDENTIALS,
+                        logSource
+                    });
                 }
 
                 // Login successful
-                
-            const token = generateToken({ userId: user._id, email: user.email, role: user.role ,firstName: user.firstName,lastName: user.lastName});
+                const token = generateToken({ userId: user._id, email: user.email, role: user.role ,firstName: user.firstName,lastName: user.lastName});
 
                 const userData = {
                     id: user._id,
@@ -58,13 +91,20 @@ exports.handleAuth = async (req, res) => {
                     phonePrefix: user.phonePrefix,
                     phone: user.phone,
                     nickname:user.nickname
-                    
                 };
-                return res.status(200).json({ token, user: userData, action: 'login' });
+                
+                logger.info({ ...meta, userId: user._id }, `${logSource} complete`);
+                return successResponse({
+                    res,
+                    req,
+                    status: 200,
+                    data: { token, user: userData, action: 'login' },
+                    message: messages.AUTH_MESSAGES.LOGIN_SUCCESS,
+                    logSource
+                });
 
             } else {
                 // Case 2: User exists but is not verified -> Overwrite password and resend verification email.
-                // This allows the user to "re-register" if they never verified their email.
                 const salt = await bcryptjs.genSalt(10);
                 user.password = await bcryptjs.hash(password, salt);
                 
@@ -74,14 +114,23 @@ exports.handleAuth = async (req, res) => {
                 await user.save();
 
                 const verificationUrl = `${process.env.SERVER_URL || 'http://localhost:5050'}/api/v1/verify-email?token=${verificationToken}`;
-                console.log("משתמש קיים אך לא אומת, נשלח אימות מחדש לכתובת האימייל" );
+                logger.info("Resending verification email for existing unverified user", { ...meta, email });
+                
                 await sendEmail({
                     email: user.email,
                     subject: 'אימות כתובת דוא"ל מחדש',
                     html: emailTemplates.resendVerification(verificationUrl),
                 });
                 
-                return res.status(200).json({ status: 'verification-resent', message: 'הסיסמה שלך עודכנה. אנא בדוק את האימייל שלך כדי לאמת את חשבונך.' });
+                logger.info({ ...meta, userId: user._id }, `${logSource} complete`);
+                return successResponse({
+                    res,
+                    req,
+                    status: 200,
+                    data: { status: 'verification-resent' },
+                    message: messages.AUTH_MESSAGES.VERIFICATION_RESENT,
+                    logSource
+                });
             }
         } else {
             // Case 3: User does not exist -> Create a new user and send a verification email.
@@ -105,7 +154,7 @@ exports.handleAuth = async (req, res) => {
             });
             await newUser.save();
 
-            console.log("New user created. Sending verification email." );
+            logger.info("New user created", { ...meta, userId: newUser._id });
 
             const verificationUrl = `${process.env.SERVER_URL || 'http://localhost:5050'}/api/v1/verify-email?token=${verificationToken}`;
             await sendEmail({
@@ -114,11 +163,26 @@ exports.handleAuth = async (req, res) => {
                 html: emailTemplates.verifyEmail(verificationUrl),
             });
 
-            return res.status(201).json({ status: 'user-created', message: 'החשבון נוצר. אנא בדוק את האימייל שלך כדי לאמת את חשבונך.' });
+            logger.info({ ...meta, userId: newUser._id }, `${logSource} complete`);
+            return successResponse({
+                res,
+                req,
+                status: 201,
+                data: { status: 'user-created' },
+                message: messages.AUTH_MESSAGES.USER_CREATED,
+                logSource
+            });
         }
-    } catch (err) {
-        console.error('Auth handling error:', err);
-        res.status(500).json({ error: 'אירעה שגיאת שרת פנימית. אנא נסה שוב מאוחר יותר.' });
+    } catch (error) {
+        logger.error({ ...meta, error }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: messages.AUTH_MESSAGES.SERVER_ERROR,
+            logSource
+        });
     }
 };
 
@@ -128,23 +192,47 @@ exports.handleAuth = async (req, res) => {
  * It verifies the Google ID token, and then either creates a new user or logs in an existing user.
  */
 exports.googleLogin = async (req, res) => {
-    console.log('Entering googleLogin function');
+    const logSource = 'authController.googleLogin';
+    const meta = getRequestMeta(req, logSource);
+    
+    logger.info({ ...meta }, `${logSource} enter`);
+    
     const { tokenId } = req.body;
+    
+    if (!tokenId) {
+        logger.warn({ ...meta }, messages.AUTH_MESSAGES.MISSING_CREDENTIALS);
+        return errorResponse({
+            res,
+            req,
+            status: 400,
+            message: messages.AUTH_MESSAGES.MISSING_CREDENTIALS,
+            logSource
+        });
+    }
+
     try {
         const ticket = await client.verifyIdToken({
             idToken: tokenId,
-            audience: process.env.GOOGLE_CLIENT_ID,
+            audience: process.env.GOOGLE_CLIENT_ID
         });
-        const { email, sub, given_name, family_name, email_verified } = ticket.getPayload();
 
-        if (!email_verified) {
-            return res.status(403).json({ error: 'חשבון הגוגל אינו מאומת. לא ניתן להמשיך.' });
+        const payload = ticket.getPayload();
+        
+        if (!payload.email_verified) {
+            logger.warn({ ...meta, email: payload.email }, messages.AUTH_MESSAGES.GOOGLE_NOT_VERIFIED);
+            return errorResponse({
+                res,
+                req,
+                status: 403,
+                message: messages.AUTH_MESSAGES.GOOGLE_NOT_VERIFIED,
+                logSource
+            });
         }
 
-        let user = await User.findOne({ email });
-
+        let user = await User.findOne({ email: payload.email });
+        
         if (!user) {
-            // If user does not exist, create a new one based on Google's data.
+            // Create new user from Google data
             user = new User({
                 firstName: given_name || '',
                 lastName: family_name || '',
@@ -158,15 +246,15 @@ exports.googleLogin = async (req, res) => {
                 password: undefined // No local password for Google-auth users.
             });
         } else {
-             // If user exists, update their provider info to 'google' and sync names.
-            user.authProvider = 'google';
-            user.providerId = sub;
-            user.is_verified = true;
-            if (given_name) user.firstName = given_name;
-            if (family_name) user.lastName = family_name;
-            user.password =  undefined // Clear any existing local password.
+            // If user exists, update their provider info to 'google' and sync names.
+           user.authProvider = 'google';
+           user.providerId = sub;
+           user.is_verified = true;
+           if (given_name) user.firstName = given_name;
+           if (family_name) user.lastName = family_name;
+           user.password =  undefined // Clear any existing local password.
+            
         }
-        
         await user.save();
         const token = generateToken({ userId: user._id, 
                                  email: user.email, 
@@ -184,10 +272,26 @@ exports.googleLogin = async (req, res) => {
             phone: user.phone,
             nickname:user.nickname
         };
-        res.status(200).json({ token, user: userData });
-    } catch (err) {
-        console.error('Google login error:', err);
-        res.status(500).json({ error: 'אימות גוגל נכשל עקב שגיאת שרת.' });
+        
+        logger.info({ ...meta, userId: user._id }, `${logSource} complete`);
+        return successResponse({
+            res,
+            req,
+            status: 200,
+            data: { token, user: userData },
+            message: messages.AUTH_MESSAGES.LOGIN_SUCCESS,
+            logSource
+        });
+    } catch (error) {
+        logger.error({ ...meta, error }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: messages.AUTH_MESSAGES.GOOGLE_AUTH_FAILED,
+            logSource
+        });
     }
 };
 
@@ -196,20 +300,45 @@ exports.googleLogin = async (req, res) => {
  * This is called if the user requests to send the email again from the client-side.
  */
 exports.resendVerificationEmail = async (req, res) => {
-    console.log('Entering resendVerificationEmail function');
+    const logSource = 'authController.resendVerificationEmail';
+    const meta = getRequestMeta(req, logSource);
+    
+    logger.info({ ...meta }, `${logSource} enter`);
+    
     try {
         const { email } = req.body;
         if (!email) {
-            return res.status(400).json({ message: 'כתובת אימייל נדרשת.' });
+            logger.warn({ ...meta }, messages.AUTH_MESSAGES.MISSING_EMAIL);
+            return errorResponse({
+                res,
+                req,
+                status: 400,
+                message: messages.AUTH_MESSAGES.MISSING_EMAIL,
+                logSource
+            });
         }
         const user = await User.findOne({ email });
 
         if (!user) {
-             return res.status(404).json({ message: 'לא נמצא משתמש עם כתובת אימייל זו.' });
+            logger.warn({ ...meta, email }, messages.AUTH_MESSAGES.USER_NOT_FOUND);
+            return errorResponse({
+                res,
+                req,
+                status: 404,
+                message: messages.AUTH_MESSAGES.USER_NOT_FOUND,
+                logSource
+            });
         }
         
         if (user.is_verified) {
-            return res.status(409).json({ message: 'חשבון זה כבר מאומת.' });
+            logger.warn({ ...meta, email }, messages.AUTH_MESSAGES.ACCOUNT_ALREADY_VERIFIED);
+            return errorResponse({
+                res,
+                req,
+                status: 409,
+                message: messages.AUTH_MESSAGES.ACCOUNT_ALREADY_VERIFIED,
+                logSource
+            });
         }
         
         const verificationToken = crypto.randomBytes(32).toString('hex');
@@ -224,11 +353,25 @@ exports.resendVerificationEmail = async (req, res) => {
             html: emailTemplates.resendVerification(verificationUrl),
         });
 
-        res.status(200).json({ message: 'מייל אימות נשלח מחדש. אנא בדוק את תיבת הדואר הנכנס וגם את תיבת הספאם.' });
+        logger.info({ ...meta, userId: user._id }, `${logSource} complete`);
+        return successResponse({
+            res,
+            req,
+            status: 200,
+            message: "מייל אימות נשלח מחדש. אנא בדוק את תיבת הדואר הנכנס וגם את תיבת הספאם",
+            logSource
+        });
 
     } catch (error) {
-        console.error('Resend verification email error:', error);
-        res.status(500).json({ message: 'אירעה שגיאת שרת. נסה שוב מאוחר יותר.' });
+        logger.error({ ...meta, error }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: messages.AUTH_MESSAGES.SERVER_ERROR,
+            logSource
+        });
     }
 };
 
@@ -238,12 +381,17 @@ exports.resendVerificationEmail = async (req, res) => {
  * It finds the user by the hashed token, marks them as verified, and redirects to the client.
  */
 exports.verifyEmail = async (req, res) => {
-    console.log('Entering verifyEmail function');
+    const logSource = 'authController.verifyEmail';
+    const meta = getRequestMeta(req, logSource);
     const clientUrl = process.env.CLIENT_URL || 'http://localhost:3030';
+    
+    logger.info({ ...meta }, `${logSource} enter`);
+    
     try {
         const { token } = req.query;
 
         if (!token) {
+            logger.warn({ ...meta }, messages.AUTH_MESSAGES.MISSING_TOKEN);
             return res.redirect(`${clientUrl}/auth?verification_status=failure`);
         }
 
@@ -251,6 +399,7 @@ exports.verifyEmail = async (req, res) => {
         const user = await User.findOne({ verification_token: hashedToken });
 
         if (!user) {
+            logger.warn({ ...meta }, messages.AUTH_MESSAGES.INVALID_TOKEN);
             return res.redirect(`${clientUrl}/auth?verification_status=failure`);
         }
         
@@ -258,10 +407,12 @@ exports.verifyEmail = async (req, res) => {
         user.verification_token = undefined; // Invalidate the token after use.
         await user.save();
         
+        logger.info({ ...meta, userId: user._id }, `${logSource} complete`);
         // Redirect to a success page on the client.
         return res.redirect(`${clientUrl}/auth?verification_status=success`);
     } catch (error) {
-        console.error('Email verification error:', error);
+        logger.error({ ...meta, error }, `${logSource} error`);
+        Sentry.captureException(error);
         // Redirect on any server error.
         res.redirect(`${clientUrl}/auth?verification_status=failure&reason=server_error`);
     }
@@ -273,11 +424,22 @@ exports.verifyEmail = async (req, res) => {
  * It generates a secure, single-use token and emails a link containing it.
  */
 exports.requestPasswordReset = async (req, res) => {
-    console.log('Entering requestPasswordReset function');
+    const logSource = 'authController.requestPasswordReset';
+    const meta = getRequestMeta(req, logSource);
+    
+    logger.info({ ...meta }, `${logSource} enter`);
+    
     try {
         const { email } = req.body;
         if (!email) {
-            return res.status(400).json({ message: 'כתובת אימייל נדרשת.' });
+            logger.warn({ ...meta }, messages.AUTH_MESSAGES.MISSING_EMAIL);
+            return errorResponse({
+                res,
+                req,
+                status: 400,
+                message: messages.AUTH_MESSAGES.MISSING_EMAIL,
+                logSource
+            });
         }
         const user = await User.findOne({ email });
 
@@ -299,13 +461,29 @@ exports.requestPasswordReset = async (req, res) => {
                 subject: 'בקשה לאיפוס סיסמה',
                 html: emailTemplates.resetPassword(resetUrl),
             });
+            
+            logger.info("Password reset email sent", { ...meta, logSource, email });
         }
         
         // Always return a success-like message to prevent email enumeration attacks.
-        res.status(200).json({ message: 'אם קיים משתמש עם כתובת אימייל זו, נשלח אליו קישור לאיפוס סיסמה.' });
+        logger.info({ ...meta }, `${logSource} complete`);
+        return successResponse({
+            res,
+            req,
+            status: 200,
+            message: messages.AUTH_MESSAGES.PASSWORD_RESET_SENT,
+            logSource
+        });
     } catch (error) {
-        console.error('Request password reset error:', error);
-        res.status(500).json({ message: 'אירעה שגיאת שרת. נסה שוב מאוחר יותר.' });
+        logger.error({ ...meta, error }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: messages.AUTH_MESSAGES.SERVER_ERROR,
+            logSource
+        });
     }
 };
 
@@ -315,29 +493,61 @@ exports.requestPasswordReset = async (req, res) => {
  * It validates the token, checks its expiration, and updates the user's password.
  */
 exports.resetPassword = async (req, res) => {
-    console.log('Entering resetPassword function');
+    const logSource = 'authController.resetPassword';
+    const meta = getRequestMeta(req, logSource);
+    
+    logger.info({ ...meta }, `${logSource} enter`);
+    
     try {
         const { token, newPassword } = req.body;
 
         if (!token || !newPassword) {
-            return res.status(400).json({ message: 'נדרשים টোকেন וסיסמה חדשה.' });
+            logger.warn({ ...meta }, messages.AUTH_MESSAGES.MISSING_TOKEN_OR_PASSWORD);
+            return errorResponse({
+                res,
+                req,
+                status: 400,
+                message: messages.AUTH_MESSAGES.MISSING_TOKEN_OR_PASSWORD,
+                logSource
+            });
         }
         
         if (newPassword.length < 8) {
-            return res.status(400).json({ message: 'הסיסמה חייבת להכיל לפחות 8 תווים.' });
+            logger.warn({ ...meta }, messages.AUTH_MESSAGES.INVALID_PASSWORD);
+            return errorResponse({
+                res,
+                req,
+                status: 400,
+                message: messages.AUTH_MESSAGES.INVALID_PASSWORD,
+                logSource
+            });
         }
 
         const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
         const resetTokenDoc = await PasswordResetToken.findOne({ token: hashedToken });
 
         if (!resetTokenDoc || resetTokenDoc.used || resetTokenDoc.expiresAt < new Date()) {
-            return res.status(400).json({ message: 'ה-token שגוי, פג תוקפו או שכבר נעשה בו שימוש.' });
+            logger.warn({ ...meta }, messages.AUTH_MESSAGES.INVALID_TOKEN);
+            return errorResponse({
+                res,
+                req,
+                status: 400,
+                message: messages.AUTH_MESSAGES.INVALID_TOKEN,
+                logSource
+            });
         }
 
         const user = await User.findOne({ email: resetTokenDoc.email });
         if (!user) {
             // This case should be rare if the token is valid, but handle it for safety.
-            return res.status(404).json({ message: 'לא נמצא משתמש המשויך ל-token זה.' });
+            logger.warn({ ...meta, email: resetTokenDoc.email }, messages.AUTH_MESSAGES.USER_NOT_FOUND);
+            return errorResponse({
+                res,
+                req,
+                status: 404,
+                message: messages.AUTH_MESSAGES.USER_NOT_FOUND,
+                logSource
+            });
         }
 
         const salt = await bcryptjs.genSalt(10);
@@ -350,10 +560,24 @@ exports.resetPassword = async (req, res) => {
         resetTokenDoc.used = true; // Mark the token as used to prevent reuse.
         await resetTokenDoc.save();
 
-        res.status(200).json({ message: 'הסיסמה אופסה בהצלחה. כעת תוכל להתחבר עם הסיסמה החדשה.' });
+        logger.info({ ...meta, userId: user._id }, `${logSource} complete`);
+        return successResponse({
+            res,
+            req,
+            status: 200,
+            message: messages.AUTH_MESSAGES.PASSWORD_RESET_SUCCESS,
+            logSource
+        });
     } catch (error) {
-        console.error('Reset password error:', error);
-        res.status(500).json({ message: 'אירעה שגיאת שרת. נסה שוב מאוחר יותר.' });
+        logger.error({ ...meta, error }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: messages.AUTH_MESSAGES.SERVER_ERROR,
+            logSource
+        });
     }
 };
 
@@ -364,13 +588,18 @@ exports.resetPassword = async (req, res) => {
  * passing the token along as a URL query parameter.
  */
 exports.handlePasswordResetRedirect = async (req, res) => {
-    console.log('Entering handlePasswordResetRedirect function');
+    const logSource = 'authController.handlePasswordResetRedirect';
+    const meta = getRequestMeta(req, logSource);
     const clientUrl = process.env.CLIENT_URL || 'http://localhost:3030';
+    
+    logger.info({ ...meta }, `${logSource} enter`);
+    
     try {
         const { token } = req.query;
 
         if (!token) {
             // If no token is provided, redirect to forgot-password page with an error.
+            logger.warn({ ...meta }, messages.AUTH_MESSAGES.MISSING_TOKEN);
             return res.redirect(`${clientUrl}/forgot-password?error=invalid_token`);
         }
     
@@ -378,7 +607,8 @@ exports.handlePasswordResetRedirect = async (req, res) => {
         res.redirect(`${clientUrl}/reset-password?token=${token}`);
 
     } catch (error) {
-        console.error('Redirect to reset password error:', error);
+        logger.error({ ...meta, error }, `${logSource} error`);
+        Sentry.captureException(error);
         // On any server error, redirect to forgot-password with a generic error.
         res.redirect(`${clientUrl}/forgot-password?error=server_error`);
     }

@@ -5,6 +5,10 @@ const mongoose = require('mongoose');
 const Service = require('../models/service');
 const Feedback = require('../models/feedback');
 const mapsUtils = require('../utils/mapsUtils');
+const logger = require('../logger');
+const Sentry = require('../sentry');
+const { errorResponse, successResponse, getRequestMeta } = require('../utils/errorUtils');
+const { BUSINESS_MESSAGES } = require('../messages');
 
 const DEFAULT_ITEMS_PER_PAGE = 8;
 const CACHE_TTL = 3600; // זמן חיים של הקאש בשניות (שעה)
@@ -115,7 +119,7 @@ const buildFilterQuery = async (categoryName, services, rating) => {
  * @returns {Array} פייפליין MongoDB
  */ 
 const buildGeoNearPipeline = (coordinates, query, sort, maxDistance) => {
-    console.log('buildGeoNearPipeline - Input:', { coordinates, sort, maxDistance });
+    logger.debug('buildGeoNearPipeline - Input:', { coordinates, sort, maxDistance });
     
     // נבנה את אובייקט ה-geoNear
     const geoNearStage = {
@@ -134,12 +138,12 @@ const buildGeoNearPipeline = (coordinates, query, sort, maxDistance) => {
     if (maxDistance !== undefined && maxDistance !== null && maxDistance !== '' && !isNaN(Number(maxDistance))) {
         const maxDistanceMeters = Number(maxDistance) * 1000; // קילומטרים למטרים
         geoNearStage.$geoNear.maxDistance = maxDistanceMeters;
-        console.log(`Added maxDistance: ${maxDistance} km = ${maxDistanceMeters} meters`);
+        logger.debug(`Added maxDistance: ${maxDistance} km = ${maxDistanceMeters} meters`);
     } else {
-        console.log('No valid maxDistance provided');
+        logger.debug('No valid maxDistance provided');
     }
 
-    console.log('Final geoNear stage:', JSON.stringify(geoNearStage, null, 2));
+    logger.debug('Final geoNear stage:', JSON.stringify(geoNearStage, null, 2));
 
     return [
         geoNearStage,
@@ -190,7 +194,12 @@ const buildLookupPipeline = (skip, limit) => {
 };
 
 exports.getAllBusinesses = async (req, res) => {
+    const logSource = 'businessesController.getAllBusinesses';
+    const meta = getRequestMeta(req, logSource);
+    
     try {
+        logger.info({ ...meta }, `${logSource} enter`);
+        
         const businesses = await Business.find({})
             .populate('categoryId', 'name color logo')
             .populate('services', 'name')
@@ -206,116 +215,213 @@ exports.getAllBusinesses = async (req, res) => {
             })
         );
 
-        res.status(200).json(businessesWithFeedback);
+        logger.info({ ...meta, count: businessesWithFeedback.length }, `${logSource} complete`);
+        return successResponse({
+            res,
+            req,
+            data: { businesses: businessesWithFeedback },
+            message: BUSINESS_MESSAGES.GET_ALL_SUCCESS,
+            logSource
+        });
     } catch (err) {
-        console.log(err);
-        res.status(500).json({message: err.message});
+        logger.error({ ...meta, error: err.message }, `${logSource} error`);
+        Sentry.captureException(err);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: BUSINESS_MESSAGES.GET_ALL_ERROR,
+            logSource
+        });
     }
 };
 
 exports.uploadBusinesses = async (req, res) => {
+    const logSource = 'businessesController.uploadBusinesses';
+    const meta = getRequestMeta(req, logSource);
+    
     try {
+        logger.info({ ...meta }, `${logSource} enter`);
+        
         const userId = req.user._id;
 
         if (req.body.id) {
             return updateBusiness(req, res, userId);
-
         } else {
             return createBusiness(req, res, userId);
         }
     } catch (error) {
-        console.error('Error handling business upload: ', error);
-        res.status(500).json({ error: 'Failed to process request' });
+        logger.error({ ...meta, error }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: BUSINESS_MESSAGES.UPLOAD_ERROR,
+            logSource
+        });
     }
 };
 
 const createBusiness = async (req, res, userId) => {
-  try {
-    console.log("createBusiness");
-    const openingHours = JSON.parse(req.body.openingHours || '[]');
-    const services = JSON.parse(req.body.services || '[]');
-
-    // Get coordinates from address
-    const location = await mapsUtils.geocode(req.body.address);
+    const logSource = 'businessesController.createBusiness';
+    const meta = getRequestMeta(req, logSource);
     
-    // ולידציה נוספת של הקואורדינטות
-    if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
-      return res.status(400).json({ error: 'Invalid coordinates received from geocoding service' });
+    try {
+        logger.info({ ...meta }, `${logSource} enter`);
+        
+        const openingHours = JSON.parse(req.body.openingHours || '[]');
+        const services = JSON.parse(req.body.services || '[]');
+
+        // Get coordinates from address
+        const location = await mapsUtils.geocode(req.body.address);
+        
+        // ולידציה נוספת של הקואורדינטות
+        if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
+            logger.warn({ ...meta, address: req.body.address }, BUSINESS_MESSAGES.INVALID_COORDINATES);
+            return errorResponse({
+                res,
+                req,
+                status: 400,
+                message: BUSINESS_MESSAGES.INVALID_COORDINATES,
+                logSource
+            });
+        }
+        
+        logger.info({ 
+            ...meta, 
+            coordinates: [location.lng, location.lat], 
+            address: req.body.address 
+        }, `${logSource} creating with coordinates`);
+        
+        const newBusiness = new Business({
+            name: req.body.name,
+            email: req.body.email,
+            prefix: req.body.prefix,
+            phone: req.body.phone,
+            categoryId: req.body.categoryId,
+            description: req.body.description || '',
+            services,
+            openingHours,
+            userId: userId,
+            address: req.body.address,
+            logo: req.file?.filename || '',
+            location: {
+                type: 'Point',
+                coordinates: [location.lng, location.lat]
+            }
+        });
+
+        const savedItem = await newBusiness.save();
+        
+        logger.info({ ...meta, businessId: savedItem._id }, `${logSource} complete`);
+        return successResponse({
+            res,
+            req,
+            status: 201,
+            data: { business: savedItem },
+            message: BUSINESS_MESSAGES.CREATE_SUCCESS,
+            logSource
+        });
+    } catch (error) {
+        logger.error({ ...meta, error }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: BUSINESS_MESSAGES.CREATE_ERROR,
+            logSource
+        });
     }
-    
-    console.log(`Creating business with coordinates: [${location.lng}, ${location.lat}] for address: ${req.body.address}`);
-    
-    const newBusiness = new Business({
-      name: req.body.name,
-      email: req.body.email,
-      prefix: req.body.prefix,
-      phone: req.body.phone,
-      categoryId: req.body.categoryId,
-      description: req.body.description || '',
-      services,
-      openingHours,
-      userId: userId,
-      address: req.body.address,
-      logo: req.file?.filename || '',
-      location: {
-        type: 'Point',
-        coordinates: [location.lng, location.lat]
-      }
-    });
-
-    const savedItem = await newBusiness.save();
-    res.status(201).json(savedItem);
-  } catch (error) {
-    console.error('Error creating business: ', error);
-    res.status(500).json({ error: 'Failed to create business' });
-  }
 };
 
 const updateBusiness = async (req, res, userId) => {
-  try {
-    const existingBusiness = await Business.findById(req.body.id);
+    const logSource = 'businessesController.updateBusiness';
+    const meta = getRequestMeta(req, logSource);
+    
+    try {
+        logger.info({ ...meta, businessId: req.body.id }, `${logSource} enter`);
+        
+        const existingBusiness = await Business.findById(req.body.id);
+        
+        if (!existingBusiness) {
+            logger.warn({ ...meta, businessId: req.body.id }, BUSINESS_MESSAGES.NOT_FOUND);
+            return errorResponse({
+                res,
+                req,
+                status: 404,
+                message: BUSINESS_MESSAGES.NOT_FOUND,
+                logSource
+            });
+        }
+        
+        // בדיקת הרשאות - רק הבעלים או אדמין יכולים לערוך
+        if (existingBusiness.userId.toString() !== userId.toString() && req.user.role !== 'admin') {
+            logger.warn({ ...meta, businessId: req.body.id, userId, ownerId: existingBusiness.userId }, BUSINESS_MESSAGES.UNAUTHORIZED_EDIT);
+            return errorResponse({
+                res,
+                req,
+                status: 403,
+                message: BUSINESS_MESSAGES.UNAUTHORIZED_EDIT,
+                logSource
+            });
+        }
 
-    if (!existingBusiness) {
-      return res.status(404).json({ error: 'Business not found' });
+        // עדכון כתובת וקואורדינטות אם השתנתה
+        if (req.body.address && req.body.address !== existingBusiness.address) {
+            const location = await mapsUtils.geocode(req.body.address);
+            
+            if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
+                logger.warn({ ...meta, address: req.body.address }, BUSINESS_MESSAGES.INVALID_COORDINATES);
+                return errorResponse({
+                    res,
+                    req,
+                    status: 400,
+                    message: BUSINESS_MESSAGES.INVALID_COORDINATES,
+                    logSource
+                });
+            }
+            
+            existingBusiness.location = {
+                type: 'Point',
+                coordinates: [location.lng, location.lat]
+            };
+        }
+
+        // עדכון שדות אחרים
+        existingBusiness.name = req.body.name || existingBusiness.name;
+        existingBusiness.email = req.body.email || existingBusiness.email;
+        existingBusiness.prefix = req.body.prefix || existingBusiness.prefix;
+        existingBusiness.phone = req.body.phone || existingBusiness.phone;
+        existingBusiness.categoryId = req.body.categoryId || existingBusiness.categoryId;
+        existingBusiness.description = req.body.description || existingBusiness.description;
+        existingBusiness.services = typeof req.body.services === 'string' ? JSON.parse(req.body.services) : (req.body.services || existingBusiness.services);
+        existingBusiness.address = req.body.address || existingBusiness.address;
+        existingBusiness.logo = req.file?.path || existingBusiness.logo;
+        existingBusiness.openingHours = typeof req.body.openingHours === 'string' ? JSON.parse(req.body.openingHours) : (req.body.openingHours || existingBusiness.openingHours);
+
+        await existingBusiness.save();
+        
+        logger.info({ ...meta, businessId: req.body.id }, `${logSource} complete`);
+        return successResponse({
+            res,
+            req,
+            data: { business: existingBusiness },
+            message: BUSINESS_MESSAGES.UPDATE_SUCCESS,
+            logSource
+        });
+    } catch (error) {
+        logger.error({ ...meta, error }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: BUSINESS_MESSAGES.UPDATE_ERROR,
+            logSource
+        });
     }
-    if (existingBusiness.userId.toString() !== userId) {
-      return res.status(403).json({ error: 'Unauthorized to edit this business' });
-    }
-
-    // If address is being updated, get new coordinates
-    if (req.body.address && req.body.address !== existingBusiness.address) {
-      const location = await mapsUtils.geocode(req.body.address);
-      
-      // ולידציה של הקואורדינטות
-      if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
-        return res.status(400).json({ error: 'Invalid coordinates received from geocoding service' });
-      }
-      
-      console.log(`Updating business coordinates: [${location.lng}, ${location.lat}] for address: ${req.body.address}`);
-      
-      existingBusiness.location = {
-        type: 'Point',
-        coordinates: [location.lng, location.lat]
-      };
-    }
-
-    existingBusiness.name = req.body.name || existingBusiness.name;
-    existingBusiness.email = req.body.email || existingBusiness.email;
-    existingBusiness.prefix = req.body.prefix || existingBusiness.prefix;
-    existingBusiness.phone = req.body.phone || existingBusiness.phone;
-    existingBusiness.categoryId = req.body.categoryId || existingBusiness.categoryId;
-    existingBusiness.services = typeof req.body.services === 'string' ? JSON.parse(req.body.services) : (req.body.services || existingBusiness.services);
-    existingBusiness.description = req.body.description || existingBusiness.description;
-    existingBusiness.address = req.body.address || existingBusiness.address;
-    existingBusiness.logo = req.file?.path || existingBusiness.logo;
-    existingBusiness.openingHours = typeof req.body.openingHours === 'string' ? JSON.parse(req.body.openingHours) : (req.body.openingHours || existingBusiness.openingHours);
-
-    await existingBusiness.save();
-    res.status(200).json({ message: 'Business updated successfully', business: existingBusiness });
-  } catch (error) {
-    console.error('Error updating business: ', error);
-    res.status(500).json({ error: 'Failed to update business' });
-  }
 };
 
 // exports.getItems = async (req, res) => {
@@ -329,12 +435,33 @@ const updateBusiness = async (req, res, userId) => {
 // };
 
 exports.getUserBusinesses = async (req, res) => {
+    const logSource = 'businessesController.getUserBusinesses';
+    const meta = getRequestMeta(req, logSource);
+    
     try {
+        logger.info({ ...meta }, `${logSource} enter`);
+        
         const userId = req.user._id;
         const businesses = await Business.find({ userId: userId }).sort({ active: -1 });
-        res.status(200).json(businesses);
+        
+        logger.info({ ...meta, count: businesses.length }, `${logSource} complete`);
+        return successResponse({
+            res,
+            req,
+            data: { businesses },
+            message: BUSINESS_MESSAGES.GET_ALL_SUCCESS,
+            logSource
+        });
     } catch (err) {
-        res.status(500).json({message: err.message});
+        logger.error({ ...meta, error: err.message }, `${logSource} error`);
+        Sentry.captureException(err);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: BUSINESS_MESSAGES.GET_ALL_ERROR,
+            logSource
+        });
     }
 };
 
@@ -344,7 +471,12 @@ exports.getUserBusinesses = async (req, res) => {
  * @param {Object} res - אובייקט התגובה
  */
 exports.getItems = async (req, res) => {
+    const logSource = 'businessesController.getItems';
+    const meta = getRequestMeta(req, logSource);
+    
     try {
+        logger.info({ ...meta, query: req.query }, `${logSource} enter`);
+        
         const { 
             q, 
             categoryName, 
@@ -357,10 +489,6 @@ exports.getItems = async (req, res) => {
             page = 1, 
             limit = DEFAULT_ITEMS_PER_PAGE 
         } = req.query;
-
-        console.log('getItems - Query params:', { 
-            q, categoryName, services, rating, lat, lng, maxDistance, sort, page, limit 
-        });
 
         const pageNum = Number(page) || 1;
         const limitNum = Number(limit) || DEFAULT_ITEMS_PER_PAGE;
@@ -380,7 +508,12 @@ exports.getItems = async (req, res) => {
         const needsLocationSorting = (sort === 'popular_nearby' || sort === 'distance') && lat && lng;
         
         if (needsLocationFiltering || needsLocationSorting) {
-            console.log('Using geoNear pipeline with coordinates:', [parseFloat(lng), parseFloat(lat)]);
+            logger.info({ 
+                ...meta, 
+                coordinates: [parseFloat(lng), parseFloat(lat)],
+                maxDistance 
+            }, `${logSource} using geoNear pipeline`);
+            
             const coordinates = [parseFloat(lng), parseFloat(lat)];
             
             // הוספת שלב לחישוב ציון הרלוונטיות הטקסטואלית
@@ -418,8 +551,8 @@ exports.getItems = async (req, res) => {
             // הוספת סטטוס מועדפים אם המשתמש מחובר
             let businessesWithFavorites = businesses;
             if (userId) {
-                const businessIds = businesses.map(b => b._id);
                 const Favorite = require('../models/favorite');
+                const businessIds = businesses.map(b => b._id);
                 const userFavorites = await Favorite.find({ 
                     user_id: userId, 
                     business_id: { $in: businessIds },
@@ -457,7 +590,7 @@ exports.getItems = async (req, res) => {
                 }
             };
         } else {
-            console.log('Using regular find pipeline (no location filtering)');
+            logger.info({ ...meta }, `${logSource} using regular find pipeline`);
             
             // טיפול במיון לפי רלוונטיות טקסטואלית
             if (q) {
@@ -526,77 +659,196 @@ exports.getItems = async (req, res) => {
             };
         }
 
-        res.json(result);
+        logger.info({ 
+            ...meta, 
+            total: result.pagination.total,
+            returned: result.data.length 
+        }, `${logSource} complete`);
+        
+        return successResponse({
+            res,
+            req,
+            data: result,
+            message: BUSINESS_MESSAGES.GET_ALL_SUCCESS,
+            logSource
+        });
 
     } catch (err) {
-        console.error('Error in getItems:', err);
-        res.status(500).json({ message: err.message });
+        logger.error({ ...meta, error: err.message }, `${logSource} error`);
+        Sentry.captureException(err);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: BUSINESS_MESSAGES.GET_ALL_ERROR,
+            logSource
+        });
     }
 };
 
-//no needed auth
 exports.getBusinessById = async (req, res) => {
-  try {
-    const business = await Business.findById(req.params.id)
-      .populate('categoryId', 'name color logo')
-      .populate('services');
+    const logSource = 'businessesController.getBusinessById';
+    const meta = getRequestMeta(req, logSource);
+    
+    try {
+        logger.info({ ...meta, businessId: req.params.id }, `${logSource} enter`);
+        
+        const business = await Business.findById(req.params.id)
+            .populate('categoryId', 'name color logo')
+            .populate('services');
 
-    if (!business) {
-      return res.status(404).json({ error: 'Business not found' });
+        if (!business) {
+            logger.warn({ ...meta, businessId: req.params.id }, BUSINESS_MESSAGES.NOT_FOUND);
+            return errorResponse({
+                res,
+                req,
+                status: 404,
+                message: BUSINESS_MESSAGES.NOT_FOUND,
+                logSource
+            });
+        }
+
+        logger.info({ ...meta, businessId: req.params.id }, `${logSource} complete`);
+        return successResponse({
+            res,
+            req,
+            data: { business },
+            message: BUSINESS_MESSAGES.GET_BY_ID_SUCCESS,
+            logSource
+        });
+    } catch (error) {
+        logger.error({ ...meta, error: error.message }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: BUSINESS_MESSAGES.GET_BY_ID_ERROR,
+            logSource
+        });
     }
-
-    res.status(200).json(business);
-  } catch (error) {
-    console.error('Error fetching business by ID:', error);
-    res.status(500).json({ error: 'Failed to fetch business' });
-  }
 };
 
 exports.deleteBusiness = async (req, res) => {
-  try {
-    console.log("deleteBusiness :");
-    const userId = req.user._id;
-    const businessId = req.params.id;
-    console.log("deleteBusiness businessId:",businessId);
-    const business = await Business.findById(businessId);
-    if (!business) {
-      return res.status(404).json({ error: 'Business not found' });
+    const logSource = 'businessesController.deleteBusiness';
+    const meta = getRequestMeta(req, logSource);
+    
+    try {
+        logger.info({ ...meta, businessId: req.params.id }, `${logSource} enter`);
+        
+        const userId = req.user._id;
+        const businessId = req.params.id;
+        
+        const business = await Business.findById(businessId);
+        if (!business) {
+            logger.warn({ ...meta, businessId }, BUSINESS_MESSAGES.NOT_FOUND);
+            return errorResponse({
+                res,
+                req,
+                status: 404,
+                message: BUSINESS_MESSAGES.NOT_FOUND,
+                logSource
+            });
+        }
+
+        if (business.userId.toString() !== userId) {
+            logger.warn({ 
+                ...meta, 
+                businessId,
+                businessUserId: business.userId.toString(),
+                requestUserId: userId 
+            }, BUSINESS_MESSAGES.UNAUTHORIZED_DELETE);
+            return errorResponse({
+                res,
+                req,
+                status: 403,
+                message: BUSINESS_MESSAGES.UNAUTHORIZED_DELETE,
+                logSource
+            });
+        }
+
+        business.active = false;
+        await business.save();
+
+        logger.info({ ...meta, businessId }, `${logSource} complete`);
+        return successResponse({
+            res,
+            req,
+            data: null,
+            message: BUSINESS_MESSAGES.DELETE_SUCCESS,
+            logSource
+        });
+    } catch (error) {
+        logger.error({ ...meta, error: error.message }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: BUSINESS_MESSAGES.DELETE_ERROR,
+            logSource
+        });
     }
-
-    if (business.userId.toString() !== userId) {
-      return res.status(403).json({ error: 'Unauthorized to delete this business' });
-    }
-
-    business.active = false;
-    await business.save();
-
-    res.status(200).json({ message: 'Business marked as inactive' });
-  } catch (error) {
-    console.error('Error deleting business:', error);
-    res.status(500).json({ error: 'Failed to delete business' });
-  }
 };
 
 exports.restoreBusiness = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const businessId = req.params.id;
+    const logSource = 'businessesController.restoreBusiness';
+    const meta = getRequestMeta(req, logSource);
+    
+    try {
+        logger.info({ ...meta, businessId: req.params.id }, `${logSource} enter`);
+        
+        const userId = req.user._id;
+        const businessId = req.params.id;
 
-    const business = await Business.findById(businessId);
-    if (!business) {
-      return res.status(404).json({ error: 'Business not found' });
+        const business = await Business.findById(businessId);
+        if (!business) {
+            logger.warn({ ...meta, businessId }, BUSINESS_MESSAGES.NOT_FOUND);
+            return errorResponse({
+                res,
+                req,
+                status: 404,
+                message: BUSINESS_MESSAGES.NOT_FOUND,
+                logSource
+            });
+        }
+
+        if (business.userId.toString() !== userId) {
+            logger.warn({ 
+                ...meta, 
+                businessId,
+                businessUserId: business.userId.toString(),
+                requestUserId: userId 
+            }, BUSINESS_MESSAGES.UNAUTHORIZED_RESTORE);
+            return errorResponse({
+                res,
+                req,
+                status: 403,
+                message: BUSINESS_MESSAGES.UNAUTHORIZED_RESTORE,
+                logSource
+            });
+        }
+
+        business.active = true;
+        await business.save();
+
+        logger.info({ ...meta, businessId }, `${logSource} complete`);
+        return successResponse({
+            res,
+            req,
+            data: { business },
+            message: BUSINESS_MESSAGES.RESTORE_SUCCESS,
+            logSource
+        });
+    } catch (error) {
+        logger.error({ ...meta, error: error.message }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            status: 500,
+            message: BUSINESS_MESSAGES.RESTORE_ERROR,
+            logSource
+        });
     }
-
-    if (business.userId.toString() !== userId) {
-      return res.status(403).json({ error: 'Unauthorized to restore this business' });
-    }
-
-    business.active = true;
-    await business.save();
-
-    res.status(200).json({ message: 'Business restored successfully', business });
-  } catch (error) {
-    console.error('Error restoring business:', error);
-    res.status(500).json({ error: 'Failed to restore business' });
-  }
 };

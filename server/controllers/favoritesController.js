@@ -1,54 +1,85 @@
 const Favorite = require("../models/favorite");
 const mongoose = require('mongoose');
+const logger = require('../logger');
+const { captureError, errorResponse, successResponse, getRequestMeta } = require('../utils/errorUtils');
+const { FAVORITES } = require('../messages');
 
 // Toggle favorite status for a business
 exports.toggleFavorite = async (req, res) => {
+  const logSource = 'favoritesController.toggleFavorite';
+  const meta = getRequestMeta(req, logSource);
+  
   try {
-    const userId = req.user._id;
     const { business_id } = req.body;
+    logger.info({ ...meta, business_id }, `${logSource} enter`);
 
     if (!mongoose.Types.ObjectId.isValid(business_id)) {
-      return res.status(400).json({ error: "מספר עסק לא תקין." });
+      logger.warn({ ...meta, business_id }, FAVORITES.INVALID_BUSINESS_ID);
+      return errorResponse({
+        res,
+        req,
+        status: 400,
+        message: FAVORITES.INVALID_BUSINESS_ID,
+        logSource
+      });
     }
 
-    // Try to find existing favorite
     let favorite = await Favorite.findOne({
-      user_id: userId,
+      user_id: req.user._id,
       business_id: business_id
     });
 
     if (favorite) {
-      // Toggle active status if exists
       favorite.active = !favorite.active;
       await favorite.save();
     } else {
-      // Create new favorite if doesn't exist
       favorite = new Favorite({
-        user_id: userId,
+        user_id: req.user._id,
         business_id: business_id,
         active: true
       });
       await favorite.save();
     }
 
-    res.status(200).json({ 
-      message: favorite.active ? "העסק נוסף למועדפים" : "העסק הוסר מהמועדפים",
+    logger.info({ 
+      ...meta, 
+      business_id, 
       active: favorite.active 
+    }, `${logSource} complete`);
+    
+    return successResponse({
+      res,
+      req,
+      data: {
+        message: favorite.active ? FAVORITES.FAVORITE_ADDED : FAVORITES.FAVORITE_REMOVED,
+        active: favorite.active
+      },
+      logSource
     });
 
   } catch (err) {
-    console.error('Error toggling favorite:', err);
-    res.status(500).json({ error: "שגיאה בעת עדכון המועדפים." });
+    logger.error({ ...meta, error: err }, `${logSource} error`);
+    captureError(err, req);
+    return errorResponse({
+      res,
+      req,
+      status: 500,
+      message: FAVORITES.ERROR_TOGGLE_FAVORITE,
+      logSource
+    });
   }
 };
 
-// Get all favorite businesses for a user
+// Get user's favorites
 exports.getUserFavorites = async (req, res) => {
+  const logSource = 'favoritesController.getUserFavorites';
+  const meta = getRequestMeta(req, logSource);
+  
   try {
-    const userId = req.user._id;
+    logger.info({ ...meta, userId: req.user._id }, `${logSource} enter`);
 
     const favorites = await Favorite.find({ 
-      user_id: userId,
+      user_id: req.user._id,
       active: true 
     })
     .populate({
@@ -60,46 +91,111 @@ exports.getUserFavorites = async (req, res) => {
       ]
     })
     .sort({ createdAt: -1 });
-
-    // Transform the data to match the expected format
     const businesses = favorites.map(fav => fav.business_id);
 
-    res.json(businesses);
+
+    logger.info({ ...meta, userId: req.user._id, count: favorites.length }, `${logSource} complete`);
+    
+    return successResponse({
+      res,
+      req,
+      data: { favorites },
+      message: "המועדפים נטענו בהצלחה",
+      logSource
+    });
+
   } catch (err) {
-    console.error('Error fetching favorites:', err); 
-    res.status(500).json({ error: "שגיאה בטעינת המועדפים." });
+    logger.error({ ...meta, error: err }, `${logSource} error`);
+    captureError(err, req);
+    return errorResponse({
+      res,
+      req,
+      status: 500,
+      message: FAVORITES.ERROR_FETCH_FAVORITES,
+      logSource
+    });
   }
 };
 
-// Check if a business is favorited by the user
+// Check if business is favorited by user
 exports.checkFavoriteStatus = async (req, res) => {
+  const logSource = 'favoritesController.checkFavoriteStatus';
+  const meta = getRequestMeta(req, logSource);
+  
   try {
-    const userId = req.user._id;
-    const businessId = req.params.businessId;
+    const { business_id } = req.params;
+    logger.info({ ...meta, business_id, userId: req.user._id }, `${logSource} enter`);
+
+    if (!mongoose.Types.ObjectId.isValid(business_id)) {
+      logger.warn({ ...meta, business_id }, FAVORITES.INVALID_BUSINESS_ID);
+      return errorResponse({
+        res,
+        req,
+        status: 400,
+        message: FAVORITES.INVALID_BUSINESS_ID,
+        logSource
+      });
+    }
 
     const favorite = await Favorite.findOne({
-      user_id: userId,
-      business_id: businessId
+      user_id: req.user._id,
+      business_id: business_id,
+      active: true
     });
 
-    res.json({ 
-      isFavorite: favorite ? favorite.active : false 
+    logger.info({ ...meta, business_id, userId: req.user._id, isFavorited: !!favorite }, `${logSource} complete`);
+    
+    return successResponse({
+      res,
+      req,
+      data: { 
+        isFavorite: favorite ? favorite.active : false 
+      },
+      message: "סטטוס המועדפים נבדק בהצלחה",
+      logSource
     });
 
   } catch (err) {
-    console.error('Error checking favorite status:', err);
-    res.status(500).json({ error: "שגיאה בבדיקת סטטוס מועדפים." });
+    logger.error({ ...meta, error: err }, `${logSource} error`);
+    captureError(err, req);
+    return errorResponse({
+      res,
+      req,
+      status: 500,
+      message: FAVORITES.ERROR_CHECK_FAVORITE_STATUS,
+      logSource
+    });
   }
 };
 
 exports.getFavorites = async (req, res) => {
+  const logSource = 'favoritesController.getFavorites';
+  const meta = getRequestMeta(req, logSource);
+  
   try {
+    logger.info({ ...meta }, `${logSource} enter`);
+    
     const favorites = await Favorite.find({ user_id: req.params.userId, active: true })
       .populate('business_id')
       .sort({ createdAt: -1 });
-
-    res.json(favorites);
+      
+    logger.info({ ...meta, count: favorites.length }, `${logSource} complete`);
+    
+    return successResponse({
+      res,
+      req,
+      data: { favorites },
+      logSource
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    logger.error({ ...meta, error: err }, `${logSource} error`);
+    captureError(err, req);
+    return errorResponse({
+      res,
+      req,
+      status: 500,
+      message: FAVORITES.ERROR_FETCH_FAVORITES,
+      logSource
+    });
   }
 }; 

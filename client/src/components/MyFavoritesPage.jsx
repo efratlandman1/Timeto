@@ -11,7 +11,7 @@ const MyFavoritesPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = getToken();
+        const token = getToken();        
         if (!token) {
             navigate('/auth');
             return;
@@ -29,7 +29,7 @@ const MyFavoritesPage = () => {
                 }
                 
                 const data = await response.json();
-                setFavorites(data);
+                setFavorites(data.data.businesses);
             } catch (error) {
                 console.error("Error fetching favorites:", error);
             } finally {

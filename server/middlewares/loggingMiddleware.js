@@ -9,6 +9,8 @@ const Sentry = require('../sentry');
  * - מוסיף את המזהה ללוגים ול־Sentry
  */
 function loggingMiddleware(req, res, next) {
+  // Always generate a unique requestId for every request
+  req.requestId = uuidv4();
   // נזהה משתמש (בהנחה שיש req.user או req.session.user)
   let userId = null;
   if (req.user && req.user._id) {
@@ -25,15 +27,13 @@ function loggingMiddleware(req, res, next) {
     // if (req.headers['x-visitor-id']) visitorId = req.headers['x-visitor-id'];
   }
 
-  // נצרף את המזהה לאובייקט הבקשה
   req.visitorId = visitorId;
 
-  // נעדכן את Sentry עם מזהה המשתמש/אורח
   Sentry.setUser(userId ? { id: userId } : { id: visitorId, isGuest: true });
 
-  // נוסיף לוג structured לכל בקשה (אפשר להרחיב לפי הצורך)
   logger.info({
     msg: 'Incoming request',
+    requestId: req.requestId,
     method: req.method,
     url: req.originalUrl,
     userId: userId || undefined,
@@ -41,10 +41,8 @@ function loggingMiddleware(req, res, next) {
     ip: req.ip,
     userAgent: req.headers['user-agent'],
     referer: req.headers['referer'],
-    // אפשר להוסיף עוד שדות
   });
 
-  // נמשיך הלאה
   next();
 }
 

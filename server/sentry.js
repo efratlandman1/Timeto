@@ -3,7 +3,8 @@ const Sentry = require('@sentry/node');
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   environment: process.env.NODE_ENV, // או SENTRY_ENV אם תרצי
-  tracesSampleRate: 0.1, // אפשר לשנות לפי הצורך
+  // TODO: החזר tracing כשנשדרג ל-Node.js 16+
+  // tracesSampleRate: 0.1, // אפשר לשנות לפי הצורך
   tags: {
     service: 'business-search-api'
   },
@@ -20,4 +21,4 @@ Sentry.init({
   },
 });
 
-module.exports = Sentry; 
+module.exports = Sentry;
