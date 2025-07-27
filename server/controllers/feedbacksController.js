@@ -1,7 +1,7 @@
 // controllers/feedbackController.js
 const Feedback = require("../models/feedback");
 const mongoose = require('mongoose');
-const { successResponse, errorResponse, getRequestMeta } = require("../utils/errorUtils");
+const { successResponse, errorResponse, getRequestMeta, serializeError } = require("../utils/errorUtils");
 const logger = require("../logger");
 const Sentry = require("@sentry/node");
 const messages = require("../messages");
@@ -59,7 +59,7 @@ exports.createFeedback = async (req, res) => {
     });
 
   } catch (err) {
-    logger.error({ ...meta, error: err }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
     Sentry.captureException(err);
     
     if (err.code === 11000) {
@@ -103,7 +103,7 @@ exports.getFeedbacksForBusiness = async (req, res) => {
       logSource
     });
   } catch (err) {
-    logger.error({ ...meta, error: err }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
     Sentry.captureException(err);
     return errorResponse({
       res,
@@ -168,7 +168,7 @@ exports.deleteFeedback = async (req, res) => {
       logSource
     });
   } catch (err) {
-    logger.error({ ...meta, error: err }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
     Sentry.captureException(err);
     return errorResponse({
       res,

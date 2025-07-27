@@ -4,13 +4,13 @@ const router = express.Router();
 const upload = require('../config/multerConfig');
 const { requireAuth, optionalAuth } = require('../middlewares/authMiddleware');
 const { writeLimiter, generalLimiter } = require('../middlewares/rateLimiter');
-const { sanitizeRequest, validateBusiness, validateMongoIdParam, validateSearchQuery } = require('../middlewares/inputValidation');
+const { sanitizeRequest, validateBusiness, validateMongoIdParam, validateSearchQuery,parseArrayFieldsGeneric} = require('../middlewares/inputValidation');
 const { fileUploadSecurity } = require('../middlewares/fileUploadSecurity');
 
 router
     .route('/')
     .get(optionalAuth, generalLimiter, sanitizeRequest, validateSearchQuery, businessesController.getItems)
-    .post(requireAuth, writeLimiter, sanitizeRequest, validateBusiness, upload.single('logo'), fileUploadSecurity, businessesController.uploadBusinesses);
+    .post(requireAuth, writeLimiter, sanitizeRequest, upload.single('logo'), fileUploadSecurity,  parseArrayFieldsGeneric(['services', 'openingHours']), validateBusiness, businessesController.uploadBusinesses);
 
 router
     .route('/all')

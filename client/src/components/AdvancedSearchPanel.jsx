@@ -42,7 +42,7 @@ const AdvancedSearchPanel = ({
       try {
         const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
         const data = await response.json();
-        setCategories(data);
+        setCategories(data.data.categories || []);
       } catch (error) {
         console.error('Error fetching categories:', error);
       }

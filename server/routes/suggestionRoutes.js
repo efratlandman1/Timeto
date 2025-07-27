@@ -1,13 +1,13 @@
 const express = require('express');
 
 const suggestionController = require("../controllers/suggestionController");
-const { requireAuth, requireAdmin } = require('../middlewares/authMiddleware');
+const { requireAuth, requireAdmin, publicRoute } = require('../middlewares/authMiddleware');
 const { writeLimiter, generalLimiter } = require('../middlewares/rateLimiter');
 const { sanitizeRequest, validateSuggestion, validateMongoIdParam } = require('../middlewares/inputValidation');
 
 const router = express.Router();
 
-router.post('/', requireAuth, writeLimiter, sanitizeRequest, validateSuggestion, suggestionController.createSuggestion);
+router.post('/', publicRoute, writeLimiter, sanitizeRequest, validateSuggestion, suggestionController.createSuggestion);
 
 router.get('/my-suggestions', requireAuth, generalLimiter, sanitizeRequest, suggestionController.getUserSuggestions);
 

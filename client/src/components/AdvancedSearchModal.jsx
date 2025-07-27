@@ -40,7 +40,7 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
-        setCategories(response.data);
+        setCategories(response.data.data.categories || []);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
@@ -55,7 +55,7 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
         const fetchServices = async () => {
           try {
             const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/services/byCategory/${category._id}`);
-            setServices(response.data);
+            setServices(response.data.data.services);
           } catch (error) {
             console.error("Error fetching services:", error);
             setServices([]);

@@ -72,7 +72,7 @@ const MainPage = () => {
     const fetchCategories = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
-            setCategories(response.data);
+            setCategories(response.data.data.categories);
         } catch (error) {
             console.error("Error fetching categories:", error);
         }
@@ -94,7 +94,7 @@ const MainPage = () => {
             );
             const newBusinessesResponse = await axios.get(newBusinessesUrl, { headers });
             console.log('New businesses response:', newBusinessesResponse.data);
-            setNewBusinesses(newBusinessesResponse.data.data);
+            setNewBusinesses(newBusinessesResponse.data.data.businesses || []);
 
             // Fetch popular nearby businesses
             const popularNearbyUrl = buildQueryUrl(
@@ -104,7 +104,7 @@ const MainPage = () => {
             );
             const popularNearbyResponse = await axios.get(popularNearbyUrl, { headers });
             console.log('Popular nearby response:', popularNearbyResponse.data);
-            setPopularBusinesses(popularNearbyResponse.data.data);
+            setPopularBusinesses(popularNearbyResponse.data.data.businesses || []);
 
             // Fetch recommended businesses (using high rating as criteria)
             const recommendedUrl = buildQueryUrl(
@@ -113,7 +113,7 @@ const MainPage = () => {
             );
             const recommendedResponse = await axios.get(recommendedUrl, { headers });
             console.log('Recommended response:', recommendedResponse.data);
-            setRecommendedBusinesses(recommendedResponse.data.data);
+            setRecommendedBusinesses(recommendedResponse.data.data.businesses || []);
 
         } catch (error) {
             console.error("Error fetching businesses:", error);
@@ -124,7 +124,7 @@ const MainPage = () => {
         try {
             setIsStatsLoading(true);
             const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/stats/home`);
-            setStats(response.data);
+            setStats(response.data.data);
         } catch (error) {
             console.error('Error fetching stats:', error);
         } finally {
@@ -271,7 +271,7 @@ const MainPage = () => {
                         <FaChevronLeft />
                     </button>
                     <div className="categories">
-                        {categories.map((category) => (
+                        {categories && categories.map((category) => (
                             <div key={category._id}
                                 className="category-business"
                                 style={{ background: category.color || '#fff' }}

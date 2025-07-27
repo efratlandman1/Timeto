@@ -41,21 +41,47 @@ const sanitizeRequest = (req, res, next) => {
     next();
 };
 
+function parseArrayFieldsGeneric(fields = ['services', 'openingHours']) {
+  return function (req, res, next) {
+    fields.forEach(field => {
+      if (typeof req.body[field] === 'string') {
+        try {
+          req.body[field] = JSON.parse(req.body[field]);
+        } catch (e) {
+          // If parsing fails, leave as string (validation will catch it)
+        }
+      }
+    });
+    next();
+  };
+}
+
+
 // Enhanced validation schemas with strict type checking
 const businessSchema = [
     body('name').isString().isLength({ min: 2, max: 100 }).withMessage('Name must be a string between 2 and 100 characters'),
     body('address').isString().isLength({ min: 5, max: 200 }).withMessage('Address must be a string between 5 and 200 characters'),
+    body('prefix').isString().isLength({ min: 1, max: 10 }).withMessage('Prefix is required'),
     body('phone').isString().matches(/^[0-9-+\s()]+$/).withMessage('Phone must be a string containing only numbers, spaces, hyphens, plus signs, and parentheses'),
     body('email').isString().isEmail().withMessage('Must be a valid email string'),
-    body('description').optional().isString().isLength({ max: 1000 }).withMessage('Description must be a string less than 1000 characters'),
     body('categoryId').isString().isMongoId().withMessage('Category ID must be a valid MongoDB ID string'),
+    body('logo').optional().isString().withMessage('Logo must be a string'),
+    body('services').optional().isArray().withMessage('Services must be an array'),
+    body('openingHours').isArray({ min: 1 }).withMessage('OpeningHours must be a non-empty array'),
+    body('openingHours.*.day').isInt({ min: 0, max: 6 }).withMessage('Each openingHours.day must be an integer (0-6)'),
+    // userId is set by server, not required from client
     (req, res, next) => {
         const errors = validationResult(req);
+        console.log('VALIDATION ERRORS:', errors.array());
         if (!errors.isEmpty()) {
             return res.status(400).json({
-                success: false,
+                success: false, 
                 message: 'Validation error',
-                details: errors.array()[0].msg
+                details: errors.array().map(e => ({
+                    field: e.param,
+                    message: e.msg,
+                    value: e.value
+                }))
             });
         }
         next();
@@ -63,17 +89,26 @@ const businessSchema = [
 ];
 
 const userSchema = [
-    body('firstName').isString().isLength({ min: 2, max: 50 }).withMessage('First name must be a string between 2 and 50 characters'),
-    body('lastName').isString().isLength({ min: 2, max: 50 }).withMessage('Last name must be a string between 2 and 50 characters'),
+    body('firstName').optional().isString().isLength({ min: 2, max: 50 }).withMessage('First name must be a string between 2 and 50 characters'),
+    body('lastName').optional().isString().isLength({ min: 2, max: 50 }).withMessage('Last name must be a string between 2 and 50 characters'),
     body('email').isString().isEmail().withMessage('Must be a valid email string'),
-    body('password').isString().isLength({ min: 6, max: 100 }).withMessage('Password must be a string between 6 and 100 characters'),
+    body('password').optional().isString().isLength({ min: 6, max: 100 }).withMessage('Password must be a string between 6 and 100 characters'),
+    body('phonePrefix').optional().isString().isLength({ min: 1, max: 6 }).withMessage('Phone prefix must be a string'),
+    body('phone').optional().isString().isLength({ min: 4, max: 20 }).withMessage('Phone must be a string'),
+    body('nickname').optional().isString().isLength({ min: 2, max: 50 }).withMessage('Nickname must be a string'),
+    body('role').optional().isString().isIn(['admin', 'manager', 'end-user']).withMessage('Role must be admin, manager, or end-user'),
+    body('authProvider').optional().isString().isIn(['local', 'google']).withMessage('authProvider must be local or google'),
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({
                 success: false,
                 message: 'Validation error',
-                details: errors.array()[0].msg
+                details: errors.array().map(e => ({
+                    field: e.param,
+                    message: e.msg,
+                    value: e.value
+                }))
             });
         }
         next();
@@ -89,7 +124,11 @@ const authSchema = [
             return res.status(400).json({
                 success: false,
                 message: 'Validation error',
-                details: errors.array()[0].msg
+                details: errors.array().map(e => ({
+                    field: e.param,
+                    message: e.msg,
+                    value: e.value
+                }))
             });
         }
         next();
@@ -98,6 +137,7 @@ const authSchema = [
 
 const categorySchema = [
     body('name').isString().isLength({ min: 2, max: 50 }).withMessage('Category name must be a string between 2 and 50 characters'),
+    body('logo').isString().withMessage('Logo is required and must be a string'),
     body('color').optional().isString().matches(/^#[0-9A-F]{6}$/i).withMessage('Color must be a valid hex color string'),
     (req, res, next) => {
         const errors = validationResult(req);
@@ -105,7 +145,11 @@ const categorySchema = [
             return res.status(400).json({
                 success: false,
                 message: 'Validation error',
-                details: errors.array()[0].msg
+                details: errors.array().map(e => ({
+                    field: e.param,
+                    message: e.msg,
+                    value: e.value
+                }))
             });
         }
         next();
@@ -113,16 +157,20 @@ const categorySchema = [
 ];
 
 const serviceSchema = [
-    body('name').isString().isLength({ min: 2, max: 100 }).withMessage('Service name must be a string between 2 and 100 characters'),
-    body('description').optional().isString().isLength({ max: 500 }).withMessage('Description must be a string less than 500 characters'),
     body('categoryId').isString().isMongoId().withMessage('Category ID must be a valid MongoDB ID string'),
+    body('name').isString().isLength({ min: 2, max: 100 }).withMessage('Service name must be a string between 2 and 100 characters'),
+    body('active').optional().isBoolean().withMessage('Active must be a boolean'),
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({
                 success: false,
                 message: 'Validation error',
-                details: errors.array()[0].msg
+                details: errors.array().map(e => ({
+                    field: e.param,
+                    message: e.msg,
+                    value: e.value
+                }))
             });
         }
         next();
@@ -130,16 +178,21 @@ const serviceSchema = [
 ];
 
 const feedbackSchema = [
+    // body('user_id').isString().isMongoId().withMessage('user_id must be a valid MongoDB ID string'),
+    body('business_id').isString().isMongoId().withMessage('business_id must be a valid MongoDB ID string'),
     body('rating').isInt({ min: 1, max: 5 }).withMessage('Rating must be an integer between 1 and 5'),
     body('comment').optional().isString().isLength({ max: 1000 }).withMessage('Comment must be a string less than 1000 characters'),
-    body('businessId').isString().isMongoId().withMessage('Business ID must be a valid MongoDB ID string'),
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({
                 success: false,
                 message: 'Validation error',
-                details: errors.array()[0].msg
+                details: errors.array().map(e => ({
+                    field: e.param,
+                    message: e.msg,
+                    value: e.value
+                }))
             });
         }
         next();
@@ -147,35 +200,58 @@ const feedbackSchema = [
 ];
 
 const favoriteSchema = [
-    body('businessId').isString().isMongoId().withMessage('Business ID must be a valid MongoDB ID string'),
+    // body('user_id').isString().isMongoId().withMessage('user_id must be a valid MongoDB ID string'),
+    body('business_id').isString().isMongoId().withMessage('business_id must be a valid MongoDB ID string'),
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({
                 success: false,
                 message: 'Validation error',
-                details: errors.array()[0].msg
+                details: errors.array().map(e => ({
+                    field: e.param,
+                    message: e.msg,
+                    value: e.value
+                }))
             });
         }
         next();
     }
 ];
 
-const suggestionSchema = [
-    body('title').isString().isLength({ min: 5, max: 100 }).withMessage('Title must be a string between 5 and 100 characters'),
-    body('description').isString().isLength({ min: 10, max: 1000 }).withMessage('Description must be a string between 10 and 1000 characters'),
-    body('type').isString().isIn(['business', 'feature', 'bug', 'other']).withMessage('Type must be a string: business, feature, bug, or other'),
-    (req, res, next) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
-                success: false,
-                message: 'Validation error',
-                details: errors.array()[0].msg
-            });
-        }
-        next();
+const validateSuggestion = [
+  body('type')
+    .isString()
+    .isIn(['category', 'service'])
+    .withMessage('Type must be either category or service'),
+  body('name_he')
+    .isString()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Hebrew name is required (2-100 chars)'),
+  body('name_en')
+    .isString()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('English name is required (2-100 chars)'),
+  body('parent_category_id')
+    .if(body('type').equals('service'))
+    .isString()
+    .isMongoId()
+    .withMessage('parent_category_id is required and must be a valid Mongo ID for service suggestions'),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        details: errors.array().map(e => ({
+            field: e.param,
+            message: e.msg,
+            value: e.value
+        }))
+      });
     }
+    next();
+  }
 ];
 
 // Generic MongoDB ID validation function
@@ -187,7 +263,11 @@ const validateMongoIdParam = (paramName = 'id', displayName = 'ID') => [
             return res.status(400).json({
                 success: false,
                 message: 'Validation error',
-                details: errors.array()[0].msg
+                details: errors.array().map(e => ({
+                    field: e.param,
+                    message: e.msg,
+                    value: e.value
+                }))
             });
         }
         next();
@@ -207,7 +287,11 @@ const searchQuerySchema = [
             return res.status(400).json({
                 success: false,
                 message: 'Validation error',
-                details: errors.array()[0].msg
+                details: errors.array().map(e => ({
+                    field: e.param,
+                    message: e.msg,
+                    value: e.value
+                }))
             });
         }
         next();
@@ -216,6 +300,7 @@ const searchQuerySchema = [
 
 module.exports = {
     sanitizeRequest,
+    parseArrayFieldsGeneric,
     validateBusiness: businessSchema,
     validateUser: userSchema,
     validateAuth: authSchema,
@@ -223,7 +308,7 @@ module.exports = {
     validateService: serviceSchema,
     validateFeedback: feedbackSchema,
     validateFavorite: favoriteSchema,
-    validateSuggestion: suggestionSchema,
+    validateSuggestion: validateSuggestion,
     validateMongoIdParam: validateMongoIdParam,
     validateSearchQuery: searchQuerySchema
 }; 

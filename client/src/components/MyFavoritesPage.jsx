@@ -28,8 +28,8 @@ const MyFavoritesPage = () => {
                     return;
                 }
                 
-                const data = await response.json();
-                setFavorites(data.data.businesses);
+                const res = await response.json();
+                setFavorites(res.data.favorites || []);
             } catch (error) {
                 console.error("Error fetching favorites:", error);
             } finally {
@@ -39,6 +39,9 @@ const MyFavoritesPage = () => {
 
         fetchFavorites();
     }, [navigate]);
+
+    // Map favorites to businesses
+    const businesses = favorites.map(fav => fav.business_id).filter(biz => biz && biz._id);
 
     if (loading) {
         return <div className="loading">טוען מועדפים...</div>;
@@ -59,7 +62,7 @@ const MyFavoritesPage = () => {
                     </div>
                 </div>
 
-                {favorites.length === 0 ? (
+                {businesses.length === 0 ? (
                     <div className="empty-state">
                         <p>עדיין לא סימנת עסקים כמועדפים</p>
                         <button className="primary-button" onClick={() => navigate('/')}>
@@ -68,7 +71,7 @@ const MyFavoritesPage = () => {
                     </div>
                 ) : (
                     <div className="business-cards-grid">
-                        {favorites.map((business) => (
+                        {businesses.map((business) => (
                             <BusinessCard
                                 key={business._id}
                                 business={business}

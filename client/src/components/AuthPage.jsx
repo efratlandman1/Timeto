@@ -44,13 +44,13 @@ const AuthPage = () => {
         try {
             const res = await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/auth`, { email, password });
 
-            if (res.data.action === 'login') {
-                document.cookie = `token=${res.data.token}; path=/`;
-                localStorage.setItem('user', JSON.stringify(res.data.user));
-                dispatch(setUser(res.data.user));
+            if (res.data.data.action === 'login') {
+                document.cookie = `token=${res.data.data.token}; path=/`;
+                localStorage.setItem('user', JSON.stringify(res.data.data.user));
+                dispatch(setUser(res.data.data.user));
                 navigate('/');
-            } else if (res.data.status === 'verification-resent' || res.data.status === 'user-created') {
-                setMessage({ text: res.data.message, type: 'success' });
+            } else if (res.data.data.status === 'verification-resent' || res.data.data.status === 'user-created') {
+                setMessage({ text: res.data.data.message, type: 'success' });
             }
         } catch (error) {
             const errorMessage = error.response?.data?.error || 'אירעה שגיאה. אנא נסה שוב.';
@@ -65,9 +65,9 @@ const AuthPage = () => {
             setIsLoading(true);
             try {
                 const res = await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/google`, { tokenId: credentialResponse.credential });
-                dispatch(setUser(res.data.user));
-                document.cookie = `token=${res.data.token}; path=/`;
-                localStorage.setItem('user', JSON.stringify(res.data.user));
+                dispatch(setUser(res.data.data.user));
+                document.cookie = `token=${res.data.data.token}; path=/`;
+                localStorage.setItem('user', JSON.stringify(res.data.data.user));
                 navigate('/');
             } catch (error) {
                 setMessage({

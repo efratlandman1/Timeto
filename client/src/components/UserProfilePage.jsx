@@ -79,7 +79,7 @@ const UserProfilePage = () => {
 
         const response = await axios.put(`${process.env.REACT_APP_API_DOMAIN}/api/v1/users/${user.id}`, payload, config);
   
-        const updatedUser = response.data;
+        const updatedUser = response.data.data;
         dispatch(setReduxUser(updatedUser.user));
         localStorage.setItem('user', JSON.stringify(updatedUser.user));
         

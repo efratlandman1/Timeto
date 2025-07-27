@@ -38,13 +38,26 @@ const AdminPanelPage = () => {
     };
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user || user.role !== 'admin') {
+        const userStr = localStorage.getItem('user');
+        if (!userStr) {
             toast.error("אין לך הרשאת גישה לדף זה.");
             navigate('/');
             return;
         }
-        fetchData();
+        
+        try {
+            const user = JSON.parse(userStr);
+            if (!user || user.role !== 'admin') {
+                toast.error("אין לך הרשאת גישה לדף זה.");
+                navigate('/');
+                return;
+            }
+            fetchData();
+        } catch (error) {
+            console.error('Error parsing user data:', error);
+            toast.error("שגיאה בנתוני המשתמש.");
+            navigate('/');
+        }
     }, [activeTab]);
 
     const getContextName = (tab, isPlural = false) => {
@@ -66,7 +79,7 @@ const AdminPanelPage = () => {
             let categoriesData = categories;
             if (categories.length === 0 || activeTab === 'categories' || activeTab === 'services') {
                 const catRes = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`, config);
-                categoriesData = catRes.data.sort((a, b) => a.name.localeCompare(b.name));
+                categoriesData = catRes.data.data.categories.sort((a, b) => a.name.localeCompare(b.name));
                 setCategories(categoriesData);
             }
 
@@ -77,7 +90,7 @@ const AdminPanelPage = () => {
                         acc[cat._id] = cat.name;
                         return acc;
                     }, {});
-                    const sortedServices = servicesRes.data.sort((a, b) => {
+                    const sortedServices = (servicesRes.data.data.services || []).sort((a, b) => {
                         const catA = categoryMap[a.categoryId] || '';
                         const catB = categoryMap[b.categoryId] || '';
                         if (catA < catB) return -1;
@@ -88,11 +101,11 @@ const AdminPanelPage = () => {
                     break;
                 case 'users':
                     const usersResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/users`, config);
-                    setUsers(usersResponse.data);
+                    setUsers(usersResponse.data.data.users || []);
                     break;
                 case 'businesses':
                     const businessesResponse = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/all`, config);
-                    setBusinesses(businessesResponse.data);
+                    setBusinesses(businessesResponse.data.data.businesses || []);
                     break;
                 default:
                     break;
@@ -657,7 +670,7 @@ const AdminPanelPage = () => {
             </div>
 
             {isModalOpen && (
-                <div className="modal-backdrop">
+                <div className="modal-backdrop" onClick={() => setIsModalOpen(false)}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>{editingItem?._id ? `ערוך ${getContextName(activeTab)}` : `הוסף ${getContextName(activeTab)}`}</h2>

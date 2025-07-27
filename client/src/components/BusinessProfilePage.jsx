@@ -25,7 +25,7 @@ const BusinessProfilePage = () => {
       const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${id}`);
       if (!response.ok) throw new Error('בעיה בטעינת פרטי העסק');
       const data = await response.json();
-      setBusiness(data);
+      setBusiness(data.data.business);
     } catch (err) {
       setError(err.message);
     }
@@ -36,7 +36,7 @@ const BusinessProfilePage = () => {
       const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/feedbacks/business/${id}`);
       if (response.ok) {
         const data = await response.json();
-        setFeedbacks(data);
+        setFeedbacks(data.data.feedbacks);
       }
     } catch (err) {
       console.error('שגיאה בשליפת פידבקים:', err);

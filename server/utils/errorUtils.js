@@ -49,9 +49,21 @@ function successResponse({ res, req, status = 200, data, message, logSource }) {
   });
 }
 
+function serializeError(err) {
+  if (!err) return null;
+  return {
+    message: err.message,
+    stack: err.stack,
+    name: err.name,
+    ...err // כולל שדות נוספים אם יש
+  };
+}
+
+
 module.exports = {
   captureError,
   errorResponse,
   successResponse,
-  getRequestMeta
+  getRequestMeta,
+  serializeError
 }; 

@@ -1,6 +1,6 @@
 const Service = require('../models/service');
 const mongoose = require('mongoose');
-const { successResponse, errorResponse, getRequestMeta } = require("../utils/errorUtils");
+const { successResponse, errorResponse, getRequestMeta, serializeError } = require("../utils/errorUtils");
 const logger = require("../logger");
 const Sentry = require("@sentry/node");
 const messages = require("../messages");
@@ -24,7 +24,7 @@ exports.getAllServices = async (req, res) => {
       logSource
     });
   } catch (error) {
-    logger.error({ ...meta, error }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
     Sentry.captureException(error);
     return errorResponse({
       res,
@@ -67,7 +67,7 @@ exports.getServicesByCategory = async (req, res) => {
       logSource
     });
   } catch (error) {
-    logger.error({ ...meta, error }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
     Sentry.captureException(error);
     return errorResponse({
       res,
@@ -101,7 +101,7 @@ exports.createService = async (req, res) => {
       logSource
     });
   } catch (error) {
-    logger.error({ ...meta, error }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
     Sentry.captureException(error);
     return errorResponse({
       res,
@@ -141,7 +141,7 @@ exports.updateService = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,
@@ -180,7 +180,7 @@ exports.deleteService = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,

@@ -22,14 +22,7 @@ const SuggestItemPage = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
-        if (response.data && Array.isArray(response.data)) {
-          setCategories(response.data);
-        } else if (response.data && Array.isArray(response.data.data)) {
-          setCategories(response.data.data);
-        } else {
-          console.error('Unexpected categories data structure:', response.data);
-          setCategories([]);
-        }
+        setCategories(response.data.data.categories || []);
       } catch (error) {
         console.error('Error fetching categories:', error);
         toast.error('שגיאה בטעינת הקטגוריות');

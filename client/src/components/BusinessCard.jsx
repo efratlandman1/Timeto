@@ -41,9 +41,13 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
       });
 
       if (response.ok) {
-        const { active } = await response.json();
+        const result = await response.json();
+        const active = result.data.active;
         setIsFavorite(active);
         showToast(active ? '✅ נוסף למועדפים' : '✅ הוסר מהמועדפים');
+      } else {
+        const errorData = await response.json();
+        showToast(`❌ ${errorData.message || 'שגיאה בעדכון מועדפים'}`, true);
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
@@ -70,12 +74,13 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
+        const result = await res.json();
         setLocalActive(false);
         setConfirmDelete(false);
-        showToast('✅ העסק נמחק');
+        showToast(result.message || '✅ העסק נמחק');
       } else {
         const err = await res.json();
-        showToast(`שגיאה: ${err.message || 'מחיקה נכשלה'}`, true);
+        showToast(`❌ ${err.message || 'מחיקה נכשלה'}`, true);
       }
     } catch {
       showToast('❌ שגיאה במחיקה', true);
@@ -99,11 +104,12 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
       });
 
       if (res.ok) {
+        const result = await res.json();
         setLocalActive(true);
-        showToast('✅ העסק שוחזר בהצלחה');
+        showToast(result.message || '✅ העסק שוחזר בהצלחה');
       } else {
         const err = await res.json();
-        showToast(`שגיאה: ${err.message || 'שחזור נכשל'}`, true);
+        showToast(`❌ ${err.message || 'שחזור נכשל'}`, true);
       }
     } catch {
       showToast('❌ שגיאה בשחזור', true);

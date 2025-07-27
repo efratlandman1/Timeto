@@ -31,6 +31,7 @@ const Header = () => {
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [username, setUsername] = useState(null);
     const [greeting, setGreeting] = useState("");
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
     const userMenuRef = useRef(null);
     const userButtonRef = useRef(null);
     const loginUser = useSelector(state => state.user.user);
@@ -92,6 +93,9 @@ const Header = () => {
                 dispatch(logout());
             }
         }
+        
+        // Set loading to false after checking auth status
+        setIsAuthLoading(false);
 
         const intervalId = setInterval(() => {
             if (loginUser) setGreeting(getGreeting());
@@ -310,76 +314,82 @@ const Header = () => {
                         </label>
                     </div>
 
-                    {username ? (
-                        <div className="user-menu" ref={userMenuRef}>
-                            <button 
-                                className="nav-button with-hover" 
-                                onClick={() => setShowUserMenu(!showUserMenu)}
-                                ref={userButtonRef}
-                                aria-expanded={showUserMenu}
-                                aria-haspopup="true"
-                            >
-                                <FaUserCircle />
-                                <span>{greeting} <span className="username">{username}</span></span>
-                            </button>
-                            {showUserMenu && (
-                                <div 
-                                    className="dropdown-menu"
-                                    role="menu"
-                                    aria-labelledby="user-menu-button"
-                                >
-                                    <button 
-                                        className="dropdown-item" 
-                                        onClick={() => handleMenuItemClick("/user-profile")}
-                                        role="menuitem"
-                                    >
-                                        <FaIdCard />
-                                        {"פרופיל אישי"}  
-                                    </button>
-                                    <button 
-                                        className="dropdown-item" 
-                                        onClick={() => handleMenuItemClick("/user-businesses")}
-                                        role="menuitem"
-                                    >
-                                        <FaStore />
-                                        {t('header.myBusinesses')}
-                                    </button>
-                                    <button 
-                                        className="dropdown-item" 
-                                        onClick={() => handleMenuItemClick("/user-favorites")}
-                                        role="menuitem"
-                                    >
-                                        <FaHeart />
-                                        {t('header.myFavorites')}
-                                    </button>
-                                    {isAdmin && (
-                                        <button 
-                                            className="dropdown-item" 
-                                            onClick={() => handleMenuItemClick("/admin")}
-                                            role="menuitem"
-                                        >
-                                            <FaCog />
-                                            {t('header.adminPanel')}
-                                        </button>
-                                    )}
-                                    <button 
-                                        className="dropdown-item" 
-                                        onClick={handleLogout}
-                                        role="menuitem"
-                                    >
-                                        <FaSignOutAlt />
-                                        {t('header.logout')}
-                                    </button>
-                                </div>
-                            )}
+                    {isAuthLoading ? (
+                        <div className="auth-buttons">
+                            <span></span>
                         </div>
                     ) : (
-                        <div className="auth-buttons">
-                            <button className="auth-button" onClick={() => navigate("/auth")}>
-                                <FaSignInAlt />
-                                הרשמה / כניסה
-                            </button>
-                        </div>
+                        username ? (
+                            <div className="user-menu" ref={userMenuRef}>
+                                <button 
+                                    className="nav-button with-hover" 
+                                    onClick={() => setShowUserMenu(!showUserMenu)}
+                                    ref={userButtonRef}
+                                    aria-expanded={showUserMenu}
+                                    aria-haspopup="true"
+                                >
+                                    <FaUserCircle />
+                                    <span>{greeting} <span className="username">{username}</span></span>
+                                </button>
+                                {showUserMenu && (
+                                    <div 
+                                        className="dropdown-menu"
+                                        role="menu"
+                                        aria-labelledby="user-menu-button"
+                                    >
+                                        <button 
+                                            className="dropdown-item" 
+                                            onClick={() => handleMenuItemClick("/user-profile")}
+                                            role="menuitem"
+                                        >
+                                            <FaIdCard />
+                                            {"פרופיל אישי"}  
+                                        </button>
+                                        <button 
+                                            className="dropdown-item" 
+                                            onClick={() => handleMenuItemClick("/user-businesses")}
+                                            role="menuitem"
+                                        >
+                                            <FaStore />
+                                            {t('header.myBusinesses')}
+                                        </button>
+                                        <button 
+                                            className="dropdown-item" 
+                                            onClick={() => handleMenuItemClick("/user-favorites")}
+                                            role="menuitem"
+                                        >
+                                            <FaHeart />
+                                            {t('header.myFavorites')}
+                                        </button>
+                                        {isAdmin && (
+                                            <button 
+                                                className="dropdown-item" 
+                                                onClick={() => handleMenuItemClick("/admin")}
+                                                role="menuitem"
+                                            >
+                                                <FaCog />
+                                                {t('header.adminPanel')}
+                                            </button>
+                                        )}
+                                        <button 
+                                            className="dropdown-item" 
+                                            onClick={handleLogout}
+                                            role="menuitem"
+                                        >
+                                            <FaSignOutAlt />
+                                            {t('header.logout')}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="auth-buttons">
+                                <button className="auth-button" onClick={() => navigate("/auth")}>
+                                    <FaSignInAlt />
+                                    הרשמה / כניסה
+                                </button>
+                            </div>
+                        )
                     )}
                 </div>
             </nav>

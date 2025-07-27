@@ -29,7 +29,7 @@ const UserBusinessesPage = () => {
                 }
                 
                 const data = await response.json();
-                setMyBusinesses(data);
+                setMyBusinesses(data.data.businesses || []);
             } catch (error) {
                 console.error("Error fetching businesses:", error);
             } finally {

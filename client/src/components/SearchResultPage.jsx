@@ -166,7 +166,7 @@ const SearchResultPage = () => {
         
         axios.get(url, { headers })
             .then(res => {
-                const newBusinesses = res.data.data || [];
+                const newBusinesses = res.data.data.businesses || [];
                 setBusinesses(prevBusinesses => 
                     currentPage === 1 ? newBusinesses : [...prevBusinesses, ...newBusinesses]
                 );

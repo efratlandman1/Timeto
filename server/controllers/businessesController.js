@@ -7,7 +7,7 @@ const Feedback = require('../models/feedback');
 const mapsUtils = require('../utils/mapsUtils');
 const logger = require('../logger');
 const Sentry = require('../sentry');
-const { errorResponse, successResponse, getRequestMeta } = require('../utils/errorUtils');
+const { errorResponse, successResponse, getRequestMeta,serializeError } = require('../utils/errorUtils');
 const { BUSINESS_MESSAGES } = require('../messages');
 
 const DEFAULT_ITEMS_PER_PAGE = 8;
@@ -224,7 +224,7 @@ exports.getAllBusinesses = async (req, res) => {
             logSource
         });
     } catch (err) {
-        logger.error({ ...meta, error: err.message }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);        
         Sentry.captureException(err);
         return errorResponse({
             res,
@@ -251,8 +251,7 @@ exports.uploadBusinesses = async (req, res) => {
             return createBusiness(req, res, userId);
         }
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
-        Sentry.captureException(error);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);        Sentry.captureException(error);
         return errorResponse({
             res,
             req,
@@ -270,9 +269,10 @@ const createBusiness = async (req, res, userId) => {
     try {
         logger.info({ ...meta }, `${logSource} enter`);
         
-        const openingHours = JSON.parse(req.body.openingHours || '[]');
-        const services = JSON.parse(req.body.services || '[]');
-
+        // const openingHours = JSON.parse(req.body.openingHours || '[]');
+        // const services = JSON.parse(req.body.services || '[]');
+        const openingHours = req.body.openingHours || [];
+        const services = req.body.services || [];
         // Get coordinates from address
         const location = await mapsUtils.geocode(req.body.address);
         
@@ -324,8 +324,7 @@ const createBusiness = async (req, res, userId) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
-        Sentry.captureException(error);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);        Sentry.captureException(error);
         return errorResponse({
             res,
             req,
@@ -357,7 +356,7 @@ const updateBusiness = async (req, res, userId) => {
         }
         
         // בדיקת הרשאות - רק הבעלים או אדמין יכולים לערוך
-        if (existingBusiness.userId.toString() !== userId.toString() && req.user.role !== 'admin') {
+        if (String(existingBusiness.userId) !== String(userId) && req.user.role !== 'admin') {
             logger.warn({ ...meta, businessId: req.body.id, userId, ownerId: existingBusiness.userId }, BUSINESS_MESSAGES.UNAUTHORIZED_EDIT);
             return errorResponse({
                 res,
@@ -412,8 +411,7 @@ const updateBusiness = async (req, res, userId) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
-        Sentry.captureException(error);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);        Sentry.captureException(error);
         return errorResponse({
             res,
             req,
@@ -453,7 +451,7 @@ exports.getUserBusinesses = async (req, res) => {
             logSource
         });
     } catch (err) {
-        logger.error({ ...meta, error: err.message }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);        
         Sentry.captureException(err);
         return errorResponse({
             res,
@@ -668,13 +666,13 @@ exports.getItems = async (req, res) => {
         return successResponse({
             res,
             req,
-            data: result,
+            data: { businesses: result.data, pagination: result.pagination },
             message: BUSINESS_MESSAGES.GET_ALL_SUCCESS,
             logSource
         });
 
     } catch (err) {
-        logger.error({ ...meta, error: err.message }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);        
         Sentry.captureException(err);
         return errorResponse({
             res,
@@ -717,8 +715,7 @@ exports.getBusinessById = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error: error.message }, `${logSource} error`);
-        Sentry.captureException(error);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);        Sentry.captureException(error);
         return errorResponse({
             res,
             req,
@@ -751,12 +748,13 @@ exports.deleteBusiness = async (req, res) => {
             });
         }
 
-        if (business.userId.toString() !== userId) {
+        // Updated authorization check
+        if (String(business.userId) !== String(userId) && req.user.role !== 'admin') {
             logger.warn({ 
                 ...meta, 
                 businessId,
-                businessUserId: business.userId.toString(),
-                requestUserId: userId 
+                businessUserId: String(business.userId),
+                requestUserId: String(userId) 
             }, BUSINESS_MESSAGES.UNAUTHORIZED_DELETE);
             return errorResponse({
                 res,
@@ -779,8 +777,7 @@ exports.deleteBusiness = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error: error.message }, `${logSource} error`);
-        Sentry.captureException(error);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);        Sentry.captureException(error);
         return errorResponse({
             res,
             req,
@@ -813,12 +810,12 @@ exports.restoreBusiness = async (req, res) => {
             });
         }
 
-        if (business.userId.toString() !== userId) {
+        if (String(business.userId) !== String(userId) && req.user.role !== 'admin') {
             logger.warn({ 
                 ...meta, 
                 businessId,
-                businessUserId: business.userId.toString(),
-                requestUserId: userId 
+                businessUserId: String(business.userId),
+                requestUserId: String(userId) 
             }, BUSINESS_MESSAGES.UNAUTHORIZED_RESTORE);
             return errorResponse({
                 res,
@@ -841,8 +838,7 @@ exports.restoreBusiness = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error: error.message }, `${logSource} error`);
-        Sentry.captureException(error);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);        Sentry.captureException(error);
         return errorResponse({
             res,
             req,

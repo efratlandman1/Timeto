@@ -47,8 +47,8 @@ const FeedbackPage = ({ businessId, onClose }) => {
         axios
         .get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/feedbacks/business/${businessId}`)
         .then(res => {
-            setPreviousFeedbacks(res.data);
-            const name = res.data?.[0]?.business_id?.name;
+            setPreviousFeedbacks(res.data.data.feedbacks || []);
+            const name = res.data.data.feedbacks?.[0]?.business_id?.name;
             if (name) setBusinessName(name);
         })
         .catch(err => console.error('Error fetching feedbacks:', err))

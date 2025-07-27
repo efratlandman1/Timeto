@@ -62,7 +62,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
       if (!res.ok) throw new Error('Search request failed');
       
       const data = await res.json();
-      const newResults = data.data || [];
+      const newResults = data.data.businesses || [];
       
       setHasMore(data.pagination?.hasNextPage || newResults.length === ITEMS_PER_PAGE);
       

@@ -1,7 +1,7 @@
 const Favorite = require("../models/favorite");
 const mongoose = require('mongoose');
 const logger = require('../logger');
-const { captureError, errorResponse, successResponse, getRequestMeta } = require('../utils/errorUtils');
+const { captureError, errorResponse, successResponse, getRequestMeta, serializeError } = require('../utils/errorUtils');
 const { FAVORITES } = require('../messages');
 
 // Toggle favorite status for a business
@@ -58,7 +58,7 @@ exports.toggleFavorite = async (req, res) => {
     });
 
   } catch (err) {
-    logger.error({ ...meta, error: err }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
     captureError(err, req);
     return errorResponse({
       res,
@@ -105,7 +105,7 @@ exports.getUserFavorites = async (req, res) => {
     });
 
   } catch (err) {
-    logger.error({ ...meta, error: err }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
     captureError(err, req);
     return errorResponse({
       res,
@@ -156,7 +156,7 @@ exports.checkFavoriteStatus = async (req, res) => {
     });
 
   } catch (err) {
-    logger.error({ ...meta, error: err }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
     captureError(err, req);
     return errorResponse({
       res,
@@ -188,7 +188,7 @@ exports.getFavorites = async (req, res) => {
       logSource
     });
   } catch (err) {
-    logger.error({ ...meta, error: err }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
     captureError(err, req);
     return errorResponse({
       res,

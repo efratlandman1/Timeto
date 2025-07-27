@@ -5,7 +5,7 @@ const User = require('../models/user');
 const PasswordResetToken = require('../models/PasswordResetToken');
 const sendEmail = require('../utils/SendEmail/sendEmail');
 const { v4: uuidv4 } = require('uuid');
-const { successResponse, errorResponse, getRequestMeta } = require("../utils/errorUtils");
+const { successResponse, errorResponse, getRequestMeta, serializeError } = require("../utils/errorUtils");
 const logger = require("../logger");
 const messages = require("../messages");
 require('dotenv').config();
@@ -174,7 +174,7 @@ exports.handleAuth = async (req, res) => {
             });
         }
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,
@@ -217,7 +217,8 @@ exports.googleLogin = async (req, res) => {
         });
 
         const payload = ticket.getPayload();
-        
+        const { email, sub, given_name, family_name, email_verified } = payload;
+
         if (!payload.email_verified) {
             logger.warn({ ...meta, email: payload.email }, messages.AUTH_MESSAGES.GOOGLE_NOT_VERIFIED);
             return errorResponse({
@@ -283,7 +284,7 @@ exports.googleLogin = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,
@@ -363,7 +364,7 @@ exports.resendVerificationEmail = async (req, res) => {
         });
 
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,
@@ -411,7 +412,7 @@ exports.verifyEmail = async (req, res) => {
         // Redirect to a success page on the client.
         return res.redirect(`${clientUrl}/auth?verification_status=success`);
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         // Redirect on any server error.
         res.redirect(`${clientUrl}/auth?verification_status=failure&reason=server_error`);
@@ -475,7 +476,7 @@ exports.requestPasswordReset = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,
@@ -569,7 +570,7 @@ exports.resetPassword = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,
@@ -607,7 +608,7 @@ exports.handlePasswordResetRedirect = async (req, res) => {
         res.redirect(`${clientUrl}/reset-password?token=${token}`);
 
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         // On any server error, redirect to forgot-password with a generic error.
         res.redirect(`${clientUrl}/forgot-password?error=server_error`);

@@ -18,7 +18,7 @@ const StepBusinessServices = ({ businessData, setBusinessData }) => {
         const response = await axios.get(
           `${process.env.REACT_APP_API_DOMAIN}/api/v1/services/byCategory/${businessData.categoryId}`
         );
-        setAvailableServices(response.data);
+        setAvailableServices(response.data.data.services || []);
       } catch (error) {
         console.error('שגיאה בטעינת השירותים:', error);
       }

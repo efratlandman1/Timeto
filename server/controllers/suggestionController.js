@@ -1,7 +1,7 @@
 const Suggestion = require('../models/suggestion');
 const Category = require('../models/category');
 const mongoose = require('mongoose');
-const { successResponse, errorResponse, getRequestMeta } = require("../utils/errorUtils");
+const { successResponse, errorResponse, getRequestMeta, serializeError } = require("../utils/errorUtils");
 const logger = require("../logger");
 const Sentry = require("@sentry/node");
 const messages = require("../messages");
@@ -52,7 +52,7 @@ const createSuggestion = async (req, res) => {
       logSource
     });
   } catch (error) {
-    logger.error({ ...meta, error }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
     Sentry.captureException(error);
     return errorResponse({
       res,
@@ -85,7 +85,7 @@ const getAllSuggestions = async (req, res) => {
       logSource
     });
   } catch (error) {
-    logger.error({ ...meta, error }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
     Sentry.captureException(error);
     return errorResponse({
       res,
@@ -141,7 +141,7 @@ const getSuggestion = async (req, res) => {
       logSource
     });
   } catch (error) {
-    logger.error({ ...meta, error }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
     Sentry.captureException(error);
     return errorResponse({
       res,
@@ -215,7 +215,7 @@ const updateSuggestionStatus = async (req, res) => {
       logSource
     });
   } catch (error) {
-    logger.error({ ...meta, error }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
     Sentry.captureException(error);
     return errorResponse({
       res,
@@ -268,7 +268,7 @@ const deleteSuggestion = async (req, res) => {
       logSource
     });
   } catch (error) {
-    logger.error({ ...meta, error }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
     Sentry.captureException(error);
     return errorResponse({
       res,
@@ -300,7 +300,7 @@ const getUserSuggestions = async (req, res) => {
       logSource
     });
   } catch (error) {
-    logger.error({ ...meta, error }, `${logSource} error`);
+    logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
     Sentry.captureException(error);
     return errorResponse({
       res,

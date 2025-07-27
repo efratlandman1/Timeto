@@ -1,5 +1,5 @@
 const Category = require("../models/category");
-const { successResponse, errorResponse, getRequestMeta } = require("../utils/errorUtils");
+const { successResponse, errorResponse, getRequestMeta, serializeError } = require("../utils/errorUtils");
 const logger = require("../logger");
 const Sentry = require("@sentry/node");
 const messages = require("../messages");
@@ -22,7 +22,7 @@ exports.getAllCategories = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,
@@ -60,7 +60,7 @@ exports.createCategory = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,
@@ -105,7 +105,7 @@ exports.updateCategory = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,
@@ -143,7 +143,7 @@ exports.deleteCategory = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,

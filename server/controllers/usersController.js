@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require("../models/user");
 const bcryptjs = require('bcryptjs');
-const { successResponse, errorResponse, getRequestMeta } = require("../utils/errorUtils");
+const { successResponse, errorResponse, getRequestMeta, serializeError } = require("../utils/errorUtils");
 const logger = require("../logger");
 const Sentry = require('@sentry/node');
 const messages = require("../messages");
@@ -93,7 +93,7 @@ exports.getAllUsers = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,
@@ -168,7 +168,7 @@ exports.updateUser = async (req, res) => {
         });
 
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,
@@ -206,7 +206,7 @@ exports.deleteUser = async (req, res) => {
             logSource
         });
     } catch (error) {
-        logger.error({ ...meta, error }, `${logSource} error`);
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
         Sentry.captureException(error);
         return errorResponse({
             res,

@@ -215,7 +215,7 @@ const EditBusinessPage = () => {
         const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${businessId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const biz = response.data;
+        const biz = response.data.data.business;
         dispatch(setSelectedBusiness(biz));
         initializeBusinessData(biz);
       } catch (error) {
@@ -256,7 +256,7 @@ const EditBusinessPage = () => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
-      setCategories(response.data);
+      setCategories(response.data.data.categories || []);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -337,10 +337,11 @@ const EditBusinessPage = () => {
         className: 'custom-toast',
       });
       setTimeout(() => {
-        navigate('/my-businesses');
+        navigate('/user-businesses');
       }, 1500);
     } catch (error) {
-      toast.error('אירעה שגיאה בעת שמירת העסק');
+      const msg = error.response?.data?.message || 'אירעה שגיאה בעת שמירת העסק';
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -358,7 +359,7 @@ const EditBusinessPage = () => {
   return (
     <div className="narrow-page-container">
       <div className="narrow-page-content">
-        <button className="nav-button above-header" onClick={() => navigate('/my-businesses')}>
+        <button className="nav-button above-header" onClick={() => navigate('/user-businesses')}>
           <FaArrowRight className="icon" />
           חזרה לעסקים שלי
         </button>
