@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const multer = require('multer');
 const app = express();
-require('dotenv').config({ path: './.env' });
+require('dotenv').config({ path: '.env' });
 const PORT = 5050;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://efla2335:eThyS1jF3qsHw6pO@cluster0.l553x.mongodb.net/Timeto?retryWrites=true&w=majority&appName=Cluster0';
+const MONGO_URI = process.env.MONGO_URI;
 
 const usersRouter = require('./routes/usersRoutes');
 const businessesRouter = require('./routes/businessesRoutes');
