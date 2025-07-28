@@ -6,7 +6,7 @@ const multer = require('multer');
 const logger = require('./logger');
 const Sentry = require('./sentry');
 const app = express();
-require('dotenv').config();
+require('dotenv').config({ quiet: true })
 
 // Validate critical environment variables
 const requiredEnvVars = [
@@ -54,7 +54,6 @@ logger.info({
 
 const PORT = 5050;
 const MONGO_URI = process.env.MONGO_URI;
-
 const usersRouter = require('./routes/usersRoutes');
 const businessesRouter = require('./routes/businessesRoutes');
 const authRouter = require('./routes/authRoutes');
