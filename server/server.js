@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const multer = require('multer');
+const logger = require('./logger');
+const Sentry = require('./sentry');
 const app = express();
 require('dotenv').config();
 
@@ -22,8 +24,12 @@ const requiredEnvVars = [
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
-  console.error('❌ Missing required environment variables:', missingEnvVars.join(', '));
-  console.error('Please check your .env file');
+  logger.error({ 
+    msg: 'Missing required environment variables',
+    missingVars: missingEnvVars,
+    logSource: 'server.js'
+  });
+  Sentry.captureException(new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}`));
   process.exit(1);
 }
 
@@ -32,11 +38,19 @@ const apiKeysToValidate = ['JWT_SECRET', 'GOOGLE_MAPS_API_KEY', 'GOOGLE_CLIENT_I
 const invalidApiKeys = apiKeysToValidate.filter(key => process.env[key] && process.env[key].length < 10);
 
 if (invalidApiKeys.length > 0) {
-  console.error('❌ Invalid API keys (too short):', invalidApiKeys.join(', '));
+  logger.error({ 
+    msg: 'Invalid API keys (too short)',
+    invalidKeys: invalidApiKeys,
+    logSource: 'server.js'
+  });
+  Sentry.captureException(new Error(`Invalid API keys (too short): ${invalidApiKeys.join(', ')}`));
   process.exit(1);
 }
 
-console.log('✅ All environment variables and API keys are valid');
+logger.info({ 
+  msg: 'All environment variables and API keys are valid',
+  logSource: 'server.js'
+});
 
 const PORT = 5050;
 const MONGO_URI = process.env.MONGO_URI;
@@ -118,7 +132,11 @@ app.use('/uploads', express.static(path.join(__dirname, 'config', 'uploads')));
 
 // Ensure NODE_ENV is set
 if (!process.env.NODE_ENV) {
-  console.error('❌ NODE_ENV is not set! Please set NODE_ENV to "dev", "prod" or "test".');
+  logger.error({ 
+    msg: 'NODE_ENV is not set',
+    logSource: 'server.js'
+  });
+  Sentry.captureException(new Error('NODE_ENV is not set'));
   process.exit(1);
 }
 
@@ -137,9 +155,22 @@ const mongooseOptions = {
 };
 
 mongoose.connect(MONGO_URI, mongooseOptions)
-   .then(() => console.log('✅ MongoDB connected successfully'))
+   .then(() => {
+     logger.info({ 
+       msg: 'MongoDB connected successfully',
+       connectionString: MONGO_URI.replace(/\/\/.*@/, '//***:***@'), // מסתיר פרטי התחברות
+       environment: process.env.NODE_ENV,
+       logSource: 'server.js'
+     });
+   })
    .catch(err => {
-     console.error('❌ MongoDB connection failed:', err.message);
+     logger.error({ 
+       msg: 'MongoDB connection failed',
+       error: err.message,
+       stack: err.stack,
+       logSource: 'server.js'
+     });
+     Sentry.captureException(err);
      process.exit(1);
    });
 
@@ -157,6 +188,13 @@ app.use('/api/v1/stats', statsRoutes);
 // Global error handler for oversized requests and other errors
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    logger.warn({ 
+      msg: 'Invalid JSON payload received',
+      requestId: req.requestId,
+      ip: req.ip,
+      userAgent: req.headers['user-agent'],
+      logSource: 'server.js'
+    });
     return res.status(400).json({ 
       error: 'Invalid JSON payload',
       message: 'The request body contains malformed JSON'
@@ -164,6 +202,13 @@ app.use((err, req, res, next) => {
   }
   
   if (err.code === 'LIMIT_FILE_SIZE') {
+    logger.warn({ 
+      msg: 'File too large uploaded',
+      requestId: req.requestId,
+      ip: req.ip,
+      fileSize: req.headers['content-length'],
+      logSource: 'server.js'
+    });
     return res.status(413).json({ 
       error: 'File too large',
       message: 'The uploaded file exceeds the size limit'
@@ -171,6 +216,12 @@ app.use((err, req, res, next) => {
   }
   
   if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+    logger.warn({ 
+      msg: 'Unexpected file field detected',
+      requestId: req.requestId,
+      ip: req.ip,
+      logSource: 'server.js'
+    });
     return res.status(400).json({ 
       error: 'Unexpected file field',
       message: 'An unexpected file field was detected'
@@ -178,7 +229,17 @@ app.use((err, req, res, next) => {
   }
   
   // Log the error for debugging
-  console.error('Server error:', err);
+  logger.error({ 
+    msg: 'Server error occurred',
+    error: err.message,
+    stack: err.stack,
+    requestId: req.requestId,
+    ip: req.ip,
+    userAgent: req.headers['user-agent'],
+    logSource: 'server.js'
+  });
+  
+  Sentry.captureException(err);
   
   // Generic error response
   res.status(500).json({ 
@@ -188,5 +249,11 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    logger.info({ 
+      msg: 'Server started successfully',
+      port: PORT,
+      environment: process.env.NODE_ENV,
+      nodeVersion: process.version,
+      logSource: 'server.js'
+    });
 });

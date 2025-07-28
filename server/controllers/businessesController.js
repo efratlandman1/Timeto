@@ -274,7 +274,7 @@ const createBusiness = async (req, res, userId) => {
         const openingHours = req.body.openingHours || [];
         const services = req.body.services || [];
         // Get coordinates from address
-        const location = await mapsUtils.geocode(req.body.address);
+        const location = await mapsUtils.geocode(req.body.address, req);
         
         // ולידציה נוספת של הקואורדינטות
         if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
@@ -369,7 +369,7 @@ const updateBusiness = async (req, res, userId) => {
 
         // עדכון כתובת וקואורדינטות אם השתנתה
         if (req.body.address && req.body.address !== existingBusiness.address) {
-            const location = await mapsUtils.geocode(req.body.address);
+            const location = await mapsUtils.geocode(req.body.address, req);
             
             if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
                 logger.warn({ ...meta, address: req.body.address }, BUSINESS_MESSAGES.INVALID_COORDINATES);

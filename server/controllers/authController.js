@@ -120,7 +120,7 @@ exports.handleAuth = async (req, res) => {
                     email: user.email,
                     subject: 'אימות כתובת דוא"ל מחדש',
                     html: emailTemplates.resendVerification(verificationUrl),
-                });
+                }, req);
                 
                 logger.info({ ...meta, userId: user._id }, `${logSource} complete`);
                 return successResponse({
@@ -161,7 +161,7 @@ exports.handleAuth = async (req, res) => {
                 email: newUser.email,
                 subject: 'ברוכים הבאים ל-Time-To!',
                 html: emailTemplates.verifyEmail(verificationUrl),
-            });
+            }, req);
 
             logger.info({ ...meta, userId: newUser._id }, `${logSource} complete`);
             return successResponse({
@@ -352,7 +352,7 @@ exports.resendVerificationEmail = async (req, res) => {
             email: user.email,
             subject: 'אימות כתובת דוא"ל מחדש',
             html: emailTemplates.resendVerification(verificationUrl),
-        });
+        }, req);
 
         logger.info({ ...meta, userId: user._id }, `${logSource} complete`);
         return successResponse({
@@ -461,7 +461,7 @@ exports.requestPasswordReset = async (req, res) => {
                 email: user.email,
                 subject: 'בקשה לאיפוס סיסמה',
                 html: emailTemplates.resetPassword(resetUrl),
-            });
+            }, req);
             
             logger.info("Password reset email sent", { ...meta, logSource, email });
         }

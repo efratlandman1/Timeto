@@ -1,6 +1,8 @@
 const path = require('path');
 const fs = require('fs');
 const NodeClam = require('clamscan');
+const logger = require('../logger');
+const Sentry = require('../sentry');
 
 // Allowed file types and their MIME types
 const ALLOWED_FILE_TYPES = {
@@ -36,10 +38,18 @@ const isProduction = process.env.NODE_ENV === 'prod' ;
                 },
             });
             clamAvailable = true;
-            console.log('✅ ClamAV initialized and ready for virus scanning');
+            logger.info({ 
+                msg: 'ClamAV initialized and ready for virus scanning',
+                logSource: 'fileUploadSecurity'
+            });
         } catch (err) {
             clamAvailable = false;
-            console.warn('⚠️ ClamAV not available. Virus scanning is disabled:', err.message);
+            logger.warn({ 
+                msg: 'ClamAV not available. Virus scanning is disabled',
+                error: err.message,
+                logSource: 'fileUploadSecurity'
+            });
+            Sentry.captureException(err);
         }
     }
 })();
@@ -52,13 +62,19 @@ const virusScan = async (req, res, next) => {
 
     // Skip virus scan in development
     if (!isProduction) {
-        console.log('🟡 Skipping virus scan (development environment)');
+        logger.info({ 
+            msg: 'Skipping virus scan (development environment)',
+            logSource: 'fileUploadSecurity.virusScan'
+        });
         return next();
     }
 
     // Skip if ClamAV is not available
     if (!clamAvailable) {
-        console.warn('⚠️ ClamAV not available. Skipping virus scan.');
+        logger.warn({ 
+            msg: 'ClamAV not available. Skipping virus scan.',
+            logSource: 'fileUploadSecurity.virusScan'
+        });
         return next();
     }
 
@@ -70,6 +86,15 @@ const virusScan = async (req, res, next) => {
                 fs.unlinkSync(req.file.path);
             }
             
+            logger.warn({ 
+                msg: 'File failed virus scan',
+                fileName: req.file.originalname,
+                viruses: viruses,
+                logSource: 'fileUploadSecurity.virusScan'
+            });
+            
+            Sentry.captureException(new Error(`Virus detected in file: ${req.file.originalname} - ${viruses.join(', ')}`));
+            
             return res.status(400).json({
                 success: false,
                 message: 'File failed virus scan',
@@ -77,10 +102,22 @@ const virusScan = async (req, res, next) => {
             });
         }
         
-        console.log('✅ File passed virus scan');
+        logger.info({ 
+            msg: 'File passed virus scan',
+            fileName: req.file.originalname,
+            logSource: 'fileUploadSecurity.virusScan'
+        });
         next();
     } catch (err) {
-        console.error('Virus scan error:', err);
+        logger.error({ 
+            msg: 'Virus scan error',
+            error: err.message,
+            stack: err.stack,
+            fileName: req.file?.originalname,
+            logSource: 'fileUploadSecurity.virusScan'
+        });
+        
+        Sentry.captureException(err);
         
         // Delete the file if scan failed
         if (req.file.path && fs.existsSync(req.file.path)) {
@@ -109,6 +146,13 @@ const validateFileType = (req, res, next) => {
             fs.unlinkSync(req.file.path);
         }
         
+        logger.warn({ 
+            msg: 'Invalid file type',
+            fileName: req.file.originalname,
+            mimeType: mimeType,
+            logSource: 'fileUploadSecurity.validateFileType'
+        });
+        
         return res.status(400).json({
             success: false,
             message: 'Invalid file type',
@@ -116,6 +160,11 @@ const validateFileType = (req, res, next) => {
         });
     }
     
+    logger.info({ 
+        msg: 'File type validated',
+        fileName: req.file.originalname,
+        logSource: 'fileUploadSecurity.validateFileType'
+    });
     next();
 };
 
@@ -131,6 +180,13 @@ const validateFileSize = (req, res, next) => {
             fs.unlinkSync(req.file.path);
         }
         
+        logger.warn({ 
+            msg: 'File too large',
+            fileName: req.file.originalname,
+            fileSize: req.file.size,
+            logSource: 'fileUploadSecurity.validateFileSize'
+        });
+        
         return res.status(400).json({
             success: false,
             message: 'File too large',
@@ -138,6 +194,11 @@ const validateFileSize = (req, res, next) => {
         });
     }
     
+    logger.info({ 
+        msg: 'File size validated',
+        fileName: req.file.originalname,
+        logSource: 'fileUploadSecurity.validateFileSize'
+    });
     next();
 };
 
@@ -171,8 +232,19 @@ const sanitizeFileName = (req, res, next) => {
     try {
         fs.renameSync(oldPath, newPath);
         req.file.path = newPath;
+        logger.info({ 
+            msg: 'File name sanitized',
+            fileName: originalName,
+            sanitizedName: newFileName,
+            logSource: 'fileUploadSecurity.sanitizeFileName'
+        });
     } catch (error) {
-        console.error('Error renaming file:', error);
+        logger.error({ 
+            msg: 'Error renaming file',
+            error: error.message,
+            fileName: originalName,
+            logSource: 'fileUploadSecurity.sanitizeFileName'
+        });
     }
     
     next();
@@ -204,6 +276,13 @@ const checkFileContent = (req, res, next) => {
         // Delete the file if signature is invalid
         fs.unlinkSync(req.file.path);
         
+        logger.warn({ 
+            msg: 'Invalid file content',
+            fileName: req.file.originalname,
+            fileSignature: fileSignature,
+            logSource: 'fileUploadSecurity.checkFileContent'
+        });
+        
         return res.status(400).json({
             success: false,
             message: 'Invalid file content',
@@ -211,6 +290,11 @@ const checkFileContent = (req, res, next) => {
         });
     }
     
+    logger.info({ 
+        msg: 'File content checked',
+        fileName: req.file.originalname,
+        logSource: 'fileUploadSecurity.checkFileContent'
+    });
     next();
 };
 
