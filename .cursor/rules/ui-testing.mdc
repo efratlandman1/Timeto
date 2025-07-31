@@ -1,0 +1,26 @@
+---
+alwaysApply: true
+---
+### RTL/LTR Testing
+- **Test all components** in both directions
+- **Verify layout mirroring** works correctly
+- **Check text alignment** and positioning
+- **Test with real content** in both languages
+
+### Wizard Testing
+- **Step navigation** works correctly
+- **Progress indicator** updates properly
+- **Form validation** per step
+- **Data persistence** between steps
+
+### Modal Testing
+- **Open/close** functionality
+- **Overlay click** to close
+- **Escape key** to close
+- **Focus management** within modal
+
+### Notification Testing
+- **Auto-dismiss** timing
+- **Manual close** functionality
+- **Multiple notifications** stacking
+- **Different types** display correctly

@@ -1,0 +1,436 @@
+---
+description:omprehensive logging system using Pino logger with Sentry integration for error tracking and monitoring.
+globs:
+alwaysApply: false
+---
+
+## Architecture
+
+### **Logging Stack**
+- **Primary Logger**: Pino (high-performance Node.js logger)
+- **Error Tracking**: Sentry (error monitoring and alerting)
+- **File Storage**: Local log files in `server/logs/`
+- **Development**: Pretty console output with colors
+- **Production**: Structured JSON logs
+
+### **Log Levels Hierarchy**
+```
+error > warn > info > debug
+```
+
+---
+### **Daily Log Rotation**
+- **File Naming**: `app-YYYY-MM-DD.log`
+- **Rotation Schedule**: Daily at midnight
+- **Compression**: Compress old log files
+
+---
+## File Structure
+
+```
+server/
+├── 📄 logger.js                    # Pino logger configuration
+├── 📄 sentry.js                    # Sentry error tracking setup
+├── 📁 logs/                        # Log files directory
+│   └── 📄 app-YYYY-MM-DD.log       # Application logs
+└── 📁 middlewares/
+    └── 📄 loggingMiddleware.js     # Request logging middleware
+```
+
+---
+
+## Logger Configuration
+
+### **Pino Logger Setup**
+- **Log Level**: Configurable via `LOG_LEVEL` environment variable
+- **Default Level**: `info`
+- **Streams**: File + Console (development only)
+- **Format**: JSON (production), Pretty (development)
+- **Timestamp**: Automatically included in all log entries
+
+### **Environment-Specific Behavior**
+- **Development**: Console + File output with colors
+- **Production**: File-only output in JSON format
+- **Log Rotation**: Manual (consider implementing automatic rotation)
+
+### **Environment-Specific Log Levels**
+- **Development**: `debug` (full debugging information)
+- **Staging**: `info` (business operations and errors)
+- **Production**: `warn` (warnings and errors only)
+- **Testing**: `error` (errors only for clean test output)
+
+### **Timestamp Configuration**
+- **Development**: Human-readable format (`translateTime: 'SYS:standard'`)
+- **Production**: ISO 8601 format (default Pino timestamp)
+- **Timezone**: System timezone (consider UTC for production)
+- **Precision**: Millisecond precision for all timestamps
+
+---
+
+## Log Levels & Usage
+
+### **Error Level** (`logger.error`)
+**When to use:**
+- Unhandled exceptions
+- Database connection failures
+- Authentication failures
+- Critical business logic errors
+- External API failures
+
+**Required fields:**
+- `error`: Error object or message
+- `requestId`: Request identifier
+- `userId/visitorId`: User identification
+- `logSource`: Source of the log
+- `timestamp`: Automatically added by Pino (ISO 8601 format)
+
+### **Warn Level** (`logger.warn`)
+**When to use:**
+- Validation failures
+- Rate limiting violations
+- Unauthorized access attempts
+- Deprecated feature usage
+- Performance warnings
+
+**Required fields:**
+- `msg`: Warning message
+- `requestId`: Request identifier
+- `userId/visitorId`: User identification
+- `logSource`: Source of the log
+- `timestamp`: Automatically added by Pino (ISO 8601 format)
+
+### **Info Level** (`logger.info`)
+**When to use:**
+- Request logging
+- Business operations
+- User actions
+- System state changes
+- Performance metrics
+
+**Required fields:**
+- `msg`: Information message
+- `requestId`: Request identifier
+- `userId/visitorId`: User identification
+- `logSource`: Source of the log
+- `timestamp`: Automatically added by Pino (ISO 8601 format)
+
+### **Debug Level** (`logger.debug`)
+**When to use:**
+- Detailed debugging information
+- Pipeline stages
+- Query parameters
+- Temporary debugging
+
+**Required fields:**
+- `msg`: Debug message
+- `requestId`: Request identifier
+- `logSource`: Source of the log
+- `timestamp`: Automatically added by Pino (ISO 8601 format)
+
+---
+
+## Request Logging Middleware
+
+### **Automatic Request Tracking**
+- **Request ID**: Unique UUID for each request
+- **User Identification**: Authenticated user or visitor ID
+- **Request Details**: Method, URL, IP, User-Agent
+- **Sentry Integration**: User context for error tracking
+
+### **Visitor ID Management**
+- **Authenticated Users**: Use user ID
+- **Anonymous Users**: Generate temporary UUID
+- **Future Enhancement**: Cookie-based visitor tracking
+
+---
+
+## Error Tracking (Sentry)
+
+### **Sentry Configuration**
+- **Environment**: Based on `NODE_ENV`
+- **Service Tag**: `business-search-api`
+- **Data Filtering**: Sensitive data removal
+- **User Context**: User ID or visitor ID
+
+### **Error Filtering**
+- **Authorization Headers**: Automatically filtered
+- **Password Fields**: Automatically filtered
+- **Custom Filtering**: BeforeSend function
+
+---
+
+## Logging Patterns
+
+### **Business Function Logging Requirements**
+**Every business function MUST include:**
+
+#### **1. Enter Log (Function Start)**
+- **Required**: Log at function entry point
+- **Parameters**: Log all input parameters (sanitized)
+- **Context**: Include request context and user info
+- **Message**: `${functionName} enter`
+
+#### **2. Complete Log (Function Success)**
+- **Required**: Log at function completion
+- **Result**: Log operation result (count, ID, status)
+- **Duration**: Include execution time if significant
+- **Message**: `${functionName} complete`
+
+#### **3. Error Log (Function Failure)**
+- **Required**: Log all errors with full context
+- **Error Details**: Include error message and stack trace
+- **Parameters**: Log input parameters that caused error
+- **Message**: `${functionName} error`
+
+**Example Log Output:**
+```json
+{
+  "level": 30,
+  "time": 1703123456789,
+  "pid": 12345,
+  "hostname": "server-01",
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "userId": "507f1f77bcf86cd799439011",
+  "visitorId": "550e8400-e29b-41d4-a716-446655440000",
+  "logSource": "businessesController.getBusinesses",
+  "msg": "businessesController.getBusinesses enter"
+}
+```
+
+### **Parameter Logging Examples**
+
+#### **1. GET Request with Query Parameters**
+```javascript
+logger.info({ 
+  ...meta, 
+  query: req.query,
+  filters: {
+    category: req.query.category,
+    location: req.query.location,
+    rating: req.query.rating
+  }
+}, `${logSource} enter`);
+```
+
+#### **2. POST Request with Body Parameters**
+```javascript
+logger.info({ 
+  ...meta, 
+  body: {
+    businessId: req.body.id,
+    name: req.body.name,
+    address: req.body.address,
+    // Exclude sensitive data like passwords
+  }
+}, `${logSource} enter`);
+```
+
+#### **3. PUT/PATCH Request with Mixed Parameters**
+```javascript
+logger.info({ 
+  ...meta, 
+  params: req.params,
+  body: sanitizeRequestBody(req.body),
+  updateFields: Object.keys(req.body)
+}, `${logSource} enter`);
+```
+
+#### **4. Parameter Sanitization Function**
+```javascript
+function sanitizeRequestBody(body) {
+  const sanitized = { ...body };
+  const sensitiveFields = ['password', 'token', 'secret', 'key'];
+  
+  sensitiveFields.forEach(field => {
+    if (sanitized[field]) {
+      sanitized[field] = '[FILTERED]';
+    }
+  });
+  
+  return sanitized;
+}
+```
+
+### **Error Logging Pattern**
+```javascript
+logger.error({ 
+  ...meta, 
+  error: serializeError(error) 
+}, `${logSource} error`);
+Sentry.captureException(error);
+```
+
+### **Validation Error Pattern**
+```javascript
+logger.warn({ 
+  ...meta,
+  errors: errors.array(),
+  msg: 'Validation failed'
+});
+```
+
+---
+
+## Log Analysis & Monitoring
+
+### **Structured Logging**
+- **JSON Format**: Machine-readable logs
+- **Consistent Fields**: Standard metadata across all logs
+- **Request Tracing**: Full request lifecycle tracking
+- **Performance Metrics**: Response times and resource usage
+
+### **Log Search & Filtering**
+- **Request ID**: Trace specific requests
+- **User ID**: Track user activities
+- **Log Level**: Filter by severity
+- **Timestamp**: Time-based filtering
+- **Source**: Filter by component
+
+### **Timestamp Management**
+- **Automatic Timestamp**: Every log entry includes timestamp
+- **Format**: ISO 8601 (YYYY-MM-DDTHH:mm:ss.sssZ)
+- **Timezone**: System timezone (consider UTC for production)
+- **Precision**: Millisecond precision for accurate timing
+- **Sorting**: Chronological order for log analysis
+- **Duration Tracking**: Calculate time between log entries
+
+---
+
+## Performance Considerations
+
+### **Logging Best Practices**
+- **Async Logging**: Non-blocking log operations
+- **Structured Data**: JSON format for easy parsing
+- **Level Filtering**: Only log necessary information
+- **File Rotation**: Prevent log file bloat
+- **Memory Management**: Avoid circular references
+
+### **Production Optimizations**
+- **Log Level**: Set to `info` or `warn` in production
+- **File Size**: Implement log rotation
+- **Storage**: Monitor log directory size
+- **Performance**: Minimize logging overhead
+
+---
+
+## Security & Privacy
+
+### **Sensitive Data Handling**
+- **Passwords**: Never logged
+- **Tokens**: Filtered in Sentry
+- **Personal Data**: Minimize in logs
+- **IP Addresses**: Logged for security
+- **User Agents**: Logged for debugging
+
+### **Parameter Sanitization**
+- **Password Fields**: Always exclude from logs
+- **Authorization Headers**: Filter sensitive tokens
+- **Personal Information**: Sanitize names, emails, phones
+- **Credit Card Data**: Never log payment information
+- **Session Data**: Filter sensitive session information
+- **API Keys**: Never log external API keys
+
+### **Data Retention**
+- **Log Files**: Implement retention policy
+- **Sentry**: Configure retention settings
+- **Compliance**: Follow data protection regulations
+- **Cleanup**: Regular log file cleanup
+
+---
+
+## Implementation Guidelines
+
+### **Middleware Integration**
+- **Order**: Early in middleware stack
+- **Error Handling**: Catch and log errors
+- **Performance**: Minimal overhead
+- **Reliability**: Fail-safe logging
+
+### **Controller Integration**
+- **Consistent Pattern**: Use standard logging pattern
+- **Error Handling**: Log all errors with context
+- **Success Tracking**: Log successful operations
+- **Performance**: Track operation duration
+
+### **Utility Functions**
+- **Error Logging**: Log utility function errors
+- **Debug Information**: Log detailed debugging info
+- **Performance**: Track function execution time
+- **Context**: Include relevant context data
+
+### **Performance Timing with Timestamps**
+- **Start Time**: Log entry timestamp at function start
+- **End Time**: Log entry timestamp at function completion
+- **Duration Calculation**: Calculate execution time in milliseconds
+- **Performance Monitoring**: Track slow operations
+- **Threshold Alerts**: Alert on operations exceeding time limits
+
+### **Log Metrics & KPIs**
+- **Request Volume**: Number of requests per minute/hour
+- **Error Rate**: Percentage of errors vs total requests
+- **Response Time**: Average response time by endpoint
+- **User Activity**: Most active users and actions
+- **Business Metrics**: Conversion rates, user engagement
+- **System Health**: Memory usage, CPU, disk space
+
+**Performance Timing Example:**
+```javascript
+const startTime = Date.now();
+logger.info({ ...meta, operation: 'database_query' }, 'Starting database query');
+
+// ... database operation ...
+
+const duration = Date.now() - startTime;
+logger.info({ 
+  ...meta, 
+  operation: 'database_query',
+  duration: `${duration}ms`
+}, 'Database query completed');
+```
+
+---
+
+## Logging Checklist
+
+### **Before Deployment**
+- [ ] Configure appropriate log levels
+- [ ] Set up log file rotation
+- [ ] Configure Sentry environment
+- [ ] Test logging in all environments
+- [ ] Verify sensitive data filtering
+
+### **During Development**
+- [ ] Use consistent logging patterns
+- [ ] Include all required metadata
+- [ ] Log errors with proper context
+- [ ] Test logging functionality
+- [ ] Monitor log file sizes
+
+### **In Production**
+- [ ] Monitor log file growth
+- [ ] Check Sentry error reports
+- [ ] Analyze log patterns
+- [ ] Optimize logging performance
+- [ ] Implement log retention
+
+---
+
+## Best Practices Summary
+
+### **Do's**
+- Use structured logging with consistent fields
+- Include request ID in all logs
+- Log errors with full context
+- Use appropriate log levels
+- Implement proper error handling
+- Monitor log file sizes
+- Test logging in all environments
+
+### **Don'ts**
+- Log sensitive information
+- Use console.log in production
+- Log without context
+- Ignore log file management
+- Use inconsistent logging patterns
+- Log too much or too little
+- Forget error tracking integration 

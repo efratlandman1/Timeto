@@ -1,0 +1,38 @@
+---
+alwaysApply: true
+---
+### Notification Types
+- **Success**: Green theme, checkmark icon
+- **Error**: Red theme, error icon
+- **Warning**: Yellow theme, warning icon
+- **Info**: Blue theme, info icon
+
+### Notification Component Structure
+- Auto-dismiss timer with configurable duration
+- Icon, content, and close button layout
+- Type-specific styling (success, error, warning, info)
+- Smooth animations for appearance/disappearance
+
+### Notification Styling
+- Fixed positioning in top-right corner
+- Responsive design with max-width
+- Type-specific colors and icons
+- Consistent spacing and typography
+- Hover effects for interactive elements
+
+### Notification Usage Examples
+- Success notifications with 4-second auto-dismiss
+- Error notifications with 6-second auto-dismiss
+- Info notifications with manual close only
+- Warning notifications with appropriate styling
+
+### Notification Rules
+- **Consistent positioning** (top-right corner)
+- **Auto-dismiss** after 4-6 seconds (configurable)
+- **Manual close** always available
+- **Stack multiple notifications** vertically
+- **Responsive design** for mobile
+- **Accessibility** with screen reader support
+- **Animation** for smooth appearance/disappearance
+- **Type-specific colors** and icons
+- **Internationalization** support for all text

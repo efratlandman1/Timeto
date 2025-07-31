@@ -1,0 +1,20 @@
+---
+alwaysApply: true
+---
+## 🔐 Security Guidelines   
+- Never commit API keys or sensitive data to version control  
+- Use environment variables for all configuration  
+- Use HTTPS in production  
+- Implement rate limiting and CORS protection  
+- Validate file uploads and scan for malware  
+- Use JWT tokens with proper expiration  
+- Input validation and sanitization  
+- Proper error handling without exposing sensitive info  
+- Implement proper authentication and authorization
+- Sanitize user inputs to prevent injection attacks
+- Use environment variables for sensitive configuration
+- Implement rate limiting to prevent abuse
+- Follow the principle of least privilege for API access
+- Use HTTPS for all communications
+- Validate and sanitize all inputs, especially from external sources
+

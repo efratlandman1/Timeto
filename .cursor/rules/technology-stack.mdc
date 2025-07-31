@@ -1,0 +1,11 @@
+---
+alwaysApply: true
+---
+- **Frontend**: React 18, Redux Toolkit, Material-UI, React Router DOM  
+- **Backend**: Node.js, Express, MongoDB (Mongoose)
+- **Containerization**: Docker & Docker Compose 
+- **Internationalization**: i18next with Hebrew and English support
+- **Maps**: Google Maps API integration
+- **Authentication**: JWT tokens, Google OAuth
+- **Styling**: CSS modules, styled-components, Material-UI, TailwindCSS , HTML, CSS
+- **Security**: Helmet, CORS, rate limiting, input validation

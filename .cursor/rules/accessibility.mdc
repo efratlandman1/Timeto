@@ -1,0 +1,20 @@
+---
+alwaysApply: true
+---
+### ARIA Attributes
+- **aria-label** for interactive elements
+- **aria-describedby** for form validation
+- **aria-expanded** for collapsible content
+- **aria-current** for navigation states
+
+### Keyboard Navigation
+- **Tab order** logical and intuitive
+- **Focus indicators** visible and clear
+- **Escape key** closes modals and overlays
+- **Enter/Space** activates buttons and links
+
+### Screen Reader Support
+- **Semantic HTML** structure
+- **Alt text** for images
+- **Descriptive labels** for form inputs
+- **Status announcements** for dynamic content

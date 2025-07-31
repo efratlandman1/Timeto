@@ -1,0 +1,102 @@
+---
+description:Guidelines for managing environment variables securely across development stages, including validation, structure, and best practices.
+globs:
+alwaysApply: false
+---
+- Separate env files per stage  
+- Validate env vars at startup  
+- Use default values where possible  
+- Handle missing config errors  
+### Environment Files Structure
+- All environment variables MUST be defined in files that are included in `.gitignore`
+- Create separate environment files for different stages:
+  - `.env` (development)
+  - `.env.production` (production)
+  - `.env.staging` (staging)
+  - `.env.example` (template with empty values)
+
+### Environment Variables Template
+Create `.env.example` with all required variables but empty values:
+
+```bash
+# Database Configuration
+MONGODB_URI=
+DATABASE_NAME=
+
+# JWT Configuration
+JWT_SECRET=
+JWT_EXPIRES_IN=
+
+# Google OAuth Configuration
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_CALLBACK_URL=
+
+# Google Maps API
+GOOGLE_MAPS_API_KEY=
+
+# Email Configuration
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASS=
+
+# Server Configuration
+PORT=
+NODE_ENV=
+CORS_ORIGIN=
+
+# File Upload Configuration
+MAX_FILE_SIZE=
+UPLOAD_PATH=
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=
+RATE_LIMIT_MAX_REQUESTS=
+
+# Security
+BCRYPT_SALT_ROUNDS=
+SESSION_SECRET=
+
+# External Services
+SENTRY_DSN=
+```
+
+### Implementation Guidelines
+- Always use environment variables for configuration
+- Never hardcode sensitive values in source code
+- Provide meaningful default values where appropriate
+- Validate required environment variables on application startup
+- Use proper error handling for missing environment variables
+
+### Environment Validation
+Implement startup validation to ensure all required environment variables are present:
+
+```javascript
+// server/config/envValidation.js
+const requiredEnvVars = [
+  'MONGODB_URI',
+  'JWT_SECRET',
+  'GOOGLE_CLIENT_ID',
+  'GOOGLE_CLIENT_SECRET',
+  'GOOGLE_MAPS_API_KEY'
+];
+
+const validateEnvironment = () => {
+  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+  
+  if (missingVars.length > 0) {
+    console.error('Missing required environment variables:', missingVars);
+    process.exit(1);
+  }
+};
+
+module.exports = { validateEnvironment };
+```
+
+## Checklist for New Features
+- Add variable to `.env.example` with empty value
+- Add variable to environment validation
+- Update documentation with variable purpose
+- Test with empty value to ensure proper error handling
+- Update deployment documentation

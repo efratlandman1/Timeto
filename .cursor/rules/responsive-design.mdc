@@ -1,0 +1,117 @@
+---
+alwaysApply: true
+---
+### Breakpoints
+```css
+/* Mobile First Approach */
+@media (min-width: 640px) { /* sm */ }
+@media (min-width: 768px) { /* md */ }
+@media (min-width: 1024px) { /* lg */ }
+@media (min-width: 1280px) { /* xl */ }
+```
+
+### Mobile Considerations
+- **Touch targets** minimum 44px
+- **Readable text** minimum 16px
+- **Adequate spacing** between interactive elements
+- **Thumb-friendly** navigation placement
+- **Simplified layouts** for small screens
+
+### Layout  
+- Use sm:, md: responsive prefixes
+- Ensure mobile-first breakpoints
+- Mobile-First: Starts with 1 column on mobile
+- Progressive Enhancement: Adds columns as screen size increases
+- Accessibility: Maintains proper reading order
+
+### Responsive Text Utilities
+- **Base Text**: Mobile-optimized sizes
+- **Heading Scale**: Responsive heading sizes
+- **Line Length**: 45-75 characters per line
+- **Spacing**: Responsive margins and padding
+- **Readability**: High contrast and proper spacing
+
+## Component-Specific CSS Rules
+
+### **When to Create Component CSS**
+- **Unique Styling**: Component has specific design requirements
+- **Complex Animations**: Advanced CSS animations or transitions
+- **Custom Layouts**: Non-standard layout patterns
+- **Special Effects**: Hover effects, shadows, gradients
+- **Accessibility**: Custom focus states or ARIA styling
+
+### **When to Use Tailwind Only**
+- **Standard Components**: Buttons, inputs, cards
+- **Layout Elements**: Containers, grids, flexbox
+- **Typography**: Text styling and spacing
+- **Spacing**: Margins, padding, gaps
+- **Colors**: Backgrounds, borders, text colors
+
+### **CSS File Naming Convention**
+- **Component Name**: PascalCase (Button.css, Modal.css)
+- **Page Name**: PascalCase (HomePage.css, Dashboard.css)
+- **Feature Name**: PascalCase (Authentication.css, Navigation.css)
+- **Utility Name**: camelCase (animations.css, transitions.css)
+
+## Design Checklist
+
+### **Before Component Development**
+- Check existing design tokens
+- Review similar components
+- Plan responsive behavior
+- Consider accessibility requirements
+- Define component variations
+
+### **During Component Development**
+- Use Tailwind utilities first
+- Create component-specific CSS only when needed
+- Test across all breakpoints
+- Ensure keyboard navigation
+- Validate color contrast
+
+### **After Component Development**
+- Document component usage
+- Test with screen readers
+- Verify responsive behavior
+- Check performance impact
+- Update design system
+
+## Best Practices Summary
+
+### **Do's**
+- Use Tailwind utilities for standard styling
+- Create component CSS only for unique requirements
+- Use design tokens for consistency
+- Follow mobile-first responsive design
+- Ensure accessibility compliance
+- Document component variations
+- Test across all breakpoints
+
+### **Don'ts**
+- Duplicate styles across components
+- Use hardcoded values instead of tokens
+- Ignore accessibility requirements
+- Create CSS for standard patterns
+- Forget responsive design
+- Use inconsistent naming conventions
+- Over-engineer simple components
+
+## File Structure
+client/src/
+├── 📁 styles/
+│   ├── 📁 global/
+│   │   ├── 📄 tailwind.config.js      # Tailwind configuration
+│   │   ├── 📄 design-tokens.css       # CSS custom properties
+│   │   ├── 📄 typography.css          # Font definitions
+│   │   ├── 📄 spacing.css             # Spacing utilities
+│   │   ├── 📄 colors.css              # Color palette
+│   │   └── 📄 index.css               # Global imports
+│   ├── 📁 components/
+│   │   ├── 📄 Button.css              # Button variations
+│   │   ├── 📄 Modal.css               # Modal styles
+│   │   ├── 📄 Form.css                # Form elements
+│   │   └── 📄 Navigation.css          # Navigation styles
+│   └── 📁 pages/
+│       ├── 📄 xxxx.css                # Page-specific styles
+│       └── 📄 yyyy.css                # Page-specific styles
+```
