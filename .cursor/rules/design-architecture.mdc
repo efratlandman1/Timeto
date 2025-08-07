@@ -1,9 +1,6 @@
 ---
-description:Comprehensive design system using Tailwind CSS for consistent spacing, colors, fonts, and responsive design with component-based CSS organization
-globs:
-alwaysApply: false
+alwaysApply: true
 ---
-
 ### Design System Principles
 - **Consistency**: Uniform design across all components
 - **Reusability**: Shared design tokens and components

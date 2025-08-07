@@ -1,7 +1,5 @@
 ---
-description:Guidelines for implementing multilingual support and proper text direction (RTL/LTR Support)
-globs:
-alwaysApply: false
+alwaysApply: true
 ---
 - Support Hebrew (RTL) and English (LTR)  
 - Use translation keys in JSON files  

@@ -1,0 +1,61 @@
+---
+alwaysApply: true
+---
+// Redux best practices
+
+const reduxBestPractices = [
+  "Use Redux Toolkit for efficient Redux development",
+  "Implement slice pattern for organizing Redux code",
+  "Utilize createAsyncThunk for handling async actions",
+  "Use selectors for accessing state in components",
+];
+
+// Folder structure
+
+const folderStructure = `
+src/
+  redux/ 
+    slices/
+    hooks.ts
+    store.ts
+  types/
+  utils/
+`;
+
+// Additional instructions
+
+const additionalInstructions = `
+1. Use React.FC for functional components with props
+3. Use Redux hooks (useSelector, useDispatch) in components
+4. Create reusable typed hooks for Redux operations
+5. Implement proper error handling in async operations
+6. Use Redux DevTools for debugging
+7. Follow Redux style guide for naming conventions
+`;
+
+
+## 📋 Redux Best Practices
+
+### State Structure Rules
+- **Normalize data**: Use entities and ids pattern
+- **Keep state flat**: Avoid deep nesting
+- **Separate concerns**: Different slices for different domains
+- **Minimize redundancy**: Don't duplicate data
+
+### Action Rules
+- **Use descriptive names**: `fetchBusinesses` not `getData`
+- **Keep actions small**: One action per state change
+- **Use constants**: Define action types as constants
+- **Handle errors**: Always handle async action errors
+
+### Performance Rules
+- **Use selectors**: Don't access state directly in components
+- **Memoize selectors**: Use createSelector for expensive computations
+- **Avoid unnecessary re-renders**: Use shallowEqual for useSelector
+- **Batch updates**: Use multiple actions in one dispatch when possible
+
+### Debugging Rules
+- **Use Redux DevTools**: Enable in development
+- **Log actions**: Use logger middleware
+- **Test selectors**: Unit test all selectors
+- **Monitor performance**: Use React DevTools Profiler

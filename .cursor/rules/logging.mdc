@@ -1,9 +1,6 @@
 ---
-description:omprehensive logging system using Pino logger with Sentry integration for error tracking and monitoring.
-globs:
-alwaysApply: false
+alwaysApply: true
 ---
-
 ## Architecture
 
 ### **Logging Stack**

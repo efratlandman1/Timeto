@@ -1,7 +1,5 @@
 ---
-description:Best practices for designing efficient, secure, and scalable MongoDB schemas with Mongoose.
-globs:
-alwaysApply: false
+alwaysApply: true
 ---
 - Use Mongoose schemas with validation  
 - Use proper data types and constraints  

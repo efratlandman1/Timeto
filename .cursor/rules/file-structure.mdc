@@ -1,0 +1,482 @@
+---
+alwaysApply: true
+---
+## 🎯 Overview
+Comprehensive file structure guidelines covering project organization, naming conventions, directory structure, and code organization patterns for scalable and maintainable projects.
+
+---
+
+## 🏗️ Project Structure Architecture
+
+### **Monorepo Structure**
+- **Client**: React frontend application
+- **Server**: Node.js backend application
+- **Shared**: Common utilities and types
+- **Tests**: Test files and configurations
+- **Docs**: Documentation and guides
+- **Scripts**: Build and deployment scripts
+
+### **Directory Organization Principles**
+- **Domain-Driven**: Organize by business domains
+- **Feature-Based**: Group related functionality
+- **Separation of Concerns**: Clear boundaries between layers
+- **Scalability**: Structure supports growth
+- **Maintainability**: Easy to navigate and understand
+
+---
+
+## 📁 Root Level Structure
+
+### **Project Root Organization**
+```
+project-name/
+├── 📁 client/                 # React Frontend
+├── 📁 server/                 # Node.js Backend
+├── 📁 shared/                 # Shared Utilities
+├── 📁 tests/                  # Test Files
+├── 📁 docs/                   # Documentation
+├── 📁 scripts/                # Build Scripts
+├── 📁 .github/                # GitHub Workflows
+├── 📄 .gitignore             # Git Ignore Rules
+├── 📄 package.json           # Root Package Config
+├── 📄 package-lock.json      # Root Package Lock
+├── 📄 README.md              # Project Documentation
+├── 📄 docker-compose.yml     # Docker Configuration
+└── 📄 .env.example           # Environment Template
+```
+
+### **Configuration Files**
+- **Package Management**: `package.json`, `package-lock.json`
+- **Environment**: `.env.example`, `.env.local`, `.env.production`
+- **Build Tools**: `webpack.config.js`, `vite.config.js`
+- **Linting**: `.eslintrc.js`, `.prettierrc`
+- **Testing**: `jest.config.js`, `cypress.config.js`
+- **Docker**: `Dockerfile`, `docker-compose.yml`
+- **Git**: `.gitignore`
+- **Monitoring**: `sentry.js` (server)
+
+### **Dependencies & Environment Files**
+- **Node Modules**: `node_modules/` (NOT in .gitignore - committed to repository)
+- **Package Files**: `package.json`, `package-lock.json` (committed)
+- **Environment Files**: `.env.example` (committed), `.env.*` (gitignored)
+- **Lock Files**: `package-lock.json` (committed for consistency)
+
+---
+
+## 🎯 Client Structure (React Frontend)
+
+### **Client Directory Organization**
+```
+client/
+├── 📁 node_modules/           # Dependencies (committed)
+├── 📁 public/                 # Static Assets
+│   ├── 📁 locales/           # Translation Files
+│   ├── 📄 index.html         # HTML Template
+│   └── 📄 favicon.ico        # Favicon
+├── 📁 src/                    # Source Code
+│   ├── 📁 components/        # React Components
+│   ├── 📁 pages/             # Page Components
+│   ├── 📁 hooks/             # Custom Hooks
+│   ├── 📁 services/          # API Services
+│   ├── 📁 utils/             # Utility Functions
+│   ├── 📁 constants/         # Global Constants
+│   ├── 📁 types/             # TypeScript Types
+│   ├── 📁 styles/            # CSS & Styling
+│   ├── 📁 assets/            # Images & Icons
+│   ├── 📁 redux/             # State Management
+│   ├── 📁 middleware/        # Application Middleware
+│   └── 📁 tests/             # Test Files
+├── 📄 package.json           # Dependencies
+├── 📄 package-lock.json      # Package Lock (committed)
+├── 📄 .env.example           # Environment Template
+├── 📄 .env.local             # Local Environment (gitignored)
+├── 📄 .env.production        # Production Environment (gitignored)
+├── 📄 tsconfig.json          # TypeScript Config
+├── 📄 Dockerfile             # Docker Configuration
+└── 📄 README.md              # Client Documentation
+```
+
+### **Components Directory Structure**
+```
+src/components/
+├── 📁 common/                # Reusable UI Components
+│   ├── 📄 Button.jsx
+│   ├── 📄 Input.jsx
+│   ├── 📄 Modal.jsx
+│   └── 📄 Loading.jsx
+├── 📁 layout/                # Layout Components
+│   ├── 📄 Header.jsx
+│   ├── 📄 Footer.jsx
+│   ├── 📄 Sidebar.jsx
+│   └── 📄 Navigation.jsx
+├── 📁 pages/                 # Page Components
+│   ├── 📁 auth/
+│   ├── 📁 business/
+│   ├── 📁 search/
+│   └── 📁 user/
+├── 📁 features/              # Feature-Specific Components
+│   ├── 📁 business/
+│   ├── 📁 search/
+│   └── 📁 forms/
+└── 📁 accessibility/         # Accessibility Components
+    └── 📄 Accessibility.jsx
+```
+
+---
+
+## 🔧 Server Structure (Node.js Backend)
+
+### **Server Directory Organization**
+```
+server/
+├── 📁 node_modules/           # Dependencies (committed)
+├── 📁 src/                    # Source Code
+│   ├── 📁 controllers/       # Route Controllers
+│   ├── 📁 models/            # Database Models
+│   ├── 📁 routes/            # Express Routes
+│   ├── 📁 middlewares/       # Custom Middleware
+│   ├── 📁 services/          # Business Logic
+│   ├── 📁 utils/             # Utility Functions
+│   ├── 📁 config/            # Configuration
+│   ├── 📁 types/             # Type Definitions
+│   └── 📁 tests/             # Test Files
+├── 📁 logs/                  # Application Logs
+├── 📁 uploads/               # File Uploads
+├── 📁 docs/                  # API Documentation
+├── 📄 server.js              # Main Entry Point
+├── 📄 logger.js              # Logging Setup
+├── 📄 sentry.js              # Error Monitoring Setup
+├── 📄 package.json           # Dependencies
+├── 📄 package-lock.json      # Package Lock (committed)
+├── 📄 .env.example           # Environment Template
+├── 📄 .env.local             # Local Environment (gitignored)
+├── 📄 .env.production        # Production Environment (gitignored)
+├── 📄 .env.staging           # Staging Environment (gitignored)
+├── 📄 .env.test              # Test Environment (gitignored)
+├── 📄 Dockerfile             # Docker Configuration
+└── 📄 README.md              # Server Documentation
+```
+
+### **Controllers Directory Structure**
+```
+src/controllers/
+├── 📁 auth/                  # Authentication Controllers
+│   ├── 📄 authController.js
+│   └── 📄 passwordController.js
+├── 📁 business/              # Business Controllers
+│   ├── 📄 businessController.js
+│   ├── 📄 categoryController.js
+│   └── 📄 serviceController.js
+├── 📁 user/                  # User Controllers
+│   ├── 📄 userController.js
+│   ├── 📄 favoriteController.js
+│   └── 📄 feedbackController.js
+└── 📁 admin/                 # Admin Controllers
+    ├── 📄 statsController.js
+    └── 📄 suggestionController.js
+```
+
+---
+
+## 📦 Package & Environment Management
+
+### **Package Files Structure**
+- **Client Level**: `client/package.json`, `client/package-lock.json` (committed)
+- **Server Level**: `server/package.json`, `server/package-lock.json` (committed)
+- **Root Level**: No package.json needed (monorepo with separate dependencies)
+- **Node Modules**: `node_modules/` in each directory (committed)
+
+### **Entry Point Files**
+- **Client**: `src/index.js` (React entry point), `src/App.js` (Main app component)
+- **Server**: `server.js` (Express entry point), `sentry.js` (Error monitoring)
+
+### **Docker Configuration**
+- **Root Level**: `docker-compose.yml` (Multi-container orchestration)
+- **Client Level**: `client/Dockerfile` (React build and serve)
+- **Server Level**: `server/Dockerfile` (Node.js runtime)
+
+### **Docker Architecture**
+- **Dockerfile**: Defines how to build individual images
+- **Docker Compose**: Orchestrates multiple containers and networking
+- **Separation**: Each service has its own Dockerfile
+- **Integration**: Docker Compose manages the complete application stack
+
+### **Git Configuration**
+- **Root Level**: `.gitignore` (Project-wide ignore rules - covers both client and server)
+- **Centralized Management**: Single .gitignore file manages all ignore rules
+- **Comprehensive Coverage**: Includes node_modules, environment files, logs, uploads, build artifacts
+
+### **Environment Files Structure**
+- **Root Level**: `.env.example` (committed)
+- **Client Level**: 
+  - `.env.example` (committed)
+  - `.env.local` (gitignored)
+  - `.env.production` (gitignored)
+- **Server Level**:
+  - `.env.example` (committed)
+  - `.env.local` (gitignored)
+  - `.env.production` (gitignored)
+  - `.env.staging` (gitignored)
+  - `.env.test` (gitignored)
+
+### **Package Management Rules**
+- **Automatic Installation**: Cursor executes `npm install` automatically
+- **Dependency Tracking**: All dependencies tracked in `package-lock.json`
+- **Version Consistency**: Lock files ensure consistent versions
+- **Environment Setup**: Copy `.env.example` to appropriate environment files
+- **Separate Dependencies**: Client and server manage their own dependencies
+- **No Root Package**: Monorepo structure without root package.json
+
+### **Entry Point Management**
+- **Client Entry**: `src/index.js` renders `src/App.js`
+- **Server Entry**: `server.js` initializes Express app
+- **Error Monitoring**: `sentry.js` configures error tracking
+- **Docker Setup**: Separate Dockerfiles for client and server
+
+### **Git & Docker Rules**
+- **Git Ignore**: Centralized .gitignore covers all environments, logs, uploads
+- **Docker Compose**: Orchestrates client and server containers with networking
+- **Docker Build**: Multi-stage builds for optimization (dev/prod stages)
+- **Container Communication**: Network configuration for services
+- **Dockerfile Purpose**: Build individual service images
+- **Docker Compose Purpose**: Manage multi-container application stack
+
+---
+
+## 📝 Naming Conventions
+
+### **File Naming Rules**
+- **Components**: PascalCase (Button.jsx, UserProfile.jsx)
+- **Pages**: PascalCase (HomePage.jsx, Dashboard.jsx)
+- **Utilities**: camelCase (authUtils.js, dateUtils.js)
+- **Constants**: UPPER_SNAKE_CASE (API_ENDPOINTS.js)
+- **Types**: PascalCase (UserTypes.ts, BusinessTypes.ts)
+- **Services**: camelCase (authService.js, businessService.js)
+- **Controllers**: camelCase (authController.js, userController.js)
+- **Models**: PascalCase (User.js, Business.js)
+
+### **Directory Naming Rules**
+- **Feature Directories**: camelCase (userProfile/, businessSearch/)
+- **Component Directories**: PascalCase (Button/, Modal/)
+- **Utility Directories**: camelCase (utils/, services/)
+- **Configuration Directories**: lowercase (config/, docs/)
+
+### **Variable Naming Rules**
+- **Variables**: camelCase (userName, businessData)
+- **Constants**: UPPER_SNAKE_CASE (API_BASE_URL, MAX_FILE_SIZE)
+- **Functions**: camelCase (getUserData, validateInput)
+- **Classes**: PascalCase (UserService, BusinessController)
+- **Interfaces**: PascalCase with 'I' prefix (IUser, IBusiness)
+- **Types**: PascalCase (UserType, BusinessType)
+
+### **Database Naming Rules**
+- **Collections**: lowercase plural (users, businesses)
+- **Fields**: camelCase (firstName, businessName)
+- **Indexes**: descriptive names (idx_user_email, idx_business_location)
+- **Relationships**: descriptive names (userBusinesses, businessCategories)
+
+---
+
+## 🎯 Code Organization Patterns
+
+### **Component Organization**
+- **Single Responsibility**: One component per file
+- **Co-location**: Related files in same directory
+- **Index Files**: Export components from index.js
+- **Props Interface**: Define prop types at top
+- **Default Export**: Use default export for components
+
+### **Service Organization**
+- **Domain-Based**: Group by business domain
+- **CRUD Operations**: Standard CRUD methods
+- **Error Handling**: Consistent error handling
+- **Type Safety**: TypeScript interfaces
+- **Documentation**: JSDoc comments
+
+### **Controller Organization**
+- **RESTful Methods**: GET, POST, PUT, DELETE
+- **Error Handling**: Try-catch blocks
+- **Validation**: Input validation
+- **Response Format**: Consistent response structure
+- **Logging**: Request/response logging
+
+### **Model Organization**
+- **Schema Definition**: Clear schema structure
+- **Validation**: Mongoose validation
+- **Indexes**: Performance optimization
+- **Methods**: Instance and static methods
+- **Virtuals**: Computed properties
+
+---
+
+## 📁 File Organization Guidelines
+
+### **When to Create New Files**
+- **New Feature**: Create feature directory
+- **Reusable Component**: Add to common/
+- **Business Logic**: Create service file
+- **API Endpoint**: Create controller method
+- **Database Model**: Create model file
+- **Utility Function**: Add to utils/
+
+### **When to Split Files**
+- **File Size**: Over 300 lines
+- **Multiple Responsibilities**: Split by responsibility
+- **Complex Logic**: Separate concerns
+- **Reusability**: Extract reusable parts
+- **Testing**: Separate testable units
+
+### **When to Combine Files**
+- **Related Functionality**: Group related functions
+- **Small Files**: Combine small related files
+- **Tight Coupling**: Keep coupled code together
+- **Performance**: Reduce file system calls
+
+---
+
+## 🔄 Import/Export Organization
+
+### **Import Order**
+1. **Node.js Modules**: Built-in modules
+2. **Third-Party Libraries**: External packages
+3. **Internal Modules**: Project-specific imports
+4. **Relative Imports**: Local file imports
+5. **Type Imports**: TypeScript type imports
+
+### **Export Patterns**
+- **Named Exports**: For multiple exports
+- **Default Exports**: For single main export
+- **Barrel Exports**: Index files for clean imports
+- **Type Exports**: Separate type exports
+
+### **Import/Export Examples**
+```javascript
+// Import order example
+import fs from 'fs';
+import path from 'path';
+import express from 'express';
+import mongoose from 'mongoose';
+import { authMiddleware } from '../middlewares/authMiddleware';
+import { User } from '../models/User';
+import type { IUser } from '../types/User';
+
+// Export patterns
+export { Button, Input, Modal } from './components';
+export default UserService;
+export type { IUser, IBusiness } from './types';
+```
+
+---
+
+## 📋 File Structure Checklist
+
+### **Before Creating New Files**
+- [ ] Check existing similar files
+- [ ] Determine appropriate location
+- [ ] Follow naming conventions
+- [ ] Consider file organization
+- [ ] Plan import/export structure
+
+### **When Organizing Code**
+- [ ] Group related functionality
+- [ ] Separate concerns clearly
+- [ ] Use consistent naming
+- [ ] Maintain clean imports
+- [ ] Document complex structures
+
+### **For Project Structure**
+- [ ] Follow domain-driven design
+- [ ] Keep directories shallow
+- [ ] Use descriptive names
+- [ ] Maintain scalability
+- [ ] Consider team workflow
+
+### **For Package Management**
+- [ ] Commit node_modules to repository
+- [ ] Track all dependencies in package-lock.json
+- [ ] Use automatic npm install
+- [ ] Maintain environment file structure
+- [ ] Follow environment setup process
+
+### **For Entry Points**
+- [ ] Ensure index.js and App.js exist in client
+- [ ] Verify server.js and sentry.js in server
+- [ ] Configure proper entry point imports
+- [ ] Test application startup process
+
+### **For Docker & Git**
+- [ ] Create Dockerfiles for client and server
+- [ ] Configure docker-compose.yml at root
+- [ ] Maintain centralized .gitignore at root level
+- [ ] Test container builds and deployment
+
+---
+
+## 🚀 Best Practices
+
+### **Do's**
+- ✅ Use descriptive, meaningful names
+- ✅ Follow consistent naming conventions
+- ✅ Organize by domain/feature
+- ✅ Keep files focused and small
+- ✅ Use index files for clean imports
+- ✅ Document complex structures
+- ✅ Consider scalability and maintainability
+- ✅ Commit node_modules and package-lock.json
+- ✅ Use automatic dependency installation
+- ✅ Configure entry points (index.js, App.js, server.js, sentry.js)
+- ✅ Set up Docker configuration (Dockerfile, docker-compose.yml)
+- ✅ Maintain centralized .gitignore at root level
+
+### **Don'ts**
+- ❌ Use generic or unclear names
+- ❌ Mix naming conventions
+- ❌ Create deeply nested directories
+- ❌ Put unrelated code in same file
+- ❌ Ignore import/export organization
+- ❌ Forget to document structure
+- ❌ Over-engineer simple structures
+- ❌ Gitignore node_modules or package-lock.json
+- ❌ Manually install dependencies
+- ❌ Forget entry point files (index.js, App.js, server.js)
+- ❌ Ignore Docker configuration for deployment
+- ❌ Create separate .gitignore files for client/server
+- ❌ Commit sensitive files to Git
+
+---
+
+## 🔧 Tools & Automation
+
+### **File Structure Tools**
+- **ESLint**: Enforce naming conventions
+- **Prettier**: Consistent code formatting
+- **TypeScript**: Type safety and organization
+- **Path Aliases**: Clean import paths
+- **Barrel Exports**: Organized exports
+
+### **Automation Scripts**
+- **File Generators**: Scaffold new files
+- **Structure Validators**: Validate organization
+- **Import Sorters**: Organize imports
+- **Naming Checkers**: Validate conventions
+- **Documentation Generators**: Auto-generate docs
+
+---
+
+## 📚 Future Enhancements
+
+### **Advanced Organization**
+- **Monorepo Tools**: Lerna, Nx for large projects
+- **Module Federation**: Micro-frontend architecture
+- **Code Splitting**: Dynamic imports and lazy loading
+- **Tree Shaking**: Remove unused code
+- **Bundle Analysis**: Optimize file structure
+
+### **Development Experience**
+- **IDE Configuration**: VSCode settings and extensions
+- **Code Templates**: Snippets and generators
+- **Hot Reloading**: Fast development cycles
+- **Debugging Tools**: Enhanced debugging experience
+- **Performance Monitoring**: File structure impact analysis
+
+

@@ -1,7 +1,5 @@
 ---
-description:Guidelines for writing clean, maintainable, and human-readable code. Apply these rules when writing or reviewing code to ensure consistency and quality.
-globs:
-alwaysApply: false
+alwaysApply: true
 ---
 ## 🗂️ Project Overview  
 This is a Senior full-stack business directory application with React frontend and Node.js/Express backend, featuring internationalization (i18n), Google Maps integration, user authentication, and business management capabilities, ReactJS, JavaScript, TypeScript, HTML, CSS and modern UI/UX frameworks (e.g., TailwindCSS). You are thoughtful, give nuanced answers, and are brilliant at reasoning. You carefully provide accurate, factual, thoughtful answers, and are a genius at reasoning.

@@ -1,7 +1,5 @@
 ---
-description:Guidelines for automated package installation and structured dependency management using npm and Cursor.
-globs:
-alwaysApply: false
+alwaysApply: true
 ---
 ### Automatic Installation
 - All `npm install` commands should be executed automatically by Cursor

@@ -1,9 +1,6 @@
 ---
-description:Guidelines for building accessible, responsive, and RTL-aware modal dialogs with consistent structure, styling, and behavior.
-globs:
-alwaysApply: false
+alwaysApply: true
 ---
-
 ### Modal Structure Requirements
 All dialog-like screens must be implemented as modal pages with:
 

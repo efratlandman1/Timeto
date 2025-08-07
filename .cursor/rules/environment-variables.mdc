@@ -1,7 +1,5 @@
 ---
-description:Guidelines for managing environment variables securely across development stages, including validation, structure, and best practices.
-globs:
-alwaysApply: false
+alwaysApply: true
 ---
 - Separate env files per stage  
 - Validate env vars at startup  
