@@ -9,3 +9,9 @@ alwaysApply: true
 - **Authentication**: JWT tokens, Google OAuth
 - **Styling**: CSS modules, styled-components, Material-UI, TailwindCSS , HTML, CSS
 - **Security**: Helmet, CORS, rate limiting, input validation
+- **File Upload**: Multer with security
+- **Email**: Nodemailer for notifications
+- **State Management**: Redux Toolkit
+- **Routing**: React Router DOM
+
+

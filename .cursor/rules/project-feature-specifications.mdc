@@ -1,0 +1,33 @@
+---
+alwaysApply: true
+---
+### **1. Search Functionality**
+- **Basic Search**: Text-based search
+- **Advanced Search**: Category, location, rating filters
+- **Geolocation**: Find nearby businesses
+- **Auto-complete**: Search suggestions
+
+### **2. Business Management**
+- **Business Creation**: Multi-step wizard
+- **Business Editing**: Update business information
+- **Business Verification**: Admin approval process
+- **Business Deactivation**: Soft delete functionality
+
+### **3. User Management**
+- **User Registration**: Email verification
+- **User Authentication**: Multiple auth methods
+- **User Profiles**: Personal information management
+- **User Roles**: Admin, Manager, End-user
+
+### **4. Rating & Review System**
+- **Star Ratings**: 1-5 star rating system
+- **Written Reviews**: Optional text reviews
+- **Review Moderation**: Admin review process
+- **Review Analytics**: Rating statistics
+
+### **5. Favorites System**
+- **Save Favorites**: Add businesses to favorites
+- **Favorites List**: View saved businesses
+- **Favorites Sync**: Cross-device synchronization
+- **Favorites Export**: Export favorites list
+
