@@ -1,5 +1,82 @@
 ---
-description:
-globs:
-alwaysApply: false
+alwaysApply: true
 ---
+
+## 🌐 API Endpoints
+
+### אימות (Authentication)
+```
+POST /api/v1/auth/register - הרשמה
+POST /api/v1/auth/login - כניסה
+POST /api/v1/auth/logout - יציאה
+POST /api/v1/auth/forgot-password - שכחתי סיסמה
+POST /api/v1/auth/reset-password - איפוס סיסמה
+POST /api/v1/auth/verify-email - אימות אימייל
+```
+
+### משתמשים (Users)
+```
+GET /api/v1/users/profile - פרופיל משתמש
+PUT /api/v1/users/profile - עדכון פרופיל
+GET /api/v1/users/businesses - העסקים שלי
+GET /api/v1/users/favorites - המועדפים שלי
+```
+
+### עסקים (Businesses)
+```
+GET /api/v1/businesses - רשימת עסקים
+GET /api/v1/businesses/:id - פרטי עסק
+POST /api/v1/businesses - יצירת עסק
+PUT /api/v1/businesses/:id - עדכון עסק
+DELETE /api/v1/businesses/:id - מחיקת עסק
+GET /api/v1/businesses/search - חיפוש עסקים
+```
+
+### קטגוריות (Categories)
+```
+GET /api/v1/categories - רשימת קטגוריות
+GET /api/v1/categories/:id - פרטי קטגוריה
+POST /api/v1/categories - יצירת קטגוריה
+PUT /api/v1/categories/:id - עדכון קטגוריה
+DELETE /api/v1/categories/:id - מחיקת קטגוריה
+```
+
+### שירותים (Services)
+```
+GET /api/v1/services - רשימת שירותים
+GET /api/v1/services/category/:categoryId - שירותים לפי קטגוריה
+POST /api/v1/services - יצירת שירות
+PUT /api/v1/services/:id - עדכון שירות
+DELETE /api/v1/services/:id - מחיקת שירות
+```
+
+### דירוגים (Feedback)
+```
+GET /api/v1/feedbacks/business/:businessId - דירוגי עסק
+POST /api/v1/feedbacks - הוספת דירוג
+PUT /api/v1/feedbacks/:id - עדכון דירוג
+DELETE /api/v1/feedbacks/:id - מחיקת דירוג
+```
+
+### מועדפים (Favorites)
+```
+GET /api/v1/favorites - רשימת מועדפים
+POST /api/v1/favorites - הוספת מועדפים
+DELETE /api/v1/favorites/:businessId - הסרת מועדפים
+```
+
+### הצעות (Suggestions)
+```
+GET /api/v1/suggestions - רשימת הצעות
+POST /api/v1/suggestions - יצירת הצעה
+PUT /api/v1/suggestions/:id - עדכון הצעה
+DELETE /api/v1/suggestions/:id - מחיקת הצעה
+```
+
+### סטטיסטיקות (Statistics)
+```
+GET /api/v1/stats/overview - סקירה כללית
+GET /api/v1/stats/businesses - סטטיסטיקות עסקים
+GET /api/v1/stats/users - סטטיסטיקות משתמשים
+GET /api/v1/stats/ratings - סטטיסטיקות דירוגים
+```

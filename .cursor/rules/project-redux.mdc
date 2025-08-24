@@ -1,5 +1,748 @@
 ---
-description:
-globs:
-alwaysApply: false
+alwaysApply: true
 ---
+# 🔄 Redux State Management - Timeto Application
+
+## 🎯 Redux Architecture Overview
+
+### **Technology Stack**
+- **Redux Toolkit**: Modern Redux with RTK Query
+- **State Structure**: Normalized data with entities pattern
+- **Async Operations**: createAsyncThunk for API calls
+- **Selectors**: Memoized selectors with createSelector
+- **DevTools**: Redux DevTools integration
+
+### **State Design Principles**
+- **Normalization**: Flat state structure with entities and ids
+- **Separation of Concerns**: Different slices for different domains
+- **Performance**: Memoized selectors and optimized re-renders
+- **Type Safety**: TypeScript integration for type safety
+- **Error Handling**: Comprehensive error states and loading states
+
+---
+
+## 📋 Core Slices Specification
+
+### **1. User Slice - `userSlice.js`**
+
+#### **State Structure**
+```javascript
+{
+  currentUser: {
+    id: string,
+    email: string,
+    firstName: string,
+    lastName: string,
+    role: 'admin' | 'manager' | 'business_owner' | 'end_user',
+    is_verified: boolean,
+    preferences: {
+      language: 'he' | 'en',
+      notifications: {
+        email: boolean,
+        push: boolean,
+        sms: boolean
+      }
+    },
+    avatar: string,
+    phone: string,
+    last_login: Date
+  },
+  auth: {
+    isAuthenticated: boolean,
+    token: string,
+    loading: boolean,
+    error: string
+  },
+  profile: {
+    loading: boolean,
+    error: string,
+    updateSuccess: boolean
+  }
+}
+```
+
+#### **Actions**
+- **Authentication**
+  - `loginUser` (async) - Login with email/password
+  - `loginWithGoogle` (async) - Google OAuth login
+  - `logoutUser` - Clear user session
+  - `registerUser` (async) - User registration
+  - `verifyEmail` (async) - Email verification
+  - `forgotPassword` (async) - Password reset request
+  - `resetPassword` (async) - Password reset
+
+- **Profile Management**
+  - `fetchUserProfile` (async) - Get user profile
+  - `updateUserProfile` (async) - Update profile
+  - `changePassword` (async) - Change password
+  - `updatePreferences` (async) - Update user preferences
+  - `uploadAvatar` (async) - Upload profile picture
+  - `deleteAccount` (async) - Delete user account
+
+#### **Selectors**
+- `selectCurrentUser` - Get current user
+- `selectIsAuthenticated` - Check authentication status
+- `selectUserRole` - Get user role
+- `selectUserPreferences` - Get user preferences
+- `selectUserLanguage` - Get user language preference
+- `selectAuthLoading` - Get auth loading state
+- `selectAuthError` - Get auth error
+
+---
+
+### **2. Business Slice - `businessSlice.js`**
+
+#### **State Structure**
+```javascript
+{
+  entities: {
+    businesses: {
+      [id]: {
+        id: string,
+        name: string,
+        description: string,
+        address: string,
+        city: string,
+        phone: string,
+        email: string,
+        website: string,
+        logo: string,
+        images: string[],
+        categoryId: string,
+        userId: string,
+        rating: number,
+        totalRatings: number,
+        ratingDistribution: object,
+        active: boolean,
+        approved: boolean,
+        featured: boolean,
+        verified: boolean,
+        viewCount: number,
+        favoriteCount: number,
+        reviewCount: number,
+        location: {
+          coordinates: [number, number]
+        },
+        openingHours: object[],
+        services: object[],
+        features: object,
+        socialMedia: object,
+        createdAt: Date,
+        updatedAt: Date
+      }
+    }
+  },
+  ids: string[],
+  filters: {
+    search: string,
+    category: string,
+    rating: number,
+    distance: number,
+    city: string,
+    services: string[],
+    sortBy: 'relevance' | 'rating' | 'distance' | 'name' | 'newest',
+    sortOrder: 'asc' | 'desc'
+  },
+  pagination: {
+    page: number,
+    limit: number,
+    total: number,
+    hasMore: boolean
+  },
+  loading: {
+    fetch: boolean,
+    create: boolean,
+    update: boolean,
+    delete: boolean
+  },
+  error: string,
+  selectedBusiness: string | null
+}
+```
+
+#### **Actions**
+- **Business CRUD**
+  - `fetchBusinesses` (async) - Get businesses with filters
+  - `fetchBusinessById` (async) - Get single business
+  - `createBusiness` (async) - Create new business
+  - `updateBusiness` (async) - Update business
+  - `deleteBusiness` (async) - Delete business
+  - `approveBusiness` (async) - Admin approve business
+  - `rejectBusiness` (async) - Admin reject business
+  - `featureBusiness` (async) - Feature/unfeature business
+
+- **Business Management**
+  - `fetchUserBusinesses` (async) - Get user's businesses
+  - `updateBusinessStatus` (async) - Update business status
+  - `uploadBusinessImages` (async) - Upload business images
+  - `updateBusinessHours` (async) - Update opening hours
+  - `updateBusinessServices` (async) - Update services
+
+- **Filters & Search**
+  - `setSearchFilter` - Set search query
+  - `setCategoryFilter` - Set category filter
+  - `setRatingFilter` - Set rating filter
+  - `setDistanceFilter` - Set distance filter
+  - `setCityFilter` - Set city filter
+  - `setServicesFilter` - Set services filter
+  - `setSortBy` - Set sort field
+  - `setSortOrder` - Set sort order
+  - `clearFilters` - Clear all filters
+  - `setPagination` - Set pagination
+
+#### **Selectors**
+- `selectAllBusinesses` - Get all businesses
+- `selectBusinessById` - Get business by ID
+- `selectFilteredBusinesses` - Get filtered businesses
+- `selectBusinessesByCategory` - Get businesses by category
+- `selectFeaturedBusinesses` - Get featured businesses
+- `selectUserBusinesses` - Get user's businesses
+- `selectBusinessFilters` - Get current filters
+- `selectBusinessPagination` - Get pagination state
+- `selectBusinessLoading` - Get loading states
+- `selectBusinessError` - Get error state
+- `selectSelectedBusiness` - Get selected business
+
+---
+
+### **3. Category Slice - `categorySlice.js`**
+
+#### **State Structure**
+```javascript
+{
+  entities: {
+    categories: {
+      [id]: {
+        id: string,
+        name: string,
+        nameEn: string,
+        description: string,
+        descriptionEn: string,
+        icon: string,
+        color: string,
+        parentId: string | null,
+        active: boolean,
+        sortOrder: number,
+        businessCount: number,
+        createdAt: Date,
+        updatedAt: Date
+      }
+    }
+  },
+  ids: string[],
+  loading: {
+    fetch: boolean,
+    create: boolean,
+    update: boolean,
+    delete: boolean
+  },
+  error: string,
+  selectedCategory: string | null
+}
+```
+
+#### **Actions**
+- **Category CRUD**
+  - `fetchCategories` (async) - Get all categories
+  - `fetchCategoryById` (async) - Get single category
+  - `createCategory` (async) - Create new category
+  - `updateCategory` (async) - Update category
+  - `deleteCategory` (async) - Delete category
+  - `toggleCategoryActive` (async) - Toggle category status
+
+- **Category Management**
+  - `fetchCategoriesByParent` (async) - Get subcategories
+  - `updateCategoryOrder` (async) - Update sort order
+  - `updateCategoryIcon` (async) - Update category icon
+
+#### **Selectors**
+- `selectAllCategories` - Get all categories
+- `selectCategoryById` - Get category by ID
+- `selectActiveCategories` - Get active categories
+- `selectCategoriesByParent` - Get subcategories
+- `selectTopLevelCategories` - Get parent categories
+- `selectCategoryLoading` - Get loading states
+- `selectCategoryError` - Get error state
+- `selectSelectedCategory` - Get selected category
+
+---
+
+### **4. Service Slice - `serviceSlice.js`**
+
+#### **State Structure**
+```javascript
+{
+  entities: {
+    services: {
+      [id]: {
+        id: string,
+        name: string,
+        nameEn: string,
+        description: string,
+        descriptionEn: string,
+        categoryId: string,
+        icon: string,
+        active: boolean,
+        sortOrder: number,
+        businessCount: number,
+        createdAt: Date,
+        updatedAt: Date
+      }
+    }
+  },
+  ids: string[],
+  loading: {
+    fetch: boolean,
+    create: boolean,
+    update: boolean,
+    delete: boolean
+  },
+  error: string,
+  selectedService: string | null
+}
+```
+
+#### **Actions**
+- **Service CRUD**
+  - `fetchServices` (async) - Get all services
+  - `fetchServiceById` (async) - Get single service
+  - `createService` (async) - Create new service
+  - `updateService` (async) - Update service
+  - `deleteService` (async) - Delete service
+  - `toggleServiceActive` (async) - Toggle service status
+
+- **Service Management**
+  - `fetchServicesByCategory` (async) - Get services by category
+  - `updateServiceOrder` (async) - Update sort order
+  - `updateServiceIcon` (async) - Update service icon
+
+#### **Selectors**
+- `selectAllServices` - Get all services
+- `selectServiceById` - Get service by ID
+- `selectActiveServices` - Get active services
+- `selectServicesByCategory` - Get services by category
+- `selectServiceLoading` - Get loading states
+- `selectServiceError` - Get error state
+- `selectSelectedService` - Get selected service
+
+---
+
+### **5. Favorite Slice - `favoriteSlice.js`**
+
+#### **State Structure**
+```javascript
+{
+  entities: {
+    favorites: {
+      [id]: {
+        id: string,
+        userId: string,
+        businessId: string,
+        createdAt: Date
+      }
+    }
+  },
+  ids: string[],
+  loading: {
+    fetch: boolean,
+    add: boolean,
+    remove: boolean
+  },
+  error: string,
+  filters: {
+    search: string,
+    category: string,
+    rating: number,
+    sortBy: 'date' | 'name' | 'rating' | 'distance'
+  }
+}
+```
+
+#### **Actions**
+- **Favorite Management**
+  - `fetchUserFavorites` (async) - Get user favorites
+  - `addToFavorites` (async) - Add business to favorites
+  - `removeFromFavorites` (async) - Remove from favorites
+  - `toggleFavorite` (async) - Toggle favorite status
+  - `clearFavorites` (async) - Clear all favorites
+
+- **Favorite Filters**
+  - `setFavoriteSearch` - Set search filter
+  - `setFavoriteCategory` - Set category filter
+  - `setFavoriteRating` - Set rating filter
+  - `setFavoriteSort` - Set sort order
+  - `clearFavoriteFilters` - Clear filters
+
+#### **Selectors**
+- `selectAllFavorites` - Get all favorites
+- `selectFavoriteById` - Get favorite by ID
+- `selectFilteredFavorites` - Get filtered favorites
+- `selectFavoriteBusinesses` - Get favorite businesses
+- `selectIsFavorite` - Check if business is favorited
+- `selectFavoriteCount` - Get favorite count
+- `selectFavoriteLoading` - Get loading states
+- `selectFavoriteError` - Get error state
+
+---
+
+### **6. Feedback Slice - `feedbackSlice.js`**
+
+#### **State Structure**
+```javascript
+{
+  entities: {
+    feedback: {
+      [id]: {
+        id: string,
+        userId: string,
+        businessId: string,
+        rating: number,
+        comment: string,
+        approved: boolean,
+        helpfulVotes: number,
+        reported: boolean,
+        reportReason: string,
+        createdAt: Date,
+        updatedAt: Date
+      }
+    }
+  },
+  ids: string[],
+  loading: {
+    fetch: boolean,
+    create: boolean,
+    update: boolean,
+    delete: boolean,
+    approve: boolean
+  },
+  error: string,
+  filters: {
+    businessId: string,
+    rating: number,
+    approved: boolean,
+    sortBy: 'date' | 'rating' | 'helpful'
+  }
+}
+```
+
+#### **Actions**
+- **Review Management**
+  - `fetchBusinessReviews` (async) - Get business reviews
+  - `fetchUserReviews` (async) - Get user reviews
+  - `createReview` (async) - Create new review
+  - `updateReview` (async) - Update review
+  - `deleteReview` (async) - Delete review
+  - `approveReview` (async) - Admin approve review
+  - `rejectReview` (async) - Admin reject review
+  - `reportReview` (async) - Report review
+
+- **Review Interactions**
+  - `voteHelpful` (async) - Vote review as helpful
+  - `removeHelpfulVote` (async) - Remove helpful vote
+
+#### **Selectors**
+- `selectAllReviews` - Get all reviews
+- `selectReviewById` - Get review by ID
+- `selectBusinessReviews` - Get business reviews
+- `selectUserReviews` - Get user reviews
+- `selectApprovedReviews` - Get approved reviews
+- `selectReviewStats` - Get review statistics
+- `selectReviewLoading` - Get loading states
+- `selectReviewError` - Get error state
+
+---
+
+### **7. Suggestion Slice - `suggestionSlice.js`**
+
+#### **State Structure**
+```javascript
+{
+  entities: {
+    suggestions: {
+      [id]: {
+        id: string,
+        type: 'category' | 'service' | 'improvement',
+        name: string,
+        description: string,
+        categoryId: string,
+        parentCategoryId: string,
+        businessExamples: string[],
+        popularity: string,
+        targetAudience: string,
+        geographicRelevance: string,
+        serviceType: string,
+        pricingRange: string,
+        availability: string,
+        improvementType: string,
+        currentIssue: string,
+        userImpact: string,
+        proposedSolution: string,
+        expectedBenefits: string,
+        implementationSuggestions: string,
+        suggestedBy: string,
+        submitterName: string,
+        submitterEmail: string,
+        submitterPhone: string,
+        userType: string,
+        expertiseLevel: string,
+        status: 'pending' | 'approved' | 'rejected',
+        adminNotes: string,
+        reviewedBy: string,
+        reviewedAt: Date,
+        createdAt: Date,
+        updatedAt: Date
+      }
+    }
+  },
+  ids: string[],
+  loading: {
+    fetch: boolean,
+    create: boolean,
+    update: boolean,
+    approve: boolean,
+    reject: boolean
+  },
+  error: string,
+  filters: {
+    type: string,
+    status: string,
+    categoryId: string
+  }
+}
+```
+
+#### **Actions**
+- **Suggestion Management**
+  - `fetchSuggestions` (async) - Get all suggestions
+  - `fetchSuggestionById` (async) - Get single suggestion
+  - `createSuggestion` (async) - Create new suggestion
+  - `updateSuggestion` (async) - Update suggestion
+  - `approveSuggestion` (async) - Admin approve suggestion
+  - `rejectSuggestion` (async) - Admin reject suggestion
+
+- **Suggestion Filters**
+  - `setSuggestionType` - Set type filter
+  - `setSuggestionStatus` - Set status filter
+  - `setSuggestionCategory` - Set category filter
+  - `clearSuggestionFilters` - Clear filters
+
+#### **Selectors**
+- `selectAllSuggestions` - Get all suggestions
+- `selectSuggestionById` - Get suggestion by ID
+- `selectPendingSuggestions` - Get pending suggestions
+- `selectSuggestionsByType` - Get suggestions by type
+- `selectSuggestionsByStatus` - Get suggestions by status
+- `selectSuggestionLoading` - Get loading states
+- `selectSuggestionError` - Get error state
+
+---
+
+### **8. UI Slice - `uiSlice.js`**
+
+#### **State Structure**
+```javascript
+{
+  language: 'he' | 'en',
+  theme: 'light' | 'dark',
+  sidebar: {
+    isOpen: boolean,
+    activeTab: string
+  },
+  modals: {
+    auth: boolean,
+    businessForm: boolean,
+    reviewForm: boolean,
+    confirmation: boolean,
+    imageGallery: boolean
+  },
+  notifications: {
+    items: Array<{
+      id: string,
+      type: 'success' | 'error' | 'warning' | 'info',
+      message: string,
+      duration: number,
+      timestamp: Date
+    }>
+  },
+  loading: {
+    global: boolean,
+    page: boolean
+  },
+  search: {
+    query: string,
+    suggestions: string[],
+    recentSearches: string[]
+  },
+  map: {
+    center: [number, number],
+    zoom: number,
+    markers: object[]
+  }
+}
+```
+
+#### **Actions**
+- **UI State**
+  - `setLanguage` - Change language
+  - `setTheme` - Change theme
+  - `toggleSidebar` - Toggle sidebar
+  - `setActiveTab` - Set active tab
+
+- **Modal Management**
+  - `openModal` - Open modal
+  - `closeModal` - Close modal
+  - `closeAllModals` - Close all modals
+
+- **Notification Management**
+  - `addNotification` - Add notification
+  - `removeNotification` - Remove notification
+  - `clearNotifications` - Clear all notifications
+
+- **Loading States**
+  - `setGlobalLoading` - Set global loading
+  - `setPageLoading` - Set page loading
+
+- **Search Management**
+  - `setSearchQuery` - Set search query
+  - `setSearchSuggestions` - Set search suggestions
+  - `addRecentSearch` - Add to recent searches
+  - `clearRecentSearches` - Clear recent searches
+
+- **Map Management**
+  - `setMapCenter` - Set map center
+  - `setMapZoom` - Set map zoom
+  - `setMapMarkers` - Set map markers
+
+#### **Selectors**
+- `selectLanguage` - Get current language
+- `selectTheme` - Get current theme
+- `selectSidebarState` - Get sidebar state
+- `selectModalState` - Get modal states
+- `selectNotifications` - Get notifications
+- `selectLoadingState` - Get loading states
+- `selectSearchState` - Get search state
+- `selectMapState` - Get map state
+
+---
+
+### **9. Location Slice - `locationSlice.js`**
+
+#### **State Structure**
+```javascript
+{
+  currentLocation: {
+    latitude: number,
+    longitude: number,
+    accuracy: number,
+    timestamp: Date
+  },
+  userLocation: {
+    latitude: number,
+    longitude: number,
+    city: string,
+    country: string,
+    address: string
+  },
+  permissions: {
+    granted: boolean,
+    denied: boolean,
+    requesting: boolean
+  },
+  loading: {
+    getCurrentLocation: boolean,
+    geocode: boolean
+  },
+  error: string
+}
+```
+
+#### **Actions**
+- **Location Management**
+  - `getCurrentLocation` (async) - Get current GPS location
+  - `setUserLocation` - Set user location manually
+  - `geocodeAddress` (async) - Geocode address to coordinates
+  - `reverseGeocode` (async) - Reverse geocode coordinates to address
+  - `requestLocationPermission` (async) - Request location permission
+
+#### **Selectors**
+- `selectCurrentLocation` - Get current GPS location
+- `selectUserLocation` - Get user location
+- `selectLocationPermissions` - Get permission status
+- `selectLocationLoading` - Get loading states
+- `selectLocationError` - Get error state
+
+---
+
+## 🔧 Redux Store Configuration
+
+### **Store Structure**
+```javascript
+{
+  user: UserState,
+  business: BusinessState,
+  category: CategoryState,
+  service: ServiceState,
+  favorite: FavoriteState,
+  feedback: FeedbackState,
+  suggestion: SuggestionState,
+  ui: UIState,
+  location: LocationState
+}
+```
+
+### **Middleware Configuration**
+- **Redux Toolkit**: Default middleware
+- **Redux Logger**: Development logging
+- **Redux Persist**: State persistence
+- **Redux DevTools**: Development tools
+
+### **State Persistence**
+- **Persisted State**: User preferences, auth token, recent searches
+- **Non-Persisted State**: Current page data, loading states, temporary UI state
+
+---
+
+## 📊 Performance Optimizations
+
+### **Selector Memoization**
+- Use `createSelector` for expensive computations
+- Memoize selectors with proper dependencies
+- Avoid selector recreation on every render
+
+### **State Normalization**
+- Normalize nested data structures
+- Use entities and ids pattern
+- Minimize data duplication
+
+### **Async Operations**
+- Use `createAsyncThunk` for API calls
+- Implement proper loading states
+- Handle errors gracefully
+- Optimistic updates where appropriate
+
+### **Component Optimization**
+- Use `useSelector` with shallow equality
+- Implement `React.memo` for expensive components
+- Avoid unnecessary re-renders
+
+---
+
+## 🧪 Testing Strategy
+
+### **Unit Tests**
+- Test all reducers
+- Test all selectors
+- Test all async thunks
+- Test error handling
+
+### **Integration Tests**
+- Test slice interactions
+- Test store configuration
+- Test middleware behavior
+
+### **Component Tests**
+- Test component state management
+- Test user interactions
+- Test async operations
+
+This comprehensive Redux specification provides a complete state management solution for the Timeto application with proper separation of concerns, performance optimizations, and maintainable code structure.
