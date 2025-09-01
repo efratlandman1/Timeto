@@ -10,18 +10,12 @@ import { FaFilter, FaTimes, FaChevronDown, FaSort } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { buildQueryUrl } from '../utils/buildQueryUrl';
 import { getToken } from '../utils/auth';
+import { useTranslation } from 'react-i18next';
 
 const ITEMS_PER_PAGE = 8;
 
-const SORT_OPTIONS = {
-    rating: 'דירוג גבוה',
-    name: 'לפי א-ב',
-    distance: 'מרחק',
-    newest: 'חדש ביותר',
-    popular_nearby: 'פופולרי באזורך'
-};
-
 const SearchResultPage = () => {
+    const { t, ready } = useTranslation();
     const [businesses, setBusinesses] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -54,8 +48,8 @@ const SearchResultPage = () => {
         });
         if (node) observer.current.observe(node);
     }, [isLoading, hasMore]);
-
-    useEffect(() => {
+    
+        useEffect(() => {
         const handleClickOutside = (event) => {
             if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target)) {
                 setShowSortDropdown(false);
@@ -79,7 +73,7 @@ const SearchResultPage = () => {
                     if (Array.isArray(filters[key])) {
                         filters[key].push(value);
                     } else {
-                        filters[key] = [filters[key], value];
+                        filters[key] = value;
                     }
                 } else {
                     filters[key] = value;
@@ -180,6 +174,28 @@ const SearchResultPage = () => {
             });
     }, [location.search, currentPage, userLocation, locationLoading, locationError]);
 
+    const SORT_OPTIONS = {
+        rating: t('searchResults.sort.rating'),
+        name: t('searchResults.sort.name'),
+        distance: t('searchResults.sort.distance'),
+        newest: t('searchResults.sort.newest'),
+        popular_nearby: t('searchResults.sort.popular_nearby')
+    };
+    
+    // Wait for translations to load
+    if (!ready) {
+        return (
+            <div className='wide-page-container'>
+                <div className='wide-page-content'>
+                    <div className="loading-container">
+                        <div className="loader"></div>
+                        <span>Loading translations...</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     const handleFilterChange = (key, value) => {
         const newParams = new URLSearchParams(location.search);
         if (Array.isArray(value)) {
@@ -230,8 +246,8 @@ const SearchResultPage = () => {
             <div className='wide-page-content'>
                 <div className="page-header">
                     <div className="page-header__content">
-                        <h1>חיפוש עסקים</h1>
-                        <p>מצא את העסק המתאים לך</p>
+                        <h1>{t('searchResults.pageTitle')}</h1>
+                        <p>{t('searchResults.pageSubtitle')}</p>
                     </div>
                 </div>
                 
@@ -247,7 +263,7 @@ const SearchResultPage = () => {
                                 aria-expanded={showFilters}
                             >
                                 <FaFilter />
-                                <span>סינון מתקדם</span>
+                                <span>{t('searchResults.advancedFilter')}</span>
                             </button>
                             <div className="sort-control" ref={sortDropdownRef}>
                                 <button 
@@ -293,7 +309,7 @@ const SearchResultPage = () => {
                 </div>
 
                 {(sortOption === 'distance' || sortOption === 'popular_nearby') && !userLocation && !locationError && (
-                    <div style={{ color: 'gray', margin: '1rem 0', textAlign: 'center' }}>טוען מיקום...</div>
+                    <div style={{ color: 'gray', margin: '1rem 0', textAlign: 'center' }}>{t('searchResults.loadingLocation')}</div>
                 )}
                 {locationError && (sortOption === 'distance' || sortOption === 'popular_nearby') && (
                     <div style={{ color: 'red', margin: '1rem 0', textAlign: 'center' }}>{locationError}</div>
@@ -302,12 +318,12 @@ const SearchResultPage = () => {
                 {Object.keys(activeFilters).length > 0 && (
                     <div className="filters-area">
                         <div className="filters-header">
-                            <div className="filters-title">סינונים פעילים:</div>
+                            <div className="filters-title">{t('searchResults.filters.active')}</div>
                             <button 
                                 className="clear-all-filters"
                                 onClick={handleClearFilters}
                             >
-                                נקה הכל
+                                {t('searchResults.filters.clearAll')}
                                 <FaTimes />
                             </button>
                         </div>
@@ -317,10 +333,10 @@ const SearchResultPage = () => {
                                 Array.isArray(value) ? (
                                     value.map((v, idx) => (
                                         <div key={`${key}-${idx}`} className="filter-tag">
-                                            {key === 'categoryName' ? `קטגוריה: ${v}` :
-                                             key === 'rating' ? `${v} כוכבים ומעלה` :
-                                             key === 'services' ? `שירות: ${v}` :
-                                             key === 'maxDistance' ? `עד מרחק של: ${v} ק"מ` : v}
+                                            {key === 'categoryName' ? `${t('searchResults.filterTags.category')} ${v}` :
+                                             key === 'rating' ? `${v} ${t('searchResults.filterTags.rating')}` :
+                                             key === 'services' ? `${t('searchResults.filterTags.service')} ${v}` :
+                                             key === 'maxDistance' ? `${t('searchResults.filterTags.maxDistance')} ${v} ${t('searchResults.filterTags.km')}` : v}
                                             <button onClick={() => handleRemoveFilter(key, v)}>
                                                 <FaTimes />
                                             </button>
@@ -328,10 +344,10 @@ const SearchResultPage = () => {
                                     ))
                                 ) : (
                                     <div key={key} className="filter-tag">
-                                        {key === 'categoryName' ? `קטגוריה: ${value}` :
-                                         key === 'rating' ? `${value} כוכבים ומעלה` :
-                                         key === 'services' ? `שירות: ${value}` :
-                                         key === 'maxDistance' ? `עד מרחק של: ${value} ק"מ` : value}
+                                        {key === 'categoryName' ? `${t('searchResults.filterTags.category')} ${value}` :
+                                         key === 'rating' ? `${value} ${t('searchResults.filterTags.rating')}` :
+                                         key === 'services' ? `${t('searchResults.filterTags.service')} ${value}` :
+                                         key === 'maxDistance' ? `${t('searchResults.filterTags.maxDistance')} ${value} ${t('searchResults.filterTags.km')}` : value}
                                         <button onClick={() => handleRemoveFilter(key)}>
                                             <FaTimes />
                                         </button>

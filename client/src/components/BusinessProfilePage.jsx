@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   FaMapMarkerAlt, FaPhoneAlt, FaTags, FaClock,
   FaStar, FaRegStar, FaEnvelope, FaWhatsapp
@@ -11,6 +12,7 @@ import { roundRating, renderStars } from '../utils/ratingUtils';
 const daysMap = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
 const BusinessProfilePage = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [business, setBusiness] = useState(null);
   const [feedbacks, setFeedbacks] = useState([]);
@@ -79,9 +81,9 @@ const BusinessProfilePage = () => {
     });
   };
 
-  if (loading) return <div className="loading">טוען פרטי עסק...</div>;
-  if (error) return <div className="error">שגיאה: {error}</div>;
-  if (!business) return <div className="not-found">לא נמצאו נתונים לעסק</div>;
+  if (loading) return <div className="loading">{t('businessProfile.loading')}</div>;
+  if (error) return <div className="error">{t('businessProfile.error')}: {error}</div>;
+  if (!business) return <div className="not-found">{t('businessProfile.notFound')}</div>;
 
   const averageRating = business.rating || 0;
   const totalReviews = feedbacks.length;
@@ -165,7 +167,7 @@ const BusinessProfilePage = () => {
         <div className="column-card">
           <div className="info-card-header">
             <FaClock />
-            <h3 className="info-card-title">שעות פעילות</h3>
+                            <h3 className="info-card-title">{t('businessSteps.hours.title')}</h3>
           </div>
           <div className="hours-list">
             {business.openingHours?.map((item, index) => (

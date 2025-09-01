@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaClock, FaPlus, FaTrash } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import '../styles/StepsStyle.css';
 
 const DAYS = [
@@ -13,6 +14,7 @@ const DAYS = [
 ];
 
 const StepBusinessHours = ({ businessData, setBusinessData }) => {
+  const { t } = useTranslation();
   const [hours, setHours] = useState([]);
 
   useEffect(() => {
@@ -99,7 +101,7 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
                 className={`closed-button ${day.closed ? 'active' : ''}`}
                 onClick={() => toggleClosed(dayIndex)}
               >
-                {day.closed ? 'סגור' : 'פתוח'}
+                {day.closed ? t('businessSteps.hours.closed') : t('businessSteps.hours.open')}
               </button>
 
             </div>
@@ -129,7 +131,7 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
                     <button
                       className="add-range-btn"
                       onClick={() => addRange(dayIndex)}
-                      title="הוסף טווח נוסף"
+                      title={t('businessSteps.hours.addRange')}
                     >
                       <FaPlus />
                     </button>
@@ -139,7 +141,7 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
                     <button
                       className="delete-range-btn"
                       onClick={() => removeTimeRange(dayIndex, rangeIndex)}
-                      title="מחק טווח"
+                      title={t('businessSteps.hours.removeRange')}
                     >
                       <FaTrash size={14} />
                     </button>

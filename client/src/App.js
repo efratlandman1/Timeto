@@ -32,7 +32,7 @@ import { getToken } from './utils/auth';
 
 function App() {
     const dispatch = useDispatch();
-    const { i18n } = useTranslation();
+    const { i18n, ready } = useTranslation();
     
     useEffect(() => {
         let user = null;
@@ -62,15 +62,44 @@ function App() {
 
     // Update document direction when language changes
     useEffect(() => {
-        document.documentElement.dir = i18n.dir();
+        const direction = i18n.dir();
+        document.documentElement.dir = direction;
         document.documentElement.lang = i18n.language;
-        document.body.style.direction = i18n.dir();
+        document.body.style.direction = direction;
+        
+        // Add RTL/LTR classes to body for global styling
+        document.body.classList.remove('rtl', 'ltr');
+        document.body.classList.add(direction);
+        
+        // Add RTL/LTR classes to app container
+        const appElement = document.querySelector('.app');
+        if (appElement) {
+            appElement.classList.remove('rtl', 'ltr');
+            appElement.classList.add(direction);
+        }
     }, [i18n.language]);
+    
+    // Wait for translations to load
+    if (!ready) {
+        return (
+            <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                height: '100vh',
+                flexDirection: 'column',
+                gap: '20px'
+            }}>
+                <div className="loader"></div>
+                <span>Loading translations...</span>
+            </div>
+        );
+    }
 
     return (
         <Router>
             <GlobalStyles />
-            <div className="app" style={{ direction: i18n.dir() }}>
+            <div className={`app ${i18n.dir()}`} style={{ direction: i18n.dir() }}>
                 <Header />
                 <ToastContainer
                     position="top-center"

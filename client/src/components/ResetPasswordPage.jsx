@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import '../styles/AuthPage.css'; // Use the new unified styles
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const ResetPasswordPage = () => {
+    const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const token = searchParams.get('token');
@@ -18,15 +20,15 @@ const ResetPasswordPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) {
-            setMessage({ text: 'הסיסמאות אינן תואמות.', type: 'error' });
+            setMessage({ text: t('userProfile.messages.passwordMismatch'), type: 'error' });
             return;
         }
         if (password.length < 8) {
-            setMessage({ text: 'הסיסמה חייבת להכיל לפחות 8 תווים.', type: 'error' });
+            setMessage({ text: t('auth.resetPassword.errors.passwordTooShort'), type: 'error' });
             return;
         }
         if (!token) {
-            setMessage({ text: 'token איפוס הסיסמה חסר או לא תקין.', type: 'error' });
+            setMessage({ text: t('common.generalError'), type: 'error' });
             return;
         }
 
@@ -34,13 +36,13 @@ const ResetPasswordPage = () => {
         setMessage({ text: '', type: '' });
         try {
             await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/reset-password`, { token, newPassword: password });
-            setMessage({ text: 'סיסמה חדשה? יש ✔ עכשיו אפשר להיכנס', type: 'success' });
+            setMessage({ text: t('auth.resetPassword.success'), type: 'success' });
             setTimeout(() => navigate('/auth'), 3000);
         } catch (error) {
             if (error.response && error.response.status === 429) {
-                setMessage({ text: 'ניסית יותר מדי פעמים. אנא נסה שוב מאוחר יותר.', type: 'error' });
+                setMessage({ text: t('auth.resetPassword.errors.tooManyAttempts'), type: 'error' });
             } else {
-                setMessage({ text: error.response?.data?.message || 'נכשל באיפוס הסיסמה. ייתכן שהקישור פג תוקף.', type: 'error' });
+                setMessage({ text: error.response?.data?.message || t('common.generalError'), type: 'error' });
             }
         } finally {
             setIsLoading(false);
@@ -59,20 +61,20 @@ const ResetPasswordPage = () => {
 
                 {message.type === 'success' ? (
                     <div className="success-view">
-                        <h2>🔐 הסיסמה החדשה מוכנה! </h2>
+                        <h2>{t('auth.resetPassword.success')}</h2>
                         {/* <p>{message.text}</p> */}
-                        <p>מיד תועבר לדף ההתחברות...</p>
+                        <p>{t('auth.resetPassword.redirecting')}</p>
                     </div>
                 ) : (
                     <>
-                        <h2>איפוס סיסמה</h2>
-                        <p>הגדירו סיסמה חדשה לחשבונכם</p>
+                        <h2>{t('auth.resetPassword.title')}</h2>
+                        <p>{t('auth.resetPassword.description')}</p>
                         <form className="email-form" onSubmit={handleSubmit}>
                             <div className="password-input-wrapper">
                                 <input
                                     className="form-input"
                                     type={showPassword ? "text" : "password"}
-                                    placeholder="סיסמה חדשה"
+                                    placeholder={t('common.password')}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
@@ -85,7 +87,7 @@ const ResetPasswordPage = () => {
                                <input
                                     className="form-input"
                                     type={showPassword ? "text" : "password"}
-                                    placeholder="אימות סיסמה"
+                                    placeholder={t('userProfile.fields.confirmPassword')}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                     required
@@ -95,11 +97,11 @@ const ResetPasswordPage = () => {
                                 </span>
                             </div>
                             <button type="submit" className="confirm-button" disabled={isLoading}>
-                                אפס סיסמה
+                                {t('auth.resetPassword.submit')}
                             </button>
                         </form>
                         <button className="cancel-button" type="button" onClick={() => navigate('/auth')} style={{marginTop: '1rem'}}>
-                            ביטול
+                            {t('common.cancel')}
                         </button>
                         {message.type === 'error' && <p className="auth-message error-message">{message.text}</p>}
                     </>

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import '../styles/AuthPage.css'; // Use the new unified styles
 
 const ForgotPasswordPage = () => {
+    const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
@@ -15,14 +17,14 @@ const ForgotPasswordPage = () => {
         try {
             await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/request-password-reset`, { email });
             setMessage({
-                text: 'אם יש חשבון עם הכתובת שהוזנה – שלחנו אליו קישור לאיפוס. שווה לבדוק גם בספאם 😉',
+                text: t('auth.forgotPassword.messages.resetLinkSent'),
                 type: 'success'
             });
         } catch (error) {
             if (error.response && error.response.status === 429) {
-                setMessage({ text: 'ניסית יותר מדי פעמים. אנא נסה שוב מאוחר יותר.', type: 'error' });
+                setMessage({ text: t('common.tooManyAttempts'), type: 'error' });
             } else {
-                setMessage({ text: 'אירעה שגיאה. אנא נסה שוב.', type: 'error' });
+                setMessage({ text: t('common.generalError'), type: 'error' });
             }
         } finally {
             setIsLoading(false);
@@ -42,31 +44,31 @@ const ForgotPasswordPage = () => {
 
                 {message.type === 'success' ? (
                     <div className="success-view">
-                        <h2>בקשה נשלחה!</h2>
+                        <h2>{t('auth.forgotPassword.requestSent')}</h2>
                         <p>{message.text}</p>
-                        <Link to="/auth" className="confirm-button" style={{textDecoration: 'none', marginTop: '1rem'}}>חזרה להתחברות</Link>
+                        <Link to="/auth" className="confirm-button" style={{textDecoration: 'none', marginTop: '1rem'}}>{t('auth.forgotPassword.backToLogin')}</Link>
                     </div>
                 ) : (
                     <>
-                        <h2>איפוס סיסמה</h2>
-                        <p>הזינו את כתובת האימייל שלכם ונשלח קישור לאיפוס הסיסמה</p>
+                        <h2>{t('auth.forgotPassword.title')}</h2>
+                        <p>{t('auth.forgotPassword.subtitle')}</p>
                         <form className="email-form" onSubmit={handleSubmit}>
                             <div className="input-wrapper">
                                 <input
                                     className="form-input"
                                     type="email"
-                                    placeholder="אימייל"
+                                    placeholder={t('auth.forgotPassword.email')}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
                                 />
                             </div>
                             <button type="submit" className="confirm-button" disabled={isLoading}>
-                                שלח קישור איפוס
+                                {t('auth.forgotPassword.submit')}
                             </button>
                         </form>
                         <button className="cancel-button" type="button" onClick={() => window.location.href = '/auth'} style={{marginTop: '1rem'}}>
-                            ביטול
+                            {t('common.cancel')}
                         </button>
                         {message.type === 'error' && <p className="auth-message error-message">{message.text}</p>}
                     </>

@@ -35,6 +35,12 @@
     direction: ltr;
 }
 
+/* RTL support for progress bar */
+[dir="rtl"] .edit-business-progress-bar {
+    direction: rtl;
+    flex-direction: row-reverse;
+}
+
 .edit-business-progress-bar-line {
     position: absolute;
     top: 50%;
@@ -47,15 +53,32 @@
     overflow: hidden;
 }
 
+/* RTL support for progress bar line */
+[dir="rtl"] .edit-business-progress-bar-line {
+    transform: scaleX(-1);
+}
+
+/* RTL support for progress steps order */
+[dir="rtl"] .edit-business-progress-step {
+    order: var(--step-order, 0);
+}
+
 .edit-business-progress-bar-line::after {
     content: '';
     position: absolute;
     top: 0;
-    right: 0;
+    left: 0;
     height: 100%;
     width: calc((var(--current-step) - 1) / (var(--total-steps) - 1) * 100%);
     background: linear-gradient(90deg, #d32f2f, #ff4444);
     transition: width 0.4s ease-in-out;
+}
+
+/* RTL support for progress bar line fill */
+[dir="rtl"] .edit-business-progress-bar-line::after {
+    left: auto;
+    right: 0;
+    background: linear-gradient(-90deg, #d32f2f, #ff4444);
 }
 
 .edit-business-progress-step {
@@ -67,6 +90,11 @@
     flex: 1;
     position: relative;
     transition: all 0.3s ease;
+}
+
+/* RTL support for progress steps */
+[dir="rtl"] .edit-business-progress-step {
+    flex-direction: column;
 }
 
 .edit-business-progress-step:hover {
@@ -115,6 +143,11 @@
     gap: 40px;
     margin: 30px 0;
     padding: 0 20px;
+}
+
+/* RTL support for navigation buttons */
+[dir="rtl"] .edit-business-navigation-buttons {
+    flex-direction: row-reverse;
 }
 
 .edit-business-arrow-button {

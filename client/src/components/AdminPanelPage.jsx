@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaTags, FaCogs, FaUsers, FaBuilding, FaExpandArrowsAlt, FaCompressArrowsAlt } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import '../styles/AdminPanelPage.css';
 import { toast } from 'react-toastify';
@@ -7,6 +8,7 @@ import { getToken } from "../utils/auth";
 import { useNavigate } from 'react-router-dom';
 
 const AdminPanelPage = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('categories');
     const [editingItem, setEditingItem] = useState(null);
@@ -40,7 +42,7 @@ const AdminPanelPage = () => {
     useEffect(() => {
         const userStr = localStorage.getItem('user');
         if (!userStr) {
-            toast.error("אין לך הרשאת גישה לדף זה.");
+            toast.error(t('admin.accessDenied'));
             navigate('/');
             return;
         }
@@ -48,14 +50,14 @@ const AdminPanelPage = () => {
         try {
             const user = JSON.parse(userStr);
             if (!user || user.role !== 'admin') {
-                toast.error("אין לך הרשאת גישה לדף זה.");
+                toast.error(t('admin.accessDenied'));
                 navigate('/');
                 return;
             }
             fetchData();
         } catch (error) {
             console.error('Error parsing user data:', error);
-            toast.error("שגיאה בנתוני המשתמש.");
+            toast.error(t('admin.userDataError'));
             navigate('/');
         }
     }, [activeTab]);
@@ -112,7 +114,7 @@ const AdminPanelPage = () => {
             }
         } catch (error) {
             console.error('Error fetching data:', error);
-            toast.error('שגיאה בטעינת הנתונים');
+            toast.error(t('admin.loadingError'));
         } finally {
             setIsLoading(false);
         }
@@ -150,11 +152,11 @@ const AdminPanelPage = () => {
                             const config = { headers: { Authorization: `Bearer ${token}` } };
                             const endpoint = `${process.env.REACT_APP_API_DOMAIN}/api/v1/${activeTab}/${id}`;
                             await axios.delete(endpoint, config);
-                            toast.success(`${contextName} נמחק בהצלחה`);
+                            toast.success(t('admin.deleteSuccess', { item: contextName }));
                             fetchData();
                         } catch (error) {
                             console.error('Error deleting item:', error);
-                            toast.error(error.response?.data?.message || `שגיאה במחיקת ${contextName}`);
+                            toast.error(error.response?.data?.message || t('admin.deleteError', { item: contextName }));
                         }
                     }}>כן, מחק</button>
                     <button onClick={() => toast.dismiss(toastId)}>ביטול</button>
@@ -193,10 +195,10 @@ const AdminPanelPage = () => {
             const endpoint = `${process.env.REACT_APP_API_DOMAIN}/api/v1/${activeTab}`;
             if (editingItem._id) {
                 await axios.put(`${endpoint}/${editingItem._id}`, payload, config);
-                toast.success(`${contextName} עודכן בהצלחה`);
+                toast.success(t('admin.updateSuccess', { item: contextName }));
             } else {
                 await axios.post(endpoint, payload, config);
-                toast.success(`${contextName} נוסף בהצלחה`);
+                toast.success(t('admin.createSuccess', { item: contextName }));
             }
             setIsModalOpen(false);
             setEditingItem(null);
@@ -666,7 +668,7 @@ const AdminPanelPage = () => {
             </div>
 
             <div className="tab-content">
-                {isLoading ? <div className="loading-spinner">טוען...</div> : renderContent()}
+                {isLoading ? <div className="loading-spinner">{t('common.loading')}</div> : renderContent()}
             </div>
 
             {isModalOpen && (

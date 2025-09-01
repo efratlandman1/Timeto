@@ -46,6 +46,12 @@
   z-index: 2;
 }
 
+/* RTL support for close button */
+[dir="rtl"] .feedback-page-close-button {
+  right: auto;
+  left: 1rem;
+}
+
 .feedback-page-close-button:hover {
   color: #333;
   transform: scale(1.1);

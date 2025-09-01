@@ -26,7 +26,7 @@
 .close-button {
     position: absolute;
     top: 16px;
-    left: 16px;
+    right: 16px;
     background: #f0f0f0;
     border: none;
     border-radius: 50%;
@@ -38,6 +38,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* RTL support for close button */
+[dir="rtl"] .close-button {
+    right: auto;
+    left: 16px;
 }
 
 .auth-modal h2 {

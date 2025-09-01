@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FaSearch, FaFilter, FaFolder, FaMapMarkerAlt } from 'react-icons/fa';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import '../styles/SearchBar.css';
 import { getToken } from '../utils/auth';
 
@@ -9,6 +10,7 @@ const ITEMS_PER_PAGE = 10;
 const DEBOUNCE_DELAY = 300;
 
 const SearchBar = ({ onSearch, isMainPage = false }) => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -290,7 +292,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
         className="search-results-dropdown" 
         ref={listRef}
         role="listbox"
-        aria-label="תוצאות חיפוש"
+        aria-label={t('search.results')}
       >
         {isSearching && results.length === 0 ? (
           <li className="load-more-item">
@@ -303,8 +305,8 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
             <svg className="no-results-icon" viewBox="0 0 24 24">
               <path fill="currentColor" d="M9.5 3a6.5 6.5 0 0 1 5.2 10.4l5.15 5.15a1 1 0 0 1-1.42 1.42l-5.15-5.15A6.5 6.5 0 1 1 9.5 3Zm0 2a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Z"/>
             </svg>
-            <div className="no-results-message">לא נמצאו תוצאות</div>
-            <div className="no-results-suggestion">נסה לחפש במילים אחרות</div>
+                    <div className="no-results-message">{t('search.noResults')}</div>
+        <div className="no-results-suggestion">{t('search.noResultsSuggestion')}</div>
           </li>
         ) : (
           <>
@@ -378,7 +380,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
           ref={inputRef}
           type="text"
           className="search-input"
-          placeholder="חפש עסק או שירות..."
+          placeholder={t('search.placeholder')}
           value={searchQuery}
           onChange={handleInputChange}
           onFocus={() => {
@@ -395,7 +397,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
         <FaSearch 
           className="search-icon"
           onClick={handleSubmit}
-          aria-label="חפש"
+          aria-label={t('search.search')}
         />
       </form>
       {renderSearchResults()}

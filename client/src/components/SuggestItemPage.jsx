@@ -5,8 +5,10 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/SuggestItemPage.css';
+import { useTranslation } from 'react-i18next';
 
 const SuggestItemPage = () => {
+  const { t, ready } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     type: 'category',
@@ -17,20 +19,33 @@ const SuggestItemPage = () => {
   });
 
   const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
+  
+    useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
         setCategories(response.data.data.categories || []);
       } catch (error) {
         console.error('Error fetching categories:', error);
-        toast.error('שגיאה בטעינת הקטגוריות');
+        toast.error(t('businessForm.errors.categories'));
         setCategories([]);
       }
     };
     fetchCategories();
   }, []);
+  
+  // Wait for translations to load
+  if (!ready) {
+    return (
+      <div className="narrow-page-container">
+        <div className="narrow-page-content">
+          <div className="loading-container">
+            <span>Loading translations...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,7 +66,7 @@ const SuggestItemPage = () => {
         formData
       );
       
-      toast.success('ההצעה נשלחה בהצלחה!', {
+      toast.success(t('suggestItem.messages.success'), {
         onClose: () => {
           navigate('/');
         }
@@ -72,7 +87,7 @@ const SuggestItemPage = () => {
       
     } catch (error) {
       console.error('Error submitting suggestion:', error);
-      toast.error('שגיאה בשליחת ההצעה');
+      toast.error(t('suggestItem.messages.error'));
     }
   };
 
@@ -83,20 +98,20 @@ const SuggestItemPage = () => {
       <div className="narrow-page-content">
         <button className="nav-button above-header" onClick={() => navigate('/')}>
           <FaArrowRight className="icon" />
-          חזרה לדף הבית
+          {t('common.backToHome')}
         </button>
 
         <div className="page-header">
           <div className="page-header__content vertical">
-            <h1>הצעת עסק חדש</h1>
-            <p>מלא את הפרטים הבאים כדי להציע עסק חדש</p>
+            <h1>{t('suggestItem.title')}</h1>
+            <p>{t('suggestItem.description')}</p>
           </div>
         </div>
 
         <form className="suggest-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">
-              סוג הצעה<RequiredMark />
+              {t('suggestItem.form.type.label')}<RequiredMark />
             </label>
             <div className="radio-group">
               <label className="radio-label">
@@ -107,7 +122,7 @@ const SuggestItemPage = () => {
                   checked={formData.type === 'category'}
                   onChange={handleChange}
                 />
-                קטגוריה
+                {t('suggestItem.form.type.category')}
               </label>
               <label className="radio-label">
                 <input
@@ -117,14 +132,14 @@ const SuggestItemPage = () => {
                   checked={formData.type === 'service'}
                   onChange={handleChange}
                 />
-                שירות
+                {t('suggestItem.form.type.service')}
               </label>
             </div>
           </div>
 
           <div className="form-group">
             <label htmlFor="name_he" className="form-label">
-              שם בעברית<RequiredMark />
+              {t('suggestItem.form.name.he')}<RequiredMark />
             </label>
             <input
               type="text"
@@ -133,13 +148,13 @@ const SuggestItemPage = () => {
               value={formData.name_he}
               onChange={handleChange}
               required
-              placeholder="לדוגמה: אינסטלציה מתקדמת"
+              placeholder={t('suggestItem.form.name.he.placeholder')}
             />
           </div>
 
           <div className="form-group">
             <label htmlFor="name_en" className="form-label">
-              שם באנגלית<RequiredMark />
+              {t('suggestItem.form.name.en')}<RequiredMark />
             </label>
             <input
               type="text"
@@ -155,7 +170,7 @@ const SuggestItemPage = () => {
           {formData.type === 'service' && categories.length > 0 && (
             <div className="form-group">
               <label htmlFor="parent_category_id" className="form-label">
-                קטגוריית אב<RequiredMark />
+                {t('suggestItem.form.parentCategory')}<RequiredMark />
               </label>
               <select
                 id="parent_category_id"
@@ -164,7 +179,7 @@ const SuggestItemPage = () => {
                 onChange={handleChange}
                 required
               >
-                <option value="">בחר קטגוריה</option>
+                <option value="">{t('businessForm.fields.selectCategory')}</option>
                 {categories.map(category => (
                   <option key={category._id} value={category._id}>
                     {category.name}
@@ -176,21 +191,21 @@ const SuggestItemPage = () => {
 
           <div className="form-group">
             <label htmlFor="reason" className="form-label">
-              סיבה או תיאור קצר
+              {t('suggestItem.form.reason')}
             </label>
             <textarea
               id="reason"
               name="reason"
               value={formData.reason}
               onChange={handleChange}
-              placeholder="מדוע אתה חושב שפריט זה נחוץ?"
+              placeholder={t('suggestItem.form.reason.placeholder')}
               rows={3}
             />
           </div>
 
           <button type="submit" className="submit-button">
             <FaPaperPlane />
-            שלח הצעה
+            {t('suggestItem.form.submit')}
           </button>
         </form>
       </div>

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import BusinessCard from './BusinessCard';
 import '../styles/userBusinesses.css';
 import { FaArrowRight } from "react-icons/fa";
 import { getToken } from "../utils/auth";
 
 const MyFavoritesPage = () => {
+    const { t } = useTranslation();
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -44,7 +46,7 @@ const MyFavoritesPage = () => {
     const businesses = favorites.map(fav => fav.business_id).filter(biz => biz && biz._id);
 
     if (loading) {
-        return <div className="loading">טוען מועדפים...</div>;
+        return <div className="loading">{t('favorites.loading')}</div>;
     }
 
     return (

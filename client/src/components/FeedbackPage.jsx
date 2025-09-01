@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaRegStar, FaStar } from 'react-icons/fa';
 import ReactDOM from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import '../styles/FeedbackPage.css';
 import {getToken} from "../utils/auth";
 
@@ -33,6 +34,7 @@ const Toast = ({ message, isError, onClose }) => {
 
 
 const FeedbackPage = ({ businessId, onClose }) => {
+  const { t } = useTranslation();
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState('');
@@ -71,7 +73,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
         const token = getToken();
 
         if (!token) {
-        showToast('לא נמצאה הרשאת התחברות. התחברי מחדש.', true);
+                        showToast(t('common.loginPermission'), true);
         setTimeout(() => window.location.href = '/auth', 3000);
         return;
         }
@@ -106,7 +108,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
   return ReactDOM.createPortal(
     <>
     {isLoading ? (
-        <div className="feedback-page-loader">טוען חוות דעת...</div>
+        <div className="feedback-page-loader">{t('feedback.loading')}</div>
         ) : (
         <>
             <div className="feedback-page-modal-overlay" onClick={onClose}>

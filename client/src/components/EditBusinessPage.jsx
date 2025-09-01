@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { FaSave, FaPlus, FaEdit, FaArrowRight } from 'react-icons/fa';
 import { LoadScript } from '@react-google-maps/api';
@@ -74,19 +75,29 @@ const ProgressBar = ({ businessData }) => {
     '--total-steps': total,
   };
 
-  const steps = ['פרטי עסק', 'שירותי העסק', 'שעות פעילות'].reverse();
+  const { t, i18n } = useTranslation();
+  const isLTR = i18n.language === 'en';
+  
+  // Default order is RTL (right to left): 3, 2, 1
+  const stepsData = [
+    { label: t('businessSteps.hours.title'), number: 3 },
+    { label: t('businessSteps.services.title'), number: 2 },
+    { label: t('businessSteps.details.title'), number: 1 }
+  ];
+  
+  // Only reverse for LTR (English)
+  const steps = isLTR ? [...stepsData].reverse() : stepsData;
 
   return (
     <div className="edit-business-progress-bar" style={progressBarStyle}>
       <div className="edit-business-progress-bar-line" />
-      {steps.map((label, index) => {
-        const actualIndex = steps.length - 1 - index;
-        const stepNumber = actualIndex + 1;
+      {steps.map((step, index) => {
+        const stepNumber = step.number;
         const isActive = stepNumber === current;
         const isCompleted = stepNumber < current;
         return (
           <div
-            key={index}
+            key={stepNumber}
             onClick={() => handleJump(stepNumber)}
             className={`edit-business-progress-step ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
           >
@@ -96,7 +107,7 @@ const ProgressBar = ({ businessData }) => {
             >
               {stepNumber}
             </div>
-            <span className="edit-business-step-label">{label}</span>
+            <span className="edit-business-step-label">{step.label}</span>
           </div>
         );
       })}
@@ -107,6 +118,8 @@ const ProgressBar = ({ businessData }) => {
 // NavigationButtons
 const NavigationButtons = ({ businessData }) => {
   const { next, prev, current, total } = useSteps();
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'he';
 
   const canGoNext = requiredFields.every(
     (field) => businessData[field] && String(businessData[field]).trim() !== ''
@@ -130,14 +143,14 @@ const NavigationButtons = ({ businessData }) => {
     <div className="edit-business-navigation-buttons">
       {current > 1 ? (
         <button onClick={prev} className="edit-business-arrow-button" aria-label="Previous step">
-          →
+          {isRTL ? '→' : '←'}
         </button>
       ) : (
         <div className="edit-business-arrow-spacer" />
       )}
       {current < total ? (
         <button onClick={handleNext} className="edit-business-arrow-button" aria-label="Next step">
-          ←
+          {isRTL ? '←' : '→'}
         </button>
       ) : (
         <div className="edit-business-arrow-spacer" />
@@ -153,6 +166,7 @@ const MySteps = ({
   handleSubmit,
   selectedBusiness,
 }) => {
+  const { t } = useTranslation();
   const { current } = useSteps();
 
   return (
@@ -168,7 +182,7 @@ const MySteps = ({
       {current === 3  &&  (
         <button onClick={handleSubmit} className="save-button">
           {selectedBusiness ? <FaEdit /> : <FaPlus />}
-          {selectedBusiness ? 'עדכן פרטי עסק' : 'צור עסק חדש'}
+                          {selectedBusiness ? t('editBusiness.buttons.update') : t('editBusiness.buttons.create')}
         </button>
       )}
     </>
@@ -176,6 +190,7 @@ const MySteps = ({
 };
 
 const EditBusinessPage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -361,13 +376,13 @@ const EditBusinessPage = () => {
       <div className="narrow-page-content">
         <button className="nav-button above-header" onClick={() => navigate('/user-businesses')}>
           <FaArrowRight className="icon" />
-          חזרה לעסקים שלי
+          {t('common.backToMyBusinesses')}
         </button>
         
         <div className="page-header">
           <div className="page-header__content vertical">
-            <h1>{selectedBusiness ? 'עריכת עסק' : 'הוספת עסק חדש'}</h1>
-            <p>מלא את הפרטים הבאים כדי {selectedBusiness ? 'לערוך' : 'להוסיף'} את העסק שלך</p>
+            <h1>{selectedBusiness ? t('businessForm.title.edit') : t('businessForm.title.new')}</h1>
+            <p>{t('businessForm.subtitle')}</p>
           </div>
         </div>
 

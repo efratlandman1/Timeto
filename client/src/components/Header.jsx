@@ -19,16 +19,19 @@ import {
     FaTimes
 } from "react-icons/fa";
 import "../styles/Header.css";
-import { useSelector,useDispatch  } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { getToken } from "../utils/auth";
 import { useTranslation } from 'react-i18next';
 import { logout } from '../redux/userSlice';
 import { fetchUserLocation } from '../redux/locationSlice';
+import { setLanguage, setDirection } from '../redux/uiSlice';
+import { changeLanguage, getCurrentDirection } from '../i18n';
 
 const Header = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [showUserMenu, setShowUserMenu] = useState(false);
+    const [showLangMenu, setShowLangMenu] = useState(false);
     const [username, setUsername] = useState(null);
     const [greeting, setGreeting] = useState("");
     const [isAuthLoading, setIsAuthLoading] = useState(true);
@@ -36,7 +39,7 @@ const Header = () => {
     const userButtonRef = useRef(null);
     const loginUser = useSelector(state => state.user.user);
     const isAdmin = loginUser && loginUser.role === 'admin';
-    const { t, i18n } = useTranslation();
+    const { t, i18n, ready } = useTranslation();
     const dispatch = useDispatch();
     const { coords, loading, error } = useSelector(state => state.location);
     const [showPopover, setShowPopover] = useState(false);
@@ -44,6 +47,20 @@ const Header = () => {
     const [addressLoading, setAddressLoading] = useState(false);
     const [addressError, setAddressError] = useState('');
     const popoverRef = useRef(null);
+    
+    // Get language and direction from Redux with fallback values
+    const uiState = useSelector(state => state.ui);
+    const language = uiState?.language || i18n.language || 'he';
+    const direction = uiState?.direction || getCurrentDirection() || 'rtl';
+    
+    // Check if Redux is ready
+    const isReduxReady = !!uiState;
+    
+    // Check if i18n is ready
+    const isI18nReady = ready;
+    
+    // Debug logging
+    console.log('Header State:', { uiState, language, direction, isReduxReady, isI18nReady });
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -52,6 +69,35 @@ const Header = () => {
         if (hour >= 17 && hour < 20) return t('greetings.evening');
         return t('greetings.night');
     };
+
+    // Initialize language and direction on component mount
+    useEffect(() => {
+        const currentLang = i18n.language;
+        const currentDir = getCurrentDirection();
+        
+        // Update Redux state if it differs from current state
+        if (currentLang !== language) {
+            dispatch(setLanguage(currentLang));
+        }
+        if (currentDir !== direction) {
+            dispatch(setDirection(currentDir));
+        }
+    }, [language, direction, dispatch]);
+
+    // Listen for language change events from i18n
+    useEffect(() => {
+        const handleLanguageChange = (event) => {
+            const { language: newLang, direction: newDir } = event.detail;
+            dispatch(setLanguage(newLang));
+            dispatch(setDirection(newDir));
+        };
+
+        window.addEventListener('languageChanged', handleLanguageChange);
+        
+        return () => {
+            window.removeEventListener('languageChanged', handleLanguageChange);
+        };
+    }, [dispatch]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -64,11 +110,18 @@ const Header = () => {
             ) {
                 setShowUserMenu(false);
             }
+            
+            // Check if click is outside language menu
+            const langDropdown = event.target.closest('.lang-dropdown');
+            if (!langDropdown) {
+                setShowLangMenu(false);
+            }
         };
 
         const handleEscape = (event) => {
             if (event.key === 'Escape') {
                 setShowUserMenu(false);
+                setShowLangMenu(false);
             }
         };
 
@@ -141,9 +194,28 @@ const Header = () => {
         navigate("/");
     };
 
-    const handleLanguageToggle = () => {
-        const newLang = i18n.language === 'he' ? 'en' : 'he';
-        i18n.changeLanguage(newLang);
+    const handleLanguageToggle = async () => {
+        const newLang = language === 'he' ? 'en' : 'he';
+        const newDir = newLang === 'he' ? 'rtl' : 'ltr';
+        
+        // Change language using i18n helper
+        const success = await changeLanguage(newLang);
+        
+        if (success) {
+            // Update Redux state
+            dispatch(setLanguage(newLang));
+            dispatch(setDirection(newDir));
+        }
+    };
+
+    const handleLanguageChange = async (newLang) => {
+        const newDir = newLang === 'he' ? 'rtl' : 'ltr';
+        const success = await changeLanguage(newLang);
+        if (success) {
+            dispatch(setLanguage(newLang));
+            dispatch(setDirection(newDir));
+            setShowLangMenu(false);
+        }
     };
 
     const handleMenuItemClick = (path) => {
@@ -182,17 +254,15 @@ const Header = () => {
     
                 setAddress(formatted);
             } else {
-                setAddressError('לא נמצאה כתובת');
+                setAddressError(t('header.addressNotFound'));
             }
         } catch (e) {
-            setAddressError('שגיאה בשליפת כתובת');
+            setAddressError(t('header.addressError'));
         } finally {
             setAddressLoading(false);
         }
     };
     
-    
-
     // When popover opens or coords change, fetch address
     useEffect(() => {
         if (showPopover && coords) {
@@ -217,13 +287,50 @@ const Header = () => {
 
     const formatAddress = (address) => address || '';
 
+    // Safety check: don't render until Redux and i18n are ready
+    if (!isReduxReady || !isI18nReady) {
+        return (
+            <div className="header-container">
+                <nav className="navbar">
+                    <div className="nav-right">
+                        <div className="logo">
+                            <FaMapMarkerAlt className="logo-icon" />
+                            <div className="logo-text">
+                                <span className="logo-text-main">{t('common.loading')}</span>
+                                <span className="logo-text-sub">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        );
+    }
+
+    // Direction-aware CSS classes with safety checks
+    const isRTL = direction === 'rtl';
+    const headerClass = `header-container ${isRTL ? 'rtl' : 'ltr'}`;
+    const navClass = `navbar ${isRTL ? 'rtl' : 'ltr'}`;
+    const navRightClass = `nav-right ${isRTL ? 'rtl' : 'ltr'}`;
+    const navCenterClass = `nav-center ${isRTL ? 'rtl' : 'ltr'}`;
+    const navLeftClass = `nav-left ${isRTL ? 'rtl' : 'ltr'}`;
+    const logoTextClass = "logo-text";
+    const navLinksClass = "nav-links";
+    const langSwitchClass = "lang-switch";
+    const userMenuClass = "user-menu";
+    const authButtonsClass = "auth-buttons";
+    const dropdownMenuClass = "dropdown-menu";
+    const dropdownItemClass = "dropdown-item";
+    const locationPopoverClass = `location-popover ${isRTL ? 'rtl' : 'ltr'}`;
+    const popoverHeaderClass = `popover-header ${isRTL ? 'rtl' : 'ltr'}`;
+    const popoverActionsClass = `popover-actions ${isRTL ? 'rtl' : 'ltr'}`;
+
     return (
-        <div className="header-container">
-            <nav className="navbar">
-                <div className="nav-right">
+        <div className={headerClass}>
+            <nav className={navClass}>
+                <div className={navRightClass}>
                     <div className="logo" onClick={() => navigate("/")}>
                         <FaMapMarkerAlt className="logo-icon" />
-                        <div className="logo-text">
+                        <div className={logoTextClass}>
                             <span className="logo-text-main">{t('header.logo.main')}</span>
                             <span className="logo-text-sub">{t('header.logo.sub')}</span>
                         </div>
@@ -232,33 +339,33 @@ const Header = () => {
                         <button
                             onClick={() => setShowPopover(!showPopover)}
                             className="refresh-location-btn styled-location-btn"
-                            title="המיקום שלי"
+                            title={t('header.myLocation')}
                             type="button"
                         >
                             <FaMapMarkerAlt style={{ marginLeft: 6, fontSize: 18 }} />
-                            המיקום שלי
+                            {t('header.myLocation')}
                         </button>
                         {showPopover && (
-                            <div ref={popoverRef} className="location-popover">
-                                <div className="popover-header">
-                                    <span>המיקום הנוכחי שלך</span>
+                            <div ref={popoverRef} className={locationPopoverClass}>
+                                <div className={popoverHeaderClass}>
+                                    <span>{t('header.currentLocation')}</span>
                                     <button className="close-popover-btn" onClick={() => setShowPopover(false)}><FaTimes /></button>
                                 </div>
                                 <div className="popover-content">
                                     {addressLoading || loading ? (
-                                        <span className="address-loading">טוען כתובת...</span>
+                                        <span className="address-loading">{t('header.loadingAddress')}</span>
                                     ) : addressError ? (
-                                        <span className="address-error">{addressError}</span>
+                                        <span className="address-error">{t('header.addressError')}</span>
                                     ) : address ? (
                                         <span className="address-text">{formatAddress(address)}</span>
                                     ) : (
-                                        <span className="address-error">לא נמצא מיקום</span>
+                                        <span className="address-error">{t('header.noLocation')}</span>
                                     )}
                                 </div>
-                                <div className="popover-actions">
-                                    <button className="refresh-popover-btn" onClick={handleRefreshLocation} disabled={loading || addressLoading} title="רענן מיקום">
+                                <div className={popoverActionsClass}>
+                                    <button className="refresh-popover-btn" onClick={handleRefreshLocation} disabled={loading || addressLoading} title={t('header.refreshLocation')}>
                                         <FaSyncAlt className={loading ? 'spin' : ''} />
-                                        רענן מיקום
+                                        {t('header.refreshLocation')}
                                     </button>
                                 </div>
                             </div>
@@ -266,8 +373,8 @@ const Header = () => {
                     </div>
                 </div>
 
-                <div className="nav-center">
-                    <div className="nav-links">
+                <div className={navCenterClass}>
+                    <div className={navLinksClass}>
                         <button 
                             className={`nav-button ${isActive("/") ? "active" : ""}`} 
                             onClick={() => navigate("/")}
@@ -299,19 +406,45 @@ const Header = () => {
                     </div>
                 </div>
 
-                <div className="nav-left">
-                    <div className="lang-switch">
-                        <label className="switch">
-                            <input
-                                type="checkbox"
-                                checked={i18n.language === 'en'}
-                                onChange={handleLanguageToggle}
-                            />
-                            <span className="slider">
-                                <span className="lang-label he">עב</span>
-                                <span className="lang-label en">EN</span>
-                            </span>
-                        </label>
+                <div className={navLeftClass}>
+                    <div className={langSwitchClass}>
+                        <div className={`lang-dropdown ${showLangMenu ? 'open' : ''}`}>
+                            <button
+                                onClick={() => setShowLangMenu(!showLangMenu)}
+                                className="lang-toggle-btn"
+                                title={t('header.selectLanguage')}
+                                type="button"
+                                aria-label={t('header.selectLanguage')}
+                                aria-expanded={showLangMenu}
+                                aria-haspopup="true"
+                            >
+                                <div className="lang-toggle-content">
+                                    <span className="lang-text">
+                                        {language === 'he' ? t('header.languages.he') : t('header.languages.en')}
+                                    </span>
+                                    <span className="lang-arrow">▼</span>
+                                </div>
+                            </button>
+                            
+                            {showLangMenu && (
+                                <div className={`lang-menu ${direction}`} role="menu">
+                                    <button
+                                        className={`lang-menu-item ${language === 'he' ? 'active' : ''}`}
+                                        onClick={() => handleLanguageChange('he')}
+                                        role="menuitem"
+                                    >
+                                        <span className="lang-text">{t('header.languages.he')}</span>
+                                    </button>
+                                    <button
+                                        className={`lang-menu-item ${language === 'en' ? 'active' : ''}`}
+                                        onClick={() => handleLanguageChange('en')}
+                                        role="menuitem"
+                                    >
+                                        <span className="lang-text">{t('header.languages.en')}</span>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {isAuthLoading ? (
@@ -320,7 +453,7 @@ const Header = () => {
                         </div>
                     ) : (
                         username ? (
-                            <div className="user-menu" ref={userMenuRef}>
+                            <div className={userMenuClass} ref={userMenuRef}>
                                 <button 
                                     className="nav-button with-hover" 
                                     onClick={() => setShowUserMenu(!showUserMenu)}
@@ -333,20 +466,20 @@ const Header = () => {
                                 </button>
                                 {showUserMenu && (
                                     <div 
-                                        className="dropdown-menu"
+                                        className={dropdownMenuClass}
                                         role="menu"
                                         aria-labelledby="user-menu-button"
                                     >
                                         <button 
-                                            className="dropdown-item" 
+                                            className={dropdownItemClass} 
                                             onClick={() => handleMenuItemClick("/user-profile")}
                                             role="menuitem"
                                         >
                                             <FaIdCard />
-                                            {"פרופיל אישי"}  
+                                            {t('profile')}
                                         </button>
                                         <button 
-                                            className="dropdown-item" 
+                                            className={dropdownItemClass} 
                                             onClick={() => handleMenuItemClick("/user-businesses")}
                                             role="menuitem"
                                         >
@@ -354,7 +487,7 @@ const Header = () => {
                                             {t('header.myBusinesses')}
                                         </button>
                                         <button 
-                                            className="dropdown-item" 
+                                            className={dropdownItemClass} 
                                             onClick={() => handleMenuItemClick("/user-favorites")}
                                             role="menuitem"
                                         >
@@ -363,7 +496,7 @@ const Header = () => {
                                         </button>
                                         {isAdmin && (
                                             <button 
-                                                className="dropdown-item" 
+                                                className={dropdownItemClass} 
                                                 onClick={() => handleMenuItemClick("/admin")}
                                                 role="menuitem"
                                             >
@@ -372,7 +505,7 @@ const Header = () => {
                                             </button>
                                         )}
                                         <button 
-                                            className="dropdown-item" 
+                                            className={dropdownItemClass} 
                                             onClick={handleLogout}
                                             role="menuitem"
                                         >
@@ -383,10 +516,10 @@ const Header = () => {
                                 )}
                             </div>
                         ) : (
-                            <div className="auth-buttons">
+                            <div className={authButtonsClass}>
                                 <button className="auth-button" onClick={() => navigate("/auth")}>
                                     <FaSignInAlt />
-                                    הרשמה / כניסה
+                                    {t('header.register')} / {t('header.login')}
                                 </button>
                             </div>
                         )
