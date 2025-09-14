@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaStar, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import '../styles/AdvancedSearchPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const MAX_DISTANCE_KM = 100;
 
 const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedServices, setSelectedServices] = useState([]);
@@ -160,16 +162,16 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <button className="close-button" onClick={onClose}>×</button>
-        <h2>חיפוש מורחב</h2>
+        <h2>{t('advancedSearch.title')}</h2>
         
         <div className="modal-scroll-content">
           <div className="form-group">
-            <label>קטגוריה</label>
+            <label>{t('advancedSearch.category.title')}</label>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
             >
-              <option value="">בחר קטגוריה</option>
+              <option value="">{t('advancedSearch.category.select')}</option>
               {categories.map((cat) => (
                 <option key={cat._id} value={cat.name}>{cat.name}</option>
               ))}
@@ -178,7 +180,7 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
 
           {services.length > 0 && (
             <div className="form-group tags-section">
-              <label>שירותים</label>
+              <label>{t('advancedSearch.services.title')}</label>
               <div className="tags-container">
                 {services.map((service) => (
                   <div
@@ -194,12 +196,12 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
           )}
 
           <div className="form-group">
-            <label>דירוג מינימלי</label>
+            <label>{t('advancedSearch.rating.title')}</label>
             {renderStarRating()}
           </div>
 
           <div className="form-group">
-            <label htmlFor="distance-slider">מרחק מקסימלי (ק"מ)</label>
+            <label htmlFor="distance-slider">{t('advancedSearch.distance.title')}</label>
             <div className="distance-slider-row">
               <input
                 id="distance-slider"
@@ -210,18 +212,18 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
                 onChange={e => setDistance(Number(e.target.value))}
                 step={1}
               />
-              <span className="distance-value">{distance} ק"מ</span>
+              <span className="distance-value">{distance} {t('advancedSearch.distance.km')}</span>
             </div>
           </div>
         </div>
 
         <div className="modal-actions">
-          <button className="clear-button" onClick={handleClearAll}>נקה הכל</button>
-          <button className="submit-button" onClick={handleSubmit}>הצג תוצאות</button>
+          <button className="clear-button" onClick={handleClearAll}>{t('advancedSearch.buttons.clear')}</button>
+          <button className="submit-button" onClick={handleSubmit}>{t('advancedSearch.buttons.apply')}</button>
         </div>
         <div style={{display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem'}}>
           <button className="cancel-button" type="button" onClick={onClose}>
-            ביטול
+            {t('advancedSearch.buttons.cancel')}
           </button>
         </div>
       </div>

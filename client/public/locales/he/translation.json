@@ -587,7 +587,7 @@
     }
   },
   "advancedSearch": {
-    "title": "סינון ומיון",
+    "title": "חיפוש מורחב",
     "sort": {
       "title": "מיון תוצאות",
       "rating": "דירוג גבוה",
@@ -597,12 +597,19 @@
       "popularNearby": "פופולרי באזורך"
     },
     "rating": {
-      "title": "דירוג",
+      "title": "דירוג מינימלי",
       "andAbove": "ומעלה"
     },
     "category": {
       "title": "קטגוריה",
       "select": "בחר קטגוריה"
+    },
+    "services": {
+      "title": "שירותים"
+    },
+    "distance": {
+      "title": "מרחק מקסימלי (ק\"מ)",
+      "km": "ק\"מ"
     },
     "filters": {
       "category": "קטגוריה",
@@ -617,9 +624,10 @@
       }
     },
     "buttons": {
-      "apply": "החל סינון",
-      "clear": "נקה",
-      "close": "סגור"
+      "apply": "הצג תוצאות",
+      "clear": "נקה הכל",
+      "close": "סגור",
+      "cancel": "ביטול"
     },
     "noResults": "לא נמצאו תוצאות",
     "selected": "נבחרו {{count}} פריטים"

@@ -578,7 +578,7 @@
     "noResultsSuggestion": "Try searching with different words"
   },
   "advancedSearch": {
-    "title": "Filtering and Sorting",
+    "title": "Advanced Search",
     "sort": {
       "title": "Sort Results",
       "rating": "High Rating",
@@ -588,12 +588,19 @@
       "popularNearby": "Popular in Your Area"
     },
     "rating": {
-      "title": "Rating",
+      "title": "Minimum Rating",
       "andAbove": "and above"
     },
     "category": {
       "title": "Category",
       "select": "Select Category"
+    },
+    "services": {
+      "title": "Services"
+    },
+    "distance": {
+      "title": "Maximum Distance (km)",
+      "km": "km"
     },
     "filters": {
       "category": "Category",
@@ -608,9 +615,10 @@
       }
     },
     "buttons": {
-      "apply": "Apply Filters",
-      "clear": "Clear",
-      "close": "Close"
+      "apply": "Show Results",
+      "clear": "Clear All",
+      "close": "Close",
+      "cancel": "Cancel"
     },
     "noResults": "No results found",
     "selected": "{{count}} items selected"
