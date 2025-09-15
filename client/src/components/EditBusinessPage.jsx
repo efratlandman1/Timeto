@@ -213,6 +213,7 @@ const EditBusinessPage = () => {
     logo: null,
     services: [],
     openingHours: [],
+    hasWhatsapp: true,
   });
 
   const [categories, setCategories] = useState([]);
@@ -254,6 +255,7 @@ const EditBusinessPage = () => {
         logo: biz.logo || null,
         services: biz.services || [],
         openingHours: deepCopiedHours,
+        hasWhatsapp: typeof biz.hasWhatsapp === 'boolean' ? biz.hasWhatsapp : true,
       });
     };
 
@@ -332,6 +334,7 @@ const EditBusinessPage = () => {
     formData.append('prefix', businessData.prefix);
     formData.append('phone', businessData.phone);
     formData.append('email', businessData.email);
+    formData.append('hasWhatsapp', String(!!businessData.hasWhatsapp));
     if (businessData.services && businessData.services.length > 0) {
       formData.append('services', JSON.stringify(businessData.services));
     }

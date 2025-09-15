@@ -119,6 +119,7 @@
       "address": "כתובת",
       "phone": "טלפון",
       "email": "כתובת דואר אלקטרונית",
+      "hasWhatsapp": "ללקוח יש ווטסאפ",
       "website": "אתר אינטרנט",
       "category": "תחום שירות",
       "selectCategory": "בחר תחום"

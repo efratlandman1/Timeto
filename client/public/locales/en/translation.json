@@ -118,6 +118,7 @@
       "address": "Address",
       "phone": "Phone",
       "email": "Email Address",
+      "hasWhatsapp": "Business has WhatsApp",
       "website": "Website",
       "category": "Service Category",
       "selectCategory": "Select Category"

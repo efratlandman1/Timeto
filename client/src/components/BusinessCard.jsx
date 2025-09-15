@@ -418,13 +418,15 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
                 >
                   <FaEnvelope />
                 </button>
-                <button 
-                  className="action-button whatsapp"
-                  onClick={(e) => handleActionClick(e, () => window.location.href = `https://wa.me/${business.phone}`)}
-                  title="וואטסאפ"
-                >
-                  <FaWhatsapp />
-                </button>
+                {business.hasWhatsapp !== false && (
+                  <button 
+                    className="action-button whatsapp"
+                    onClick={(e) => handleActionClick(e, () => window.location.href = `https://wa.me/${business.phone}`)}
+                    title="וואטסאפ"
+                  >
+                    <FaWhatsapp />
+                  </button>
+                )}
                 <button 
                   className="action-button phone"
                   onClick={(e) => handleActionClick(e, () => window.location.href = `tel:${business.phone}`)}

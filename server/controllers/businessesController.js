@@ -297,6 +297,7 @@ const createBusiness = async (req, res, userId) => {
         const newBusiness = new Business({
             name: req.body.name,
             email: req.body.email,
+            hasWhatsapp: typeof req.body.hasWhatsapp === 'string' ? req.body.hasWhatsapp === 'true' : (req.body.hasWhatsapp ?? true),
             prefix: req.body.prefix,
             phone: req.body.phone,
             categoryId: req.body.categoryId,
@@ -391,6 +392,11 @@ const updateBusiness = async (req, res, userId) => {
         // עדכון שדות אחרים
         existingBusiness.name = req.body.name || existingBusiness.name;
         existingBusiness.email = req.body.email || existingBusiness.email;
+        if (req.body.hasWhatsapp !== undefined) {
+            existingBusiness.hasWhatsapp = typeof req.body.hasWhatsapp === 'string' 
+                ? req.body.hasWhatsapp === 'true' 
+                : !!req.body.hasWhatsapp;
+        }
         existingBusiness.prefix = req.body.prefix || existingBusiness.prefix;
         existingBusiness.phone = req.body.phone || existingBusiness.phone;
         existingBusiness.categoryId = req.body.categoryId || existingBusiness.categoryId;

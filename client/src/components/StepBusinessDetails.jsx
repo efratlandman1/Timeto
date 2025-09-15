@@ -21,7 +21,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
   }
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value, files, type, checked } = e.target;
 
     if (name === 'logo') {
       setBusinessData(prev => ({
@@ -33,7 +33,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
 
     setBusinessData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -85,6 +85,8 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
         />
       </div>
 
+      
+
       <div className="form-group">
         <label htmlFor="address" className="form-label">
           {t('businessForm.fields.address')}<RequiredMark />
@@ -110,7 +112,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
           {t('businessForm.fields.phone')}<RequiredMark />
         </label>
 
-        <div style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: "ltr" }}>
+        <div style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: "ltr", alignItems: 'center' }}>
           <select
             id="phonePrefix"
             name="prefix"
@@ -136,6 +138,19 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
             inputMode="numeric"
             maxLength={PHONE_NUMBER_MAX_LENGTH}
           />
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0, direction: 'rtl' }}>
+            <input
+              type="checkbox"
+              id="hasWhatsapp"
+              name="hasWhatsapp"
+              checked={!!businessData.hasWhatsapp}
+              onChange={handleChange}
+            />
+            <label htmlFor="hasWhatsapp" className="form-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>
+              {t('businessForm.fields.hasWhatsapp')}
+            </label>
+          </div>
         </div>
       </div>
 

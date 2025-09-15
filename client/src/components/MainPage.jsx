@@ -148,6 +148,30 @@ const MainPage = () => {
         }
     };
 
+    const formatStat = (value) => {
+        if (value == null) {
+            return { value: '', plus: false };
+        }
+        if (value < 10) {
+            return { value, plus: false };
+        }
+        let step = 10;
+        if (value >= 100000) {
+            step = 10000;
+        } else if (value >= 10000) {
+            step = 1000;
+        } else if (value >= 1000) {
+            step = 100;
+        } else if (value >= 100) {
+            step = 10;
+        }
+        let floored = Math.floor(value / step) * step;
+        if (floored >= value) {
+            floored = Math.max(0, value - step);
+        }
+        return { value: floored, plus: floored < value };
+    };
+
     const handleFilterChange = (categoryName) => {
         navigate(`/search-results?categoryName=${categoryName}`);
     };
@@ -240,9 +264,10 @@ const MainPage = () => {
                                     </div>
                                     <div className="stat-content">
                                         <div className="stat-number">
-                                            {!isStatsLoading && stats.users !== null && (
-                                                <>{stats.users > 0 && '+ '}{stats.users}</>
-                                            )}
+                                            {!isStatsLoading && stats.users !== null && (() => {
+                                                const f = formatStat(stats.users);
+                                                return <>{f.plus && '+ '}{f.value}</>;
+                                            })()}
                                         </div>
                                         <div className="stat-label">{t('mainPage.stats.newUsers')}</div>
                                     </div>
@@ -253,9 +278,10 @@ const MainPage = () => {
                                     </div>
                                     <div className="stat-content">
                                         <div className="stat-number">
-                                            {!isStatsLoading && stats.reviews !== null && (
-                                                <>{stats.reviews > 0 && '+ '}{stats.reviews}</>
-                                            )}
+                                            {!isStatsLoading && stats.reviews !== null && (() => {
+                                                const f = formatStat(stats.reviews);
+                                                return <>{f.plus && '+ '}{f.value}</>;
+                                            })()}
                                         </div>
                                         <div className="stat-label">{t('mainPage.stats.verifiedReviews')}</div>
                                     </div>
@@ -266,9 +292,10 @@ const MainPage = () => {
                                     </div>
                                     <div className="stat-content">
                                         <div className="stat-number">
-                                            {!isStatsLoading && stats.businesses !== null && (
-                                                <>{stats.businesses > 0 && '+ '}{stats.businesses}</>
-                                            )}
+                                            {!isStatsLoading && stats.businesses !== null && (() => {
+                                                const f = formatStat(stats.businesses);
+                                                return <>{f.plus && '+ '}{f.value}</>;
+                                            })()}
                                         </div>
                                         <div className="stat-label">{t('mainPage.stats.registeredBusinesses')}</div>
                                     </div>

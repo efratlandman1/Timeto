@@ -17,6 +17,7 @@ const businessSchema = new mongoose.Schema({
     prefix: { type: String, required: true },
     phone: { type: String, required: true },
     email: { type: String, required: true },
+    hasWhatsapp: { type: Boolean, default: true },
     logo: { type: String },
     rating: { type: Number },
     // heroImage: { type: String, required: true },
