@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import FeedbackPage from './FeedbackPage';
@@ -13,12 +14,14 @@ import { getToken } from "../utils/auth";
 import { roundRating, renderStars } from '../utils/ratingUtils';
 
 const BusinessCard = ({ business, fromUserBusinesses }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [localActive, setLocalActive] = useState(business.active);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(business.isFavorite || false);
+  const [now, setNow] = useState(new Date());
 
   // הסרת useEffect לבדיקת סטטוס מועדפים - עכשיו זה מגיע מהשרת
 
@@ -141,10 +144,136 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     );
   };
 
-  const isBusinessOpen = () => {
-    // Add your business hours logic here
-    return true; // Placeholder
+  // Update current time every minute to refresh open/closed status
+  useEffect(() => {
+    const intervalId = setInterval(() => setNow(new Date()), 60 * 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const parseTimeToMinutes = (timeStr) => {
+    if (!timeStr || typeof timeStr !== 'string') return null;
+    const [hStr, mStr] = timeStr.split(':');
+    const hours = Number(hStr);
+    const minutes = Number(mStr);
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return null;
+    return hours * 60 + minutes;
   };
+
+  const isBusinessOpen = useMemo(() => {
+    const openingHours = business?.openingHours;
+    if (!Array.isArray(openingHours) || openingHours.length === 0) {
+      return false;
+    }
+
+    // Map JS getDay (0=Sunday ... 6=Saturday) matches our schema (0-6)
+    const currentDay = now.getDay();
+    const today = openingHours.find(d => Number(d.day) === currentDay);
+    if (!today || today.closed) {
+      return false;
+    }
+
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    // A day can have multiple ranges; open if any range matches
+    for (const range of (today.ranges || [])) {
+      const openMin = parseTimeToMinutes(range.open);
+      const closeMin = parseTimeToMinutes(range.close);
+      if (openMin == null || closeMin == null) continue;
+
+      if (closeMin > openMin) {
+        // Normal same-day range: open <= now < close
+        if (currentMinutes >= openMin && currentMinutes < closeMin) {
+          return true;
+        }
+      } else if (closeMin < openMin) {
+        // Overnight range (e.g., 20:00-02:00): open if now >= open OR now < close
+        if (currentMinutes >= openMin || currentMinutes < closeMin) {
+          return true;
+        }
+      } else {
+        // open == close (edge case) => treat as closed range
+        continue;
+      }
+    }
+    return false;
+  }, [business?.openingHours, now]);
+
+  // Compute timing text: current close time if open, or next open time if closed
+  const { timingText, isSoon, isOpenNow } = useMemo(() => {
+    const openingHours = business?.openingHours;
+    if (!Array.isArray(openingHours) || openingHours.length === 0) {
+      return { timingText: '', isSoon: false, isOpenNow: false };
+    }
+
+    const currentDay = now.getDay();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    const today = openingHours.find(d => Number(d.day) === currentDay);
+
+    // If open now: find active range to get close time
+    if (isBusinessOpen && today && !today.closed) {
+      for (const range of (today.ranges || [])) {
+        const openMin = parseTimeToMinutes(range.open);
+        const closeMin = parseTimeToMinutes(range.close);
+        if (openMin == null || closeMin == null) continue;
+
+        if (closeMin > openMin) {
+          if (currentMinutes >= openMin && currentMinutes < closeMin) {
+            const minutesUntilClose = closeMin - currentMinutes;
+            if (minutesUntilClose <= 30) {
+              return { timingText: t('businessCard.timing.closingSoon'), isSoon: true, isOpenNow: true };
+            }
+            return { timingText: t('businessCard.timing.openUntil', { time: range.close }), isSoon: false, isOpenNow: true };
+          }
+        } else if (closeMin < openMin) {
+          // Overnight
+          if (currentMinutes >= openMin || currentMinutes < closeMin) {
+            const minutesUntilClose = currentMinutes >= openMin
+              ? (24 * 60 - currentMinutes) + closeMin
+              : closeMin - currentMinutes;
+            if (minutesUntilClose <= 30) {
+              return { timingText: t('businessCard.timing.closingSoon'), isSoon: true, isOpenNow: true };
+            }
+            return { timingText: t('businessCard.timing.openUntil', { time: range.close }), isSoon: false, isOpenNow: true };
+          }
+        }
+      }
+    }
+
+    // Otherwise find the next opening time within the next 7 days
+    const MINUTES_IN_DAY = 24 * 60;
+    const SOON_THRESHOLD = 30; // minutes
+    for (let offset = 0; offset < 7; offset++) {
+      const dayIndex = (currentDay + offset) % 7;
+      const day = openingHours.find(d => Number(d.day) === dayIndex);
+      if (!day || day.closed) continue;
+      const ranges = Array.isArray(day.ranges) ? day.ranges : [];
+      // Sort ranges by open time to get the earliest
+      const sorted = [...ranges].sort((a, b) => (parseTimeToMinutes(a.open) ?? 0) - (parseTimeToMinutes(b.open) ?? 0));
+
+      for (const range of sorted) {
+        const openMin = parseTimeToMinutes(range.open);
+        const closeMin = parseTimeToMinutes(range.close);
+        if (openMin == null || closeMin == null) continue;
+
+        if (offset === 0) {
+          // Today: next range with open in the future (or overnight already handled above)
+          if (openMin > currentMinutes) {
+            const diff = openMin - currentMinutes;
+            if (diff <= SOON_THRESHOLD) {
+              return { timingText: t('businessCard.timing.opensSoon'), isSoon: true, isOpenNow: false };
+            }
+            return { timingText: t('businessCard.timing.opensAt', { time: range.open }), isSoon: false, isOpenNow: false };
+          }
+        } else {
+          // Future day: take the earliest open time
+          return { timingText: t('businessCard.timing.opensAt', { time: range.open }), isSoon: false, isOpenNow: false };
+        }
+      }
+    }
+
+    return { timingText: '', isSoon: false, isOpenNow: false };
+  }, [business?.openingHours, now, isBusinessOpen, t]);
 
   return (
     <div 
@@ -179,8 +308,13 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
         )}
         <div className="business-card-overlay" />
         {localActive && (
-          <div className={`business-card-badge ${isBusinessOpen() ? 'badge-open' : 'badge-closed'}`}>
-            {isBusinessOpen() ? 'פתוח' : 'סגור'}
+          <div className={`business-card-badge ${isBusinessOpen ? 'badge-open' : 'badge-closed'}`}>
+            {isBusinessOpen ? t('businessCard.status.open') : t('businessCard.status.closed')}
+            {((!isBusinessOpen && timingText) || (isBusinessOpen && isSoon)) && (
+              <span className={`badge-timing ${isBusinessOpen ? 'badge-timing-soon' : 'badge-timing-closed'}`}>
+                {' '}· {timingText}
+              </span>
+            )}
           </div>
         )}
         <button 
@@ -199,6 +333,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
             <FaMapMarkerAlt />
             <span className="business-card-address">{business.address}</span>
           </div>
+          {/* timing moved into badge */}
         </div>
 
         {/* <div className="business-card-info"> */}

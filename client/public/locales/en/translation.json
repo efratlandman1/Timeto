@@ -260,6 +260,12 @@
       "closed": "Closed",
       "new": "New"
     },
+    "timing": {
+      "openUntil": "Open until {{time}}",
+      "opensAt": "Opens at {{time}}",
+      "opensSoon": "Opens soon",
+      "closingSoon": "Closing soon"
+    },
     "actions": {
       "edit": "Edit",
       "delete": {

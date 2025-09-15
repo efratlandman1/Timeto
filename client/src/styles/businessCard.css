@@ -111,6 +111,8 @@
   max-width: calc(100% - 20px);
 }
 
+/* timing text moved into badge */
+
 /* Unused classes - can be removed */
 /* .business-card-info {
   display: flex;
@@ -280,6 +282,24 @@
 .badge-closed {
   background: #f44336;
   color: white;
+}
+
+.business-card-badge .badge-timing {
+  opacity: 0.95;
+  margin-left: 4px;
+}
+
+.badge-timing-open {
+  color: #e8f5e9;
+}
+
+.badge-timing-closed {
+  color: #ffebee;
+}
+
+.badge-timing-soon {
+  color: #fff3e0; /* light orange */
+  font-weight: 600;
 }
 
 .business-card.inactive {

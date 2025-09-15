@@ -78,7 +78,8 @@
     "sections": {
       "popular": "עסקים פופולריים",
       "new": "עסקים חדשים",
-      "recommended": "מומלצים עבורך"
+      "recommended": "מומלצים עבורך",
+      "featuredAds": "מודעות מובילות"
     },
     "joinBanner": {
       "title": "הצטרף לקהילת זמן",
@@ -272,6 +273,12 @@
       "open": "פתוח",
       "closed": "סגור",
       "new": "חדש"
+    },
+    "timing": {
+      "openUntil": "פתוח עד {{time}}",
+      "opensAt": "נפתח ב-{{time}}",
+      "opensSoon": "נפתח בקרוב",
+      "closingSoon": "נסגר בקרוב"
     },
     "actions": {
       "edit": "עריכה",
