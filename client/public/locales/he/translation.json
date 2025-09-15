@@ -10,20 +10,54 @@
     "myFavorites": "המועדפים שלי",
     "adminPanel": "פאנל ניהול",
     "logout": "יציאה",
+    "backToMyBusinesses": "חזרה לעסקים שלי",
+    "letsGo": "בואו ניכנס",
+    "addNewBusiness": "הוספת עסק חדש",
     "languages": {
       "he": "עברית",
       "en": "English"
     },
+    "selectLanguage": "בחר שפה",
     "logo": {
       "main": "זמן",
       "sub": "מדריך העסקים"
-    }
+    },
+    "myLocation": "המיקום שלי",
+    "currentLocation": "המיקום הנוכחי שלך",
+    "loadingAddress": "טוען כתובת...",
+    "addressNotFound": "לא נמצאה כתובת",
+    "addressError": "שגיאה בשליפת כתובת",
+    "noLocation": "לא נמצא מיקום",
+    "refreshLocation": "רענן מיקום"
   },
   "greetings": {
     "morning": "בוקר טוב",
     "afternoon": "צהריים טובים",
     "evening": "ערב טוב",
     "night": "לילה טוב"
+  },
+  "profile": "פרופיל אישי",
+  "userProfile": {
+    "title": "עריכת פרופיל",
+    "fields": {
+      "firstName": "שם פרטי",
+      "lastName": "שם משפחה",
+      "email": "דואר אלקטרוני",
+      "phonePrefix": "קידומת",
+      "phone": "מספר טלפון",
+      "nickname": "כינוי באפליקציה",
+      "password": "סיסמה חדשה",
+      "confirmPassword": "אישור סיסמה חדשה"
+    },
+    "changePassword": "שנה סיסמה (אופציונלי)",
+    "saveChanges": "שמור שינויים",
+    "messages": {
+      "passwordLength": "הסיסמה חייבת להכיל לפחות 8 תווים.",
+      "passwordMismatch": "הסיסמאות אינן תואמות",
+      "userNotFound": "לא ניתן לעדכן פרופיל, משתמש לא זוהה.",
+      "updateSuccess": "הפרופיל עודכן בהצלחה",
+      "updateFailed": "עדכון הפרופיל נכשל, נסה שוב"
+    }
   },
   "mainPage": {
     "title": "מדריך העסקים המוביל בישראל",
@@ -32,6 +66,7 @@
       "title": "מצא את העסק המושלם",
       "subtitle": "בקרבתך ובכל הארץ"
     },
+    "joinNowAndDiscover": "הצטרפו עכשיו והתחילו לגלות דברים מעניינים סביבכם",
     "stats": {
       "newUsers": "משתמשים חדשים",
       "verifiedReviews": "ביקורות מאומתות",
@@ -48,7 +83,20 @@
     "joinBanner": {
       "title": "הצטרף לקהילת זמן",
       "description": "הוסף את העסק שלך והתחל לקבל לקוחות חדשים עוד היום",
-      "button": "הוסף עסק חינם"
+      "button": "הוסף עסק חינם",
+      "joinNowAndDiscover": "הצטרפו עכשיו והתחילו לגלות דברים מעניינים סביבכם"
+    },
+    "viewAll": "הצג הכל",
+    "footer": {
+      "contact": "צור קשר",
+      "quickLinks": "קישורים מהירים",
+      "search": "חיפוש",
+      "suggestItem": "הצע פריט",
+      "termsOfService": "תנאי שימוש",
+      "termsComingSoon": "תנאי השימוש יהיו זמינים בקרוב",
+      "about": "זה הזמן",
+      "aboutDescription": "מדריך העסקים המוביל בישראל. תמצא את העסק הנכון בקרבתך.",
+      "copyright": "© Zezman 2023 כל הזכויות שמורות."
     }
   },
   "businessForm": {
@@ -56,6 +104,9 @@
       "new": "הוספת עסק חדש",
       "edit": "עריכת עסק"
     },
+    "addNewBusiness": "הוספת עסק חדש",
+    "fillDetailsToAddBusiness": "מלא את הפרטים הבאים כדי להוסיף את העסק שלך",
+    "subtitle": "מלא את הפרטים הבאים כדי להוסיף את העסק שלך",
     "steps": {
       "details": "פרטי העסק",
       "services": "שירותי העסק",
@@ -66,27 +117,58 @@
       "description": "תיאור העסק",
       "address": "כתובת",
       "phone": "טלפון",
-      "email": "דואר אלקטרוני",
+      "email": "כתובת דואר אלקטרונית",
       "website": "אתר אינטרנט",
-      "category": "קטגוריה"
+      "category": "תחום שירות",
+      "selectCategory": "בחר תחום"
     },
     "validation": {
       "required": "שדה חובה",
       "email": "כתובת אימייל לא תקינה",
       "phone": "מספר טלפון לא תקין"
+    },
+    "logo": {
+      "selectLogo": "בחירת לוגו",
+      "logoPreview": "תצוגת לוגו",
+      "removeLogo": "הסר לוגו"
     }
   },
   "auth": {
     "login": {
       "title": "התחברות",
+      "simpleLoginWithEmail": "התחברות פשוטה עם כתובת המייל שלכם",
       "email": "אימייל",
+      "emailAddress": "כתובת מייל",
       "password": "סיסמה",
       "submit": "התחברות",
       "loading": "טוען...",
+      "continue": "המשך",
       "errors": {
         "loginFailed": "התחברות נכשלה",
         "invalidCredentials": "אימייל או סיסמה לא נכונים",
         "invalidEmail": "אנא הזן כתובת אימייל חוקית"
+      }
+    },
+    "register": {
+      "title": "הרשמה",
+      "loading": "רושם...",
+      "errors": {
+        "registrationFailed": "הרשמה נכשלה, נסה שוב"
+      }
+    },
+    "verification": {
+      "success": "האימייל אומת בהצלחה! כעת ניתן להתחבר.",
+      "failure": "אימות האימייל נכשל. ייתכן שהקישור אינו תקין או שפג תוקפו. אנא נסה שנית."
+    },
+    "resetPassword": {
+      "title": "איפוס סיסמה",
+      "description": "הגדירו סיסמה חדשה לחשבונכם",
+      "success": "🔐 הסיסמה החדשה מוכנה!",
+      "redirecting": "מיד תועבר לדף ההתחברות...",
+      "submit": "אפס סיסמה",
+      "errors": {
+        "passwordTooShort": "הסיסמה חייבת להכיל לפחות 8 תווים.",
+        "tooManyAttempts": "ניסית יותר מדי פעמים. אנא נסה שוב מאוחר יותר."
       }
     },
     "register": {
@@ -108,44 +190,44 @@
         "registrationFailed": "הרשמה נכשלה, נסה שוב",
         "invalidEmail": "אנא הזן כתובת אימייל חוקית"
       }
+    },
+    "forgotPassword": {
+      "title": "שכחתי סיסמה",
+      "subtitle": "הזן את כתובת המייל שלך כדי לקבל קישור לאיפוס סיסמה",
+      "email": "כתובת מייל",
+      "submit": "שלח קישור איפוס",
+      "backToLogin": "חזרה להתחברות",
+      "createNewPassword": "יצירת סיסמה חדשה",
+      "requestSent": "בקשה נשלחה!",
+      "messages": {
+        "resetEmailSent": "נשלח לך אימייל עם קישור לאיפוס סיסמה",
+        "emailNotFound": "כתובת המייל לא נמצאה במערכת",
+        "resetFailed": "שליחת אימייל איפוס נכשלה, נסה שוב",
+        "googleLoginFailed": "התחברות גוגל נכשלה",
+        "resetLinkSent": "אם יש חשבון עם הכתובת שהוזנה – שלחנו אליו קישור לאיפוס. שווה לבדוק גם בספאם 😉"
+      }
     }
   },
   "accessibility": {
     "title": "הגדרות נגישות",
-    "options": {
-      "fontSize": {
-        "title": "גודל טקסט",
-        "normal": "רגיל",
-        "large": "גדול",
-        "larger": "גדול מאוד"
-      },
-      "contrast": {
-        "title": "ניגודיות",
-        "normal": "רגילה",
-        "high": "גבוהה"
-      },
-      "animations": {
-        "title": "אנימציות",
-        "on": "מופעל",
-        "off": "כבוי"
-      },
-      "screenReader": {
-        "title": "קורא מסך",
-        "instructions": "הוראות לשימוש בקורא מסך"
-      },
-      "readableFont": "פונט קריא"
-    },
-    "values": {
-      "normal": "רגיל",
-      "large": "גדול",
-      "larger": "גדול מאוד",
-      "high": "גבוה",
-      "low": "נמוך",
-      "off": "כבוי",
-      "on": "פעיל"
-    },
-    "apply": "החל שינויים",
-    "reset": "אפס הגדרות"
+    "openSettings": "פתח הגדרות נגישות",
+    "closeSettings": "סגור הגדרות נגישות",
+    "fontSize": "גודל טקסט",
+    "contrast": "ניגודיות",
+    "cursorSize": "גודל סמן",
+    "textAlign": "יישור טקסט",
+    "keyboardNav": "ניווט מקלדת",
+    "normal": "רגיל",
+    "large": "גדול",
+    "veryLarge": "גדול מאוד",
+    "highContrast": "ניגודיות גבוהה",
+    "right": "ימין",
+    "center": "מרכז",
+    "left": "שמאל",
+    "active": "פעיל",
+    "inactive": "כבוי",
+    "resetSettings": "אפס הגדרות",
+    "cancel": "ביטול"
   },
   "common": {
     "loading": "טוען...",
@@ -160,12 +242,20 @@
     "less": "הצג פחות",
     "showMore": "הצג עוד",
     "backToHome": "חזרה לדף הבית",
-    "backToBusinesses": "חזרה לעסקים שלי"
+    "backToBusinesses": "חזרה לעסקים שלי",
+    "backToMyBusinesses": "חזרה לעסקים שלי",
+    "loginPermission": "יש צורך בהתחברות כדי לבצע פעולה זו",
+    "generalError": "אירעה שגיאה, נסה שוב מאוחר יותר",
+    "tooManyAttempts": "ניסית יותר מדי פעמים. אנא נסה שוב מאוחר יותר.",
+    "password": "סיסמה"
   },
   "search": {
-    "placeholder": "חפש עסק לפי שם, קטגוריה או שירות",
-    "advancedSearch": "חיפוש מתקדם",
+    "placeholder": "חפש עסק או שירות...",
+    "search": "חפש",
+    "results": "תוצאות חיפוש",
     "noResults": "לא נמצאו תוצאות",
+    "noResultsSuggestion": "נסה לחפש במילים אחרות",
+    "advancedSearch": "חיפוש מתקדם",
     "errors": {
       "loading": "שגיאה בטעינת תוצאות החיפוש"
     },
@@ -258,6 +348,11 @@
       "to": "עד שעה"
     }
   },
+  "favorites": {
+    "loading": "טוען מועדפים...",
+    "title": "המועדפים שלי",
+    "empty": "עדיין לא סימנת עסקים כמועדפים"
+  },
   "feedback": {
     "title": "חוות דעת על {{businessName}}",
     "loading": "טוען חוות דעת...",
@@ -336,24 +431,50 @@
     "errors": {
       "loading": "בעיה בטעינת פרטי העסק",
       "notFound": "לא נמצאו נתונים לעסק"
-    }
+    },
+    "loading": "טוען פרטי עסק...",
+    "error": "שגיאה"
   },
   "searchResults": {
     "title": "תוצאות חיפוש",
     "noResults": "לא נמצאו תוצאות",
+    "pageTitle": "חיפוש עסקים",
+    "pageSubtitle": "מצא את העסק המתאים לך",
+    "advancedFilter": "סינון מתקדם",
+    "loadingLocation": "טוען מיקום...",
     "filters": {
       "title": "סינון תוצאות",
       "category": "קטגוריה",
       "rating": "דירוג",
       "services": "שירותים",
       "clear": "נקה סינון",
-      "apply": "החל סינון"
+      "apply": "החל סינון",
+      "active": "סינונים פעילים:",
+      "clearAll": "נקה הכל"
     },
     "sort": {
       "title": "מיון לפי",
       "rating": "דירוג גבוה",
       "name": "לפי א-ב",
-      "distance": "מרחק"
+      "distance": "מרחק",
+      "newest": "חדש ביותר",
+      "popular_nearby": "פופולרי באזורך"
+    },
+    "pagination": {
+      "page": "עמוד",
+      "of": "מתוך",
+      "next": "הבא",
+      "previous": "קודם",
+      "showing": "מציג",
+      "to": "עד",
+      "results": "תוצאות"
+    },
+    "filterTags": {
+      "category": "קטגוריה:",
+      "rating": "כוכבים ומעלה",
+      "service": "שירות:",
+      "maxDistance": "עד מרחק של:",
+      "km": "ק\"מ"
     }
   },
   "businessSteps": {
@@ -393,10 +514,13 @@
         "saturday": "שבת"
       },
       "closed": "סגור",
+      "open": "פתוח",
       "24hours": "פתוח 24/7",
       "custom": "שעות מותאמות",
       "from": "משעה",
-      "to": "עד שעה"
+      "to": "עד שעה",
+      "addRange": "הוסף טווח נוסף",
+      "removeRange": "מחק טווח"
     }
   },
   "editSteps": {
@@ -463,7 +587,30 @@
     }
   },
   "advancedSearch": {
-    "title": "חיפוש מתקדם",
+    "title": "חיפוש מורחב",
+    "sort": {
+      "title": "מיון תוצאות",
+      "rating": "דירוג גבוה",
+      "name": "לפי א-ב",
+      "distance": "מרחק",
+      "newest": "חדש ביותר",
+      "popularNearby": "פופולרי באזורך"
+    },
+    "rating": {
+      "title": "דירוג מינימלי",
+      "andAbove": "ומעלה"
+    },
+    "category": {
+      "title": "קטגוריה",
+      "select": "בחר קטגוריה"
+    },
+    "services": {
+      "title": "שירותים"
+    },
+    "distance": {
+      "title": "מרחק מקסימלי (ק\"מ)",
+      "km": "ק\"מ"
+    },
     "filters": {
       "category": "קטגוריה",
       "services": "שירותים",
@@ -477,9 +624,10 @@
       }
     },
     "buttons": {
-      "apply": "החל סינון",
-      "clear": "נקה",
-      "close": "סגור"
+      "apply": "הצג תוצאות",
+      "clear": "נקה הכל",
+      "close": "סגור",
+      "cancel": "ביטול"
     },
     "noResults": "לא נמצאו תוצאות",
     "selected": "נבחרו {{count}} פריטים"
@@ -495,10 +643,12 @@
       },
       "name": {
         "he": "שם בעברית",
-        "en": "שם באנגלית"
+        "en": "שם באנגלית",
+        "placeholder": "לדוגמה: אינסטלציה מתקדמת"
       },
       "parentCategory": "קטגוריית אב",
       "reason": "סיבה או תיאור קצר",
+      "reasonPlaceholder": "מדוע אתה חושב שפריט זה נחוץ?",
       "submit": "שלח הצעה"
     },
     "messages": {
@@ -513,11 +663,52 @@
     "addBusiness": "הוסף עסק חדש",
     "loading": "טוען עסקים...",
     "error": "שגיאה בטעינת העסקים",
+    "subtitle": "נהל את העסקים שהוספת למדריך",
+    "noBusinesses": "אין לך עסקים עדיין",
+    "addNewBusiness": "הוספת עסק חדש",
     "filters": {
       "all": "כל העסקים",
       "active": "פעילים",
       "inactive": "לא פעילים",
       "deleted": "מחוקים"
+    }
+  },
+  "termsPage": {
+    "title": "תנאי שימוש",
+    "content": "או למטרות שלא הותרו במפורש בתנאי שימוש אלה.",
+    "sections": {
+      "general": {
+        "title": "1. כללי",
+        "content": "ברוכים הבאים לאתר זה זמן. השימוש באתר ובשירותים המוצעים בו כפוף לתנאי השימוש המפורטים להלן. השימוש באתר מהווה הסכמה מצדך לתנאים אלה."
+      },
+      "definitions": {
+        "title": "2. הגדרות",
+        "content": "\"האתר\" - אתר זה זמן על כל תכניו ושירותיו.<br />\"המשתמש\" - כל אדם הגולש באתר או עושה שימוש בשירותיו."
+      },
+      "usage": {
+        "title": "3. השימוש באתר",
+        "content": "השימוש באתר מותר למטרות חוקיות בלבד. חל איסור על שימוש באתר למטרות בלתי חוקיות או למטרות שלא הותרו במפורש בתנאי שימוש אלה."
+      },
+      "businessRegistration": {
+        "title": "4. רישום עסקים",
+        "content": "רישום עסקים באתר מחייב מסירת פרטים מדויקים ואמיתיים. האתר רשאי לדחות בקשות רישום או להסיר עסקים שנמסרו לגביהם פרטים שגויים או מטעים."
+      },
+      "privacy": {
+        "title": "5. פרטיות",
+        "content": "האתר מכבד את פרטיות המשתמשים בו. כל המידע הנאסף באתר נשמר במאגרי המידע של האתר ונעשה בו שימוש בהתאם למדיניות הפרטיות של האתר."
+      },
+      "intellectualProperty": {
+        "title": "6. קניין רוחני",
+        "content": "כל זכויות הקניין הרוחני באתר, לרבות זכויות היוצרים, סימני המסחר וכל זכות אחרת, שייכות לאתר או לבעלי הרישיון שלו."
+      },
+      "changes": {
+        "title": "7. שינויים בתנאי השימוש",
+        "content": "האתר רשאי לשנות את תנאי השימוש מעת לעת, לפי שיקול דעתו הבלעדי. שינויים אלה ייכנסו לתוקף מיד עם פרסומם באתר."
+      },
+      "contact": {
+        "title": "8. יצירת קשר",
+        "content": "לכל שאלה או בירור בנוגע לתנאי השימוש, ניתן ליצור קשר באמצעות:<br />דוא\"ל: info@zezman.app"
+      }
     }
   }
 } 

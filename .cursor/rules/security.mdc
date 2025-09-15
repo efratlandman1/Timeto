@@ -1,0 +1,103 @@
+---
+alwaysApply: true
+---
+## 🔐 Security Guidelines   
+- Never commit API keys or sensitive data to version control  
+- Use environment variables for all configuration  
+- Use HTTPS in production  
+- Implement rate limiting and CORS protection  
+- Validate file uploads and scan for malware  
+- Use JWT tokens with proper expiration  
+- Input validation and sanitization  
+- Proper error handling without exposing sensitive info  
+- Implement proper authentication and authorization
+- Sanitize user inputs to prevent injection attacks
+- Use environment variables for sensitive configuration
+- Implement rate limiting to prevent abuse
+- Follow the principle of least privilege for API access
+- Use HTTPS for all communications
+- Validate and sanitize all inputs, especially from external sources
+
+### **3. Security Requirements**
+- **Input Validation**: Server-side validation
+- **File Upload Security**: Malware scanning
+- **Rate Limiting**: Prevent abuse
+- **CORS**: Proper cross-origin handling
+- **Helmet**: Security headers
+
+## 🔐 Security Specifications
+
+### **1. Authentication & Authorization**
+```javascript
+// JWT Configuration
+const jwtConfig = {
+  secret: process.env.JWT_SECRET,
+  expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  algorithm: 'HS256'
+};
+
+// Password Hashing
+const bcryptConfig = {
+  saltRounds: 12
+};
+
+// Role-based Access Control
+const roles = {
+  ADMIN: 'admin',
+  MANAGER: 'manager',
+  END_USER: 'end-user'
+};
+```
+
+### **2. Input Validation**
+```javascript
+// Validation middleware
+const validateBusiness = [
+  body('name').trim().isLength({ min: 2, max: 100 }),
+  body('email').isEmail().normalizeEmail(),
+  body('phone').matches(/^[0-9+\-\s()]+$/),
+  body('address').trim().isLength({ min: 5, max: 200 }),
+  body('categoryId').isMongoId(),
+  handleValidationErrors
+];
+```
+
+### **3. File Upload Security**
+```javascript
+// Multer configuration with security
+const multerConfig = {
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  }),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+    files: 1
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type'), false);
+    }
+  }
+};
+```
+
+### **4. Rate Limiting**
+```javascript
+// Rate limiting configuration
+const rateLimitConfig = {
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP',
+  standardHeaders: true,
+  legacyHeaders: false
+};
+```

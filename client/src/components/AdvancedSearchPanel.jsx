@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaTimes, FaChevronDown, FaStar, FaCheck } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import '../styles/AdvancedSearchPanel.css';
 
 const AdvancedSearchPanel = ({ 
@@ -13,6 +14,7 @@ const AdvancedSearchPanel = ({
   sortOption,
   onSortChange
 }) => {
+  const { t } = useTranslation();
   const [expandedSections, setExpandedSections] = useState({
     category: true,
     rating: true,
@@ -42,7 +44,7 @@ const AdvancedSearchPanel = ({
       try {
         const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
         const data = await response.json();
-        setCategories(data);
+        setCategories(data.data.categories || []);
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
@@ -83,19 +85,19 @@ const AdvancedSearchPanel = ({
   };
 
   const SORT_OPTIONS = [
-    { key: 'rating', label: 'דירוג גבוה' },
-    { key: 'name', label: 'לפי א-ב' },
-    { key: 'distance', label: 'מרחק' },
-    { key: 'newest', label: 'חדש ביותר' },
-    { key: 'popular_nearby', label: 'פופולרי באזורך' }
+    { key: 'rating', label: t('advancedSearch.sort.rating') },
+    { key: 'name', label: t('advancedSearch.sort.name') },
+    { key: 'distance', label: t('advancedSearch.sort.distance') },
+    { key: 'newest', label: t('advancedSearch.sort.newest') },
+    { key: 'popular_nearby', label: t('advancedSearch.sort.popularNearby') }
   ];
 
   const RATING_OPTIONS = [
-    { value: 5, label: 'ומעלה' },
-    { value: 4, label: 'ומעלה' },
-    { value: 3, label: 'ומעלה' },
-    { value: 2, label: 'ומעלה' },
-    { value: 1, label: 'ומעלה' }
+    { value: 5, label: t('advancedSearch.rating.andAbove') },
+    { value: 4, label: t('advancedSearch.rating.andAbove') },
+    { value: 3, label: t('advancedSearch.rating.andAbove') },
+    { value: 2, label: t('advancedSearch.rating.andAbove') },
+    { value: 1, label: t('advancedSearch.rating.andAbove') }
   ];
 
   const renderStars = (rating) => {
@@ -112,7 +114,7 @@ const AdvancedSearchPanel = ({
     <div className={`advanced-search-panel ${isOpen ? 'open' : ''} ${isMobile ? 'mobile' : ''}`} ref={panelRef}>
       {isMobile && (
         <div className="panel-header">
-          <h2>סינון ומיון</h2>
+                      <h2>{t('advancedSearch.title')}</h2>
           <button className="close-button" onClick={onClose}>
             <FaTimes />
           </button>
@@ -126,7 +128,7 @@ const AdvancedSearchPanel = ({
             className="section-header" 
             onClick={() => toggleSection('sort')}
           >
-            <h3>מיון תוצאות</h3>
+                          <h3>{t('advancedSearch.sort.title')}</h3>
             <FaChevronDown className={`chevron ${expandedSections.sort ? 'open' : ''}`} />
           </div>
           {expandedSections.sort && (
@@ -157,7 +159,7 @@ const AdvancedSearchPanel = ({
             className="section-header" 
             onClick={() => toggleSection('rating')}
           >
-            <h3>דירוג</h3>
+                          <h3>{t('advancedSearch.rating.title')}</h3>
             <FaChevronDown className={`chevron ${expandedSections.rating ? 'open' : ''}`} />
           </div>
           {expandedSections.rating && (
@@ -189,7 +191,7 @@ const AdvancedSearchPanel = ({
             className="section-header" 
             onClick={() => toggleSection('category')}
           >
-            <h3>קטגוריה</h3>
+                          <h3>{t('advancedSearch.category.title')}</h3>
             <FaChevronDown className={`chevron ${expandedSections.category ? 'open' : ''}`} />
           </div>
           {expandedSections.category && (
@@ -204,7 +206,7 @@ const AdvancedSearchPanel = ({
                 }}
                 value=""
               >
-                <option value="">בחר קטגוריה</option>
+                <option value="">{t('advancedSearch.category.select')}</option>
                 {categories
                   .filter(category => !selectedCategories.includes(category.name))
                   .map((category) => (
@@ -234,7 +236,7 @@ const AdvancedSearchPanel = ({
       {isMobile && (
         <div className="panel-footer">
           <button className="apply-filters-button" onClick={onClose}>
-            החל סינון
+            {t('advancedSearch.buttons.apply')}
           </button>
         </div>
       )}

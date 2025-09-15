@@ -8,8 +8,11 @@ import { useNavigate } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaUserFriends, FaStar, FaCalendarCheck } from 'react-icons/fa';
 import { buildQueryUrl } from '../utils/buildQueryUrl';
 import { useSelector } from 'react-redux';
+import { getToken } from '../utils/auth';
+import { useTranslation } from 'react-i18next';
 
 const MainPage = () => {
+    const { t, ready } = useTranslation();
     const [businesses, setBusinesses] = useState([]);
     const [filteredBusinesses, setFilteredBusinesses] = useState([]);
     const [popularBusinesses, setPopularBusinesses] = useState([]);
@@ -28,14 +31,14 @@ const MainPage = () => {
     const userLocation = useSelector(state => state.location.coords);
     const locationLoading = useSelector(state => state.location.loading);
     const locationError = useSelector(state => state.location.error);
-
+    
     const bannerImages = [
         '/uploads/business1.jpeg',
         '/uploads/business2.png',
         '/uploads/business3.jpg'
     ];
 
-    // Auto-advance banner
+        // Auto-advance banner
     useEffect(() => {
         const timer = setInterval(() => {
             handleNextSlide();
@@ -43,6 +46,29 @@ const MainPage = () => {
         return () => clearInterval(timer);
     }, [currentSlide]);
 
+    useEffect(() => {
+        fetchCategories();
+        fetchStats();
+    }, []);
+
+    useEffect(() => {
+        fetchBusinesses();
+    }, [userLocation, locationError]);
+    
+    // Wait for translations to load
+    if (!ready) {
+        return (
+            <div className="wide-page-container">
+                <div className="wide-page-content">
+                    <div className="loading-container">
+                        <div className="loader"></div>
+                        <span>Loading translations...</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
     const handleNextSlide = () => {
         setCurrentSlide((prev) => (prev + 1) % bannerImages.length);
     };
@@ -59,19 +85,10 @@ const MainPage = () => {
         setCurrentSlide(index);
     };
 
-    useEffect(() => {
-        fetchCategories();
-        fetchStats();
-    }, []);
-
-    useEffect(() => {
-        fetchBusinesses();
-    }, [userLocation, locationError]);
-
     const fetchCategories = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
-            setCategories(response.data);
+            setCategories(response.data.data.categories);
         } catch (error) {
             console.error("Error fetching categories:", error);
         }
@@ -79,14 +96,21 @@ const MainPage = () => {
 
     const fetchBusinesses = async () => {
         try {
+            // הוספת headers עם טוקן אם המשתמש מחובר
+            const headers = {};
+            const token = getToken();
+            if (token) {
+                headers.Authorization = `Bearer ${token}`;
+            }
+
             // Fetch new businesses
             const newBusinessesUrl = buildQueryUrl(
                 `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`,
                 { sort: 'newest', limit: 3 }
             );
-            const newBusinessesResponse = await axios.get(newBusinessesUrl);
+            const newBusinessesResponse = await axios.get(newBusinessesUrl, { headers });
             console.log('New businesses response:', newBusinessesResponse.data);
-            setNewBusinesses(newBusinessesResponse.data.data);
+            setNewBusinesses(newBusinessesResponse.data.data.businesses || []);
 
             // Fetch popular nearby businesses
             const popularNearbyUrl = buildQueryUrl(
@@ -94,18 +118,18 @@ const MainPage = () => {
                 { sort: 'popular_nearby', limit: 3 },
                 userLocation
             );
-            const popularNearbyResponse = await axios.get(popularNearbyUrl);
+            const popularNearbyResponse = await axios.get(popularNearbyUrl, { headers });
             console.log('Popular nearby response:', popularNearbyResponse.data);
-            setPopularBusinesses(popularNearbyResponse.data.data);
+            setPopularBusinesses(popularNearbyResponse.data.data.businesses || []);
 
             // Fetch recommended businesses (using high rating as criteria)
             const recommendedUrl = buildQueryUrl(
                 `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`,
                 { sort: 'rating', limit: 3 }
             );
-            const recommendedResponse = await axios.get(recommendedUrl);
+            const recommendedResponse = await axios.get(recommendedUrl, { headers });
             console.log('Recommended response:', recommendedResponse.data);
-            setRecommendedBusinesses(recommendedResponse.data.data);
+            setRecommendedBusinesses(recommendedResponse.data.data.businesses || []);
 
         } catch (error) {
             console.error("Error fetching businesses:", error);
@@ -116,7 +140,7 @@ const MainPage = () => {
         try {
             setIsStatsLoading(true);
             const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/stats/home`);
-            setStats(response.data);
+            setStats(response.data.data);
         } catch (error) {
             console.error('Error fetching stats:', error);
         } finally {
@@ -151,8 +175,8 @@ const MainPage = () => {
                     <div className="hero-content">
                         {/* Search Section */}
                         <div className="search-section">
-                            <h1>מצא את העסק המושלם</h1>
-                            <p>בקרבתך ובכל הארץ</p>
+                            <h1>{t('mainPage.search.title')}</h1>
+                            <p>{t('mainPage.search.subtitle')}</p>
                             <SearchBar />
                         </div>
 
@@ -220,7 +244,7 @@ const MainPage = () => {
                                                 <>{stats.users > 0 && '+ '}{stats.users}</>
                                             )}
                                         </div>
-                                        <div className="stat-label">משתמשים רשומים</div>
+                                        <div className="stat-label">{t('mainPage.stats.newUsers')}</div>
                                     </div>
                                 </div>
                                 <div className="stat-box">
@@ -233,7 +257,7 @@ const MainPage = () => {
                                                 <>{stats.reviews > 0 && '+ '}{stats.reviews}</>
                                             )}
                                         </div>
-                                        <div className="stat-label">ביקורות מאומתות</div>
+                                        <div className="stat-label">{t('mainPage.stats.verifiedReviews')}</div>
                                     </div>
                                 </div>
                                 <div className="stat-box">
@@ -246,7 +270,7 @@ const MainPage = () => {
                                                 <>{stats.businesses > 0 && '+ '}{stats.businesses}</>
                                             )}
                                         </div>
-                                        <div className="stat-label">עסקים רשומים</div>
+                                        <div className="stat-label">{t('mainPage.stats.registeredBusinesses')}</div>
                                     </div>
                                 </div>
                             </div>
@@ -257,21 +281,26 @@ const MainPage = () => {
                 {/* Categories */}
                 <div className="categories-wrapper">
                     <div className="categories-header">
-                        <h2>קטגוריות פופולריות</h2>
+                        <h2>{t('mainPage.categories.title')}</h2>
                     </div>
                     <button className="category-arrow left" onClick={() => handleScroll('left')}>
                         <FaChevronLeft />
                     </button>
                     <div className="categories">
-                        {categories.map((category) => (
-                            <div key={category._id} 
-                                className="category-business" 
+                        {categories && categories.map((category) => (
+                            <div key={category._id}
+                                className="category-business"
+                                style={{ background: category.color || '#fff' }}
                                 onClick={() => handleFilterChange(category.name)}>
-                                <img
-                                    src={`${process.env.REACT_APP_API_DOMAIN}${category.logo}`}
-                                    alt={category.name}
-                                    className="category-logo"
-                                />
+                                {category.logo ? (
+                                    <img
+                                        src={`${process.env.REACT_APP_API_DOMAIN}${category.logo}`}
+                                        alt={category.name}
+                                        className="category-logo"
+                                    />
+                                ) : (
+                                    <span className="category-initial">{category.name?.charAt(0)}</span>
+                                )}
                                 <span>{category.name}</span>
                             </div>
                         ))}
@@ -285,8 +314,8 @@ const MainPage = () => {
                 <div className="business-groups">
                     <div className="business-row">
                         <div className="business-row-header">
-                            <h3>עסקים חדשים</h3>
-                            <a href="/search-results?sort=newest" className="view-all">הצג הכל</a>
+                            <h3>{t('mainPage.sections.new')}</h3>
+                            <a href="/search-results?sort=newest" className="view-all">{t('mainPage.viewAll')}</a>
                         </div>
                         <div className="card-slider">
                             {newBusinesses.map((business) => (
@@ -297,8 +326,8 @@ const MainPage = () => {
 
                     <div className="business-row">
                         <div className="business-row-header">
-                            <h3>פופולרי באזורך</h3>
-                            <a href="/search-results?sort=popular_nearby" className="view-all">הצג הכל</a>
+                            <h3>{t('mainPage.sections.popular')}</h3>
+                            <a href="/search-results?sort=popular_nearby" className="view-all">{t('mainPage.viewAll')}</a>
                         </div>
                         <div className="card-slider">
                             {popularBusinesses.map((business) => (
@@ -309,8 +338,8 @@ const MainPage = () => {
 
                     <div className="business-row">
                         <div className="business-row-header">
-                            <h3>עסקים מומלצים</h3>
-                            <a href="/search-results?sort=rating" className="view-all">הצג הכל</a>
+                            <h3>{t('mainPage.sections.recommended')}</h3>
+                            <a href="/search-results?sort=rating" className="view-all">{t('mainPage.viewAll')}</a>
                         </div>
                         <div className="card-slider">
                             {recommendedBusinesses.map((business) => (
@@ -323,10 +352,10 @@ const MainPage = () => {
                 {/* Bottom Banner */}
                 <section className="bottom-banner">
                     <div className="bottom-banner-content">
-                        <h2>הצטרף לקהילת זמן</h2>
-                        <p>הוסף את העסק שלך והתחיל לקבל לקוחות חדשים עוד היום</p>
-                        <button className="banner-button" onClick={() => navigate('/edit')}>
-                            הוסף עסק חינם
+                        <h2>{t('mainPage.joinBanner.title')}</h2>
+                        <p>{t('mainPage.joinBanner.description')}</p>
+                        <button className="banner-button" onClick={() => navigate('/business')}>
+                            {t('mainPage.joinBanner.button')}
                         </button>
                     </div>
                 </section>
@@ -335,34 +364,34 @@ const MainPage = () => {
                 <footer className="footer">
                     <div className="footer-content">
                         <div className="footer-section">
-                            <h3>צור קשר</h3>
+                            <h3>{t('mainPage.footer.contact')}</h3>
                             <div className="contact-info">
                                 <a href="mailto:info@zezman.app">info@zezman.app</a>
                             </div>
                         </div>
 
                         <div className="footer-section">
-                            <h3>קישורים מהירים</h3>
+                            <h3>{t('mainPage.footer.quickLinks')}</h3>
                             <ul className="quick-links">
-                                <li><a href="/search">חיפוש</a></li>
-                                <li><a href="/suggest">הצע פריט</a></li>
+                                <li><a href="/search">{t('mainPage.footer.search')}</a></li>
+                                <li><a href="/suggest-item">{t('mainPage.footer.suggestItem')}</a></li>
                                 <li><a href="/terms" onClick={(e) => {
                                     e.preventDefault();
                                     // Show terms modal or navigate to terms page when ready
-                                    alert('תנאי השימוש יהיו זמינים בקרוב');
-                                }}>תנאי שימוש</a></li>
+                                    alert(t('mainPage.footer.termsComingSoon'));
+                                }}>{t('mainPage.footer.termsOfService')}</a></li>
                             </ul>
                         </div>
 
                         <div className="footer-section">
-                            <h3>זה הזמן</h3>
-                            <p>מדריך העסקים המוביל בישראל. תמצא את העסק הנכון בקרבתך.</p>
+                            <h3>{t('mainPage.footer.about')}</h3>
+                            <p>{t('mainPage.footer.aboutDescription')}</p>
                         </div>
                     </div>
 
                     <div className="footer-bottom">
                         <div className="copyright">
-                            © Zezman 2023 כל הזכויות שמורות.
+                            {t('mainPage.footer.copyright')}
                         </div>
                     </div>
                 </footer>

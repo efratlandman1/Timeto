@@ -33,15 +33,21 @@
 .business-card-image-container {
   position: relative;
   width: 100%;
-  height: 180px;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
+  background: #f8f8f8;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .business-card-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
+  object-fit: contain;
+  object-position: center;
+  display: block;
 }
 
 .business-card:hover .business-card-image {
@@ -405,4 +411,26 @@
 
 .action-button.admin.restore-button:hover {
   background: #27ae60;
+}
+
+.business-card-placeholder {
+  background: none;
+  /* שאר העיצוב הקיים */
+}
+.business-placeholder-name {
+  margin-top: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.category-logo-in-placeholder {
+  display: block;
+  margin: 0 auto 4px auto;
+  max-width: 40px;
+  max-height: 40px;
+  border-radius: 6px;
+  background: white;
+  object-fit: contain;
 }

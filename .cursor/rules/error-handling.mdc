@@ -1,0 +1,315 @@
+---
+alwaysApply: true
+---
+---
+
+## 🏗️ Error Handling Architecture
+
+### **Error Handling Layers**
+- **Frontend Error Boundaries**: React error boundaries for component errors
+- **Backend Error Middleware**: Express error handling middleware
+- **User Experience**: User-friendly error messages and recovery
+- **Monitoring Integration**: Error tracking with Sentry and logging
+- **Validation Errors**: Input validation and form error handling
+
+### **Error Classification**
+- **Client Errors (4xx)**: User input errors, validation failures
+- **Server Errors (5xx)**: Application errors, database failures
+- **Network Errors**: Connection issues, timeout errors
+- **Authentication Errors**: Login failures, permission issues
+- **Business Logic Errors**: Domain-specific error conditions
+
+---
+
+## 🎯 Frontend Error Handling
+
+### **React Error Boundaries**
+- **Component Error Boundaries**: Catch component rendering errors
+- **Route Error Boundaries**: Handle route-level errors
+- **Global Error Boundary**: Catch unhandled errors
+- **Error Fallback UI**: User-friendly error displays
+- **Error Recovery**: Automatic retry mechanisms
+
+### **Error Boundary Implementation**
+```javascript
+// Global Error Boundary
+class GlobalErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // Log error to monitoring service
+    logger.error({
+      error: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack
+    });
+    
+    // Send to Sentry
+    Sentry.captureException(error, { extra: errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorFallback error={this.state.error} />;
+    }
+    return this.props.children;
+  }
+}
+```
+
+### **Error Fallback Components**
+- **Generic Error**: General error display
+- **Network Error**: Connection issue handling
+- **Authentication Error**: Login/authorization issues
+- **Validation Error**: Form validation errors
+- **Loading Error**: Data loading failures
+
+---
+
+## 🔧 Backend Error Handling
+
+### **Express Error Middleware**
+- **Error Catching**: Catch all unhandled errors
+- **Error Classification**: Categorize errors by type
+- **Error Logging**: Log errors with context
+- **Error Response**: Return appropriate HTTP status codes
+- **Error Sanitization**: Remove sensitive information
+
+### **Error Middleware Implementation**
+```javascript
+// Global Error Handler
+const errorHandler = (err, req, res, next) => {
+  const errorId = uuidv4();
+  
+  // Log error with context
+  logger.error({
+    errorId,
+    error: err.message,
+    stack: err.stack,
+    requestId: req.requestId,
+    userId: req.user?._id,
+    url: req.originalUrl,
+    method: req.method
+  });
+
+  // Send to Sentry
+  Sentry.captureException(err, {
+    tags: { errorId, requestId: req.requestId },
+    user: { id: req.user?._id }
+  });
+
+  // Determine error type and response
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({
+      success: false,
+      error: 'Validation Error',
+      details: err.details,
+      errorId
+    });
+  }
+
+  if (err.name === 'AuthenticationError') {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication Required',
+      errorId
+    });
+  }
+
+  // Default server error
+  return res.status(500).json({
+    success: false,
+    error: 'Internal Server Error',
+    errorId
+  });
+};
+```
+
+### **Custom Error Classes**
+- **ValidationError**: Input validation failures
+- **AuthenticationError**: Login/authorization issues
+- **AuthorizationError**: Permission/role issues
+- **DatabaseError**: Database operation failures
+- **ExternalServiceError**: Third-party service failures
+
+---
+
+## 👤 User Experience Error Handling
+
+### **Error Message Guidelines**
+- **User-Friendly**: Clear, non-technical language
+- **Actionable**: Provide next steps or solutions
+- **Consistent**: Standardized error message format
+- **Localized**: Support for multiple languages
+- **Accessible**: Screen reader friendly
+
+### **Error Message Structure**
+```javascript
+const errorMessages = {
+  validation: {
+    required: 'This field is required',
+    email: 'Please enter a valid email address',
+    password: 'Password must be at least 8 characters'
+  },
+  network: {
+    timeout: 'Request timed out. Please try again.',
+    connection: 'Connection failed. Check your internet.',
+    server: 'Server error. Please try again later.'
+  },
+  authentication: {
+    invalid: 'Invalid email or password',
+    expired: 'Session expired. Please login again.',
+    unauthorized: 'You are not authorized for this action.'
+  }
+};
+```
+
+### **Error Recovery Strategies**
+- **Automatic Retry**: Retry failed requests automatically
+- **Manual Retry**: Provide retry buttons for user
+- **Alternative Actions**: Suggest alternative solutions
+- **Graceful Degradation**: Show partial content when possible
+- **Offline Support**: Handle offline scenarios
+
+---
+
+## 📊 Error Monitoring & Analytics
+
+### **Error Tracking Integration**
+- **Sentry Integration**: Automatic error reporting
+- **Error Metrics**: Track error rates and patterns
+- **Performance Impact**: Monitor error impact on performance
+- **User Impact**: Track affected users and sessions
+- **Trend Analysis**: Identify error patterns over time
+
+### **Error Analytics Dashboard**
+- **Error Rate**: Percentage of requests with errors
+- **Error Types**: Distribution of error categories
+- **User Impact**: Number of affected users
+- **Resolution Time**: Time to fix errors
+- **Prevention Metrics**: Errors prevented by validation
+
+### **Error Alerting**
+- **Critical Errors**: Immediate alerts for severe issues
+- **Error Thresholds**: Alerts when error rate exceeds limit
+- **User Impact Alerts**: Alerts when many users affected
+- **Performance Alerts**: Alerts for performance degradation
+- **Security Alerts**: Alerts for security-related errors
+
+---
+
+## 🔍 Error Validation & Prevention
+
+### **Input Validation**
+- **Client-Side Validation**: Real-time form validation
+- **Server-Side Validation**: Backend validation for security
+- **Schema Validation**: Use Joi or similar for API validation
+- **Type Validation**: TypeScript for type safety
+- **Business Rule Validation**: Domain-specific validation
+
+### **Error Prevention Strategies**
+- **Defensive Programming**: Handle edge cases proactively
+- **Graceful Degradation**: Continue operation with reduced functionality
+- **Circuit Breakers**: Prevent cascade failures
+- **Rate Limiting**: Prevent abuse and overload
+- **Input Sanitization**: Clean user inputs
+
+---
+
+## 🎯 Error Handling Patterns
+
+### **Frontend Error Patterns**
+- **Try-Catch Blocks**: Wrap async operations
+- **Error Boundaries**: Catch component errors
+- **Loading States**: Show loading during operations
+- **Error States**: Display error information
+- **Retry Mechanisms**: Allow users to retry failed operations
+
+### **Backend Error Patterns**
+- **Error Middleware**: Centralized error handling
+- **Custom Error Classes**: Specific error types
+- **Error Logging**: Comprehensive error logging
+- **Error Responses**: Consistent error response format
+- **Error Recovery**: Automatic error recovery where possible
+
+### **API Error Response Format**
+```javascript
+// Standard Error Response
+{
+  "success": false,
+  "error": "Error message",
+  "errorCode": "VALIDATION_ERROR",
+  "details": {
+    "field": "email",
+    "message": "Invalid email format"
+  },
+  "errorId": "uuid-for-tracking",
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+```
+
+---
+
+## 🚨 Error Handling Checklist
+
+### **Frontend Implementation**
+- [ ] Implement global error boundary
+- [ ] Create component-specific error boundaries
+- [ ] Add error fallback components
+- [ ] Implement retry mechanisms
+- [ ] Add loading and error states
+- [ ] Test error scenarios
+
+### **Backend Implementation**
+- [ ] Set up error middleware
+- [ ] Create custom error classes
+- [ ] Implement error logging
+- [ ] Add error response formatting
+- [ ] Set up error monitoring
+- [ ] Test error handling
+
+### **User Experience**
+- [ ] Write user-friendly error messages
+- [ ] Implement error recovery options
+- [ ] Add accessibility features
+- [ ] Support multiple languages
+- [ ] Test error scenarios with users
+
+### **Monitoring & Analytics**
+- [ ] Set up error tracking
+- [ ] Configure error alerts
+- [ ] Create error dashboards
+- [ ] Implement error metrics
+- [ ] Set up error reporting
+
+---
+
+## 🔧 Error Handling Best Practices
+
+### **Do's**
+- ✅ Implement comprehensive error boundaries
+- ✅ Log errors with full context
+- ✅ Provide user-friendly error messages
+- ✅ Set up error monitoring and alerting
+- ✅ Implement retry mechanisms
+- ✅ Test error scenarios thoroughly
+- ✅ Use consistent error response format
+- ✅ Handle errors gracefully
+
+### **Don'ts**
+- ❌ Expose sensitive information in errors
+- ❌ Ignore errors or fail silently
+- ❌ Show technical error details to users
+- ❌ Let errors crash the application
+- ❌ Forget to log errors
+- ❌ Use generic error messages
+- ❌ Ignore error monitoring
+- ❌ Forget to test error scenarios
+

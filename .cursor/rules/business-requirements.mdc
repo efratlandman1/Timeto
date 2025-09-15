@@ -1,0 +1,293 @@
+---
+alwaysApply: true
+---
+## 📊 Data Models
+
+### **1. User Model**
+```javascript
+{
+  // Required fields
+  email: String (required, unique),
+  password: String (required for local auth),
+  authProvider: String (enum: ['local', 'google']),
+  
+  // Optional fields
+  firstName: String,
+  lastName: String,
+  phonePrefix: String,
+  phone: String,
+  nickname: String,
+  providerId: String (for Google auth),
+  role: String (enum: ['admin', 'manager', 'end-user']),
+  is_verified: Boolean (default: false),
+  verification_token: String,
+  
+  // System fields
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### **2. Business Model**
+```javascript
+{
+  // Required fields
+  name: String (required),
+  address: String (required),
+  location: {
+    type: String (enum: ['Point']),
+    coordinates: [Number] (longitude, latitude)
+  },
+  prefix: String (required),
+  phone: String (required),
+  email: String (required),
+  categoryId: ObjectId (required, ref: 'categories'),
+  userId: ObjectId (required, ref: 'users'),
+  
+  // Optional fields
+  logo: String,
+  rating: Number,
+  description: String,
+  active: Boolean (default: true),
+  services: [ObjectId] (ref: 'services'),
+  openingHours: [{
+    day: Number (required),
+    closed: Boolean (default: false),
+    ranges: [{
+      open: String,
+      close: String
+    }]
+  }],
+  
+  // System fields
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### **3. Category Model**
+```javascript
+{
+  name: String (required),
+  description: String,
+  icon: String,
+  active: Boolean (default: true),
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### **4. Service Model**
+```javascript
+{
+  name: String (required),
+  description: String,
+  categoryId: ObjectId (ref: 'categories'),
+  active: Boolean (default: true),
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### **5. Favorite Model**
+```javascript
+{
+  userId: ObjectId (required, ref: 'users'),
+  businessId: ObjectId (required, ref: 'businesses'),
+  createdAt: Date
+}
+```
+
+### **6. Feedback Model**
+```javascript
+{
+  userId: ObjectId (required, ref: 'users'),
+  businessId: ObjectId (required, ref: 'businesses'),
+  rating: Number (required, min: 1, max: 5),
+  comment: String,
+  createdAt: Date
+}
+```
+
+---
+
+## 🔄 User Flows
+
+### **1. Business Discovery Flow**
+1. User visits MainPage
+2. User searches for businesses
+3. User views search results
+4. User clicks on business card
+5. User views business profile
+6. User can save to favorites (if authenticated)
+
+### **2. Business Registration Flow**
+1. User clicks "Add Business"
+2. User fills business details (Step 1)
+3. User sets opening hours (Step 2)
+4. User selects services (Step 3)
+5. User submits for approval
+6. Admin reviews and approves
+
+### **3. User Authentication Flow**
+1. User clicks "Login/Register"
+2. User chooses authentication method
+3. User completes authentication
+4. User is redirected to intended page
+5. User can access protected features
+
+### **4. Admin Management Flow**
+1. Admin logs in with admin credentials
+2. Admin accesses admin panel
+3. Admin manages categories, services, users
+4. Admin reviews business submissions
+5. Admin generates reports and statistics
+
+---
+
+## 🎨 UI/UX Requirements
+
+### **1. Design Principles**
+- **Bilingual Support**: Hebrew (RTL) and English (LTR)
+- **Responsive Design**: Mobile-first approach
+- **Accessibility**: WCAG 2.1 AA compliance
+- **Modern UI**: Clean, intuitive interface
+
+### **2. Color Scheme**
+- **Primary**: Brand colors for main actions
+- **Secondary**: Supporting colors for UI elements
+- **Neutral**: Grays for text and backgrounds
+- **Semantic**: Success (green), Warning (yellow), Error (red)
+
+### **3. Typography**
+- **Hebrew**: System fonts with RTL support
+- **English**: System fonts with LTR support
+- **Responsive**: Scalable font sizes
+- **Hierarchy**: Clear heading structure
+
+### **4. Component Requirements**
+- **Search Bar**: Advanced search with filters
+- **Business Cards**: Consistent card design
+- **Modals**: Standard modal patterns
+- **Forms**: Validation and error handling
+- **Navigation**: Clear navigation structure
+
+---
+
+## 🔧 Technical Requirements
+
+### **1. Frontend (React)**
+- **State Management**: Redux Toolkit
+- **Routing**: React Router DOM
+- **UI Framework**: Material-UI + Tailwind CSS
+- **Internationalization**: react-i18next
+- **Maps**: Google Maps API
+- **Authentication**: Google OAuth + JWT
+
+### **2. Backend (Node.js/Express)**
+- **Database**: MongoDB with Mongoose
+- **Authentication**: JWT tokens
+- **File Upload**: Multer with security
+- **Email**: Nodemailer for notifications
+- **Logging**: Pino logger
+- **Error Tracking**: Sentry
+
+### **3. Security Requirements**
+- **Input Validation**: Server-side validation
+- **File Upload Security**: Malware scanning
+- **Rate Limiting**: Prevent abuse
+- **CORS**: Proper cross-origin handling
+- **Helmet**: Security headers
+
+### **4. Performance Requirements**
+- **Loading Times**: < 3 seconds for main pages
+- **Search Performance**: Fast search results
+- **Image Optimization**: Compressed images
+- **Caching**: Browser and server caching
+- **Database Indexing**: Optimized queries
+
+---
+
+## 📋 Feature Specifications
+
+### **1. Search Functionality**
+- **Basic Search**: Text-based search
+- **Advanced Search**: Category, location, rating filters
+- **Geolocation**: Find nearby businesses
+- **Auto-complete**: Search suggestions
+
+### **2. Business Management**
+- **Business Creation**: Multi-step wizard
+- **Business Editing**: Update business information
+- **Business Verification**: Admin approval process
+- **Business Deactivation**: Soft delete functionality
+
+### **3. User Management**
+- **User Registration**: Email verification
+- **User Authentication**: Multiple auth methods
+- **User Profiles**: Personal information management
+- **User Roles**: Admin, Manager, End-user
+
+### **4. Rating & Review System**
+- **Star Ratings**: 1-5 star rating system
+- **Written Reviews**: Optional text reviews
+- **Review Moderation**: Admin review process
+- **Review Analytics**: Rating statistics
+
+### **5. Favorites System**
+- **Save Favorites**: Add businesses to favorites
+- **Favorites List**: View saved businesses
+- **Favorites Sync**: Cross-device synchronization
+- **Favorites Export**: Export favorites list
+
+---
+
+## 🚀 Success Metrics
+
+### **1. User Engagement**
+- **Daily Active Users**: Track user activity
+- **Session Duration**: Average session length
+- **Search Queries**: Number of searches per day
+- **Business Views**: Profile view statistics
+
+### **2. Business Metrics**
+- **Business Registrations**: New business signups
+- **Business Updates**: Information updates
+- **Business Verification**: Approval rates
+- **Business Retention**: Active business accounts
+
+### **3. Technical Metrics**
+- **Page Load Times**: Performance monitoring
+- **Error Rates**: Application error tracking
+- **API Response Times**: Backend performance
+- **Database Performance**: Query optimization
+
+---
+
+## 🔄 Development Phases
+
+### **Phase 1: Core Features**
+- [ ] User authentication system
+- [ ] Basic business listing
+- [ ] Search functionality
+- [ ] Business profiles
+
+### **Phase 2: Advanced Features**
+- [ ] Advanced search filters
+- [ ] Rating and review system
+- [ ] Favorites functionality
+- [ ] Business management
+
+### **Phase 3: Admin Features**
+- [ ] Admin panel
+- [ ] Business approval system
+- [ ] User management
+- [ ] Analytics dashboard
+
+### **Phase 4: Optimization**
+- [ ] Performance optimization
+- [ ] SEO improvements
+- [ ] Mobile app development
+- [ ] Advanced analytics
+
+This comprehensive business requirements document provides the foundation for building a scalable and user-friendly business directory application.

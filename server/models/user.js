@@ -4,6 +4,7 @@ const usersSchema = new mongoose.Schema({
   firstName: { type: String },
   lastName:  { type: String},
   email:     { type: String, required: true, unique: true },
+  phonePrefix: { type: String },
   phone:     { type: String },
   nickname:  { type: String },
   password:  { type: String, required: function() {
@@ -35,5 +36,12 @@ const usersSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Virtual field for full phone number
+usersSchema.virtual('fullPhone').get(function() {
+  if (this.phonePrefix && this.phone) {
+    return `${this.phonePrefix}${this.phone}`;
+  }
+  return null;
+});
 
 module.exports = mongoose.model('users', usersSchema); 

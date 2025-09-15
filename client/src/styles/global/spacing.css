@@ -1,0 +1,214 @@
+:root {
+    /* Base Spacing Unit */
+    --spacing-unit: 0.25rem; /* 4px */
+    
+    /* Spacing Scale */
+    --spacing-xs: 0.25rem;   /* 4px */
+    --spacing-sm: 0.5rem;    /* 8px */
+    --spacing-md: 1rem;      /* 16px */
+    --spacing-lg: 1.5rem;    /* 24px */
+    --spacing-xl: 2rem;      /* 32px */
+    --spacing-2xl: 3rem;     /* 48px */
+    --spacing-3xl: 4rem;     /* 64px */
+    --spacing-4xl: 6rem;     /* 96px */
+    
+    /* Component Spacing */
+    --component-padding: 1rem;
+    --component-margin: 1rem;
+    --component-gap: 1rem;
+    
+    /* Layout Spacing */
+    --layout-padding: 2rem;
+    --layout-margin: 2rem;
+    --layout-gap: 2rem;
+    
+    /* Section Spacing */
+    --section-padding: 4rem;
+    --section-margin: 4rem;
+    --section-gap: 4rem;
+    
+    /* Container Spacing */
+    --container-padding: 1rem;
+    --container-margin: 0 auto;
+    --container-max-width: 1200px;
+    
+    /* Grid Spacing */
+    --grid-gap: 1rem;
+    --grid-padding: 1rem;
+    
+    /* Form Spacing */
+    --form-group-margin: 1.5rem;
+    --form-label-margin: 0.5rem;
+    --form-input-padding: 0.75rem 1rem;
+    --form-button-margin: 1rem;
+    
+    /* Button Spacing */
+    --button-padding: 0.75rem 1.5rem;
+    --button-margin: 0.5rem;
+    --button-gap: 0.5rem;
+    
+    /* Card Spacing */
+    --card-padding: 1.5rem;
+    --card-margin: 1rem;
+    --card-gap: 1rem;
+    
+    /* Navigation Spacing */
+    --nav-item-margin: 1rem;
+    --nav-padding: 1rem;
+    --nav-gap: 1rem;
+    
+    /* Modal Spacing */
+    --modal-padding: 2rem;
+    --modal-margin: 2rem;
+    --modal-gap: 1rem;
+    
+    /* List Spacing */
+    --list-item-padding: 0.5rem 0;
+    --list-item-margin: 0;
+    --list-gap: 0.5rem;
+    
+    /* Table Spacing */
+    --table-cell-padding: 0.75rem;
+    --table-header-padding: 1rem 0.75rem;
+    --table-margin: 1rem 0;
+    
+    /* Icon Spacing */
+    --icon-margin: 0.5rem;
+    --icon-padding: 0.25rem;
+    --icon-gap: 0.5rem;
+    
+    /* Border Radius */
+    --border-radius-sm: 0.25rem;  /* 4px */
+    --border-radius-md: 0.5rem;   /* 8px */
+    --border-radius-lg: 1rem;     /* 16px */
+    --border-radius-xl: 1.5rem;   /* 24px */
+    --border-radius-full: 9999px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+    
+    /* Z-Index Scale */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+    --z-toast: 1080;
+}
+
+/* RTL/LTR Spacing Variables */
+[dir="rtl"] {
+    --margin-start: margin-right;
+    --margin-end: margin-left;
+    --padding-start: padding-right;
+    --padding-end: padding-left;
+    --border-start: border-right;
+    --border-end: border-left;
+    --left: right;
+    --right: left;
+    --start: right;
+    --end: left;
+}
+
+[dir="ltr"] {
+    --margin-start: margin-left;
+    --margin-end: margin-right;
+    --padding-start: padding-left;
+    --padding-end: padding-right;
+    --border-start: border-left;
+    --border-end: border-right;
+    --left: left;
+    --right: right;
+    --start: left;
+    --end: right;
+}
+
+/* Direction-Aware Spacing Utilities */
+.ms-auto {
+    margin-inline-start: auto;
+}
+
+.me-auto {
+    margin-inline-end: auto;
+}
+
+.ps-auto {
+    padding-inline-start: auto;
+}
+
+.pe-auto {
+    padding-inline-end: auto;
+}
+
+/* RTL/LTR Specific Spacing */
+.rtl .ms-auto {
+    margin-right: auto;
+    margin-left: 0;
+}
+
+.rtl .me-auto {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.ltr .ms-auto {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.ltr .me-auto {
+    margin-right: auto;
+    margin-left: 0;
+}
+
+/* Responsive Spacing */
+@media (max-width: 640px) {
+    :root {
+        --layout-padding: 1rem;
+        --layout-margin: 1rem;
+        --layout-gap: 1rem;
+        --section-padding: 2rem;
+        --section-margin: 2rem;
+        --section-gap: 2rem;
+        --container-padding: 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --component-padding: 0.75rem;
+        --component-margin: 0.75rem;
+        --component-gap: 0.75rem;
+        --nav-item-margin: 0.5rem;
+        --nav-padding: 0.75rem;
+        --nav-gap: 0.75rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    :root {
+        --container-max-width: 100%;
+        --grid-gap: 0.75rem;
+        --grid-padding: 0.75rem;
+    }
+}
+
+/* Print Spacing */
+@media print {
+    :root {
+        --layout-padding: 0;
+        --layout-margin: 0;
+        --layout-gap: 0;
+        --section-padding: 1rem;
+        --section-margin: 1rem;
+        --section-gap: 1rem;
+        --component-padding: 0.5rem;
+        --component-margin: 0.5rem;
+        --component-gap: 0.5rem;
+    }
+} 

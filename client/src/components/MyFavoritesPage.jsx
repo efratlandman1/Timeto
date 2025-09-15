@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import BusinessCard from './BusinessCard';
 import '../styles/userBusinesses.css';
 import { FaArrowRight } from "react-icons/fa";
 import { getToken } from "../utils/auth";
 
 const MyFavoritesPage = () => {
+    const { t } = useTranslation();
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = getToken();
+        const token = getToken();        
         if (!token) {
             navigate('/auth');
             return;
@@ -28,8 +30,8 @@ const MyFavoritesPage = () => {
                     return;
                 }
                 
-                const data = await response.json();
-                setFavorites(data);
+                const res = await response.json();
+                setFavorites(res.data.favorites || []);
             } catch (error) {
                 console.error("Error fetching favorites:", error);
             } finally {
@@ -40,8 +42,11 @@ const MyFavoritesPage = () => {
         fetchFavorites();
     }, [navigate]);
 
+    // Map favorites to businesses
+    const businesses = favorites.map(fav => fav.business_id).filter(biz => biz && biz._id);
+
     if (loading) {
-        return <div className="loading">טוען מועדפים...</div>;
+        return <div className="loading">{t('favorites.loading')}</div>;
     }
 
     return (
@@ -59,7 +64,7 @@ const MyFavoritesPage = () => {
                     </div>
                 </div>
 
-                {favorites.length === 0 ? (
+                {businesses.length === 0 ? (
                     <div className="empty-state">
                         <p>עדיין לא סימנת עסקים כמועדפים</p>
                         <button className="primary-button" onClick={() => navigate('/')}>
@@ -68,7 +73,7 @@ const MyFavoritesPage = () => {
                     </div>
                 ) : (
                     <div className="business-cards-grid">
-                        {favorites.map((business) => (
+                        {businesses.map((business) => (
                             <BusinessCard
                                 key={business._id}
                                 business={business}

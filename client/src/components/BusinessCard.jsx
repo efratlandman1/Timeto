@@ -18,30 +18,9 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [localActive, setLocalActive] = useState(business.active);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(business.isFavorite || false);
 
-  useEffect(() => {
-    const checkFavoriteStatus = async () => {
-      try {
-        const token = getToken();
-        if (!token) return;
-
-        const response = await fetch(
-          `${process.env.REACT_APP_API_DOMAIN}/api/v1/favorites/status/${business._id}`,
-          { headers: { 'Authorization': `Bearer ${token}` } }
-        );
-        
-        if (response.ok) {
-          const { isFavorite } = await response.json();
-          setIsFavorite(isFavorite);
-        }
-      } catch (error) {
-        console.error('Error checking favorite status:', error);
-      }
-    };
-
-    checkFavoriteStatus();
-  }, [business._id]);
+  // הסרת useEffect לבדיקת סטטוס מועדפים - עכשיו זה מגיע מהשרת
 
   const handleToggleFavorite = async (e) => {
     e.stopPropagation();
@@ -62,9 +41,13 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
       });
 
       if (response.ok) {
-        const { active } = await response.json();
+        const result = await response.json();
+        const active = result.data.active;
         setIsFavorite(active);
         showToast(active ? '✅ נוסף למועדפים' : '✅ הוסר מהמועדפים');
+      } else {
+        const errorData = await response.json();
+        showToast(`❌ ${errorData.message || 'שגיאה בעדכון מועדפים'}`, true);
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
@@ -91,12 +74,13 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
+        const result = await res.json();
         setLocalActive(false);
         setConfirmDelete(false);
-        showToast('✅ העסק נמחק');
+        showToast(result.message || '✅ העסק נמחק');
       } else {
         const err = await res.json();
-        showToast(`שגיאה: ${err.message || 'מחיקה נכשלה'}`, true);
+        showToast(`❌ ${err.message || 'מחיקה נכשלה'}`, true);
       }
     } catch {
       showToast('❌ שגיאה במחיקה', true);
@@ -120,11 +104,12 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
       });
 
       if (res.ok) {
+        const result = await res.json();
         setLocalActive(true);
-        showToast('✅ העסק שוחזר בהצלחה');
+        showToast(result.message || '✅ העסק שוחזר בהצלחה');
       } else {
         const err = await res.json();
-        showToast(`שגיאה: ${err.message || 'שחזור נכשל'}`, true);
+        showToast(`❌ ${err.message || 'שחזור נכשל'}`, true);
       }
     } catch {
       showToast('❌ שגיאה בשחזור', true);
@@ -134,7 +119,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
   const handleEdit = (e) => {
     e.stopPropagation(); // Prevent card navigation
     dispatch(setSelectedBusiness(business));
-    navigate(`/edit/${business._id}`);
+    navigate(`/business/${business._id}`);
   };
 
   const handleCardClick = () => {
@@ -166,16 +151,32 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
       className={`business-card ${!localActive ? 'inactive' : ''}`}
       onClick={handleCardClick}
     >
-      <div className="business-card-image-container">
-        <img
-          className="business-card-image"
-          src={
-            business.logo
-              ? `${process.env.REACT_APP_API_DOMAIN}/uploads/${business.logo.split('/').pop()}`
-              : `${process.env.REACT_APP_API_DOMAIN}/uploads/default-logo.png`
-          }
-          alt={business.name}
-        />
+      <div
+        className="business-card-image-container"
+        style={{
+          background: !business.logo && business.categoryId?.color
+            ? business.categoryId.color
+            : '#f8f8f8'
+        }}
+      >
+        {business.logo ? (
+          <img
+            className="business-card-image"
+            src={`${process.env.REACT_APP_API_DOMAIN}/uploads/${business.logo.split('/').pop()}`}
+            alt={business.name}
+          />
+        ) : (
+          <span className="business-card-placeholder">
+            {business.categoryId?.logo && (
+              <img
+                src={`${process.env.REACT_APP_API_DOMAIN}${business.categoryId.logo}`}
+                alt={business.categoryId?.name}
+                className="category-logo-in-placeholder"
+              />
+            )}
+            <span className="business-placeholder-name">{business.name}</span>
+          </span>
+        )}
         <div className="business-card-overlay" />
         {localActive && (
           <div className={`business-card-badge ${isBusinessOpen() ? 'badge-open' : 'badge-closed'}`}>
@@ -216,13 +217,6 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
             <div className="rating-stars">
               {renderRatingStars(business.rating)}
             </div>
-            {business.rating !== null && business.rating !== undefined ? (
-              <span className="rating-number">
-                {roundRating(business.rating)}
-              </span>
-            ) : (
-              <span className="rating-number new">חדש</span>
-            )}
           </div>
 
           <div className="business-card-actions">

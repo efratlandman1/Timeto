@@ -1,0 +1,46 @@
+---
+alwaysApply: true
+---
+### Wizard Structure Requirements
+Every multi-step process must implement a standardized wizard component with:
+
+#### 1. Visual Progress Indicator
+- Progress bar with connecting line
+- Step dots with numbers and labels
+- Active step highlighting
+- Completed steps indication
+
+#### 2. Navigation Controls
+- Previous/Next buttons
+- Disable back button on first step
+- Different text for last step (Finish vs Next)
+- Step validation before allowing next
+
+#### 3. Step Content Container
+- Content wrapper for each step
+- Form validation per step
+- Data persistence between steps
+
+### Wizard Styling Guidelines
+
+#### Progress Bar Design
+- Use flexbox for step alignment
+- Implement connecting line between steps
+- Style step dots with active/completed states
+- Use consistent colors and transitions
+
+#### Navigation Buttons
+- Position buttons on opposite sides
+- Style back button with secondary appearance
+- Style next button with primary appearance
+- Implement proper hover states and transitions
+
+### Wizard Implementation Rules
+- **Always show progress indicator** at the top
+- **Disable back button** on first step
+- **Show different text** for last step (Finish vs Next)
+- **Validate current step** before allowing next
+- **Save progress** automatically between steps
+- **Allow step navigation** via progress dots (optional)
+- **Show step titles** in current language
+- **Handle form validation** per step

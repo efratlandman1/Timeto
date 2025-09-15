@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import BusinessCard from './BusinessCard';
 import '../styles/userBusinesses.css';
 import { FaPlus, FaArrowRight } from "react-icons/fa";
 import { getToken } from "../utils/auth";
 
 const UserBusinessesPage = () => {
+    const { t } = useTranslation();
     const [myBusinesses, setMyBusinesses] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -29,7 +31,7 @@ const UserBusinessesPage = () => {
                 }
                 
                 const data = await response.json();
-                setMyBusinesses(data);
+                setMyBusinesses(data.data.businesses || []);
             } catch (error) {
                 console.error("Error fetching businesses:", error);
             } finally {
@@ -45,30 +47,30 @@ const UserBusinessesPage = () => {
             <div className='wide-page-content'>
                 <button className="nav-button above-header" onClick={() => navigate('/')}>
                     <FaArrowRight className="icon" />
-                    חזרה לדף הבית
+                    {t('common.backToHome')}
                 </button>
                 
                 <div className="page-header">
                     <div className="page-header__content">
-                        <h1>העסקים שלי</h1>
-                        <p>נהל את העסקים שהוספת למדריך</p>
+                        <h1>{t('userBusinesses.title')}</h1>
+                        <p>{t('userBusinesses.subtitle')}</p>
                     </div>
                     <div className="page-header__action">
                         <button 
                             className="add-business-button"
-                            onClick={() => navigate('/edit')}
+                            onClick={() => navigate('/business')}
                         >
                             <FaPlus className="add-business-icon" />
-                            הוספת עסק חדש
+                            {t('userBusinesses.addNewBusiness')}
                         </button>
                     </div>
                 </div>
 
                 <div className="business-cards-grid">
                     {loading ? (
-                        <div>טוען...</div>
+                        <div>{t('common.loading')}</div>
                     ) : myBusinesses.length === 0 ? (
-                        <div>אין לך עסקים עדיין</div>
+                        <div>{t('userBusinesses.noBusinesses')}</div>
                     ) : (
                         myBusinesses.map(business => (
                             <BusinessCard

@@ -7,22 +7,27 @@ import '../styles/LoginPage.css'; // Reusing the same styles for a consistent lo
 import { FaUser, FaLock, FaEnvelope, FaPhone, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { getToken } from '../utils/auth';
 import { toast } from 'react-toastify'; // Import toast
+import { PHONE_PREFIXES, PHONE_NUMBER_MAX_LENGTH } from '../constants/globals';
+import { useTranslation } from 'react-i18next';
 
 const UserProfilePage = () => {
+  const { t, ready } = useTranslation();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    phonePrefix: '',
     phone: '',
     nickname: '',
     password: '',
     confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     // Load user data from Redux store
     if (user) {
@@ -30,6 +35,7 @@ const UserProfilePage = () => {
         firstName: user.firstName || '',
         lastName: user.lastName || '',
         email: user.email || '',
+        phonePrefix: user.phonePrefix || '',
         phone: user.phone || '',
         nickname: user.nickname || '',
         password: '',
@@ -37,6 +43,35 @@ const UserProfilePage = () => {
       });
     }
   }, [user]);
+  
+  useEffect(() => {
+    // Load user data from Redux store
+    if (user) {
+      setFormData({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phonePrefix: user.phonePrefix || '',
+        phone: user.phone || '',
+        nickname: user.nickname || '',
+        password: '',
+        confirmPassword: '',
+      });
+    }
+  }, [user]);
+  
+  // Wait for translations to load
+  if (!ready) {
+    return (
+      <div className="narrow-page-container">
+        <div className="narrow-page-content">
+          <div className="loading-container">
+            <span>Loading translations...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -46,17 +81,17 @@ const UserProfilePage = () => {
     e.preventDefault();
   
     if (formData.password && formData.password.length < 8) {
-      toast.error('הסיסמה חייבת להכיל לפחות 8 תווים.');
+      toast.error(t('userProfile.messages.passwordLength'));
       return;
     }
 
     if (formData.password && formData.password !== formData.confirmPassword) {
-      toast.error('הסיסמאות אינן תואמות');
+      toast.error(t('userProfile.messages.passwordMismatch'));
       return;
     }
   
     if (!user || !user.id) {
-        toast.error('לא ניתן לעדכן פרופיל, משתמש לא זוהה.');
+        toast.error(t('userProfile.messages.userNotFound'));
         return;
     }
   
@@ -75,11 +110,11 @@ const UserProfilePage = () => {
 
         const response = await axios.put(`${process.env.REACT_APP_API_DOMAIN}/api/v1/users/${user.id}`, payload, config);
   
-        const updatedUser = response.data;
+        const updatedUser = response.data.data;
         dispatch(setReduxUser(updatedUser.user));
         localStorage.setItem('user', JSON.stringify(updatedUser.user));
         
-        toast.success('הפרופיל עודכן בהצלחה');
+        toast.success(t('userProfile.messages.updateSuccess'));
         
         // Navigate after a short delay to allow user to see the toast
         setTimeout(() => {
@@ -88,7 +123,7 @@ const UserProfilePage = () => {
       
     } catch (err) {
       console.error('Update failed:', err);
-      const errorMessage = err.response?.data?.message || 'עדכון הפרופיל נכשל, נסה שוב';
+      const errorMessage = err.response?.data?.message || t('userProfile.messages.updateFailed');
       toast.error(errorMessage);
     }
   };
@@ -97,50 +132,74 @@ const UserProfilePage = () => {
     <div className="narrow-page-container">
       <div className="narrow-page-content">
         <form className="login-form" onSubmit={handleUpdate}>
-          <h1 className="login-title">עריכת פרופיל</h1>
+          <h1 className="login-title">{t('userProfile.title')}</h1>
 
           <div className="login-input-wrapper">
             <FaUser className="login-input-icon" />
-            <input className="login-input" type="text" name="firstName" placeholder="שם פרטי" value={formData.firstName} onChange={handleChange} required />
+            <input className="login-input" type="text" name="firstName" placeholder={t('userProfile.fields.firstName')} value={formData.firstName} onChange={handleChange} required />
           </div>
 
           <div className="login-input-wrapper">
             <FaUser className="login-input-icon" />
-            <input className="login-input" type="text" name="lastName" placeholder="שם משפחה" value={formData.lastName} onChange={handleChange} required />
-          </div>
-
-          <div className="login-input-wrapper">
-            <FaPhone className="login-input-icon" />
-            <input className="login-input" type="tel" name="phone" placeholder="טלפון" value={formData.phone} onChange={handleChange} required />
+            <input className="login-input" type="text" name="lastName" placeholder={t('userProfile.fields.lastName')} value={formData.lastName} onChange={handleChange} required />
           </div>
 
           <div className="login-input-wrapper">
             <FaEnvelope className="login-input-icon" />
-            <input className="login-input" type="email" name="email" placeholder="דואר אלקטרוני" value={formData.email} onChange={handleChange} required />
+            <input className="login-input" type="email" name="email" placeholder={t('userProfile.fields.email')} value={formData.email} onChange={handleChange} required />
+          </div>
+          
+          <div className="login-input-wrapper phone-split">
+            <FaPhone className="login-input-icon" />
+            <div className="phone-inputs-container">
+              <select
+                name="phonePrefix"
+                value={formData.phonePrefix}
+                onChange={handleChange}
+                className="phone-prefix-select"
+              >
+                <option value="">{t('userProfile.fields.phonePrefix')}</option>
+                {PHONE_PREFIXES.map(prefix => (
+                  <option key={prefix} value={prefix}>{prefix}</option>
+                ))}
+              </select>
+
+              <input
+                className="phone-number-input"
+                type="text"
+                name="phone"
+                placeholder={t('userProfile.fields.phone')}
+                value={formData.phone}
+                onChange={handleChange}
+                inputMode="numeric"
+                maxLength={PHONE_NUMBER_MAX_LENGTH}
+              />
+            </div>
           </div>
           
           <div className="login-input-wrapper">
             <FaUser className="login-input-icon" />
-            <input className="login-input" type="text" name="nickname" placeholder="כינוי באפליקציה" value={formData.nickname} onChange={handleChange} required />
+            <input className="login-input" type="text" name="nickname" placeholder={t('userProfile.fields.nickname')} value={formData.nickname} onChange={handleChange} required />
           </div>
           
           <hr style={{width: '100%', border: '1px solid #eee', margin: '20px 0'}} />
-          <p style={{textAlign: 'center', color: '#666'}}>שנה סיסמה (אופציונלי)</p>
+          <p style={{textAlign: 'center', color: '#666'}}>{t('userProfile.changePassword')}</p>
 
           <div className="login-input-wrapper">
-            <FaLock className="login-input-icon" />
-            <input className="login-input" type={showPassword ? "text" : "password"} name="password" placeholder="סיסמה חדשה" value={formData.password} onChange={handleChange} />
+            <input className="login-input" type={showPassword ? "text" : "password"} name="password" placeholder={t('userProfile.fields.password')} value={formData.password} onChange={handleChange} />
             <span className="login-password-toggle" onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
 
           <div className="login-input-wrapper">
-            <FaLock className="login-input-icon" />
-            <input className="login-input" type={showPassword ? "text" : "password"} name="confirmPassword" placeholder="אישור סיסמה חדשה" value={formData.confirmPassword} onChange={handleChange} />
+            <input className="login-input" type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder={t('userProfile.fields.confirmPassword')} value={formData.confirmPassword} onChange={handleChange} />
+            <span className="login-password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
           </div>
 
-          <button className="login-button" type="submit">שמור שינויים</button>
+          <button className="login-button" type="submit">{t('userProfile.saveChanges')}</button>
         </form>
       </div>
     </div>

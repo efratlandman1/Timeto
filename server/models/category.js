@@ -5,7 +5,8 @@ const CategorySchema = new mongoose.Schema({
     // subcategories: [{
     //     name: { type: String, required: true }
     // }],
-    logo: { type: String, required: true }
+    logo: { type: String, required: true },
+    color: { type: String, required: false }
 }, {
     timestamps: true
 });

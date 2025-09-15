@@ -1,0 +1,859 @@
+# 📱 Screen Flow & Navigation - Timeto Application
+
+## 🎯 Navigation Architecture
+
+### **Navigation Structure**
+- **Public Routes**: Accessible without authentication
+- **Protected Routes**: Require user authentication
+- **Admin Routes**: Require admin privileges
+- **Dynamic Routes**: Parameter-based navigation
+
+### **Route Organization**
+```javascript
+// Route structure
+/                           // MainPage (Public)
+/search-results             // SearchResultPage (Public)
+/business-profile/:id       // BusinessProfilePage (Public)
+/terms                      // TermsPage (Public)
+/suggest-item              // SuggestItemPage (Public)
+
+/auth                       // AuthPage (Public)
+/forgot-password           // ForgotPasswordPage (Public)
+/reset-password            // ResetPasswordPage (Public)
+
+/user-profile              // UserProfilePage (Protected)
+/user-businesses           // UserBusinessesPage (Protected)
+/user-favorites            // MyFavoritesPage (Protected)
+/feedback                  // FeedbackPage (Protected)
+
+/business                  // EditBusinessPage (Protected)
+/business/:id              // EditBusinessPage (Protected)
+
+/admin                     // AdminPanelPage (Admin)
+```
+
+---
+
+## 🏠 Public Screens Flow
+
+### **1. MainPage (`/`)**
+```javascript
+// Entry point for all users
+MainPage
+├── Header (Navigation, Search, Language Toggle)
+├── Hero Section (Featured Businesses)
+├── Search Bar (Global Search)
+├── Category Grid (Business Categories)
+├── Popular Businesses Section
+├── New Businesses Section
+├── Near you Businesses Section
+└── Footer (Links, Social Media)
+```
+
+#### **User Actions**
+- **Search**: Click search bar → SearchResultPage
+- **Category**: Click category → SearchResultPage with filter
+- **Business**: Click business card → BusinessProfilePage
+- **Add Business**: Click "Add Business" → EditBusinessPage (if authenticated)
+- **Login**: Click "Login" → AuthPage
+- **Language Toggle**: Switch between Hebrew/English
+
+### **2. SearchResultPage (`/search-results`)**
+```javascript
+// Search results with filters
+SearchResultPage
+├── Header (Back button, Search bar)
+├── Filter Panel (Category, Rating, Distance)
+├── Sort Options (Relevance, Rating, Distance)
+├── Results Grid (Business Cards)
+├── Pagination
+└── Map View Toggle
+```
+
+#### **User Actions**
+- **Filter**: Apply filters → Update results
+- **Sort**: Change sort order → Reorder results
+- **Business**: Click business card → BusinessProfilePage
+- **Map View**: Toggle map/list view
+- **Back**: Return to previous page
+- **Clear Filters**: Reset all filters
+
+### **3. BusinessProfilePage (`/business-profile/:id`)**
+```javascript
+// Detailed business information
+BusinessProfilePage
+├── Header (Back button, Share button)
+├── Business Hero (Logo, Name, Rating)
+├── Contact Information (Phone, Email, Address)
+├── Business Details (Description, Services)
+├── Opening Hours
+├── Location Map
+├── Reviews Section
+├── Similar Businesses
+└── Action Buttons (Call, Favorite, Review)
+```
+
+#### **User Actions**
+- **Call**: Click phone number → Phone dialer
+- **Favorite**: Click heart → Add to favorites (if authenticated)
+- **Review**: Click "Write Review" → FeedbackPage
+- **Share**: Click share → Share options
+- **Directions**: Click address → Maps app
+- **Back**: Return to previous page
+- **View All Reviews**: Click → Expand reviews section
+
+### **4. TermsPage (`/terms`)**
+```javascript
+// Terms of service
+TermsPage
+├── Header (Back button)
+├── Terms Content
+├── Privacy Policy
+├── Cookie Policy
+└── Contact Information
+```
+
+#### **User Actions**
+- **Back**: Return to previous page
+- **Print**: Print terms page
+- **Share**: Share terms link
+
+### **5. SuggestItemPage (`/suggest-item`)**
+```javascript
+// Suggest new categories/services
+SuggestItemPage
+├── Header (Back button, Help button)
+├── Suggestion Type Selection
+│   ├── Category Suggestion Tab
+│   ├── Service Suggestion Tab
+│   └── General Improvement Tab
+├── Suggestion Form
+│   ├── Basic Information
+│   ├── Market Research
+│   ├── Business Examples
+│   └── Your Information
+├── Submit Button
+└── Success Message
+```
+
+#### **User Actions**
+- **Submit Suggestion**: Fill form → Submit → Success page
+- **Save Draft**: Save incomplete form
+- **Help**: Click help → Show guidelines
+- **Back**: Return to previous page
+
+---
+
+## 🔐 Authentication Screens Flow
+
+### **1. AuthPage (`/auth`)**
+```javascript
+// Login and registration
+AuthPage
+├── Header (Logo, Language Toggle)
+├── Tab Navigation (Login/Register)
+├── Login Form
+│   ├── Email Input
+│   ├── Password Input
+│   ├── Remember Me
+│   ├── Login Button
+│   └── Forgot Password Link
+├── Register Form
+│   ├── Email Input
+│   ├── Password Input
+│   ├── Confirm Password
+│   ├── Terms Checkbox
+│   ├── Register Button
+│   └── Login Link
+├── Social Login (Google)
+└── Footer (Terms, Privacy)
+```
+
+#### **User Actions**
+- **Login**: Submit form → Redirect to intended page
+- **Register**: Submit form → Email verification
+- **Google Login**: Click Google button → OAuth flow
+- **Forgot Password**: Click link → ForgotPasswordPage
+- **Switch Tabs**: Toggle between login/register
+- **Language Toggle**: Switch interface language
+
+### **2. ForgotPasswordPage (`/forgot-password`)**
+```javascript
+// Password recovery
+ForgotPasswordPage
+├── Header (Back button)
+├── Email Input
+├── Submit Button
+├── Success Message
+└── Back to Login Link
+```
+
+#### **User Actions**
+- **Submit**: Enter email → Send reset link
+- **Back**: Return to login page
+
+### **3. ResetPasswordPage (`/reset-password`)**
+```javascript
+// Password reset with token
+ResetPasswordPage
+├── Header (Back button)
+├── New Password Input
+├── Confirm Password Input
+├── Submit Button
+├── Success Message
+└── Back to Login Link
+```
+
+#### **User Actions**
+- **Submit**: Enter new password → Update password
+- **Back**: Return to login page
+
+---
+
+## 👤 User Screens Flow
+
+### **1. UserProfilePage (`/user-profile`)**
+```javascript
+// User profile management
+UserProfilePage
+├── Header (Back button, Edit button)
+├── Profile Information
+│   ├── Avatar
+│   ├── Name
+│   ├── Email
+│   ├── Phone
+│   └── Join Date
+├── Preferences
+│   ├── Language Setting
+│   ├── Notification Settings
+│   └── Privacy Settings
+├── Statistics
+│   ├── Businesses Owned
+│   ├── Favorites Count
+│   └── Reviews Written
+└── Action Buttons (Edit Profile, Logout)
+```
+
+#### **User Actions**
+- **Edit Profile**: Click edit → Edit form
+- **Change Language**: Toggle language → Update UI
+- **Logout**: Click logout → Clear session → MainPage
+- **Change Password**: Click → Password change form
+- **Delete Account**: Click → Confirmation modal
+
+### **2. UserBusinessesPage (`/user-businesses`)**
+```javascript
+// User's owned businesses
+UserBusinessesPage
+├── Header (Back button, Add Business button)
+├── Statistics Bar
+│   ├── Total Businesses
+│   ├── Active Businesses
+│   ├── Pending Approvals
+│   └── Rejected Businesses
+├── Filter Panel
+│   ├── Status Filter
+│   ├── Category Filter
+│   └── Sort Options
+├── Business List
+│   ├── Business Card
+│   │   ├── Business Name
+│   │   ├── Status (Active/Inactive)
+│   │   ├── Rating
+│   │   ├── Edit Button
+│   │   └── Delete Button
+│   └── Empty State
+└── Add Business Button
+```
+
+#### **User Actions**
+- **Add Business**: Click button → EditBusinessPage
+- **Edit Business**: Click edit → EditBusinessPage
+- **Delete Business**: Click delete → Confirmation modal
+- **View Business**: Click business → BusinessProfilePage
+- **Filter**: Apply filters → Update list
+- **Sort**: Change sort order → Reorder list
+
+### **3. MyFavoritesPage (`/user-favorites`)**
+```javascript
+// User's favorite businesses
+MyFavoritesPage
+├── Header (Back button)
+├── Statistics Bar
+│   ├── Total Favorites
+│   ├── Recently Added
+│   ├── Most Visited
+│   └── Average Rating
+├── Filter & Sort Panel
+│   ├── Search Input
+│   ├── Category Filter
+│   ├── Rating Filter
+│   └── Sort Options
+├── Favorites Grid
+│   ├── Business Card
+│   │   ├── Business Name
+│   │   ├── Rating
+│   │   ├── Remove Button
+│   │   └── View Button
+│   └── Empty State
+└── Export Favorites Button
+```
+
+#### **User Actions**
+- **Remove Favorite**: Click remove → Remove from favorites
+- **View Business**: Click business → BusinessProfilePage
+- **Export**: Click export → Download favorites list
+- **Search**: Search within favorites
+- **Filter**: Filter by category/rating
+- **Sort**: Sort by date/name/rating
+
+### **4. FeedbackPage (`/feedback`)**
+```javascript
+// Write business review
+FeedbackPage
+├── Header (Back button)
+├── Business Information
+│   ├── Business Name
+│   ├── Business Logo
+│   └── Current Rating
+├── Review Form
+│   ├── Star Rating (1-5)
+│   ├── Comment Text Area
+│   ├── Review Categories (Optional)
+│   ├── Additional Options
+│   └── Submit Button
+└── Success Message
+```
+
+#### **User Actions**
+- **Submit Review**: Fill form → Submit → Success page
+- **Save Draft**: Save incomplete review
+- **Cancel**: Return to business page
+- **Anonymous Review**: Toggle anonymous option
+
+---
+
+## 🏢 Business Management Screens Flow
+
+### **1. EditBusinessPage (`/business` or `/business/:id`)**
+```javascript
+// Create or edit business with wizard
+EditBusinessPage
+├── Header (Back button, Save button, Preview button)
+├── Wizard Navigation
+│   ├── Progress Bar
+│   ├── Step Indicators
+│   │   ├── Step 1: Basic Info
+│   │   ├── Step 2: Contact & Location
+│   │   ├── Step 3: Services & Hours
+│   │   └── Step 4: Review & Submit
+│   └── Step Counter
+├── Step Content
+└── Navigation Buttons (Previous, Next, Save)
+```
+
+#### **Step 1: Basic Information**
+```javascript
+BusinessDetailsStep
+├── Basic Information
+│   ├── Business Name
+│   ├── Description
+│   ├── Category Selection
+│   └── Logo Upload
+├── Business Images
+│   ├── Multiple Image Upload
+│   ├── Image Gallery
+│   └── Primary Image Selection
+└── Validation Messages
+```
+
+#### **Step 2: Contact & Location**
+```javascript
+ContactLocationStep
+├── Contact Information
+│   ├── Address
+│   ├── Phone Number
+│   ├── Email
+│   └── Website
+├── Location Picker
+│   ├── Address Input
+│   ├── Map Picker
+│   └── Coordinates
+└── Social Media Links
+```
+
+#### **Step 3: Services & Hours**
+```javascript
+ServicesHoursStep
+├── Services Selection
+│   ├── Service Categories
+│   ├── Service Checkboxes
+│   ├── Custom Service Input
+│   └── Service Descriptions
+├── Operating Hours
+│   ├── Weekly Schedule
+│   ├── Time Range Picker
+│   └── Closed Day Toggle
+└── Business Features
+    ├── Parking Available
+    ├── WiFi Available
+    └── Other Features
+```
+
+#### **Step 4: Review & Submit**
+```javascript
+ReviewSubmitStep
+├── Business Summary
+│   ├── Business Name
+│   ├── Category
+│   ├── Address
+│   └── Contact Info
+├── Services Summary
+│   ├── Selected Services
+│   └── Service Count
+├── Hours Summary
+│   ├── Weekly Schedule
+│   └── Features List
+├── Terms & Conditions
+└── Submit Section
+    ├── Save Draft
+    ├── Submit for Review
+    └── Preview Business
+```
+
+#### **User Actions**
+- **Next Step**: Complete current step → Move to next
+- **Previous Step**: Go back to previous step
+- **Save Progress**: Save current state
+- **Preview**: View business as it will appear
+- **Submit**: Submit for admin approval
+- **Cancel**: Exit without saving
+
+---
+
+## 👨‍💼 Admin Screens Flow
+
+### **1. AdminPanelPage (`/admin`)**
+```javascript
+// Admin dashboard
+AdminPanelPage
+├── Header (Admin title, Logout button)
+├── Navigation Tabs
+│   ├── Dashboard
+│   ├── Categories
+│   ├── Services
+│   ├── Users
+│   ├── Businesses
+│   ├── Reviews
+│   ├── Suggestions
+│   └── Settings
+├── Tab Content
+└── Statistics Overview
+```
+
+#### **Dashboard Tab**
+```javascript
+DashboardContent
+├── Statistics Cards
+│   ├── Total Users
+│   ├── Total Businesses
+│   ├── Pending Approvals
+│   └── Recent Activity
+├── Charts and Graphs
+│   ├── User Growth Chart
+│   ├── Business Growth Chart
+│   ├── Review Activity Chart
+│   └── Category Distribution
+├── Recent Reviews
+└── System Alerts
+```
+
+#### **Categories Tab**
+```javascript
+CategoriesContent
+├── Category List
+│   ├── Category Name
+│   ├── Business Count
+│   ├── Active Status
+│   ├── Edit Button
+│   └── Delete Button
+├── Add Category Button
+└── Category Form Modal
+```
+
+#### **Services Tab**
+```javascript
+ServicesContent
+├── Service List
+│   ├── Service Name
+│   ├── Category
+│   ├── Active Status
+│   ├── Edit Button
+│   └── Delete Button
+├── Add Service Button
+└── Service Form Modal
+```
+
+#### **Users Tab**
+```javascript
+UsersContent
+├── User List
+│   ├── User Email
+│   ├── Role
+│   ├── Status
+│   ├── Edit Button
+│   └── Delete Button
+├── User Search
+└── User Details Modal
+```
+
+#### **Businesses Tab**
+```javascript
+BusinessesContent
+├── Business List
+│   ├── Business Name
+│   ├── Owner
+│   ├── Status
+│   ├── Rating
+│   ├── Edit Button
+│   └── Approve/Reject Button
+├── Business Search
+└── Business Details Modal
+```
+
+#### **Reviews Tab**
+```javascript
+ReviewsContent
+├── Review List
+│   ├── User Name
+│   ├── Business Name
+│   ├── Rating
+│   ├── Review Text
+│   ├── Status
+│   ├── Approve Button
+│   └── Reject Button
+├── Review Search
+└── Review Details Modal
+```
+
+#### **Suggestions Tab**
+```javascript
+SuggestionsContent
+├── Suggestion List
+│   ├── Suggestion Type
+│   ├── Name
+│   ├── Submitted By
+│   ├── Date
+│   ├── Status
+│   ├── Approve Button
+│   └── Reject Button
+├── Suggestion Details
+└── Admin Notes
+```
+
+#### **Settings Tab**
+```javascript
+SettingsContent
+├── System Settings
+│   ├── Site Configuration
+│   ├── Email Settings
+│   ├── Notification Settings
+│   └── Security Settings
+├── Content Management
+│   ├── Terms of Service
+│   ├── Privacy Policy
+│   ├── Help Content
+│   └── FAQ Management
+├── User Management
+│   ├── Role Permissions
+│   ├── User Limits
+│   ├── Verification Settings
+│   └── Ban Management
+└── System Maintenance
+    ├── Database Backup
+    ├── Cache Management
+    ├── Log Management
+    └── System Updates
+```
+
+#### **Admin Actions**
+- **Approve/Reject**: Review items → Approve or reject
+- **Edit**: Modify categories, services, users
+- **Delete**: Remove items with confirmation
+- **Search**: Find specific items
+- **Export**: Download data reports
+- **Settings**: Configure system settings
+
+---
+
+## 🔄 Navigation Patterns
+
+### **1. Breadcrumb Navigation**
+```javascript
+// Breadcrumb structure
+Home > Search Results > Business Profile
+Home > Categories > Restaurants > Business Profile
+User Profile > My Businesses > Edit Business
+Admin > Dashboard > Users > User Details
+```
+
+### **2. Tab Navigation**
+```javascript
+// Tab patterns
+AuthPage: Login | Register
+AdminPanel: Dashboard | Categories | Services | Users | Businesses | Reviews | Suggestions | Settings
+UserProfile: Profile | Preferences | Statistics
+EditBusiness: Step 1 | Step 2 | Step 3 | Step 4
+SuggestItem: Category | Service | Improvement
+```
+
+### **3. Wizard Navigation**
+```javascript
+// Wizard patterns
+EditBusiness: Step 1 | Step 2 | Step 3 | Step 4
+Progress indicator with current step highlighted
+Previous/Next navigation buttons
+Save progress functionality
+```
+
+### **4. Modal Navigation**
+```javascript
+// Modal patterns
+Confirmation Modal: Yes/No actions
+Form Modal: Data input
+Information Modal: Display content
+Search Modal: Advanced search
+Image Gallery Modal: View business images
+```
+
+### **5. Filter Navigation**
+```javascript
+// Filter patterns
+Search Results: Category | Rating | Distance | Services
+User Businesses: Status | Category | Sort
+Favorites: Category | Rating | Sort
+Admin Lists: Status | Role | Date Range
+```
+
+---
+
+## 📱 Mobile Navigation
+
+### **1. Bottom Navigation**
+```javascript
+// Mobile bottom nav
+Home | Search | Favorites | Profile
+```
+
+### **2. Mobile Menu**
+```javascript
+// Hamburger menu
+├── Home
+├── Search
+├── Categories
+├── My Businesses
+├── My Favorites
+├── Profile
+├── Settings
+└── Logout
+```
+
+### **3. Mobile Gestures**
+```javascript
+// Touch gestures
+Swipe Left/Right: Navigate between tabs
+Pull to Refresh: Reload content
+Pinch to Zoom: Map interactions
+Long Press: Context menus
+Swipe to Delete: Remove favorites
+```
+
+### **4. Mobile Optimizations**
+```javascript
+// Mobile-specific features
+Touch-friendly buttons (44px minimum)
+Large tap targets
+Simplified navigation
+Mobile-optimized forms
+Responsive design
+```
+
+---
+
+## 🎯 User Journey Flows
+
+### **1. New User Journey**
+```javascript
+MainPage → AuthPage → UserProfilePage → MainPage
+```
+
+#### **Detailed Flow:**
+1. **Landing**: User visits MainPage
+2. **Discovery**: Browse categories and businesses
+3. **Registration**: Click "Login" → AuthPage
+4. **Sign Up**: Fill registration form
+5. **Verification**: Receive email verification
+6. **Profile Setup**: Complete UserProfilePage
+7. **Return**: Back to MainPage as authenticated user
+
+### **2. Business Discovery Journey**
+```javascript
+MainPage → SearchResultPage → BusinessProfilePage → FeedbackPage
+```
+
+#### **Detailed Flow:**
+1. **Search**: Use search bar on MainPage
+2. **Results**: View SearchResultPage with filters
+3. **Explore**: Apply filters and sort options
+4. **Select**: Click business → BusinessProfilePage
+5. **Review**: Read reviews and business details
+6. **Interact**: Call, favorite, or write review
+7. **Feedback**: Write review → FeedbackPage
+
+### **3. Business Owner Journey**
+```javascript
+MainPage → AuthPage → EditBusinessPage → UserBusinessesPage
+```
+
+#### **Detailed Flow:**
+1. **Login**: Authenticate as business owner
+2. **Create**: Click "Add Business" → EditBusinessPage
+3. **Wizard**: Complete 4-step business creation
+4. **Submit**: Submit for admin approval
+5. **Manage**: View UserBusinessesPage
+6. **Edit**: Modify business details
+7. **Monitor**: Track business performance
+
+### **4. Admin Journey**
+```javascript
+MainPage → AuthPage → AdminPanelPage → Various Admin Tabs
+```
+
+#### **Detailed Flow:**
+1. **Login**: Authenticate as admin
+2. **Dashboard**: View AdminPanelPage overview
+3. **Review**: Check pending approvals
+4. **Manage**: Edit categories, services, users
+5. **Monitor**: Track system statistics
+6. **Configure**: Update system settings
+
+### **5. Power User Journey**
+```javascript
+MainPage → SearchResultPage → BusinessProfilePage → MyFavoritesPage
+```
+
+#### **Detailed Flow:**
+1. **Search**: Find specific businesses
+2. **Explore**: Browse multiple businesses
+3. **Favorite**: Add businesses to favorites
+4. **Organize**: Manage favorites list
+5. **Share**: Export or share favorites
+6. **Review**: Write detailed reviews
+
+---
+
+## 🔧 Technical Navigation
+
+### **1. Route Guards**
+```javascript
+// Authentication guards
+const requireAuth = (Component) => {
+  return user ? <Component /> : <Redirect to="/auth" />
+}
+
+const requireAdmin = (Component) => {
+  return user?.role === 'admin' ? <Component /> : <Redirect to="/" />
+}
+
+const requireBusinessOwner = (Component) => {
+  return user?.role === 'business_owner' || user?.role === 'admin' 
+    ? <Component /> 
+    : <Redirect to="/" />
+}
+```
+
+### **2. Route Parameters**
+```javascript
+// Dynamic routes
+/business-profile/:id
+/business/:id
+/user-profile/:userId
+/admin/users/:userId
+/admin/businesses/:businessId
+```
+
+### **3. Query Parameters**
+```javascript
+// Search parameters
+/search-results?q=restaurant&category=food&rating=4&distance=10
+/user-businesses?status=active&category=restaurant&sort=name
+/user-favorites?category=all&rating=4&sort=date
+```
+
+### **4. State Management**
+```javascript
+// Navigation state
+{
+  currentPage: 'business-profile',
+  previousPage: 'search-results',
+  userPermissions: ['read', 'write'],
+  breadcrumbs: ['Home', 'Search', 'Business'],
+  searchFilters: {
+    query: 'restaurant',
+    category: 'food',
+    rating: 4,
+    distance: 10
+  },
+  wizardState: {
+    currentStep: 2,
+    completedSteps: [1],
+    formData: { ... }
+  }
+}
+```
+
+### **5. Error Handling**
+```javascript
+// Error boundaries
+const ErrorBoundary = ({ children }) => {
+  return (
+    <ErrorBoundaryComponent>
+      {children}
+    </ErrorBoundaryComponent>
+  )
+}
+
+// 404 handling
+const NotFound = () => {
+  return <Redirect to="/" />
+}
+
+// Loading states
+const LoadingSpinner = () => {
+  return <div className="loading-spinner" />
+}
+```
+
+### **6. Performance Optimization**
+```javascript
+// Lazy loading
+const LazyComponent = lazy(() => import('./Component'))
+
+// Route-based code splitting
+const routes = {
+  '/': () => import('./pages/MainPage'),
+  '/search-results': () => import('./pages/SearchResultPage'),
+  '/business-profile/:id': () => import('./pages/BusinessProfilePage'),
+  '/admin': () => import('./pages/AdminPanelPage')
+}
+
+// Prefetching
+const prefetchRoute = (route) => {
+  const link = document.createElement('link')
+  link.rel = 'prefetch'
+  link.href = route
+  document.head.appendChild(link)
+}
+```
+
+This comprehensive screen flow specification ensures intuitive navigation and optimal user experience across all devices and user types for the Timeto application.

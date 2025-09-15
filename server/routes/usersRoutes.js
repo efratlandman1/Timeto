@@ -1,7 +1,9 @@
 const express = require('express');
-const usersController = require("../controllers/usersController");
 const router = express.Router();
-const adminAuth = require('../middlewares/adminAuth'); // Import the admin middleware
+const usersController = require('../controllers/usersController');
+const { requireAuth, requireAdmin } = require('../middlewares/authMiddleware');
+const { writeLimiter, generalLimiter } = require('../middlewares/rateLimiter');
+const { sanitizeRequest, validateUser, validateMongoIdParam } = require('../middlewares/inputValidation');
 
 // The user registration route is handled by authController
 // and defined in authRoutes.js. This route here can be used
@@ -11,8 +13,8 @@ const adminAuth = require('../middlewares/adminAuth'); // Import the admin middl
 // router.post('/register', usersController.registerUser); //update to register by auth
 
 // All other user management routes are for admins only
-router.get('/', adminAuth, usersController.getAllUsers);
-router.put('/:id', usersController.updateUser);
-router.delete('/:id', adminAuth, usersController.deleteUser);
+router.get('/', requireAdmin, generalLimiter, sanitizeRequest, usersController.getAllUsers);
+router.put('/:id', requireAuth, writeLimiter, sanitizeRequest, validateUser, validateMongoIdParam('id', 'User ID'), usersController.updateUser);
+router.delete('/:id', requireAdmin, writeLimiter, usersController.deleteUser);
 
 module.exports = router;

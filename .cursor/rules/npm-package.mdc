@@ -1,0 +1,21 @@
+---
+alwaysApply: true
+---
+### Automatic Installation
+- All `npm install` commands should be executed automatically by Cursor
+- No user approval required for npm installations
+- Install missing dependencies automatically when detected
+
+### Package Installation Guidelines
+- Install packages when import statements reference missing modules
+- Install dev dependencies when build tools are missing
+- Install peer dependencies automatically
+- Update package-lock.json automatically
+
+### Package.json Management
+- Keep package.json organized with proper categorization
+- Use exact versions for critical dependencies
+- Use caret (^) for minor version updates in development dependencies
+- Document all dependencies with clear purposes
+
+

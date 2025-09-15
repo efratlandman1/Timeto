@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaRegStar, FaStar } from 'react-icons/fa';
 import ReactDOM from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import '../styles/FeedbackPage.css';
 import {getToken} from "../utils/auth";
 
@@ -33,6 +34,7 @@ const Toast = ({ message, isError, onClose }) => {
 
 
 const FeedbackPage = ({ businessId, onClose }) => {
+  const { t } = useTranslation();
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState('');
@@ -47,8 +49,8 @@ const FeedbackPage = ({ businessId, onClose }) => {
         axios
         .get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/feedbacks/business/${businessId}`)
         .then(res => {
-            setPreviousFeedbacks(res.data);
-            const name = res.data?.[0]?.business_id?.name;
+            setPreviousFeedbacks(res.data.data.feedbacks || []);
+            const name = res.data.data.feedbacks?.[0]?.business_id?.name;
             if (name) setBusinessName(name);
         })
         .catch(err => console.error('Error fetching feedbacks:', err))
@@ -71,7 +73,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
         const token = getToken();
 
         if (!token) {
-        showToast('לא נמצאה הרשאת התחברות. התחברי מחדש.', true);
+                        showToast(t('common.loginPermission'), true);
         setTimeout(() => window.location.href = '/auth', 3000);
         return;
         }
@@ -106,7 +108,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
   return ReactDOM.createPortal(
     <>
     {isLoading ? (
-        <div className="feedback-page-loader">טוען חוות דעת...</div>
+        <div className="feedback-page-loader">{t('feedback.loading')}</div>
         ) : (
         <>
             <div className="feedback-page-modal-overlay" onClick={onClose}>
@@ -115,7 +117,7 @@ const FeedbackPage = ({ businessId, onClose }) => {
                     dir="rtl"
                     onClick={(e) => e.stopPropagation()}
                     >
-                    <button className="feedback-page-close-button" onClick={onClose}>×</button>
+                    <button className="feedback-page-close-button close-button" onClick={onClose}>×</button>
                     <h2 className="feedback-page-title">
                         חוות דעת על {businessName || 'העסק'}
                     </h2>
@@ -154,6 +156,9 @@ const FeedbackPage = ({ businessId, onClose }) => {
                     </div>
 
                     <button className="confirm-button" onClick={handleSubmit}>שלח פידבק</button>
+                    <button className="cancel-button" type="button" onClick={onClose} style={{marginTop: '1.5rem', width: '100%'}}>
+                      ביטול
+                    </button>
 
                     <div className="feedback-page-feedback-list">
                         <h3>חוות דעת קודמות</h3>

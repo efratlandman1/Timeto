@@ -10,14 +10,25 @@
     "myFavorites": "My Favorites",
     "adminPanel": "Admin panel",
     "logout": "Logout",
+    "backToMyBusinesses": "Back to My Businesses",
+    "letsGo": "Let's Go",
+    "addNewBusiness": "Add New Business",
     "languages": {
       "he": "עברית",
       "en": "English"
     },
+    "selectLanguage": "Select Language",
     "logo": {
       "main": "Time",
       "sub": "Business Directory"
-    }
+    },
+    "myLocation": "My Location",
+    "currentLocation": "Your Current Location",
+    "loadingAddress": "Loading address...",
+    "addressNotFound": "Address not found",
+    "addressError": "Error loading address",
+    "noLocation": "No location found",
+    "refreshLocation": "Refresh Location"
   },
   "greetings": {
     "morning": "Good Morning",
@@ -25,6 +36,30 @@
     "evening": "Good Evening",
     "night": "Good Night"
   },
+  "profile": "Profile",
+  "userProfile": {
+    "title": "Edit Profile",
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phonePrefix": "Prefix",
+      "phone": "Phone Number",
+      "nickname": "Nickname in App",
+      "password": "New Password",
+      "confirmPassword": "Confirm New Password"
+    },
+    "changePassword": "Change Password (Optional)",
+    "saveChanges": "Save Changes",
+    "messages": {
+      "passwordLength": "Password must contain at least 8 characters.",
+      "passwordMismatch": "Passwords do not match",
+      "userNotFound": "Cannot update profile, user not identified.",
+      "updateSuccess": "Profile updated successfully",
+      "updateFailed": "Profile update failed, try again"
+    }
+  },
+
   "mainPage": {
     "title": "Israel's Leading Business Directory",
     "subtitle": "Find the right business near you",
@@ -48,7 +83,20 @@
     "joinBanner": {
       "title": "Join Time Community",
       "description": "Add your business and start getting new customers today",
-      "button": "Add Business Free"
+      "button": "Add Business Free",
+      "joinNowAndDiscover": "Join now and start discovering interesting things around you"
+    },
+    "viewAll": "View All",
+    "footer": {
+      "contact": "Contact",
+      "quickLinks": "Quick Links",
+      "search": "Search",
+      "suggestItem": "Suggest Item",
+      "termsOfService": "Terms of Service",
+      "termsComingSoon": "Terms of service will be available soon",
+      "about": "About Time",
+      "aboutDescription": "Israel's leading business directory. Find the right business near you.",
+      "copyright": "© Zezman 2023 All rights reserved."
     }
   },
   "businessForm": {
@@ -56,6 +104,9 @@
       "new": "Add New Business",
       "edit": "Edit Business"
     },
+    "addNewBusiness": "Add New Business",
+    "fillDetailsToAddBusiness": "Fill in the following details to add your business",
+    "subtitle": "Fill in the following details to add your business",
     "steps": {
       "details": "Business Details",
       "services": "Business Services",
@@ -66,30 +117,54 @@
       "description": "Business Description",
       "address": "Address",
       "phone": "Phone",
-      "email": "Email",
+      "email": "Email Address",
       "website": "Website",
-      "category": "Category"
+      "category": "Service Category",
+      "selectCategory": "Select Category"
     },
     "validation": {
       "required": "Required field",
       "email": "Invalid email address",
       "phone": "Invalid phone number"
+    },
+    "logo": {
+      "selectLogo": "Select Logo",
+      "logoPreview": "Logo Preview",
+      "removeLogo": "Remove Logo"
     }
   },
   "auth": {
     "login": {
       "title": "Login",
+      "simpleLoginWithEmail": "Simple login with your email address",
       "email": "Email",
+      "emailAddress": "Email Address",
       "password": "Password",
       "submit": "Login",
       "forgotPassword": "Forgot Password?",
       "noAccount": "Don't have an account?",
       "signUp": "Sign Up Now",
       "loading": "Loading...",
+      "continue": "Continue",
       "errors": {
         "loginFailed": "Login failed",
         "invalidCredentials": "Invalid email or password",
         "invalidEmail": "Please enter a valid email address"
+      }
+    },
+    "verification": {
+      "success": "Email verified successfully! You can now login.",
+      "failure": "Email verification failed. The link may be invalid or expired. Please try again."
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "description": "Set a new password for your account",
+      "success": "🔐 New password is ready!",
+      "redirecting": "You will be redirected to the login page shortly...",
+      "submit": "Reset Password",
+      "errors": {
+        "passwordTooShort": "Password must contain at least 8 characters.",
+        "tooManyAttempts": "You've tried too many times. Please try again later."
       }
     },
     "register": {
@@ -110,6 +185,22 @@
         "passwordMismatch": "Passwords do not match",
         "registrationFailed": "Registration failed, please try again",
         "invalidEmail": "Please enter a valid email address"
+      }
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "subtitle": "Enter your email address to receive a password reset link",
+      "email": "Email Address",
+      "submit": "Send Reset Link",
+      "backToLogin": "Back to Login",
+      "createNewPassword": "Create New Password",
+      "requestSent": "Request Sent!",
+      "messages": {
+        "resetEmailSent": "A password reset email has been sent to you",
+        "emailNotFound": "Email address not found in the system",
+        "resetFailed": "Failed to send reset email, please try again",
+        "googleLoginFailed": "Google login failed",
+        "resetLinkSent": "If there's an account with the entered address – we've sent a reset link. Worth checking spam too 😉"
       }
     }
   },
@@ -141,7 +232,12 @@
     "showMore": "Show More",
     "submit": "Submit",
     "backToHome": "Back to Home",
-    "backToBusinesses": "Back to My Businesses"
+    "backToBusinesses": "Back to My Businesses",
+    "backToMyBusinesses": "Back to My Businesses",
+    "loginPermission": "Login required to perform this action",
+    "generalError": "An error occurred, please try again later",
+    "tooManyAttempts": "Too many attempts. Please try again later.",
+    "password": "Password"
   },
   "search": {
     "placeholder": "Search business by name, category or service",
@@ -239,6 +335,11 @@
       "to": "To"
     }
   },
+  "favorites": {
+    "loading": "Loading favorites...",
+    "title": "My Favorites",
+    "empty": "You haven't marked any businesses as favorites yet"
+  },
   "feedback": {
     "title": "Feedback for {{businessName}}",
     "loading": "Loading feedback...",
@@ -317,24 +418,50 @@
     "errors": {
       "loading": "Error loading business details",
       "notFound": "Business data not found"
-    }
+    },
+    "loading": "Loading business details...",
+    "error": "Error"
   },
   "searchResults": {
     "title": "Search Results",
     "noResults": "No results found",
+    "pageTitle": "Business Search",
+    "pageSubtitle": "Find the right business for you",
+    "advancedFilter": "Advanced Filter",
+    "loadingLocation": "Loading location...",
     "filters": {
       "title": "Filter Results",
       "category": "Category",
       "rating": "Rating",
       "services": "Services",
       "clear": "Clear Filters",
-      "apply": "Apply Filters"
+      "apply": "Apply Filters",
+      "active": "Active Filters:",
+      "clearAll": "Clear All"
     },
     "sort": {
       "title": "Sort By",
       "rating": "Highest Rating",
       "name": "A-Z",
-      "distance": "Distance"
+      "distance": "Distance",
+      "newest": "Newest",
+      "popular_nearby": "Popular Nearby"
+    },
+    "pagination": {
+      "page": "Page",
+      "of": "of",
+      "next": "Next",
+      "previous": "Previous",
+      "showing": "Showing",
+      "to": "to",
+      "results": "results"
+    },
+    "filterTags": {
+      "category": "Category:",
+      "rating": "stars and above",
+      "service": "Service:",
+      "maxDistance": "Up to distance:",
+      "km": "km"
     }
   },
   "businessSteps": {
@@ -374,10 +501,13 @@
         "saturday": "Saturday"
       },
       "closed": "Closed",
+      "open": "Open",
       "24hours": "Open 24/7",
       "custom": "Custom Hours",
       "from": "From",
-      "to": "To"
+      "to": "To",
+      "addRange": "Add Time Range",
+      "removeRange": "Remove Range"
     }
   },
   "editSteps": {
@@ -440,8 +570,38 @@
       "error": "Error saving business"
     }
   },
+  "search": {
+    "placeholder": "Search for business or service...",
+    "search": "Search",
+    "results": "Search results",
+    "noResults": "No results found",
+    "noResultsSuggestion": "Try searching with different words"
+  },
   "advancedSearch": {
     "title": "Advanced Search",
+    "sort": {
+      "title": "Sort Results",
+      "rating": "High Rating",
+      "name": "Alphabetical",
+      "distance": "Distance",
+      "newest": "Newest",
+      "popularNearby": "Popular in Your Area"
+    },
+    "rating": {
+      "title": "Minimum Rating",
+      "andAbove": "and above"
+    },
+    "category": {
+      "title": "Category",
+      "select": "Select Category"
+    },
+    "services": {
+      "title": "Services"
+    },
+    "distance": {
+      "title": "Maximum Distance (km)",
+      "km": "km"
+    },
     "filters": {
       "category": "Category",
       "services": "Services",
@@ -455,39 +615,34 @@
       }
     },
     "buttons": {
-      "apply": "Apply Filters",
-      "clear": "Clear",
-      "close": "Close"
+      "apply": "Show Results",
+      "clear": "Clear All",
+      "close": "Close",
+      "cancel": "Cancel"
     },
     "noResults": "No results found",
     "selected": "{{count}} items selected"
   },
   "accessibility": {
     "title": "Accessibility Settings",
-    "options": {
-      "fontSize": {
-        "title": "Font Size",
-        "normal": "Normal",
-        "large": "Large",
-        "larger": "Extra Large"
-      },
-      "contrast": {
-        "title": "Contrast",
-        "normal": "Normal",
-        "high": "High"
-      },
-      "animations": {
-        "title": "Animations",
-        "on": "On",
-        "off": "Off"
-      },
-      "screenReader": {
-        "title": "Screen Reader",
-        "instructions": "Screen reader usage instructions"
-      }
-    },
-    "apply": "Apply Changes",
-    "reset": "Reset Settings"
+    "openSettings": "Open accessibility settings",
+    "closeSettings": "Close accessibility settings",
+    "fontSize": "Font Size",
+    "contrast": "Contrast",
+    "cursorSize": "Cursor Size",
+    "textAlign": "Text Alignment",
+    "keyboardNav": "Keyboard Navigation",
+    "normal": "Normal",
+    "large": "Large",
+    "veryLarge": "Extra Large",
+    "highContrast": "High Contrast",
+    "right": "Right",
+    "center": "Center",
+    "left": "Left",
+    "active": "Active",
+    "inactive": "Inactive",
+    "resetSettings": "Reset Settings",
+    "cancel": "Cancel"
   },
   "suggestItem": {
     "title": "Suggest Item",
@@ -500,10 +655,12 @@
       },
       "name": {
         "he": "Hebrew Name",
-        "en": "English Name"
+        "en": "English Name",
+        "placeholder": "For example: Advanced Plumbing"
       },
       "parentCategory": "Parent Category",
       "reason": "Reason or Brief Description",
+      "reasonPlaceholder": "Why do you think this item is needed?",
       "submit": "Submit Suggestion"
     },
     "messages": {
@@ -518,11 +675,52 @@
     "addBusiness": "Add New Business",
     "loading": "Loading businesses...",
     "error": "Error loading businesses",
+    "subtitle": "Manage the businesses you've added to the directory",
+    "noBusinesses": "You don't have any businesses yet",
+    "addNewBusiness": "Add New Business",
     "filters": {
       "all": "All Businesses",
       "active": "Active",
       "inactive": "Inactive",
       "deleted": "Deleted"
+    }
+  },
+  "termsPage": {
+    "title": "Terms of Use",
+    "content": "or for purposes not explicitly permitted in these terms of use.",
+    "sections": {
+      "general": {
+        "title": "1. General",
+        "content": "Welcome to the Time website. The use of the website and the services offered on it is subject to the terms of use detailed below. Using the website constitutes your agreement to these terms."
+      },
+      "definitions": {
+        "title": "2. Definitions",
+        "content": "\"Website\" - This Time website with all its content and services.<br />\"User\" - Any person browsing the website or using its services."
+      },
+      "usage": {
+        "title": "3. Website Usage",
+        "content": "Use of the website is permitted for legal purposes only. It is prohibited to use the website for illegal purposes or for purposes not explicitly permitted in these terms of use."
+      },
+      "businessRegistration": {
+        "title": "4. Business Registration",
+        "content": "Registering businesses on the website requires providing accurate and truthful details. The website may reject registration requests or remove businesses for which incorrect or misleading information was provided."
+      },
+      "privacy": {
+        "title": "5. Privacy",
+        "content": "The website respects the privacy of its users. All information collected on the website is stored in the website's databases and is used in accordance with the website's privacy policy."
+      },
+      "intellectualProperty": {
+        "title": "6. Intellectual Property",
+        "content": "All intellectual property rights on the website, including copyrights, trademarks and any other right, belong to the website or its license holders."
+      },
+      "changes": {
+        "title": "7. Changes to Terms of Use",
+        "content": "The website may change the terms of use from time to time, at its sole discretion. These changes will take effect immediately upon their publication on the website."
+      },
+      "contact": {
+        "title": "8. Contact",
+        "content": "For any question or inquiry regarding the terms of use, you can contact us via:<br />Email: info@zezman.app"
+      }
     }
   }
 } 

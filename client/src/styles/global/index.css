@@ -1,6 +1,7 @@
 @import './colors.css';
 @import './typography.css';
 @import './layout.css';
+@import './spacing.css';
 
 /* Import Component Styles */
 @import './components/headers.css';
@@ -14,7 +15,7 @@
     box-sizing: border-box;
 }
 
-/* RTL/LTR Support */
+/* RTL/LTR Support - Complete Layout Mirroring */
 [dir="rtl"] {
     --start: right;
     --end: left;
@@ -23,6 +24,18 @@
     --padding-start: padding-right;
     --padding-end: padding-left;
     --text-align: right;
+    --float-start: right;
+    --float-end: left;
+    --border-start: border-right;
+    --border-end: border-left;
+    --border-radius-start: border-top-right-radius;
+    --border-radius-end: border-bottom-right-radius;
+    --border-radius-start-alt: border-top-left-radius;
+    --border-radius-end-alt: border-bottom-left-radius;
+    --transform-mirror: scaleX(-1);
+    --flex-direction: row-reverse;
+    --justify-start: flex-end;
+    --justify-end: flex-start;
 }
 
 [dir="ltr"] {
@@ -33,6 +46,18 @@
     --padding-start: padding-left;
     --padding-end: padding-right;
     --text-align: left;
+    --float-start: left;
+    --float-end: right;
+    --border-start: border-left;
+    --border-end: border-right;
+    --border-radius-start: border-top-left-radius;
+    --border-radius-end: border-bottom-left-radius;
+    --border-radius-start-alt: border-top-right-radius;
+    --border-radius-end-alt: border-bottom-right-radius;
+    --transform-mirror: scaleX(1);
+    --flex-direction: row;
+    --justify-start: flex-start;
+    --justify-end: flex-end;
 }
 
 body {
@@ -41,313 +66,2097 @@ body {
     color: var(--text-primary);
     background-color: var(--bg-secondary);
     text-align: var(--text-align);
+    margin-top: 60px; /* Add margin to prevent content from being hidden behind fixed header */
 }
 
-/* Direction-aware margins and paddings */
-.ms-1 { margin-inline-start: var(--spacing-sm); }
-.ms-2 { margin-inline-start: var(--spacing-md); }
-.ms-3 { margin-inline-start: var(--spacing-lg); }
-.ms-4 { margin-inline-start: var(--spacing-xl); }
-
-.me-1 { margin-inline-end: var(--spacing-sm); }
-.me-2 { margin-inline-end: var(--spacing-md); }
-.me-3 { margin-inline-end: var(--spacing-lg); }
-.me-4 { margin-inline-end: var(--spacing-xl); }
-
-.ps-1 { padding-inline-start: var(--spacing-sm); }
-.ps-2 { padding-inline-start: var(--spacing-md); }
-.ps-3 { padding-inline-start: var(--spacing-lg); }
-.ps-4 { padding-inline-start: var(--spacing-xl); }
-
-.pe-1 { padding-inline-end: var(--spacing-sm); }
-.pe-2 { padding-inline-end: var(--spacing-md); }
-.pe-3 { padding-inline-end: var(--spacing-lg); }
-.pe-4 { padding-inline-end: var(--spacing-xl); }
-
-/* Direction-aware flexbox */
-.flex-row {
-    flex-direction: row;
+/* Complete Layout Mirroring Classes */
+.rtl {
+    direction: rtl;
+    text-align: right;
 }
 
-[dir="rtl"] .flex-row {
+.ltr {
+    direction: ltr;
+    text-align: left;
+}
+
+/* RTL/LTR Layout Mirroring */
+.rtl .layout-container {
     flex-direction: row-reverse;
 }
 
-/* Direction-aware text alignment */
-.text-start { text-align: var(--start); }
-.text-end { text-align: var(--end); }
-
-/* Direction-aware positioning */
-.float-start { float: var(--start); }
-.float-end { float: var(--end); }
-
-.position-start { left: var(--start); }
-.position-end { right: var(--end); }
-
-/* Existing utility classes */
-.text-center { text-align: center; }
-.mt-1 { margin-top: var(--spacing-sm); }
-.mt-2 { margin-top: var(--spacing-md); }
-.mt-3 { margin-top: var(--spacing-lg); }
-.mt-4 { margin-top: var(--spacing-xl); }
-
-.mb-1 { margin-bottom: var(--spacing-sm); }
-.mb-2 { margin-bottom: var(--spacing-md); }
-.mb-3 { margin-bottom: var(--spacing-lg); }
-.mb-4 { margin-bottom: var(--spacing-xl); }
-
-.p-1 { padding: var(--spacing-sm); }
-.p-2 { padding: var(--spacing-md); }
-.p-3 { padding: var(--spacing-lg); }
-.p-4 { padding: var(--spacing-xl); }
-
-.d-flex { display: flex; }
-.flex-column { flex-direction: column; }
-.align-items-center { align-items: center; }
-.justify-content-center { justify-content: center; }
-.justify-content-between { justify-content: space-between; }
-
-.w-100 { width: 100%; }
-.h-100 { height: 100%; }
-
-/* Animation Classes */
-.fade-in {
-    animation: fadeIn 0.3s ease-in;
+.ltr .layout-container {
+    flex-direction: row;
 }
 
-.slide-in {
-    animation: slideIn 0.3s ease-out;
+.rtl .main-content {
+    margin-right: 0;
+    margin-left: var(--spacing-lg);
 }
 
-@keyframes fadeIn {
+.ltr .main-content {
+    margin-left: 0;
+    margin-right: var(--spacing-lg);
+}
+
+.rtl .sidebar {
+    right: 0;
+    left: auto;
+}
+
+.ltr .sidebar {
+    left: 0;
+    right: auto;
+}
+
+/* RTL/LTR Component Mirroring */
+.rtl .card {
+    text-align: right;
+}
+
+.ltr .card {
+    text-align: left;
+}
+
+.rtl .form-group {
+    text-align: right;
+}
+
+.ltr .form-group {
+    text-align: left;
+}
+
+.rtl .btn-group {
+    flex-direction: row-reverse;
+}
+
+.ltr .btn-group {
+    flex-direction: row;
+}
+
+/* RTL/LTR Navigation Mirroring */
+.rtl .nav-menu {
+    flex-direction: row-reverse;
+}
+
+.ltr .nav-menu {
+    flex-direction: row;
+}
+
+.rtl .nav-item {
+    margin-right: 0;
+    margin-left: var(--spacing-md);
+}
+
+.ltr .nav-item {
+    margin-left: 0;
+    margin-right: var(--spacing-md);
+}
+
+/* RTL/LTR Grid Mirroring */
+.rtl .grid-container {
+    direction: rtl;
+}
+
+.ltr .grid-container {
+    direction: ltr;
+}
+
+.rtl .grid-item:first-child {
+    margin-left: 0;
+}
+
+.ltr .grid-item:first-child {
+    margin-right: 0;
+}
+
+/* RTL/LTR Modal Mirroring */
+.rtl .modal-header {
+    flex-direction: row-reverse;
+}
+
+.ltr .modal-header {
+    flex-direction: row;
+}
+
+.rtl .modal-footer {
+    flex-direction: row-reverse;
+}
+
+.ltr .modal-footer {
+    flex-direction: row;
+}
+
+/* RTL/LTR List Mirroring */
+.rtl .list-item {
+    text-align: right;
+    padding-right: 0;
+    padding-left: var(--spacing-md);
+}
+
+.ltr .list-item {
+    text-align: left;
+    padding-left: 0;
+    padding-right: var(--spacing-md);
+}
+
+/* RTL/LTR Table Mirroring */
+.rtl .table th,
+.rtl .table td {
+    text-align: right;
+}
+
+.ltr .table th,
+.ltr .table td {
+    text-align: left;
+}
+
+/* RTL/LTR Alert Mirroring */
+.rtl .alert {
+    text-align: right;
+}
+
+.ltr .alert {
+    text-align: left;
+}
+
+/* RTL/LTR Badge Mirroring */
+.rtl .badge {
+    margin-right: 0;
+    margin-left: var(--spacing-xs);
+}
+
+.ltr .badge {
+    margin-left: 0;
+    margin-right: var(--spacing-xs);
+}
+
+/* RTL/LTR Icon Mirroring */
+.rtl .icon-left {
+    margin-right: 0;
+    margin-left: var(--spacing-sm);
+}
+
+.ltr .icon-left {
+    margin-left: 0;
+    margin-right: var(--spacing-sm);
+}
+
+.rtl .icon-right {
+    margin-left: 0;
+    margin-right: var(--spacing-sm);
+}
+
+.ltr .icon-right {
+    margin-right: 0;
+    margin-left: var(--spacing-sm);
+}
+
+/* RTL/LTR Input Mirroring */
+.rtl .input-group {
+    flex-direction: row-reverse;
+}
+
+.ltr .input-group {
+    flex-direction: row;
+}
+
+.rtl .input-group-text {
+    border-right: none;
+    border-left: 1px solid var(--border-color);
+}
+
+.ltr .input-group-text {
+    border-left: none;
+    border-right: 1px solid var(--border-color);
+}
+
+/* RTL/LTR Dropdown Mirroring */
+.rtl .dropdown-menu {
+    right: 0;
+    left: auto;
+    text-align: right;
+}
+
+.ltr .dropdown-menu {
+    left: 0;
+    right: auto;
+    text-align: left;
+}
+
+/* RTL/LTR Tooltip Mirroring */
+.rtl .tooltip {
+    text-align: right;
+}
+
+.ltr .tooltip {
+    text-align: left;
+}
+
+/* RTL/LTR Popover Mirroring */
+.rtl .popover {
+    text-align: right;
+}
+
+.ltr .popover {
+    text-align: left;
+}
+
+/* RTL/LTR Progress Mirroring */
+.rtl .progress-bar {
+    float: right;
+}
+
+.ltr .progress-bar {
+    float: left;
+}
+
+/* RTL/LTR Breadcrumb Mirroring */
+.rtl .breadcrumb-item {
+    float: right;
+}
+
+.ltr .breadcrumb-item {
+    float: left;
+}
+
+.rtl .breadcrumb-item + .breadcrumb-item::before {
+    content: "\\";
+    float: right;
+    margin-right: 0;
+    margin-left: var(--spacing-sm);
+}
+
+.ltr .breadcrumb-item + .breadcrumb-item::before {
+    content: "/";
+    float: left;
+    margin-left: 0;
+    margin-right: var(--spacing-sm);
+}
+
+/* RTL/LTR Pagination Mirroring */
+.rtl .pagination {
+    flex-direction: row-reverse;
+}
+
+.ltr .pagination {
+    flex-direction: row;
+}
+
+/* RTL/LTR Carousel Mirroring */
+.rtl .carousel-control-prev {
+    right: 0;
+    left: auto;
+}
+
+.ltr .carousel-control-prev {
+    left: 0;
+    right: auto;
+}
+
+.rtl .carousel-control-next {
+    left: 0;
+    right: auto;
+}
+
+.ltr .carousel-control-next {
+    right: 0;
+    left: auto;
+}
+
+/* RTL/LTR Accordion Mirroring */
+.rtl .accordion-button {
+    text-align: right;
+}
+
+.ltr .accordion-button {
+    text-align: left;
+}
+
+/* RTL/LTR Tabs Mirroring */
+.rtl .nav-tabs {
+    flex-direction: row-reverse;
+}
+
+.ltr .nav-tabs {
+    flex-direction: row;
+}
+
+/* RTL/LTR Responsive Mirroring */
+@media (max-width: 768px) {
+    .rtl .mobile-nav {
+        flex-direction: column-reverse;
+    }
+    
+    .ltr .mobile-nav {
+        flex-direction: column;
+    }
+    
+    .rtl .mobile-menu {
+        right: 0;
+        left: auto;
+    }
+    
+    .ltr .mobile-menu {
+        left: 0;
+        right: auto;
+    }
+}
+
+/* RTL/LTR Animation Mirroring */
+.rtl .slide-in {
+    animation: slideInRTL 0.3s ease-out;
+}
+
+.ltr .slide-in {
+    animation: slideInLTR 0.3s ease-out;
+}
+
+@keyframes slideInRTL {
     from {
+        transform: translateX(100%);
         opacity: 0;
     }
     to {
+        transform: translateX(0);
         opacity: 1;
     }
 }
 
-@keyframes slideIn {
+@keyframes slideInLTR {
     from {
-        transform: translateY(20px);
+        transform: translateX(-100%);
         opacity: 0;
     }
     to {
-        transform: translateY(0);
+        transform: translateX(0);
         opacity: 1;
     }
 }
 
-/* Global Colors */
-:root {
-    --primary-color: #ff4d4d;
-    --primary-light: #ff8080;
-    --primary-dark: #ff1a1a;
-    --background-color: #f8f9fa;
-    --text-color: #2d3436;
-    --text-light: #636e72;
-    --border-color: #eee;
-    --shadow-color: rgba(0, 0, 0, 0.1);
+/* RTL/LTR Transition Mirroring */
+.rtl .transition-slide {
+    transition: transform 0.3s ease;
 }
 
-/* Form Elements */
-input, textarea, select {
-    text-align: inherit;
+.ltr .transition-slide {
+    transition: transform 0.3s ease;
 }
 
-/* Icons and Buttons */
-button {
-    cursor: pointer;
-    font-family: inherit;
+.rtl .transition-slide:hover {
+    transform: translateX(-5px);
 }
 
-/* Lists */
-ul, ol {
-    padding-inline-start: 20px;
+.ltr .transition-slide:hover {
+    transform: translateX(5px);
 }
 
-/* Tables */
-table {
-    text-align: var(--text-align);
+/* RTL/LTR Print Mirroring */
+@media print {
+    .rtl {
+        direction: rtl;
+    }
+    
+    .ltr {
+        direction: ltr;
+    }
 }
 
-/* Images */
-img {
-    max-width: 100%;
-    height: auto;
+/* Global RTL/LTR Layout Mirroring */
+body.rtl {
+    direction: rtl;
+    text-align: right;
 }
 
-/* Links */
-a {
-    color: var(--primary-color);
-    text-decoration: none;
+body.ltr {
+    direction: ltr;
+    text-align: left;
 }
 
-a:hover {
-    color: var(--primary-dark);
+/* Main Container Mirroring */
+.rtl .main-container {
+    flex-direction: row-reverse;
 }
 
-/* Global Utility Classes */
-.text-center {
+.ltr .main-container {
+    flex-direction: row;
+}
+
+/* Page Layout Mirroring */
+.rtl .page-layout {
+    direction: rtl;
+}
+
+.ltr .page-layout {
+    direction: ltr;
+}
+
+/* Content Area Mirroring */
+.rtl .content-area {
+    margin-right: 0;
+    margin-left: var(--spacing-lg);
+}
+
+.ltr .content-area {
+    margin-left: 0;
+    margin-right: var(--spacing-lg);
+}
+
+/* Sidebar Mirroring */
+.rtl .sidebar {
+    right: 0;
+    left: auto;
+    border-right: none;
+    border-left: 1px solid var(--border-color);
+}
+
+.ltr .sidebar {
+    left: 0;
+    right: auto;
+    border-left: none;
+    border-right: 1px solid var(--border-color);
+}
+
+/* Footer Mirroring */
+.rtl .footer {
+    text-align: right;
+}
+
+.ltr .footer {
+    text-align: left;
+}
+
+/* Global Text Mirroring */
+.rtl h1, .rtl h2, .rtl h3, .rtl h4, .rtl h5, .rtl h6 {
+    text-align: right;
+}
+
+.ltr h1, .ltr h2, .ltr h3, .ltr h4, .ltr h5, .ltr h6 {
+    text-align: left;
+}
+
+.rtl p, .rtl span, .rtl div {
+    text-align: right;
+}
+
+.ltr p, .ltr span, .ltr div {
+    text-align: left;
+}
+
+/* Global Button Mirroring */
+.rtl .btn {
   text-align: center;
 }
 
-.text-right {
+.ltr .btn {
+    text-align: center;
+}
+
+/* Global Input Mirroring */
+.rtl input, .rtl textarea, .rtl select {
   text-align: right;
 }
 
-.text-left {
+.ltr input, .ltr textarea, .ltr select {
   text-align: left;
 }
 
-/* Global Animation Classes */
-.fade-in {
-  animation: fadeIn 0.3s ease-in;
+/* Global List Mirroring */
+.rtl ul, .rtl ol {
+    padding-right: 0;
+    padding-left: 1.5rem;
 }
 
-.slide-in {
-  animation: slideIn 0.3s ease-out;
+.ltr ul, .ltr ol {
+    padding-left: 0;
+    padding-right: 1.5rem;
 }
 
-@keyframes fadeIn {
+/* Global Image Mirroring */
+.rtl img {
+    float: right;
+    margin-right: 0;
+    margin-left: var(--spacing-md);
+}
+
+.ltr img {
+    float: left;
+    margin-left: 0;
+    margin-right: var(--spacing-md);
+}
+
+/* Global Link Mirroring */
+.rtl a {
+    text-align: right;
+}
+
+.ltr a {
+    text-align: left;
+}
+
+/* App Container Mirroring */
+.app.rtl {
+    direction: rtl;
+}
+
+.app.ltr {
+    direction: ltr;
+}
+
+/* Global Container Mirroring */
+.rtl .container {
+    direction: rtl;
+}
+
+.ltr .container {
+    direction: ltr;
+}
+
+/* Global Section Mirroring */
+.rtl .section {
+    text-align: right;
+}
+
+.ltr .section {
+    text-align: left;
+}
+
+/* Global Card Mirroring */
+.rtl .card {
+    text-align: right;
+}
+
+.ltr .card {
+    text-align: left;
+}
+
+/* Global Form Mirroring */
+.rtl .form {
+    text-align: right;
+}
+
+.ltr .form {
+    text-align: left;
+}
+
+/* Global Button Mirroring */
+.rtl .button {
+    text-align: center;
+}
+
+.ltr .button {
+    text-align: center;
+}
+
+/* Global Input Mirroring */
+.rtl .input {
+    text-align: right;
+}
+
+.ltr .input {
+    text-align: left;
+}
+
+/* Global Label Mirroring */
+.rtl .label {
+    text-align: right;
+}
+
+.ltr .label {
+    text-align: left;
+}
+
+/* Global Text Mirroring */
+.rtl .text {
+    text-align: right;
+}
+
+.ltr .text {
+    text-align: left;
+}
+
+/* Global Title Mirroring */
+.rtl .title {
+    text-align: right;
+}
+
+.ltr .title {
+    text-align: left;
+}
+
+/* Global Subtitle Mirroring */
+.rtl .subtitle {
+    text-align: right;
+}
+
+.ltr .subtitle {
+    text-align: left;
+}
+
+/* Global Description Mirroring */
+.rtl .description {
+    text-align: right;
+}
+
+.ltr .description {
+    text-align: left;
+}
+
+/* Global List Mirroring */
+.rtl .list {
+    text-align: right;
+}
+
+.ltr .list {
+    text-align: left;
+}
+
+/* Global Item Mirroring */
+.rtl .item {
+    text-align: right;
+}
+
+.ltr .item {
+    text-align: left;
+}
+
+/* Global Header Mirroring */
+.rtl .page-header {
+    text-align: right;
+}
+
+.ltr .page-header {
+    text-align: left;
+}
+
+/* Global Footer Mirroring */
+.rtl .page-footer {
+    text-align: right;
+}
+
+.ltr .page-footer {
+    text-align: left;
+}
+
+/* Global Navigation Mirroring */
+.rtl .page-nav {
+    text-align: right;
+}
+
+.ltr .page-nav {
+    text-align: left;
+}
+
+/* Global Content Mirroring */
+.rtl .page-content {
+    text-align: right;
+}
+
+.ltr .page-content {
+    text-align: left;
+}
+
+/* Global Sidebar Mirroring */
+.rtl .page-sidebar {
+    text-align: right;
+}
+
+.ltr .page-sidebar {
+    text-align: left;
+}
+
+/* Global Main Mirroring */
+.rtl .page-main {
+    text-align: right;
+}
+
+.ltr .page-main {
+    text-align: left;
+}
+
+/* Specific Component Mirroring */
+.rtl .business-card {
+    text-align: right;
+}
+
+.ltr .business-card {
+    text-align: left;
+}
+
+.rtl .search-form {
+    text-align: right;
+}
+
+.ltr .search-form {
+    text-align: left;
+}
+
+.rtl .auth-form {
+    text-align: right;
+}
+
+.ltr .auth-form {
+    text-align: left;
+}
+
+.rtl .profile-section {
+    text-align: right;
+}
+
+.ltr .profile-section {
+    text-align: left;
+}
+
+.rtl .favorites-list {
+    text-align: right;
+}
+
+.ltr .favorites-list {
+    text-align: left;
+}
+
+.rtl .business-form {
+    text-align: right;
+}
+
+.ltr .business-form {
+    text-align: left;
+}
+
+.rtl .suggestion-form {
+    text-align: right;
+}
+
+.ltr .suggestion-form {
+    text-align: left;
+}
+
+.rtl .feedback-form {
+    text-align: right;
+}
+
+.ltr .feedback-form {
+    text-align: left;
+}
+
+.rtl .admin-panel {
+    text-align: right;
+}
+
+.ltr .admin-panel {
+    text-align: left;
+}
+
+.rtl .stats-section {
+    text-align: right;
+}
+
+.ltr .stats-section {
+    text-align: left;
+}
+
+.rtl .user-menu {
+    text-align: right;
+}
+
+.ltr .user-menu {
+    text-align: left;
+}
+
+.rtl .dropdown-menu {
+    text-align: right;
+}
+
+.ltr .dropdown-menu {
+    text-align: left;
+}
+
+.rtl .modal-content {
+    text-align: right;
+}
+
+.ltr .modal-content {
+    text-align: left;
+}
+
+.rtl .popover-content {
+    text-align: right;
+}
+
+.ltr .popover-content {
+    text-align: left;
+}
+
+.rtl .tooltip-content {
+    text-align: right;
+}
+
+.ltr .tooltip-content {
+    text-align: left;
+}
+
+.rtl .alert-content {
+    text-align: right;
+}
+
+.ltr .alert-content {
+    text-align: left;
+}
+
+.rtl .notification-content {
+    text-align: right;
+}
+
+.ltr .notification-content {
+    text-align: left;
+}
+
+.rtl .breadcrumb {
+    text-align: right;
+}
+
+.ltr .breadcrumb {
+    text-align: left;
+}
+
+.rtl .pagination {
+    text-align: right;
+}
+
+.ltr .pagination {
+    text-align: left;
+}
+
+.rtl .carousel {
+    text-align: right;
+}
+
+.ltr .carousel {
+    text-align: left;
+}
+
+.rtl .accordion {
+    text-align: right;
+}
+
+.ltr .accordion {
+    text-align: left;
+}
+
+.rtl .tabs {
+    text-align: right;
+}
+
+.ltr .tabs {
+    text-align: left;
+}
+
+.rtl .progress {
+    text-align: right;
+}
+
+.ltr .progress {
+    text-align: left;
+}
+
+.rtl .badge {
+    text-align: center;
+}
+
+.ltr .badge {
+    text-align: center;
+}
+
+.rtl .spinner {
+    text-align: center;
+}
+
+.ltr .spinner {
+    text-align: center;
+}
+
+.rtl .loading {
+    text-align: center;
+}
+
+.ltr .loading {
+    text-align: center;
+}
+
+.rtl .error {
+    text-align: center;
+}
+
+.ltr .error {
+    text-align: center;
+}
+
+.rtl .success {
+    text-align: center;
+}
+
+.ltr .success {
+    text-align: center;
+}
+
+.rtl .warning {
+    text-align: center;
+}
+
+.ltr .warning {
+    text-align: center;
+}
+
+.rtl .info {
+    text-align: center;
+}
+
+.ltr .info {
+    text-align: center;
+}
+
+/* Main Page Specific Mirroring */
+.rtl .main-page {
+    text-align: right;
+}
+
+.ltr .main-page {
+    text-align: left;
+}
+
+.rtl .hero-section {
+    text-align: right;
+}
+
+.ltr .hero-section {
+    text-align: left;
+}
+
+.rtl .search-section {
+    text-align: right;
+}
+
+.ltr .search-section {
+    text-align: left;
+}
+
+.rtl .categories-section {
+    text-align: right;
+}
+
+.ltr .categories-section {
+    text-align: left;
+}
+
+.rtl .businesses-section {
+    text-align: right;
+}
+
+.ltr .businesses-section {
+    text-align: left;
+}
+
+.rtl .join-banner {
+    text-align: right;
+}
+
+.ltr .join-banner {
+    text-align: left;
+}
+
+/* Search Results Mirroring */
+.rtl .search-results {
+    text-align: right;
+}
+
+.ltr .search-results {
+    text-align: left;
+}
+
+.rtl .filters-panel {
+    text-align: right;
+}
+
+.ltr .filters-panel {
+    text-align: left;
+}
+
+.rtl .results-list {
+    text-align: right;
+}
+
+.ltr .results-list {
+    text-align: left;
+}
+
+/* Business Profile Mirroring */
+.rtl .business-profile {
+    text-align: right;
+}
+
+.ltr .business-profile {
+    text-align: left;
+}
+
+.rtl .business-header {
+    text-align: right;
+}
+
+.ltr .business-header {
+    text-align: left;
+}
+
+.rtl .business-details {
+    text-align: right;
+}
+
+.ltr .business-details {
+    text-align: left;
+}
+
+.rtl .business-services {
+    text-align: right;
+}
+
+.ltr .business-services {
+    text-align: left;
+}
+
+.rtl .business-hours {
+    text-align: right;
+}
+
+.ltr .business-hours {
+    text-align: left;
+}
+
+.rtl .business-reviews {
+    text-align: right;
+}
+
+.ltr .business-reviews {
+    text-align: left;
+}
+
+/* User Profile Mirroring */
+.rtl .user-profile {
+    text-align: right;
+}
+
+.ltr .user-profile {
+    text-align: left;
+}
+
+.rtl .profile-header {
+    text-align: right;
+}
+
+.ltr .profile-header {
+    text-align: left;
+}
+
+.rtl .profile-details {
+    text-align: right;
+}
+
+.ltr .profile-details {
+    text-align: left;
+}
+
+.rtl .profile-actions {
+    text-align: right;
+}
+
+.ltr .profile-actions {
+    text-align: left;
+}
+
+/* Admin Panel Mirroring */
+.rtl .admin-panel {
+    text-align: right;
+}
+
+.ltr .admin-panel {
+    text-align: left;
+}
+
+.rtl .admin-header {
+    text-align: right;
+}
+
+.ltr .admin-header {
+    text-align: left;
+}
+
+.rtl .admin-content {
+    text-align: right;
+}
+
+.ltr .admin-content {
+    text-align: left;
+}
+
+.rtl .admin-sidebar {
+    text-align: right;
+}
+
+.ltr .admin-sidebar {
+    text-align: left;
+}
+
+/* Form Components Mirroring */
+.rtl .form-group {
+    text-align: right;
+}
+
+.ltr .form-group {
+    text-align: left;
+}
+
+.rtl .form-label {
+    text-align: right;
+}
+
+.ltr .form-label {
+    text-align: left;
+}
+
+.rtl .form-input {
+    text-align: right;
+}
+
+.ltr .form-input {
+    text-align: left;
+}
+
+.rtl .form-textarea {
+    text-align: right;
+}
+
+.ltr .form-textarea {
+    text-align: left;
+}
+
+.rtl .form-select {
+    text-align: right;
+}
+
+.ltr .form-select {
+    text-align: left;
+}
+
+.rtl .form-checkbox {
+    text-align: right;
+}
+
+.ltr .form-checkbox {
+    text-align: left;
+}
+
+.rtl .form-radio {
+    text-align: right;
+}
+
+.ltr .form-radio {
+    text-align: left;
+}
+
+.rtl .form-button {
+    text-align: center;
+}
+
+.ltr .form-button {
+    text-align: center;
+}
+
+/* Button Components Mirroring */
+.rtl .btn-primary {
+    text-align: center;
+}
+
+.ltr .btn-primary {
+    text-align: center;
+}
+
+.rtl .btn-secondary {
+    text-align: center;
+}
+
+.ltr .btn-secondary {
+    text-align: center;
+}
+
+.rtl .btn-success {
+    text-align: center;
+}
+
+.ltr .btn-success {
+    text-align: center;
+}
+
+.rtl .btn-danger {
+    text-align: center;
+}
+
+.ltr .btn-danger {
+    text-align: center;
+}
+
+.rtl .btn-warning {
+    text-align: center;
+}
+
+.ltr .btn-warning {
+    text-align: center;
+}
+
+.rtl .btn-info {
+    text-align: center;
+}
+
+.ltr .btn-info {
+    text-align: center;
+}
+
+/* Card Components Mirroring */
+.rtl .card-header {
+    text-align: right;
+}
+
+.ltr .card-header {
+    text-align: left;
+}
+
+.rtl .card-body {
+    text-align: right;
+}
+
+.ltr .card-body {
+    text-align: left;
+}
+
+.rtl .card-footer {
+    text-align: right;
+}
+
+.ltr .card-footer {
+    text-align: left;
+}
+
+/* List Components Mirroring */
+.rtl .list-header {
+    text-align: right;
+}
+
+.ltr .list-header {
+    text-align: left;
+}
+
+.rtl .list-body {
+    text-align: right;
+}
+
+.ltr .list-body {
+    text-align: left;
+}
+
+.rtl .list-footer {
+    text-align: right;
+}
+
+.ltr .list-footer {
+    text-align: left;
+}
+
+/* Table Components Mirroring */
+.rtl .table-header {
+    text-align: right;
+}
+
+.ltr .table-header {
+    text-align: left;
+}
+
+.rtl .table-body {
+    text-align: right;
+}
+
+.ltr .table-body {
+    text-align: left;
+}
+
+.rtl .table-footer {
+    text-align: right;
+}
+
+.ltr .table-footer {
+    text-align: left;
+}
+
+/* Layout Mirroring for All Pages */
+.rtl .page-wrapper {
+    direction: rtl;
+}
+
+.ltr .page-wrapper {
+    direction: ltr;
+}
+
+.rtl .content-wrapper {
+    direction: rtl;
+}
+
+.ltr .content-wrapper {
+    direction: ltr;
+}
+
+.rtl .sidebar-wrapper {
+    direction: rtl;
+}
+
+.ltr .sidebar-wrapper {
+    direction: ltr;
+}
+
+/* Flexbox Direction Mirroring */
+.rtl .flex-container {
+    flex-direction: row-reverse;
+}
+
+.ltr .flex-container {
+    flex-direction: row;
+}
+
+.rtl .flex-row {
+    flex-direction: row-reverse;
+}
+
+.ltr .flex-row {
+    flex-direction: row;
+}
+
+.rtl .flex-row-reverse {
+    flex-direction: row;
+}
+
+.ltr .flex-row-reverse {
+    flex-direction: row-reverse;
+}
+
+/* Grid Direction Mirroring */
+.rtl .grid-container {
+    direction: rtl;
+}
+
+.ltr .grid-container {
+    direction: ltr;
+}
+
+/* Text Direction Mirroring */
+.rtl .text-start {
+    text-align: right;
+}
+
+.ltr .text-start {
+    text-align: left;
+}
+
+.rtl .text-end {
+    text-align: left;
+}
+
+.ltr .text-end {
+    text-align: right;
+}
+
+/* Margin and Padding Mirroring */
+.rtl .ms-auto {
+    margin-right: auto;
+    margin-left: 0;
+}
+
+.ltr .ms-auto {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.rtl .me-auto {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.ltr .me-auto {
+    margin-right: auto;
+    margin-left: 0;
+}
+
+/* Border Radius Mirroring */
+.rtl .rounded-start {
+    border-top-right-radius: var(--border-radius-md);
+    border-bottom-right-radius: var(--border-radius-md);
+}
+
+.rtl .rounded-end {
+    border-top-left-radius: var(--border-radius-md);
+    border-bottom-left-radius: var(--border-radius-md);
+}
+
+.ltr .rounded-start {
+    border-top-left-radius: var(--border-radius-md);
+    border-bottom-left-radius: var(--border-radius-md);
+}
+
+.ltr .rounded-end {
+    border-top-right-radius: var(--border-radius-md);
+    border-bottom-right-radius: var(--border-radius-md);
+}
+
+/* Position Mirroring */
+.rtl .position-start {
+    right: 0;
+    left: auto;
+}
+
+.ltr .position-start {
+    left: 0;
+    right: auto;
+}
+
+.rtl .position-end {
+    left: 0;
+    right: auto;
+}
+
+.ltr .position-end {
+    right: 0;
+    left: auto;
+}
+
+/* Float Mirroring */
+.rtl .float-start {
+    float: right;
+}
+
+.ltr .float-start {
+    float: left;
+}
+
+.rtl .float-end {
+    float: left;
+}
+
+.ltr .float-end {
+    float: right;
+}
+
+/* Transform Mirroring */
+.rtl .mirror-x {
+    transform: scaleX(-1);
+}
+
+.ltr .mirror-x {
+    transform: scaleX(1);
+}
+
+/* Animation Direction Mirroring */
+.rtl .slide-in-left {
+    animation: slideInRight 0.3s ease-out;
+}
+
+.ltr .slide-in-left {
+    animation: slideInLeft 0.3s ease-out;
+}
+
+.rtl .slide-in-right {
+    animation: slideInLeft 0.3s ease-out;
+}
+
+.ltr .slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
   from {
+        transform: translateX(-100%);
     opacity: 0;
   }
   to {
+        transform: translateX(0);
     opacity: 1;
   }
 }
 
-@keyframes slideIn {
+@keyframes slideInRight {
   from {
-    transform: translateY(20px);
+        transform: translateX(100%);
     opacity: 0;
   }
   to {
-    transform: translateY(0);
+        transform: translateX(0);
     opacity: 1;
   }
 }
 
-/* Global Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* Global RTL/LTR Override for All Elements */
+.rtl * {
+    direction: inherit;
 }
 
-body {
-  background-color: var(--background-color);
-  color: var(--text-color);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  line-height: 1.5;
+.ltr * {
+    direction: inherit;
 }
 
-/* Global Button Styles */
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  gap: 0.5rem;
+/* Force RTL/LTR on specific elements */
+.rtl h1, .rtl h2, .rtl h3, .rtl h4, .rtl h5, .rtl h6,
+.rtl p, .rtl span, .rtl div, .rtl a, .rtl li, .rtl td, .rtl th {
+    text-align: right;
 }
 
-.button-primary {
-  background: var(--primary-color);
-  color: white;
+.ltr h1, .ltr h2, .ltr h3, .ltr h4, .ltr h5, .ltr h6,
+.ltr p, .ltr span, .ltr div, .ltr a, .ltr li, .ltr td, .ltr th {
+    text-align: left;
 }
 
-.button-primary:hover {
-  background: var(--primary-dark);
-  transform: translateY(-2px);
+/* Override any conflicting styles */
+.rtl .text-center {
+    text-align: right !important;
 }
 
-.button-secondary {
-  background: white;
-  color: var(--primary-color);
-  border: 1px solid var(--primary-color);
+.ltr .text-center {
+    text-align: left !important;
 }
 
-.button-secondary:hover {
-  background: var(--primary-color);
-  color: white;
+.rtl .text-left {
+    text-align: right !important;
 }
 
-/* Global Form Styles */
-.form-group {
-  margin-bottom: 1.5rem;
+.ltr .text-left {
+    text-align: left !important;
 }
 
-.form-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--text-color);
-  font-weight: 500;
+.rtl .text-right {
+    text-align: left !important;
 }
 
-.form-input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.2s ease;
+.ltr .text-right {
+    text-align: right !important;
 }
 
-.form-input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.1);
+/* Force RTL/LTR on form elements */
+.rtl input, .rtl textarea, .rtl select {
+    text-align: right !important;
 }
 
-/* Global Loading and Error States */
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
-  color: var(--text-light);
+.ltr input, .ltr textarea, .ltr select {
+    text-align: left !important;
 }
 
-.error {
-  color: #dc3545;
-  padding: 1rem;
-  border-radius: 8px;
-  background: #fff5f5;
-  margin: 1rem 0;
-  text-align: center;
+/* Force RTL/LTR on buttons */
+.rtl button {
+    text-align: center !important;
 }
 
-/* Spinner Styles */
-.spinner-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+.ltr button {
+    text-align: center !important;
 }
 
-.spinner {
-  border: 8px solid #f3f3f3; /* Light grey */
-  border-top: 8px solid #3498db; /* Blue */
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1.5s linear infinite;
+/* Force RTL/LTR on labels */
+.rtl label {
+    text-align: right !important;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.ltr label {
+    text-align: left !important;
+}
+
+/* Force RTL/LTR on lists */
+.rtl ul, .rtl ol {
+    padding-right: 0 !important;
+    padding-left: 1.5rem !important;
+}
+
+.ltr ul, .ltr ol {
+    padding-left: 0 !important;
+    padding-right: 1.5rem !important;
+}
+
+/* Force RTL/LTR on tables */
+.rtl table {
+    direction: rtl !important;
+}
+
+.ltr table {
+    direction: ltr !important;
+}
+
+.rtl th, .rtl td {
+    text-align: right !important;
+}
+
+.ltr th, .ltr td {
+    text-align: left !important;
+}
+
+/* Force RTL/LTR on all page components */
+.rtl .page {
+    direction: rtl !important;
+}
+
+.ltr .page {
+    direction: ltr !important;
+}
+
+.rtl .component {
+    direction: rtl !important;
+}
+
+.ltr .component {
+    direction: ltr !important;
+}
+
+.rtl .section {
+    direction: rtl !important;
+}
+
+.ltr .section {
+    direction: ltr !important;
+}
+
+.rtl .container {
+    direction: rtl !important;
+}
+
+.ltr .container {
+    direction: ltr !important;
+}
+
+.rtl .wrapper {
+    direction: rtl !important;
+}
+
+.ltr .wrapper {
+    direction: ltr !important;
+}
+
+/* Force RTL/LTR on all text elements */
+.rtl .text {
+    text-align: right !important;
+}
+
+.ltr .text {
+    text-align: left !important;
+}
+
+.rtl .title {
+    text-align: right !important;
+}
+
+.ltr .title {
+    text-align: left !important;
+}
+
+.rtl .subtitle {
+    text-align: right !important;
+}
+
+.ltr .subtitle {
+    text-align: left !important;
+}
+
+.rtl .description {
+    text-align: right !important;
+}
+
+.ltr .description {
+    text-align: left !important;
+}
+
+.rtl .content {
+    text-align: right !important;
+}
+
+.ltr .content {
+    text-align: left !important;
+}
+
+.rtl .header {
+    text-align: right !important;
+}
+
+.ltr .header {
+    text-align: left !important;
+}
+
+.rtl .footer {
+    text-align: right !important;
+}
+
+.ltr .footer {
+    text-align: left !important;
+}
+
+.rtl .nav {
+    text-align: right !important;
+}
+
+.ltr .nav {
+    text-align: left !important;
+}
+
+.rtl .menu {
+    text-align: right !important;
+}
+
+.ltr .menu {
+    text-align: left !important;
+}
+
+.rtl .item {
+    text-align: right !important;
+}
+
+.ltr .item {
+    text-align: left !important;
+}
+
+.rtl .list {
+    text-align: right !important;
+}
+
+.ltr .list {
+    text-align: left !important;
+}
+
+.rtl .card {
+    text-align: right !important;
+}
+
+.ltr .card {
+    text-align: left !important;
+}
+
+.rtl .form {
+    text-align: right !important;
+}
+
+.ltr .form {
+    text-align: left !important;
+}
+
+.rtl .button {
+    text-align: center !important;
+}
+
+.ltr .button {
+    text-align: center !important;
+}
+
+.rtl .input {
+    text-align: right !important;
+}
+
+.ltr .input {
+    text-align: left !important;
+}
+
+.rtl .label {
+    text-align: right !important;
+}
+
+.ltr .label {
+    text-align: left !important;
+}
+
+.rtl .select {
+    text-align: right !important;
+}
+
+.ltr .select {
+    text-align: left !important;
+}
+
+.rtl .textarea {
+    text-align: right !important;
+}
+
+.ltr .textarea {
+    text-align: left !important;
+}
+
+.rtl .checkbox {
+    text-align: right !important;
+}
+
+.ltr .checkbox {
+    text-align: left !important;
+}
+
+.rtl .radio {
+    text-align: right !important;
+}
+
+.ltr .radio {
+    text-align: left !important;
+}
+
+.rtl .field {
+    text-align: right !important;
+}
+
+.ltr .field {
+    text-align: left !important;
+}
+
+.rtl .group {
+    text-align: right !important;
+}
+
+.ltr .group {
+    text-align: left !important;
+}
+
+.rtl .row {
+    text-align: right !important;
+}
+
+.ltr .row {
+    text-align: left !important;
+}
+
+.rtl .col {
+    text-align: right !important;
+}
+
+.ltr .col {
+    text-align: left !important;
+}
+
+.rtl .grid {
+    text-align: right !important;
+}
+
+.ltr .grid {
+    text-align: left !important;
+}
+
+.rtl .flex {
+    text-align: right !important;
+}
+
+.ltr .flex {
+    text-align: left !important;
+}
+
+.rtl .block {
+    text-align: right !important;
+}
+
+.ltr .block {
+    text-align: left !important;
+}
+
+.rtl .inline {
+    text-align: right !important;
+}
+
+.ltr .inline {
+    text-align: left !important;
+}
+
+.rtl .inline-block {
+    text-align: right !important;
+}
+
+.ltr .inline-block {
+    text-align: left !important;
+}
+
+.rtl .table {
+    text-align: right !important;
+}
+
+.ltr .table {
+    text-align: left !important;
+}
+
+.rtl .thead {
+    text-align: right !important;
+}
+
+.ltr .thead {
+    text-align: left !important;
+}
+
+.rtl .tbody {
+    text-align: right !important;
+}
+
+.ltr .tbody {
+    text-align: left !important;
+}
+
+.rtl .tfoot {
+    text-align: right !important;
+}
+
+.ltr .tfoot {
+    text-align: left !important;
+}
+
+.rtl .caption {
+    text-align: right !important;
+}
+
+.ltr .caption {
+    text-align: left !important;
+}
+
+.rtl .figure {
+    text-align: right !important;
+}
+
+.ltr .figure {
+    text-align: left !important;
+}
+
+.rtl .figcaption {
+    text-align: right !important;
+}
+
+.ltr .figcaption {
+    text-align: left !important;
+}
+
+.rtl .picture {
+    text-align: right !important;
+}
+
+.ltr .picture {
+    text-align: left !important;
+}
+
+.rtl .video {
+    text-align: right !important;
+}
+
+.ltr .video {
+    text-align: left !important;
+}
+
+.rtl .audio {
+    text-align: right !important;
+}
+
+.ltr .audio {
+    text-align: left !important;
+}
+
+.rtl .canvas {
+    text-align: right !important;
+}
+
+.ltr .canvas {
+    text-align: left !important;
+}
+
+.rtl .svg {
+    text-align: right !important;
+}
+
+.ltr .svg {
+    text-align: left !important;
+}
+
+.rtl .map {
+    text-align: right !important;
+}
+
+.ltr .map {
+    text-align: left !important;
+}
+
+.rtl .area {
+    text-align: right !important;
+}
+
+.ltr .area {
+    text-align: left !important;
+}
+
+.rtl .base {
+    text-align: right !important;
+}
+
+.ltr .base {
+    text-align: left !important;
+}
+
+.rtl .head {
+    text-align: right !important;
+}
+
+.ltr .head {
+    text-align: left !important;
+}
+
+.rtl .link {
+    text-align: right !important;
+}
+
+.ltr .link {
+    text-align: left !important;
+}
+
+.rtl .meta {
+    text-align: right !important;
+}
+
+.ltr .meta {
+    text-align: left !important;
+}
+
+.rtl .script {
+    text-align: right !important;
+}
+
+.ltr .script {
+    text-align: left !important;
+}
+
+.rtl .style {
+    text-align: right !important;
+}
+
+.ltr .style {
+    text-align: left !important;
+}
+
+.rtl .title {
+    text-align: right !important;
+}
+
+.ltr .title {
+    text-align: left !important;
+}
+
+/* RTL/LTR High Contrast Mode */
+@media (prefers-contrast: high) {
+    .rtl .focus-visible,
+    .ltr .focus-visible {
+        outline: 3px solid var(--focus-color);
+        outline-offset: 2px;
+    }
+}
+
+/* RTL/LTR Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .rtl .transition-slide,
+    .ltr .transition-slide {
+        transition: none;
+    }
+    
+    .rtl .slide-in,
+    .ltr .slide-in {
+        animation: none;
+    }
 } 

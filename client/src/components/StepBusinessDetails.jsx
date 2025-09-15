@@ -2,15 +2,23 @@ import React, { useState } from 'react';
 import { FaUpload } from 'react-icons/fa';
 import { Autocomplete } from '@react-google-maps/api';
 import '../styles/StepsStyle.css';
-
-const phonePrefixes = [
-  '050', '052', '053', '054', '055', '057', '058',
-  '02', '03', '04', '08', '09',
-  '072', '073', '074', '076',
-].sort((a, b) => Number(a) - Number(b));
+import { PHONE_PREFIXES, PHONE_NUMBER_MAX_LENGTH } from '../constants/globals';
+import { useTranslation } from 'react-i18next';
 
 const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
+  const { t, ready } = useTranslation();
   const [autocomplete, setAutocomplete] = useState(null);
+  
+  // Wait for translations to load
+  if (!ready) {
+    return (
+      <div className="step-business-details">
+        <div className="loading-container">
+          <span>Loading translations...</span>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -64,7 +72,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
     <div className="step-business-details">
       <div className="form-group">
         <label htmlFor="name" className="form-label">
-          שם העסק<RequiredMark />
+          {t('businessForm.fields.name')}<RequiredMark />
         </label>
         <input
           type="text"
@@ -79,7 +87,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
 
       <div className="form-group">
         <label htmlFor="address" className="form-label">
-          כתובת<RequiredMark />
+          {t('businessForm.fields.address')}<RequiredMark />
         </label>
         <Autocomplete
           onLoad={onLoad}
@@ -99,7 +107,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
 
       <div className="form-group" style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
         <label htmlFor="phonePrefix" className="form-label" style={{ flexShrink: 0, marginTop: '6px' }}>
-          טלפון<RequiredMark />
+          {t('businessForm.fields.phone')}<RequiredMark />
         </label>
 
         <div style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: "ltr" }}>
@@ -112,7 +120,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
             style={{ width: '80px', textAlign: 'center' }}
             required
           >
-            {phonePrefixes.map(prefix => (
+            {PHONE_PREFIXES.map(prefix => (
               <option key={prefix} value={prefix}>{prefix}</option>
             ))}
           </select>
@@ -126,14 +134,14 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
             className="form-input"
             style={{ flexGrow: 1 }}
             inputMode="numeric"
-            maxLength={7}
+            maxLength={PHONE_NUMBER_MAX_LENGTH}
           />
         </div>
       </div>
 
       <div className="form-group">
         <label htmlFor="email" className="form-label">
-          כתובת דואר אלקטרונית<RequiredMark />
+          {t('businessForm.fields.email')}<RequiredMark />
         </label>
         <input
           type="email"
@@ -148,7 +156,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
 
       <div className="form-group">
         <label htmlFor="categoryId" className="form-label">
-          תחום שירות<RequiredMark />
+          {t('businessForm.fields.category')}<RequiredMark />
         </label>
         <select
           id="categoryId"
@@ -158,7 +166,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
           className="form-select"
           required
         >
-          <option value="">בחר תחום</option>
+          <option value="">{t('businessForm.fields.selectCategory')}</option>
           {categories.map(cat => (
             <option key={cat._id} value={cat._id}>{cat.name}</option>
           ))}
@@ -166,7 +174,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
       </div>
 
       <div className="form-group">
-        <label htmlFor="description" className="form-label">תיאור העסק</label>
+        <label htmlFor="description" className="form-label">{t('businessForm.fields.description')}</label>
         <input
           type="text"
           id="description"
@@ -180,7 +188,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
       <div className="form-group-logo">
         <label htmlFor="logo" className="button file-upload">
           <FaUpload className="icon" />
-          {'בחירת לוגו'}
+          {t('businessForm.logo.selectLogo')}
           <input
             type="file"
             id="logo"
@@ -195,7 +203,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
           <div className="logo-preview-wrapper">
             <img
               src={logoPreviewUrl}
-              alt="תצוגת לוגו"
+              alt={t('businessForm.logo.logoPreview')}
               className="business-logo-preview"
               onLoad={() => {
                 if (typeof businessData.logo !== 'string') {
@@ -206,7 +214,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
             <button
               className="remove-logo-button"
               onClick={removeLogo}
-              title="הסר לוגו"
+              title={t('businessForm.logo.removeLogo')}
             >
               &times;
             </button>

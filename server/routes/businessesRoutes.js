@@ -2,30 +2,34 @@ const express = require('express');
 const businessesController = require('../controllers/businessesController');
 const router = express.Router();
 const upload = require('../config/multerConfig');
+const { requireAuth, optionalAuth } = require('../middlewares/authMiddleware');
+const { writeLimiter, generalLimiter } = require('../middlewares/rateLimiter');
+const { sanitizeRequest, validateBusiness, validateMongoIdParam, validateSearchQuery,parseArrayFieldsGeneric} = require('../middlewares/inputValidation');
+const { fileUploadSecurity } = require('../middlewares/fileUploadSecurity');
 
 router
     .route('/')
-    .get(businessesController.getItems)
-    .post(upload.single('logo'), businessesController.uploadBusinesses);
+    .get(optionalAuth, generalLimiter, sanitizeRequest, validateSearchQuery, businessesController.getItems)
+    .post(requireAuth, writeLimiter, sanitizeRequest, upload.single('logo'), fileUploadSecurity,  parseArrayFieldsGeneric(['services', 'openingHours']), validateBusiness, businessesController.uploadBusinesses);
 
 router
     .route('/all')
-    .get(businessesController.getAllBusinesses);
+    .get(optionalAuth, generalLimiter, sanitizeRequest, businessesController.getAllBusinesses);
     
 router
     .route('/user-businesses')
-    .get(businessesController.getUserBusinesses);
+    .get(requireAuth, generalLimiter, sanitizeRequest, businessesController.getUserBusinesses);
 
 // router
 //     .get('/search', businessesController.searchBusinesses);
 
 router
   .route('/:id')
-  .get(businessesController.getBusinessById)
-  .delete(businessesController.deleteBusiness);
+  .get(optionalAuth, generalLimiter, sanitizeRequest, validateMongoIdParam('id', 'Business ID'), businessesController.getBusinessById)
+  .delete(requireAuth, writeLimiter, sanitizeRequest, validateMongoIdParam('id', 'Business ID'), businessesController.deleteBusiness);
 
 router
-  .patch('/restore/:id', businessesController.restoreBusiness);
+  .patch('/restore/:id', requireAuth, writeLimiter, sanitizeRequest, validateMongoIdParam('id', 'Business ID'), businessesController.restoreBusiness);
 
   
 module.exports = router;

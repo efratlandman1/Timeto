@@ -1,74 +1,68 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import '../styles/TermsPage.css';
 
 const TermsPage = () => {
+    const { t } = useTranslation();
+    
     return (
         <div className="terms-page">
             <div className="terms-content">
-                <h1>תנאי שימוש</h1>
+                <h1>{t('termsPage.title')}</h1>
                 
                 <section>
-                    <h2>1. כללי</h2>
+                    <h2>{t('termsPage.sections.general.title')}</h2>
                     <p>
-                        ברוכים הבאים לאתר זה זמן. השימוש באתר ובשירותים המוצעים בו כפוף לתנאי השימוש המפורטים להלן.
-                        השימוש באתר מהווה הסכמה מצדך לתנאים אלה.
+                        {t('termsPage.sections.general.content')}
                     </p>
                 </section>
 
                 <section>
-                    <h2>2. הגדרות</h2>
+                    <h2>{t('termsPage.sections.definitions.title')}</h2>
                     <p>
-                        "האתר" - אתר זה זמן על כל תכניו ושירותיו.<br />
-                        "המשתמש" - כל אדם הגולש באתר או עושה שימוש בשירותיו.
+                        {t('termsPage.sections.definitions.content')}
                     </p>
                 </section>
 
                 <section>
-                    <h2>3. השימוש באתר</h2>
+                    <h2>{t('termsPage.sections.usage.title')}</h2>
                     <p>
-                        השימוש באתר מותר למטרות חוקיות בלבד. חל איסור על שימוש באתר למטרות בלתי חוקיות
-                        או למטרות שלא הותרו במפורש בתנאי שימוש אלה.
+                        {t('termsPage.sections.usage.content')}
                     </p>
                 </section>
 
                 <section>
-                    <h2>4. רישום עסקים</h2>
+                    <h2>{t('termsPage.sections.businessRegistration.title')}</h2>
                     <p>
-                        רישום עסקים באתר מחייב מסירת פרטים מדויקים ואמיתיים. האתר רשאי לדחות בקשות
-                        רישום או להסיר עסקים שנמסרו לגביהם פרטים שגויים או מטעים.
+                        {t('termsPage.sections.businessRegistration.content')}
                     </p>
                 </section>
 
                 <section>
-                    <h2>5. פרטיות</h2>
+                    <h2>{t('termsPage.sections.privacy.title')}</h2>
                     <p>
-                        האתר מכבד את פרטיות המשתמשים בו. כל המידע הנאסף באתר נשמר במאגרי המידע של האתר
-                        ונעשה בו שימוש בהתאם למדיניות הפרטיות של האתר.
+                        {t('termsPage.sections.privacy.content')}
                     </p>
                 </section>
 
                 <section>
-                    <h2>6. קניין רוחני</h2>
+                    <h2>{t('termsPage.sections.intellectualProperty.title')}</h2>
                     <p>
-                        כל זכויות הקניין הרוחני באתר, לרבות זכויות היוצרים, סימני המסחר וכל זכות אחרת,
-                        שייכות לאתר או לבעלי הרישיון שלו.
+                        {t('termsPage.sections.intellectualProperty.content')}
                     </p>
                 </section>
 
                 <section>
-                    <h2>7. שינויים בתנאי השימוש</h2>
+                    <h2>{t('termsPage.sections.changes.title')}</h2>
                     <p>
-                        האתר רשאי לשנות את תנאי השימוש מעת לעת, לפי שיקול דעתו הבלעדי. שינויים אלה
-                        ייכנסו לתוקף מיד עם פרסומם באתר.
+                        {t('termsPage.sections.changes.content')}
                     </p>
                 </section>
 
                 <section>
-                    <h2>8. יצירת קשר</h2>
+                    <h2>{t('termsPage.sections.contact.title')}</h2>
                     <p>
-                        לכל שאלה או בירור בנוגע לתנאי השימוש, ניתן ליצור קשר באמצעות:
-                        <br />
-                        דוא"ל: info@zezman.app
+                        {t('termsPage.sections.contact.content')}
                     </p>
                 </section>
             </div>

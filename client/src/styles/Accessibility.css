@@ -41,7 +41,6 @@
   align-items: center;
   justify-content: center;
   z-index: 1001;
-  direction: rtl;
 }
 
 .accessibility-modal {
@@ -56,10 +55,30 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* RTL support for modal */
+[dir="rtl"] .accessibility-modal {
+  direction: rtl;
+}
+
+/* LTR support for modal */
+[dir="ltr"] .accessibility-modal {
+  direction: ltr;
+}
+
+/* RTL support for modal overlay */
+[dir="rtl"] .accessibility-modal-overlay {
+  direction: rtl;
+}
+
+/* LTR support for modal overlay */
+[dir="ltr"] .accessibility-modal-overlay {
+  direction: ltr;
+}
+
 .close-button {
   position: absolute;
   top: 1rem;
-  left: 1rem;
+  right: 1rem;
   background: none;
   border: none;
   font-size: 1.5rem;
@@ -71,6 +90,18 @@
   justify-content: center;
   border-radius: 50%;
   transition: all 0.3s ease;
+}
+
+/* RTL support for close button */
+[dir="rtl"] .close-button {
+  right: auto;
+  left: 1rem;
+}
+
+/* LTR support for close button */
+[dir="ltr"] .close-button {
+  left: auto;
+  right: 1rem;
 }
 
 .close-button:hover {

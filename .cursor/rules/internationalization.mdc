@@ -1,0 +1,44 @@
+---
+alwaysApply: true
+---
+- Support Hebrew (RTL) and English (LTR)  
+- Use translation keys in JSON files  
+- Proper text direction handling  
+- Use react-i18next  
+
+### Language Direction Management
+- **Hebrew (RTL)**: Right-to-left reading direction
+- **English (LTR)**: Left-to-right reading direction
+- **Dynamic Direction**: All UI elements must adapt to current language direction
+### Implementation Guidelines
+
+#### 1. CSS Direction Properties
+- Use `[dir="rtl"]` and `[dir="ltr"]` selectors for direction-specific styling
+- Apply `direction: rtl/ltr` and `text-align: right/left` appropriately
+- Use CSS logical properties (margin-inline, padding-inline) for better RTL support
+
+#### 2. Flexbox Direction Adaptation
+- Use `flex-direction: row-reverse` for RTL containers
+- Use `flex-direction: row` for LTR containers
+- Apply to any flex container that needs direction-aware layout
+
+#### 3. Component Layout Examples
+- **Search Bar with Filters**: Mirror positioning based on language direction
+- **Navigation Menu**: Reverse order of elements based on language
+- **Form Layouts**: Adapt input groups and button positioning
+
+#### 4. Icon and Button Positioning
+- **Close Button (X)**: 
+  - Hebrew: Left side
+  - English: Right side
+- **Action Buttons**: Mirror positioning based on language
+- **Icons**: Use `transform: scaleX(-1)` for RTL when needed
+
+### RTL/LTR Best Practices
+- **Always test both directions** during development
+- **Use CSS logical properties** (margin-inline, padding-inline)
+- **Implement direction-aware components** as reusable utilities
+- **Test with real content** in both languages
+- **Consider cultural differences** in layout preferences
+
+

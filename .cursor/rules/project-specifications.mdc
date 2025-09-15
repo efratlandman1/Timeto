@@ -1,0 +1,1060 @@
+# 📋 Project Specifications - Timeto Application
+
+## 📑 תוכן עניינים
+- [מבנה מסכים מפורט](#מבנה-מסכים-מפורט)
+- [מודלים עסקיים מפורטים](#מודלים-עסקיים-מפורטים)
+- [לוגיקות עסקיות מפורטות](#לוגיקות-עסקיות-מפורטות)
+- [זרימת נתונים](#זרימת-נתונים)
+- [הרשאות ומערכת תפקידים](#הרשאות-ומערכת-תפקידים)
+- [API Endpoints](#api-endpoints)
+- [מבנה מסד נתונים](#מבנה-מסד-נתונים)
+
+---
+
+
+---
+
+## 📊 מודלים עסקיים מפורטים
+
+### **1. User Model - מודל משתמש**
+```javascript
+const userSchema = new mongoose.Schema({
+  // Authentication & Identity
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+    validate: {
+      validator: function(v) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      },
+      message: 'Invalid email format'
+    }
+  },
+  password: {
+    type: String,
+    required: function() { return this.authProvider === 'local'; },
+    minlength: 8,
+    validate: {
+      validator: function(v) {
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(v);
+      },
+      message: 'Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character'
+    }
+  },
+  authProvider: {
+    type: String,
+    enum: ['local', 'google', 'facebook', 'apple'],
+    default: 'local'
+  },
+  providerId: String, // For OAuth providers
+  
+  // Personal Information
+  firstName: {
+    type: String,
+    trim: true,
+    maxlength: 50,
+    validate: {
+      validator: function(v) {
+        return /^[a-zA-Z\u0590-\u05FF\s]+$/.test(v);
+      },
+      message: 'First name can only contain letters and spaces'
+    }
+  },
+  lastName: {
+    type: String,
+    trim: true,
+    maxlength: 50,
+    validate: {
+      validator: function(v) {
+        return /^[a-zA-Z\u0590-\u05FF\s]+$/.test(v);
+      },
+      message: 'Last name can only contain letters and spaces'
+    }
+  },
+  nickname: {
+    type: String,
+    trim: true,
+    maxlength: 30,
+    unique: true,
+    sparse: true
+  },
+  phonePrefix: {
+    type: String,
+    maxlength: 5,
+    validate: {
+      validator: function(v) {
+        return /^\+?[0-9]{1,4}$/.test(v);
+      },
+      message: 'Invalid phone prefix'
+    }
+  },
+  phone: {
+    type: String,
+    maxlength: 15,
+    validate: {
+      validator: function(v) {
+        return /^[0-9+\-\s()]+$/.test(v);
+      },
+      message: 'Invalid phone format'
+    }
+  },
+  
+  // Profile & Preferences
+  avatar: {
+    type: String,
+    validate: {
+      validator: function(v) {
+        return !v || /^https?:\/\/.+/.test(v);
+      },
+      message: 'Invalid avatar URL'
+    }
+  },
+  bio: {
+    type: String,
+    maxlength: 500
+  },
+  preferences: {
+    language: {
+      type: String,
+      enum: ['he', 'en'],
+      default: 'he'
+    },
+    notifications: {
+      email: { type: Boolean, default: true },
+      push: { type: Boolean, default: true },
+      sms: { type: Boolean, default: false }
+    },
+    privacy: {
+      profileVisible: { type: Boolean, default: true },
+      reviewsVisible: { type: Boolean, default: true },
+      activityVisible: { type: Boolean, default: false }
+    }
+  },
+  
+  // System & Status
+  role: {
+    type: String,
+    enum: ['admin', 'manager', 'business_owner', 'end_user'],
+    default: 'end_user'
+  },
+  is_verified: {
+    type: Boolean,
+    default: false
+  },
+  verification_token: String,
+  reset_password_token: String,
+  reset_password_expires: Date,
+  email_verification_token: String,
+  email_verification_expires: Date,
+  
+  // Activity & Statistics
+  last_login: {
+    type: Date,
+    default: Date.now
+  },
+  login_count: {
+    type: Number,
+    default: 0
+  },
+  total_reviews: {
+    type: Number,
+    default: 0
+  },
+  total_favorites: {
+    type: Number,
+    default: 0
+  },
+  total_businesses: {
+    type: Number,
+    default: 0
+  },
+  
+  // Timestamps
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
+}, {
+  timestamps: true
+});
+```
+
+### **2. Business Model - מודל עסק**
+```javascript
+const businessSchema = new mongoose.Schema({
+  // Basic Information
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 100,
+    validate: {
+      validator: function(v) {
+        return v.length >= 2 && v.length <= 100;
+      },
+      message: 'Business name must be between 2 and 100 characters'
+    }
+  },
+  description: {
+    type: String,
+    maxlength: 2000,
+    trim: true
+  },
+  shortDescription: {
+    type: String,
+    maxlength: 200,
+    trim: true
+  },
+  
+  // Contact Information
+  address: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 200
+  },
+  city: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 50
+  },
+  postalCode: {
+    type: String,
+    maxlength: 10
+  },
+  country: {
+    type: String,
+    default: 'Israel',
+    maxlength: 50
+  },
+  prefix: {
+    type: String,
+    required: true,
+    maxlength: 5,
+    validate: {
+      validator: function(v) {
+        return /^\+?[0-9]{1,4}$/.test(v);
+      },
+      message: 'Invalid phone prefix'
+    }
+  },
+  phone: {
+    type: String,
+    required: true,
+    maxlength: 15,
+    validate: {
+      validator: function(v) {
+        return /^[0-9+\-\s()]+$/.test(v);
+      },
+      message: 'Invalid phone format'
+    }
+  },
+  email: {
+    type: String,
+    required: true,
+    lowercase: true,
+    trim: true,
+    validate: {
+      validator: function(v) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      },
+      message: 'Invalid email format'
+    }
+  },
+  website: {
+    type: String,
+    validate: {
+      validator: function(v) {
+        return !v || /^https?:\/\/.+/.test(v);
+      },
+      message: 'Invalid website URL'
+    }
+  },
+  
+  // Location & Geography
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point'
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+      validate: {
+        validator: function(v) {
+          return v.length === 2 && 
+                 v[0] >= -180 && v[0] <= 180 && 
+                 v[1] >= -90 && v[1] <= 90;
+        },
+        message: 'Invalid coordinates'
+      }
+    }
+  },
+  geocodedAddress: {
+    formatted_address: String,
+    place_id: String,
+    geometry: {
+      location: {
+        lat: Number,
+        lng: Number
+      }
+    }
+  },
+  
+  // Business Details
+  logo: {
+    type: String,
+    validate: {
+      validator: function(v) {
+        return !v || /^https?:\/\/.+/.test(v);
+      },
+      message: 'Invalid logo URL'
+    }
+  },
+  images: [{
+    url: {
+      type: String,
+      required: true,
+      validate: {
+        validator: function(v) {
+          return /^https?:\/\/.+/.test(v);
+        },
+        message: 'Invalid image URL'
+      }
+    },
+    caption: {
+      type: String,
+      maxlength: 100
+    },
+    isPrimary: {
+      type: Boolean,
+      default: false
+    }
+  }],
+  
+  // Categories & Services
+  categoryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category',
+    required: true
+  },
+  subCategories: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category'
+  }],
+  services: [{
+    serviceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Service'
+    },
+    customName: String,
+    description: String,
+    price: {
+      type: Number,
+      min: 0
+    },
+    currency: {
+      type: String,
+      default: 'ILS'
+    }
+  }],
+  
+  // Operating Hours
+  openingHours: [{
+    day: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 6
+    },
+    closed: {
+      type: Boolean,
+      default: false
+    },
+    ranges: [{
+      open: {
+        type: String,
+        pattern: /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/
+      },
+      close: {
+        type: String,
+        pattern: /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/
+      }
+    }],
+    specialHours: {
+      type: String,
+      maxlength: 200
+    }
+  }],
+  
+  // Ratings & Reviews
+  rating: {
+    type: Number,
+    min: 0,
+    max: 5,
+    default: 0
+  },
+  totalRatings: {
+    type: Number,
+    default: 0
+  },
+  ratingDistribution: {
+    1: { type: Number, default: 0 },
+    2: { type: Number, default: 0 },
+    3: { type: Number, default: 0 },
+    4: { type: Number, default: 0 },
+    5: { type: Number, default: 0 }
+  },
+  
+  // Business Status
+  active: {
+    type: Boolean,
+    default: true
+  },
+  approved: {
+    type: Boolean,
+    default: false
+  },
+  featured: {
+    type: Boolean,
+    default: false
+  },
+  verified: {
+    type: Boolean,
+    default: false
+  },
+  
+  // Ownership & Management
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  managers: [{
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    role: {
+      type: String,
+      enum: ['owner', 'manager', 'editor'],
+      default: 'manager'
+    },
+    permissions: [{
+      type: String,
+      enum: ['edit', 'delete', 'manage_reviews', 'manage_hours', 'manage_services']
+    }]
+  }],
+  
+  // Business Features
+  features: {
+    hasParking: { type: Boolean, default: false },
+    hasWifi: { type: Boolean, default: false },
+    hasAccessibility: { type: Boolean, default: false },
+    acceptsCreditCards: { type: Boolean, default: false },
+    hasDelivery: { type: Boolean, default: false },
+    hasTakeaway: { type: Boolean, default: false },
+    hasReservations: { type: Boolean, default: false }
+  },
+  
+  // Social Media
+  socialMedia: {
+    facebook: String,
+    instagram: String,
+    twitter: String,
+    linkedin: String,
+    youtube: String
+  },
+  
+  // Timestamps
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
+}, {
+  timestamps: true
+});
+```
+
+---
+
+## 🔄 לוגיקות עסקיות מפורטות
+
+### **1. מערכת חיפוש מתקדמת**
+```javascript
+// Search Logic Implementation
+const searchBusinesses = async (query, filters, sort, page = 1, limit = 20) => {
+  const skip = (page - 1) * limit;
+  
+  // Build search criteria
+  const searchCriteria = {
+    active: true,
+    approved: true
+  };
+  
+  // Text search
+  if (query) {
+    searchCriteria.$text = { $search: query };
+  }
+  
+  // Category filter
+  if (filters.category) {
+    searchCriteria.categoryId = filters.category;
+  }
+  
+  // Rating filter
+  if (filters.minRating) {
+    searchCriteria.rating = { $gte: filters.minRating };
+  }
+  
+  // Distance filter (if coordinates provided)
+  if (filters.lat && filters.lng && filters.maxDistance) {
+    searchCriteria.location = {
+      $near: {
+        $geometry: {
+          type: 'Point',
+          coordinates: [filters.lng, filters.lat]
+        },
+        $maxDistance: filters.maxDistance * 1000 // Convert to meters
+      }
+    };
+  }
+  
+  // Services filter
+  if (filters.services && filters.services.length > 0) {
+    searchCriteria['services.serviceId'] = { $in: filters.services };
+  }
+  
+  // Build sort criteria
+  let sortCriteria = {};
+  switch (sort) {
+    case 'rating':
+      sortCriteria = { rating: -1 };
+      break;
+    case 'distance':
+      sortCriteria = { location: 1 };
+      break;
+    case 'name':
+      sortCriteria = { name: 1 };
+      break;
+    case 'newest':
+      sortCriteria = { createdAt: -1 };
+      break;
+    default:
+      sortCriteria = { score: { $meta: 'textScore' } };
+  }
+  
+  // Execute search
+  const [businesses, total] = await Promise.all([
+    Business.find(searchCriteria)
+      .select('name description rating categoryId location images logo totalRatings')
+      .populate('categoryId', 'name')
+      .sort(sortCriteria)
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Business.countDocuments(searchCriteria)
+  ]);
+  
+  return {
+    businesses,
+    pagination: {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit)
+    }
+  };
+};
+```
+
+### **2. מערכת דירוג וביקורות**
+```javascript
+// Review System Logic
+const addReview = async (userId, businessId, rating, comment) => {
+  // Check if user already reviewed this business
+  const existingReview = await Feedback.findOne({ userId, businessId });
+  if (existingReview) {
+    throw new Error('User has already reviewed this business');
+  }
+  
+  // Create new review
+  const review = new Feedback({
+    userId,
+    businessId,
+    rating,
+    comment,
+    approved: false // Requires admin approval
+  });
+  
+  await review.save();
+  
+  // Update business rating (if review is approved)
+  if (review.approved) {
+    await updateBusinessRating(businessId);
+  }
+  
+  return review;
+};
+
+const updateBusinessRating = async (businessId) => {
+  const reviews = await Feedback.find({ 
+    businessId, 
+    approved: true 
+  });
+  
+  if (reviews.length === 0) {
+    await Business.findByIdAndUpdate(businessId, {
+      rating: 0,
+      totalRatings: 0,
+      ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+    });
+    return;
+  }
+  
+  // Calculate new rating
+  const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+  const averageRating = totalRating / reviews.length;
+  
+  // Calculate rating distribution
+  const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  reviews.forEach(review => {
+    distribution[review.rating]++;
+  });
+  
+  // Update business
+  await Business.findByIdAndUpdate(businessId, {
+    rating: Math.round(averageRating * 10) / 10,
+    totalRatings: reviews.length,
+    ratingDistribution: distribution
+  });
+};
+```
+
+### **3. מערכת מועדפים**
+```javascript
+// Favorites System Logic
+const addToFavorites = async (userId, businessId) => {
+  // Check if already in favorites
+  const existingFavorite = await Favorite.findOne({ userId, businessId });
+  if (existingFavorite) {
+    throw new Error('Business is already in favorites');
+  }
+  
+  // Add to favorites
+  const favorite = new Favorite({
+    userId,
+    businessId
+  });
+  
+  await favorite.save();
+  
+  // Update user statistics
+  await User.findByIdAndUpdate(userId, {
+    $inc: { total_favorites: 1 }
+  });
+  
+  return favorite;
+};
+
+const removeFromFavorites = async (userId, businessId) => {
+  const result = await Favorite.findOneAndDelete({ userId, businessId });
+  
+  if (result) {
+    // Update user statistics
+    await User.findByIdAndUpdate(userId, {
+      $inc: { total_favorites: -1 }
+    });
+  }
+  
+  return result;
+};
+
+const getUserFavorites = async (userId, page = 1, limit = 20) => {
+  const skip = (page - 1) * limit;
+  
+  const [favorites, total] = await Promise.all([
+    Favorite.find({ userId })
+      .populate({
+        path: 'businessId',
+        select: 'name description rating categoryId location images logo',
+        populate: { path: 'categoryId', select: 'name' }
+      })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Favorite.countDocuments({ userId })
+  ]);
+  
+  return {
+    favorites: favorites.map(f => f.businessId),
+    pagination: {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit)
+    }
+  };
+};
+```
+
+### **4. מערכת אישור עסקים**
+```javascript
+// Business Approval System
+const submitBusinessForApproval = async (businessData, userId) => {
+  // Create business with pending status
+  const business = new Business({
+    ...businessData,
+    userId,
+    approved: false,
+    active: false
+  });
+  
+  await business.save();
+  
+  // Send notification to admins
+  await notifyAdminsForApproval(business);
+  
+  return business;
+};
+
+const approveBusiness = async (businessId, adminId) => {
+  const business = await Business.findByIdAndUpdate(businessId, {
+    approved: true,
+    active: true,
+    approvedBy: adminId,
+    approvedAt: new Date()
+  }, { new: true });
+  
+  // Notify business owner
+  await notifyBusinessOwner(business.userId, 'approved');
+  
+  return business;
+};
+
+const rejectBusiness = async (businessId, adminId, reason) => {
+  const business = await Business.findByIdAndUpdate(businessId, {
+    approved: false,
+    active: false,
+    rejectionReason: reason,
+    rejectedBy: adminId,
+    rejectedAt: new Date()
+  }, { new: true });
+  
+  // Notify business owner
+  await notifyBusinessOwner(business.userId, 'rejected', reason);
+  
+  return business;
+};
+```
+
+---
+
+## 📊 זרימת נתונים
+
+### **1. זרימת חיפוש עסקים**
+```mermaid
+graph TD
+    A[User enters search query] --> B[Validate input]
+    B --> C[Apply filters]
+    C --> D[Geolocation check]
+    D --> E[Database query]
+    E --> F[Sort results]
+    F --> G[Paginate results]
+    G --> H[Return formatted data]
+    H --> I[Display results]
+    I --> J[Cache results]
+```
+
+### **2. זרימת יצירת עסק**
+```mermaid
+graph TD
+    A[User starts business creation] --> B[Step 1: Basic info]
+    B --> C[Validate basic info]
+    C --> D[Step 2: Contact details]
+    D --> E[Validate contact details]
+    E --> F[Step 3: Location]
+    F --> G[Geocode address]
+    G --> H[Step 4: Services]
+    H --> I[Validate services]
+    I --> J[Step 5: Hours]
+    J --> K[Validate hours]
+    K --> L[Submit for approval]
+    L --> M[Admin review]
+    M --> N{Approved?}
+    N -->|Yes| O[Activate business]
+    N -->|No| P[Notify rejection]
+```
+
+### **3. זרימת דירוג וביקורת**
+```mermaid
+graph TD
+    A[User writes review] --> B[Validate user permissions]
+    B --> C[Check if already reviewed]
+    C --> D[Create review]
+    D --> E[Admin approval required]
+    E --> F{Approved?}
+    F -->|Yes| G[Update business rating]
+    F -->|No| H[Notify user]
+    G --> I[Recalculate average]
+    I --> J[Update distribution]
+    J --> K[Notify business owner]
+```
+
+---
+
+## 🔐 הרשאות ומערכת תפקידים
+
+### **1. תפקידים (Roles)**
+```javascript
+const ROLES = {
+  ADMIN: 'admin',
+  MANAGER: 'manager', 
+  BUSINESS_OWNER: 'business_owner',
+  END_USER: 'end_user'
+};
+
+const PERMISSIONS = {
+  // User Management
+  VIEW_USERS: 'view_users',
+  EDIT_USERS: 'edit_users',
+  DELETE_USERS: 'delete_users',
+  
+  // Business Management
+  CREATE_BUSINESS: 'create_business',
+  EDIT_BUSINESS: 'edit_business',
+  DELETE_BUSINESS: 'delete_business',
+  APPROVE_BUSINESS: 'approve_business',
+  
+  // Content Management
+  MANAGE_CATEGORIES: 'manage_categories',
+  MANAGE_SERVICES: 'manage_services',
+  MANAGE_REVIEWS: 'manage_reviews',
+  
+  // System Management
+  VIEW_STATISTICS: 'view_statistics',
+  MANAGE_SETTINGS: 'manage_settings',
+  VIEW_LOGS: 'view_logs'
+};
+```
+
+### **2. הרשאות לפי תפקיד**
+```javascript
+const ROLE_PERMISSIONS = {
+  admin: [
+    'view_users', 'edit_users', 'delete_users',
+    'create_business', 'edit_business', 'delete_business', 'approve_business',
+    'manage_categories', 'manage_services', 'manage_reviews',
+    'view_statistics', 'manage_settings', 'view_logs'
+  ],
+  manager: [
+    'view_users', 'edit_users',
+    'edit_business', 'approve_business',
+    'manage_categories', 'manage_services', 'manage_reviews',
+    'view_statistics'
+  ],
+  business_owner: [
+    'create_business', 'edit_business', 'delete_business'
+  ],
+  end_user: [
+    'create_business'
+  ]
+};
+```
+
+### **3. Middleware להרשאות**
+```javascript
+const requirePermission = (permission) => {
+  return (req, res, next) => {
+    const userRole = req.user.role;
+    const userPermissions = ROLE_PERMISSIONS[userRole] || [];
+    
+    if (!userPermissions.includes(permission)) {
+      return res.status(403).json({
+        success: false,
+        error: 'Insufficient permissions',
+        message: 'You do not have permission to perform this action'
+      });
+    }
+    
+    next();
+  };
+};
+
+const requireRole = (role) => {
+  return (req, res, next) => {
+    if (req.user.role !== role) {
+      return res.status(403).json({
+        success: false,
+        error: 'Insufficient role',
+        message: 'You do not have the required role for this action'
+      });
+    }
+    
+    next();
+  };
+};
+```
+
+---
+
+## 🌐 API Endpoints
+
+### **1. Authentication Endpoints**
+```javascript
+// POST /api/v1/auth/register
+// POST /api/v1/auth/login
+// POST /api/v1/auth/logout
+// POST /api/v1/auth/forgot-password
+// POST /api/v1/auth/reset-password
+// POST /api/v1/auth/verify-email
+// GET /api/v1/auth/me
+// PUT /api/v1/auth/profile
+```
+
+### **2. Business Endpoints**
+```javascript
+// GET /api/v1/businesses
+// GET /api/v1/businesses/:id
+// POST /api/v1/businesses
+// PUT /api/v1/businesses/:id
+// DELETE /api/v1/businesses/:id
+// GET /api/v1/businesses/search
+// GET /api/v1/businesses/nearby
+// POST /api/v1/businesses/:id/approve
+// POST /api/v1/businesses/:id/reject
+```
+
+### **3. User Endpoints**
+```javascript
+// GET /api/v1/users
+// GET /api/v1/users/:id
+// PUT /api/v1/users/:id
+// DELETE /api/v1/users/:id
+// GET /api/v1/users/:id/businesses
+// GET /api/v1/users/:id/favorites
+// GET /api/v1/users/:id/reviews
+```
+
+### **4. Review Endpoints**
+```javascript
+// GET /api/v1/reviews
+// GET /api/v1/reviews/:id
+// POST /api/v1/reviews
+// PUT /api/v1/reviews/:id
+// DELETE /api/v1/reviews/:id
+// POST /api/v1/reviews/:id/approve
+// POST /api/v1/reviews/:id/reject
+```
+
+### **5. Category Endpoints**
+```javascript
+// GET /api/v1/categories
+// GET /api/v1/categories/:id
+// POST /api/v1/categories
+// PUT /api/v1/categories/:id
+// DELETE /api/v1/categories/:id
+// GET /api/v1/categories/:id/businesses
+```
+
+### **6. Service Endpoints**
+```javascript
+// GET /api/v1/services
+// GET /api/v1/services/:id
+// POST /api/v1/services
+// PUT /api/v1/services/:id
+// DELETE /api/v1/services/:id
+// GET /api/v1/services/category/:categoryId
+```
+
+### **7. Favorite Endpoints**
+```javascript
+// GET /api/v1/favorites
+// POST /api/v1/favorites
+// DELETE /api/v1/favorites/:businessId
+// GET /api/v1/favorites/check/:businessId
+```
+
+### **8. Admin Endpoints**
+```javascript
+// GET /api/v1/admin/statistics
+// GET /api/v1/admin/pending-approvals
+// GET /api/v1/admin/users
+// GET /api/v1/admin/businesses
+// GET /api/v1/admin/reviews
+// POST /api/v1/admin/approve/:type/:id
+// POST /api/v1/admin/reject/:type/:id
+```
+
+---
+
+## 🗄️ מבנה מסד נתונים
+
+### **1. Collections Overview**
+```javascript
+// Main Collections
+- users (משתמשים)
+- businesses (עסקים)
+- categories (קטגוריות)
+- services (שירותים)
+- reviews (ביקורות)
+- favorites (מועדפים)
+- suggestions (הצעות)
+- notifications (התראות)
+- logs (לוגים)
+```
+
+### **2. Indexes Strategy**
+```javascript
+// Performance Indexes
+businessSchema.index({ location: '2dsphere' });
+businessSchema.index({ categoryId: 1, active: 1, approved: 1 });
+businessSchema.index({ rating: -1, active: 1, approved: 1 });
+businessSchema.index({ name: 'text', description: 'text' });
+businessSchema.index({ userId: 1, active: 1 });
+businessSchema.index({ createdAt: -1, active: 1, approved: 1 });
+
+userSchema.index({ email: 1 });
+userSchema.index({ role: 1 });
+userSchema.index({ is_verified: 1 });
+
+reviewSchema.index({ businessId: 1, approved: 1, createdAt: -1 });
+reviewSchema.index({ userId: 1, businessId: 1 }, { unique: true });
+
+favoriteSchema.index({ userId: 1, businessId: 1 }, { unique: true });
+favoriteSchema.index({ userId: 1, createdAt: -1 });
+```
+
+### **3. Data Relationships**
+```javascript
+// One-to-Many Relationships
+User → Businesses (One user can own multiple businesses)
+Category → Services (One category can have multiple services)
+Category → Businesses (One category can have multiple businesses)
+
+// Many-to-Many Relationships
+Business ↔ Services (Businesses can offer multiple services)
+User ↔ Business (Favorites) (Users can favorite multiple businesses)
+User ↔ Business (Reviews) (Users can review multiple businesses)
+
+// Referential Integrity
+Business deletion → Delete related favorites and reviews
+Category deletion → Check if businesses exist
+User deletion → Handle owned businesses and reviews
+```
+
+This comprehensive specification provides a complete blueprint for building the Timeto business directory application.

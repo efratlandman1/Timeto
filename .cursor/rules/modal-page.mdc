@@ -1,0 +1,45 @@
+---
+alwaysApply: true
+---
+### Modal Structure Requirements
+All dialog-like screens must be implemented as modal pages with:
+
+#### 1. Modal Container
+- Overlay with backdrop blur
+- Centered modal container
+- Header with title and close button
+- Content area
+- Footer with action buttons
+
+#### 2. RTL-Aware Close Button Positioning
+- Position close button based on language direction
+- Use CSS order property for RTL/LTR adaptation
+- Maintain consistent spacing and alignment
+
+#### 3. Modal Styling
+- Fixed positioning with overlay
+- Responsive sizing (max-width/height)
+- Smooth animations for open/close
+- Proper z-index management
+
+### Modal Component Guidelines
+- **Overlay**: Semi-transparent backdrop
+- **Content**: Centered with max-width constraints
+- **Header**: Title and close button
+- **Body**: Scrollable content area
+- **Footer**: Action buttons
+- **Responsive**: Mobile-first design
+
+
+### Modal Implementation Rules
+- **Click outside to close** (overlay click)
+- **Escape key to close** (keyboard accessibility)
+- **Focus trap** within modal
+- **Scroll lock** on body when modal is open
+- **Close button positioning** based on language direction
+- **Responsive design** for mobile devices
+- **Animation** for smooth open/close transitions
+- **Accessibility** with proper ARIA attributes
+- **Consistent width** across all modals
+- **Scrollable content** when content exceeds modal height
+- **Custom scrollbar** styling for better UX

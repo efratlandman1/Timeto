@@ -1,0 +1,64 @@
+---
+alwaysApply: true
+---
+### Design System Principles
+- **Consistency**: Uniform design across all components
+- **Reusability**: Shared design tokens and components
+- **Maintainability**: Centralized design configuration
+- **Scalability**: Easy to extend and modify
+- **Accessibility**: WCAG compliant design patterns
+
+### CSS Organization Strategy
+- **Global Styles**: Tailwind utilities and custom CSS variables
+- **Component Styles**: Unique styling per component
+- **Shared Components**: Reusable design patterns
+- **No Repetition**: DRY (Don't Repeat Yourself) principle
+
+## Tailwind Configuration
+
+### Spacing System
+- **Base Unit**: 4px (0.25rem)
+- **Scale**: 0, 1, 2, 4, 6, 8, 12, 16, 20, 24, 32, 40, 48, 56, 64
+- **Responsive**: sm, md, lg, xl, 2xl breakpoints
+- **Consistent**: Use Tailwind spacing classes only
+
+### Color Palette
+- **Primary Colors**: Brand colors with variations
+- **Secondary Colors**: Supporting color scheme
+- **Neutral Colors**: Grays for text and backgrounds
+- **Semantic Colors**: Success, warning, error, info
+- **Accessibility**: High contrast ratios (4.5:1 minimum)
+
+### Typography System
+- **Font Family**: System fonts with fallbacks
+- **Font Sizes**: Responsive scale (xs, sm, base, lg, xl, 2xl, 3xl)
+- **Font Weights**: 300, 400, 500, 600, 700, 900
+- **Line Heights**: Optimized for readability
+- **RTL Support**: Proper text direction handling
+
+
+## Component Design Rules
+
+### **Button Component Variations**
+- **Primary Button**: Main call-to-action
+- **Secondary Button**: Supporting actions
+- **Danger Button**: Destructive actions
+- **Ghost Button**: Subtle actions
+- **Icon Button**: Actions with icons only
+- **Loading Button**: States with loading indicators
+
+### **Form Component Standards**
+- **Input Fields**: Consistent styling and focus states
+- **Select Dropdowns**: Custom styled dropdowns
+- **Checkboxes/Radios**: Accessible form controls
+- **Validation States**: Error, warning, success indicators
+- **Form Groups**: Organized form layouts
+
+
+### **Navigation Component Rules**
+- **Header Navigation**: Main site navigation
+- **Sidebar Navigation**: Secondary navigation
+- **Breadcrumbs**: Page hierarchy navigation
+- **Pagination**: Page navigation controls
+- **Mobile Menu**: Responsive navigation
+

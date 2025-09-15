@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
 const User = require("../models/user");
- const bcryptjs = require('bcryptjs');
-// const crypto = require('crypto');
-// const sendEmail = require('../utils/SendEmail/sendEmail');
-// const { emailTemplates } = require('../utils/Sendmail/emailTemplates'); // אם אתה משתמש ב-export במקום module.exports
+const bcryptjs = require('bcryptjs');
+const { successResponse, errorResponse, getRequestMeta, serializeError } = require("../utils/errorUtils");
+const logger = require("../logger");
+const Sentry = require('@sentry/node');
+const messages = require("../messages");
 
 //register by auth
 // exports.registerUser = async (req, res) => {
@@ -75,17 +76,56 @@ const User = require("../models/user");
 // };
 
 exports.getAllUsers = async (req, res) => {
+    const logSource = 'usersController.getAllUsers';
+    const meta = getRequestMeta(req, logSource);
+    
+    logger.info({ ...meta }, `${logSource} enter`);
+    
     try {
         const users = await User.find({}).select('-password'); // Exclude passwords from the result
-        res.json(users);
+        logger.info({ ...meta, count: users.length }, `${logSource} complete`);
+        
+        return successResponse({
+            res,
+            req,
+            data: { users },
+            message: messages.USER_MESSAGES.GET_ALL_SUCCESS,
+            logSource
+        });
     } catch (error) {
-        res.status(500).json({ message: "Error fetching users", error });
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            message: messages.USER_MESSAGES.GET_ALL_ERROR,
+            logSource
+        });
     }
 };
 
 exports.updateUser = async (req, res) => {
+    const logSource = 'usersController.updateUser';
+    const meta = getRequestMeta(req, logSource);
+    
+    logger.info({ ...meta, currentUserId: req.user._id, targetUserId: req.params.id }, `${logSource} enter`);
+    
     try {
-        console.log("updateUser");
+        const currentUserId = req.user._id;
+        const targetUserId = req.params.id;
+        
+        // בדיקה אם המשתמש מעדכן את הפרופיל שלו או שהוא אדמין
+        if (currentUserId.toString() !== targetUserId && req.user.role !== 'admin') {
+            logger.warn({ ...meta, currentUserId, targetUserId }, messages.USER_MESSAGES.UNAUTHORIZED_UPDATE);
+            return errorResponse({
+                res,
+                req,
+                status: 403,
+                message: messages.USER_MESSAGES.UNAUTHORIZED_UPDATE,
+                logSource
+            });
+        }
+        
         const updateData = { ...req.body };
         if (updateData.password && updateData.password.length > 0) {
             updateData.password = await bcryptjs.hash(updateData.password, 10);
@@ -93,10 +133,18 @@ exports.updateUser = async (req, res) => {
             // Ensure the password is not overwritten with an empty value
             delete updateData.password;
         }
-        const updatedUser = await User.findByIdAndUpdate(req.params.id, updateData, { new: true }).select('-password');
+        
+        const updatedUser = await User.findByIdAndUpdate(targetUserId, updateData, { new: true }).select('-password');
        
         if (!updatedUser) {
-            return res.status(404).json({ message: 'User not found' });
+            logger.warn({ ...meta, targetUserId }, messages.USER_MESSAGES.NOT_FOUND);
+            return errorResponse({
+                res,
+                req,
+                status: 404,
+                message: messages.USER_MESSAGES.NOT_FOUND,
+                logSource
+            });
         }
 
         const userData = {
@@ -105,25 +153,66 @@ exports.updateUser = async (req, res) => {
             lastName: updatedUser.lastName,
             email: updatedUser.email,
             role: updatedUser.role, 
-            phone : updatedUser.phone,
-            nickname : updatedUser.nickname
+            phonePrefix: updatedUser.phonePrefix,
+            phone: updatedUser.phone,
+            nickname: updatedUser.nickname
         };
-        // res.json(userData);
-        res.status(200).json({ user:userData });
+        
+        logger.info({ ...meta, currentUserId, targetUserId }, `${logSource} complete`);
+        return successResponse({
+            res,
+            req,
+            data: { user: userData },
+            message: messages.USER_MESSAGES.UPDATE_SUCCESS,
+            logSource
+        });
 
     } catch (error) {
-        res.status(400).json({ message: 'Error updating user', error });
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            message: messages.USER_MESSAGES.UPDATE_ERROR,
+            logSource
+        });
     }
 };
 
 exports.deleteUser = async (req, res) => {
+    const logSource = 'usersController.deleteUser';
+    const meta = getRequestMeta(req, logSource);
+    
+    logger.info({ ...meta, userId: req.params.id }, `${logSource} enter`);
+    
     try {
         const deletedUser = await User.findByIdAndDelete(req.params.id);
         if (!deletedUser) {
-            return res.status(404).json({ message: 'User not found' });
+            logger.warn({ ...meta, userId: req.params.id }, messages.USER_MESSAGES.NOT_FOUND);
+            return errorResponse({
+                res,
+                req,
+                status: 404,
+                message: messages.USER_MESSAGES.NOT_FOUND,
+                logSource
+            });
         }
-        res.json({ message: 'User deleted successfully' });
+        
+        logger.info({ ...meta, userId: req.params.id }, `${logSource} complete`);
+        return successResponse({
+            res,
+            req,
+            message: messages.USER_MESSAGES.DELETE_SUCCESS,
+            logSource
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting user', error });
+        logger.error({ ...meta, error: serializeError(error) }, `${logSource} error`);
+        Sentry.captureException(error);
+        return errorResponse({
+            res,
+            req,
+            message: messages.USER_MESSAGES.DELETE_ERROR,
+            logSource
+        });
     }
 };

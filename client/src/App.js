@@ -20,7 +20,7 @@ import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
 // import SetPasswordPage from './components/SetPasswordPage';
 import { useDispatch } from 'react-redux';
-import { setUser } from './redux/userSlice';
+import { setUser, logout } from './redux/userSlice';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Accessibility from './components/Accessibility';
@@ -28,15 +28,31 @@ import './styles/global/index.css';
 import './i18n';
 import { useTranslation } from 'react-i18next';
 import { fetchUserLocation } from './redux/locationSlice';
+import { getToken } from './utils/auth';
 
 function App() {
     const dispatch = useDispatch();
-    const { i18n } = useTranslation();
+    const { i18n, ready } = useTranslation();
     
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
+        let user = null;
+        try {
+            const userData = localStorage.getItem('user');
+            user = userData ? JSON.parse(userData) : null;
+        } catch (error) {
+            console.error('Error parsing user data from localStorage:', error);
+            localStorage.removeItem('user');
+        }
+        
+        const token = getToken(); // Now checks validity automatically
+        
+        // Only set user if token is valid
+        if (user && token) {
             dispatch(setUser(user));
+        } else if (user && !token) {
+            // Clear invalid user data
+            localStorage.removeItem('user');
+            dispatch(logout());
         }
     }, [dispatch]);
 
@@ -46,15 +62,44 @@ function App() {
 
     // Update document direction when language changes
     useEffect(() => {
-        document.documentElement.dir = i18n.dir();
+        const direction = i18n.dir();
+        document.documentElement.dir = direction;
         document.documentElement.lang = i18n.language;
-        document.body.style.direction = i18n.dir();
+        document.body.style.direction = direction;
+        
+        // Add RTL/LTR classes to body for global styling
+        document.body.classList.remove('rtl', 'ltr');
+        document.body.classList.add(direction);
+        
+        // Add RTL/LTR classes to app container
+        const appElement = document.querySelector('.app');
+        if (appElement) {
+            appElement.classList.remove('rtl', 'ltr');
+            appElement.classList.add(direction);
+        }
     }, [i18n.language]);
+    
+    // Wait for translations to load
+    if (!ready) {
+        return (
+            <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                height: '100vh',
+                flexDirection: 'column',
+                gap: '20px'
+            }}>
+                <div className="loader"></div>
+                <span>Loading translations...</span>
+            </div>
+        );
+    }
 
     return (
         <Router>
             <GlobalStyles />
-            <div className="app" style={{ direction: i18n.dir() }}>
+            <div className={`app ${i18n.dir()}`} style={{ direction: i18n.dir() }}>
                 <Header />
                 <ToastContainer
                     position="top-center"
@@ -67,20 +112,20 @@ function App() {
                 />
                 <Routes>
                     <Route path="/" element={<MainPage />} />
-                    <Route path="/edit" element={<EditBusinessPage />} />
-                    <Route path="/edit/:id" element={<EditBusinessPage />} />
-                    <Route path="/my-businesses" element={<UserBusinessPage />} />
-                    <Route path="/my-favorites" element={<MyFavoritesPage />} />
+                    <Route path="/business" element={<EditBusinessPage />} />
+                    <Route path="/business/:id" element={<EditBusinessPage />} />
+                    <Route path="/user-businesses" element={<UserBusinessPage />} />
+                    <Route path="/user-favorites" element={<MyFavoritesPage />} />
                     <Route path="/auth" element={<AuthPage />} />
                     {/* <Route path="/login" element={<AuthPage />} /> */}
                     {/* <Route path="/register" element={<AuthPage />} /> */}
                     {/* <Route path="/login" element={<LoginPage />} /> */}
                     {/* <Route path="/register" element={<RegistrationPage />} /> */}
-                    <Route path="/profile" element={<UserProfilePage />} />
+                    <Route path="/user-profile" element={<UserProfilePage />} />
                     <Route path="/search-results" element={<SearchResultPage />} />
-                    <Route path="/feedback-page" element={<FeedbackPage />} />
+                    <Route path="/feedback" element={<FeedbackPage />} />
                     <Route path="/business-profile/:id" element={<BusinessProfilePage />} />
-                    <Route path="/suggest" element={<SuggestItemPage />} />
+                    <Route path="/suggest-item" element={<SuggestItemPage />} />
                     <Route path="/terms" element={<TermsPage />} />
                     <Route path="/admin" element={<AdminPanelPage />} />
                     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
