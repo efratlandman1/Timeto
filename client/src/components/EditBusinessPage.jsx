@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { FaSave, FaPlus, FaEdit, FaArrowRight } from 'react-icons/fa';
-import { LoadScript } from '@react-google-maps/api';
+// Removed LoadScript to avoid blocking UI; StepBusinessDetails handles maps loading internally
 import StepBusinessDetails from './StepBusinessDetails';
 import StepBusinessServices from './StepBusinessServices';
 import StepBusinessHours from './StepBusinessHours';
@@ -219,6 +219,14 @@ const EditBusinessPage = () => {
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Redirect unauthenticated users immediately on page load (add/edit business requires auth)
+  useEffect(() => {
+    const token = getToken();
+    if (!token) {
+      navigate('/auth');
+    }
+  }, [navigate]);
+
   useEffect(() => {
     const loadBusiness = async (businessId) => {
       const token = getToken();
@@ -389,20 +397,15 @@ const EditBusinessPage = () => {
           </div>
         </div>
 
-        <LoadScript
-          googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
-          libraries={GOOGLE_MAPS_LIBRARIES}
-        >
-          <StepsProvider>
-            <MySteps
-              businessData={businessData}
-              setBusinessData={setBusinessData}
-              categories={categories}
-              handleSubmit={handleSubmit}
-              selectedBusiness={selectedBusiness}
-            />
-          </StepsProvider>
-        </LoadScript>
+        <StepsProvider>
+          <MySteps
+            businessData={businessData}
+            setBusinessData={setBusinessData}
+            categories={categories}
+            handleSubmit={handleSubmit}
+            selectedBusiness={selectedBusiness}
+          />
+        </StepsProvider>
         <ToastContainer position="bottom-center" rtl={true} />
       </div>
     </div>

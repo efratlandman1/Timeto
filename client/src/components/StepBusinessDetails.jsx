@@ -1,24 +1,19 @@
 import React, { useState } from 'react';
 import { FaUpload } from 'react-icons/fa';
-import { Autocomplete } from '@react-google-maps/api';
+import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
 import '../styles/StepsStyle.css';
 import { PHONE_PREFIXES, PHONE_NUMBER_MAX_LENGTH } from '../constants/globals';
 import { useTranslation } from 'react-i18next';
 
 const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
-  const { t, ready } = useTranslation();
+  const { t } = useTranslation();
   const [autocomplete, setAutocomplete] = useState(null);
-  
-  // Wait for translations to load
-  if (!ready) {
-    return (
-      <div className="step-business-details">
-        <div className="loading-container">
-          <span>Loading translations...</span>
-        </div>
-      </div>
-    );
-  }
+  const { isLoaded: mapsLoaded } = useJsApiLoader({
+    id: 'google-maps-script',
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
+    libraries: ['places']
+  });
+
 
   const handleChange = (e) => {
     const { name, value, files, type, checked } = e.target;
@@ -91,10 +86,19 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
         <label htmlFor="address" className="form-label">
           {t('businessForm.fields.address')}<RequiredMark />
         </label>
-        <Autocomplete
-          onLoad={onLoad}
-          onPlaceChanged={onPlaceChanged}
-        >
+        {mapsLoaded ? (
+          <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
+            <input
+              type="text"
+              id="address"
+              name="address"
+              value={businessData.address || ''}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </Autocomplete>
+        ) : (
           <input
             type="text"
             id="address"
@@ -104,7 +108,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
             className="form-input"
             required
           />
-        </Autocomplete>
+        )}
       </div>
 
       <div className="form-group" style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
