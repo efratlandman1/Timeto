@@ -249,7 +249,8 @@
     "loginPermission": "יש צורך בהתחברות כדי לבצע פעולה זו",
     "generalError": "אירעה שגיאה, נסה שוב מאוחר יותר",
     "tooManyAttempts": "ניסית יותר מדי פעמים. אנא נסה שוב מאוחר יותר.",
-    "password": "סיסמה"
+    "password": "סיסמה",
+    "select": "בחר"
   },
   "search": {
     "placeholder": "חפש עסק או שירות...",

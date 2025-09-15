@@ -238,7 +238,8 @@
     "loginPermission": "Login required to perform this action",
     "generalError": "An error occurred, please try again later",
     "tooManyAttempts": "Too many attempts. Please try again later.",
-    "password": "Password"
+    "password": "Password",
+    "select": "Select"
   },
   "search": {
     "placeholder": "Search business by name, category or service",
