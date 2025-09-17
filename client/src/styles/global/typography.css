@@ -31,6 +31,11 @@ body {
     color: var(--text-primary);
 }
 
+/* Accessibility: dynamic base font size via CSS var set by Accessibility component */
+html, body, .app {
+    font-size: var(--base-font-size, var(--font-size-md));
+}
+
 /* Text Styles */
 .text-xs { font-size: var(--font-size-xs); }
 .text-sm { font-size: var(--font-size-sm); }

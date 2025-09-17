@@ -10,7 +10,6 @@ const Accessibility = () => {
     fontSize: 'normal',
     contrast: 'normal',
     cursorSize: 'normal',
-    textAlign: 'right',
     keyboardNav: false
   });
 
@@ -31,20 +30,21 @@ const Accessibility = () => {
       newSettings.fontSize === 'larger' ? '20px' : '16px'
     );
 
-    // Contrast
-    document.body.className = newSettings.contrast === 'high' ? 'high-contrast' : '';
+    // Contrast (avoid overwriting existing body classes like rtl/ltr)
+    if (newSettings.contrast === 'high') {
+      document.body.classList.add('high-contrast');
+    } else {
+      document.body.classList.remove('high-contrast');
+    }
 
     // Cursor Size
-    document.documentElement.style.setProperty(
-      '--cursor-size',
-      newSettings.cursorSize === 'large' ? '32px' : '16px'
-    );
+    if (newSettings.cursorSize === 'large') {
+      document.documentElement.classList.add('cursor-large');
+    } else {
+      document.documentElement.classList.remove('cursor-large');
+    }
 
-    // Text Alignment
-    document.documentElement.style.setProperty(
-      '--text-align',
-      newSettings.textAlign
-    );
+    // Text Alignment removed – alignment controlled by language direction (dir="rtl"/"ltr")
 
     // Keyboard Navigation
     if (newSettings.keyboardNav) {
@@ -80,6 +80,14 @@ const Accessibility = () => {
       <button 
         className="accessibility-button"
         onClick={() => setIsOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsOpen(true);
+          }
+        }}
+        tabIndex={0}
+        aria-expanded={isOpen}
         aria-label={t('accessibility.openSettings')}
       >
         <FaUniversalAccess />
@@ -87,7 +95,13 @@ const Accessibility = () => {
 
       {isOpen && (
         <div className="accessibility-modal-overlay" onClick={() => setIsOpen(false)}>
-          <div className="accessibility-modal" onClick={e => e.stopPropagation()}>
+          <div
+            className="accessibility-modal"
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="accessibility-title"
+          >
             <button 
               className="close-button"
               onClick={() => setIsOpen(false)}
@@ -96,7 +110,7 @@ const Accessibility = () => {
               ×
             </button>
 
-            <h2 className="accessibility-title">
+            <h2 id="accessibility-title" className="accessibility-title">
               <FaUniversalAccess /> {t('accessibility.title')}
             </h2>
 
@@ -161,29 +175,7 @@ const Accessibility = () => {
                 </div>
               </div>
 
-              <div className="option-group">
-                <h3><FaAlignRight /> {t('accessibility.textAlign')}</h3>
-                <div className="button-group">
-                                      <button 
-                      className={settings.textAlign === 'right' ? 'active' : ''}
-                      onClick={() => updateSetting('textAlign', 'right')}
-                    >
-                      {t('accessibility.right')}
-                    </button>
-                    <button 
-                      className={settings.textAlign === 'center' ? 'active' : ''}
-                      onClick={() => updateSetting('textAlign', 'center')}
-                    >
-                      {t('accessibility.center')}
-                    </button>
-                    <button 
-                      className={settings.textAlign === 'left' ? 'active' : ''}
-                      onClick={() => updateSetting('textAlign', 'left')}
-                    >
-                      {t('accessibility.left')}
-                    </button>
-                </div>
-              </div>
+              {/* Text alignment control removed */}
 
               <div className="option-group">
                 <h3><FaKeyboard /> {t('accessibility.keyboardNav')}</h3>
@@ -199,6 +191,9 @@ const Accessibility = () => {
 
               <button className="reset-button" onClick={resetSettings}>
                 {t('accessibility.resetSettings')}
+              </button>
+              <button className="reset-button" style={{ background: '#4caf50' }} onClick={() => setIsOpen(false)}>
+                {t('accessibility.apply')}
               </button>
               <button className="cancel-button" type="button" onClick={() => setIsOpen(false)} style={{marginTop: '1.5rem', width: '100%'}}>
                 {t('accessibility.cancel')}

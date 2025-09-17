@@ -229,7 +229,8 @@
     "active": "פעיל",
     "inactive": "כבוי",
     "resetSettings": "אפס הגדרות",
-    "cancel": "ביטול"
+    "cancel": "ביטול",
+    "apply": "החל"
   },
   "common": {
     "loading": "טוען...",

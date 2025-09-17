@@ -650,7 +650,8 @@
     "active": "Active",
     "inactive": "Inactive",
     "resetSettings": "Reset Settings",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "apply": "Apply"
   },
   "suggestItem": {
     "title": "Suggest Item",
