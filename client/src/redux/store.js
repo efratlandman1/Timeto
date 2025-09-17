@@ -2,6 +2,10 @@ import { configureStore } from '@reduxjs/toolkit';
 import businessReducer from './businessSlice';
 import userReducer from './userSlice';
 import servicesReducer from './servicesSlice';
+import saleAdsReducer from './saleAdsSlice';
+import promoAdsReducer from './promoAdsSlice';
+import saleCategoriesReducer from './saleCategoriesSlice';
+import saleFavoritesReducer from './saleFavoritesSlice';
 import locationReducer from './locationSlice';
 import uiReducer from './uiSlice';
 
@@ -44,7 +48,11 @@ const store = configureStore({
         user: userReducer,
         services: servicesReducer,
         location: locationReducer,
-        ui: uiReducer
+        ui: uiReducer,
+        saleAds: saleAdsReducer,
+        promoAds: promoAdsReducer,
+        saleCategories: saleCategoriesReducer,
+        saleFavorites: saleFavoritesReducer
     },
     preloadedState: {
         ui: getInitialUIState()

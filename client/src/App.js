@@ -18,6 +18,9 @@ import AdminPanelPage from './components/AdminPanelPage';
 import UserProfilePage from './components/UserProfilePage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
+import AdsHubPage from './components/AdsHubPage';
+import CreateSaleAdPage from './components/CreateSaleAdPage';
+import CreatePromoAdPage from './components/CreatePromoAdPage';
 // import SetPasswordPage from './components/SetPasswordPage';
 import { useDispatch } from 'react-redux';
 import { setUser, logout } from './redux/userSlice';
@@ -112,6 +115,9 @@ function App() {
                 />
                 <Routes>
                     <Route path="/" element={<MainPage />} />
+                    <Route path="/ads" element={<AdsHubPage />} />
+                    <Route path="/ads/sale/new" element={<CreateSaleAdPage />} />
+                    <Route path="/ads/promo/new" element={<CreatePromoAdPage />} />
                     <Route path="/business" element={<EditBusinessPage />} />
                     <Route path="/business/:id" element={<EditBusinessPage />} />
                     <Route path="/user-businesses" element={<UserBusinessPage />} />

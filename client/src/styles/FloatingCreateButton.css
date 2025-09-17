@@ -1,0 +1,56 @@
+.fab-root {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+}
+
+.fab-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 9999px;
+  border: none;
+  background: #4f46e5; /* indigo-600 */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.fab-button.open { background: #111827; /* gray-900 */ }
+.fab-button:hover { filter: brightness(1.05); }
+
+.fab-menu {
+  width: 260px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(6px);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.fab-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  text-align: right;
+  cursor: pointer;
+}
+
+.fab-menu-item:hover { background: #f3f4f6; }
+
+.fab-icon { font-size: 16px; }
+.fab-icon.store { color: #4f46e5; }
+.fab-icon.sale { color: #059669; }
+.fab-icon.promo { color: #e11d48; }
+

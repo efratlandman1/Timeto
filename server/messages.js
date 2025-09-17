@@ -166,4 +166,62 @@ module.exports = {
     INVALID_STATUS: "ערך סטטוס לא תקין",
     PARENT_CATEGORY_NOT_FOUND: "קטגוריית האב לא נמצאה"
   }
+  ,
+  SALE_AD_MESSAGES: {
+    GET_ALL_SUCCESS: "מודעות מכירה נטענו בהצלחה",
+    GET_ALL_ERROR: "שגיאה בטעינת מודעות המכירה",
+    GET_BY_ID_SUCCESS: "מודעת מכירה נטענה בהצלחה",
+    GET_BY_ID_ERROR: "שגיאה בטעינת מודעת המכירה",
+    CREATE_SUCCESS: "מודעת המכירה נוצרה בהצלחה",
+    CREATE_ERROR: "שגיאה ביצירת מודעת המכירה",
+    UPDATE_SUCCESS: "מודעת המכירה עודכנה בהצלחה",
+    UPDATE_ERROR: "שגיאה בעדכון מודעת המכירה",
+    DELETE_SUCCESS: "מודעת המכירה הוסרה בהצלחה",
+    DELETE_ERROR: "שגיאה בהסרת מודעת המכירה",
+    RESTORE_SUCCESS: "מודעת המכירה שוחזרה בהצלחה",
+    RESTORE_ERROR: "שגיאה בשחזור מודעת המכירה",
+    NOT_FOUND: "מודעת המכירה לא נמצאה",
+    UNAUTHORIZED_EDIT: "אין לך הרשאה לערוך מודעה זו",
+    UNAUTHORIZED_DELETE: "אין לך הרשאה להסיר מודעה זו",
+    UNAUTHORIZED_RESTORE: "אין לך הרשאה לשחזר מודעה זו",
+    INVALID_COORDINATES: "הכתובת/המיקום לא נמצאו או לא תקינים"
+  },
+  PROMO_AD_MESSAGES: {
+    GET_ALL_SUCCESS: "מודעות פרסום נטענו בהצלחה",
+    GET_ALL_ERROR: "שגיאה בטעינת מודעות הפרסום",
+    GET_BY_ID_SUCCESS: "מודעת פרסום נטענה בהצלחה",
+    GET_BY_ID_ERROR: "שגיאה בטעינת מודעת הפרסום",
+    CREATE_SUCCESS: "מודעת הפרסום נוצרה בהצלחה",
+    CREATE_ERROR: "שגיאה ביצירת מודעת הפרסום",
+    UPDATE_SUCCESS: "מודעת הפרסום עודכנה בהצלחה",
+    UPDATE_ERROR: "שגיאה בעדכון מודעת הפרסום",
+    DELETE_SUCCESS: "מודעת הפרסום הוסרה בהצלחה",
+    DELETE_ERROR: "שגיאה בהסרת מודעת הפרסום",
+    RESTORE_SUCCESS: "מודעת הפרסום שוחזרה בהצלחה",
+    RESTORE_ERROR: "שגיאה בשחזור מודעת הפרסום",
+    NOT_FOUND: "מודעת הפרסום לא נמצאה",
+    IMAGE_REQUIRED: "יש לצרף תמונה למודעת פרסום",
+    UNAUTHORIZED_EDIT: "אין לך הרשאה לערוך מודעה זו",
+    UNAUTHORIZED_DELETE: "אין לך הרשאה להסיר מודעה זו",
+    UNAUTHORIZED_RESTORE: "אין לך הרשאה לשחזר מודעה זו"
+  },
+  SALE_CATEGORY_MESSAGES: {
+    GET_ALL_SUCCESS: "קטגוריות מכירה נטענו בהצלחה",
+    GET_ALL_ERROR: "שגיאה בטעינת קטגוריות המכירה",
+    CREATE_SUCCESS: "קטגוריית מכירה נוצרה בהצלחה",
+    CREATE_ERROR: "שגיאה ביצירת קטגוריית המכירה",
+    UPDATE_SUCCESS: "קטגוריית מכירה עודכנה בהצלחה",
+    UPDATE_ERROR: "שגיאה בעדכון קטגוריית המכירה",
+    DELETE_SUCCESS: "קטגוריית מכירה הוסרה בהצלחה",
+    DELETE_ERROR: "שגיאה בהסרת קטגוריית המכירה",
+    NOT_FOUND: "קטגוריית המכירה לא נמצאה"
+  },
+  SALE_FAVORITES_MESSAGES: {
+    ADDED: "המודעה נוספה למועדפים",
+    REMOVED: "המודעה הוסרה מהמועדפים",
+    INVALID_ID: "מזהה מודעה לא תקין",
+    ERROR_TOGGLE: "שגיאה בעת עדכון המועדפים",
+    FETCH_SUCCESS: "מועדפים נטענו בהצלחה",
+    ERROR_FETCH: "שגיאה בטעינת המועדפים"
+  }
 }; 

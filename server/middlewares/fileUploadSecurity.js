@@ -298,14 +298,85 @@ const checkFileContent = (req, res, next) => {
     next();
 };
 
-// Combined file upload security middleware
+// Combined file upload security middleware (single file)
 const fileUploadSecurity = [
     validateFileType,
     validateFileSize,
     sanitizeFileName,
     checkFileContent,
-    virusScan  // Add virus scanning to the chain
+    virusScan
 ];
+
+// Array-aware variants for multiple files
+const fileUploadSecurityArray = async (req, res, next) => {
+    if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+        return next();
+    }
+
+    try {
+        // Validate each file
+        for (const file of req.files) {
+            // Type
+            if (!ALLOWED_FILE_TYPES[file.mimetype]) {
+                if (file.path) { try { fs.unlinkSync(file.path); } catch (_) {} }
+                return res.status(400).json({ success: false, message: 'Invalid file type', details: `Only ${Object.values(ALLOWED_FILE_TYPES).join(', ')} files are allowed` });
+            }
+            // Size
+            if (file.size > MAX_FILE_SIZE) {
+                if (file.path) { try { fs.unlinkSync(file.path); } catch (_) {} }
+                return res.status(400).json({ success: false, message: 'File too large', details: `File size must be less than ${MAX_FILE_SIZE / (1024 * 1024)}MB` });
+            }
+            // Sanitize filename and rename
+            const originalName = file.originalname;
+            const extension = path.extname(originalName).toLowerCase();
+            const baseName = path.basename(originalName, extension);
+            const sanitizedName = baseName
+                .replace(/[^a-zA-Z0-9]/g, '_')
+                .replace(/_+/g, '_')
+                .replace(/^_|_$/g, '');
+            const timestamp = Date.now();
+            const newFileName = `${sanitizedName}_${timestamp}${extension}`;
+            const oldPath = file.path;
+            const newPath = path.join(path.dirname(oldPath), newFileName);
+            try {
+                fs.renameSync(oldPath, newPath);
+                file.filename = newFileName;
+                file.path = newPath;
+            } catch (_) {}
+            // Check signature
+            try {
+                const buffer = fs.readFileSync(file.path);
+                const fileSignature = buffer.toString('hex', 0, 4);
+                const validSignatures = ['ffd8ff','89504e47','47494638','52494646'];
+                const isValidSignature = validSignatures.some(sig => fileSignature.toLowerCase().startsWith(sig));
+                if (!isValidSignature) {
+                    try { fs.unlinkSync(file.path); } catch (_) {}
+                    return res.status(400).json({ success: false, message: 'Invalid file content', details: 'File appears to be corrupted or not a valid image' });
+                }
+            } catch (_) {
+                // If fail to read, reject
+                try { fs.unlinkSync(file.path); } catch (_) {}
+                return res.status(400).json({ success: false, message: 'Invalid file content', details: 'Unable to read uploaded file' });
+            }
+        }
+
+        // Virus scan (production only)
+        if (isProduction && clamAvailable) {
+            for (const file of req.files) {
+                const { isInfected, viruses } = await clamscan.isInfected(file.path);
+                if (isInfected) {
+                    try { fs.unlinkSync(file.path); } catch (_) {}
+                    return res.status(400).json({ success: false, message: 'File failed virus scan', details: `Virus detected: ${viruses.join(', ')}` });
+                }
+            }
+        }
+
+        return next();
+    } catch (err) {
+        Sentry.captureException(err);
+        return res.status(500).json({ success: false, message: 'File validation failed' });
+    }
+};
 
 module.exports = {
     validateFileType,
@@ -313,5 +384,6 @@ module.exports = {
     sanitizeFileName,
     checkFileContent,
     virusScan,
-    fileUploadSecurity
+    fileUploadSecurity,
+    fileUploadSecurityArray
 }; 

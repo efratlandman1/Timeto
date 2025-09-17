@@ -6,6 +6,9 @@ import {
     FaSignInAlt, 
     FaGlobe, 
     FaPlusCircle,
+    FaPlus,
+    FaTags,
+    FaBullhorn,
     FaHeart,
     FaStore,
     FaLightbulb,
@@ -32,11 +35,14 @@ const Header = () => {
     const location = useLocation();
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showLangMenu, setShowLangMenu] = useState(false);
+    const [showCreateMenu, setShowCreateMenu] = useState(false);
     const [username, setUsername] = useState(null);
     const [greeting, setGreeting] = useState("");
     const [isAuthLoading, setIsAuthLoading] = useState(true);
     const userMenuRef = useRef(null);
     const userButtonRef = useRef(null);
+    const createMenuRef = useRef(null);
+    const createButtonRef = useRef(null);
     const loginUser = useSelector(state => state.user.user);
     const isAdmin = loginUser && loginUser.role === 'admin';
     const { t, i18n, ready } = useTranslation();
@@ -116,12 +122,23 @@ const Header = () => {
             if (!langDropdown) {
                 setShowLangMenu(false);
             }
+
+            // Close create dropdown if clicking outside
+            if (
+                createMenuRef.current &&
+                !createMenuRef.current.contains(event.target) &&
+                createButtonRef.current &&
+                !createButtonRef.current.contains(event.target)
+            ) {
+                setShowCreateMenu(false);
+            }
         };
 
         const handleEscape = (event) => {
             if (event.key === 'Escape') {
                 setShowUserMenu(false);
                 setShowLangMenu(false);
+                setShowCreateMenu(false);
             }
         };
 
@@ -389,13 +406,53 @@ const Header = () => {
                             <FaSearch />
                             {t('header.search')}
                         </button>
-                        <button 
-                            className={`nav-button ${isActive("/business") ? "active" : ""}`} 
-                            onClick={() => navigate("/business")}
-                        >
-                            <FaPlusCircle />
-                            {t('header.addBusiness')}
-                        </button>
+                        <div style={{ position: 'relative', display: 'inline-block' }}>
+                            <button 
+                                className={`nav-button with-hover`}
+                                onClick={() => setShowCreateMenu(!showCreateMenu)}
+                                ref={createButtonRef}
+                                aria-expanded={showCreateMenu}
+                                aria-haspopup="true"
+                                title="צור חדש"
+                            >
+                                <FaPlus />
+                                צור
+                            </button>
+                            {showCreateMenu && (
+                                <div 
+                                    className={dropdownMenuClass}
+                                    role="menu"
+                                    aria-label="Create dropdown"
+                                    ref={createMenuRef}
+                                    style={{ minWidth: 200 }}
+                                >
+                                    <button 
+                                        className={dropdownItemClass} 
+                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/business"); }}
+                                        role="menuitem"
+                                    >
+                                        <FaStore />
+                                        הוספת עסק
+                                    </button>
+                                    <button 
+                                        className={dropdownItemClass} 
+                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/ads/sale/new"); }}
+                                        role="menuitem"
+                                    >
+                                        <FaTags />
+                                        מודעת מכירה
+                                    </button>
+                                    <button 
+                                        className={dropdownItemClass} 
+                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/ads/promo/new"); }}
+                                        role="menuitem"
+                                    >
+                                        <FaBullhorn />
+                                        מודעת פרסום
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                         <button 
                             className={`nav-button ${isActive("/suggest-item") ? "active" : ""}`} 
                             onClick={() => navigate("/suggest-item")}
