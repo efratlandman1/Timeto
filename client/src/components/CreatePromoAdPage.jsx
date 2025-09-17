@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { createPromoAd } from '../redux/promoAdsSlice';
 import { useNavigate } from 'react-router-dom';
 import '../styles/EditBusinessPage.css';
+import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
 
 const CreatePromoAdPage = () => {
   const dispatch = useDispatch();
@@ -12,6 +13,22 @@ const CreatePromoAdPage = () => {
   const [validFrom, setValidFrom] = useState('');
   const [validTo, setValidTo] = useState('');
   const [image, setImage] = useState(null);
+  const [auto, setAuto] = useState(null);
+
+  const { isLoaded: mapsLoaded } = useJsApiLoader({
+    id: 'google-maps-script',
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
+    libraries: ['places']
+  });
+
+  const onAutoLoad = (instance) => setAuto(instance);
+  const onPlaceChanged = () => {
+    if (auto) {
+      const place = auto.getPlace();
+      const value = place?.formatted_address || place?.name || '';
+      if (value) setCity(value);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,11 +61,20 @@ const CreatePromoAdPage = () => {
           <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
               <label className="form-label">עיר/אזור *</label>
-              <input className="form-input" value={city} onChange={e => setCity(e.target.value)} required />
+              {mapsLoaded ? (
+                <Autocomplete onLoad={onAutoLoad} onPlaceChanged={onPlaceChanged}>
+                  <input className="form-input" value={city} onChange={e => setCity(e.target.value)} required />
+                </Autocomplete>
+              ) : (
+                <input className="form-input" value={city} onChange={e => setCity(e.target.value)} required />
+              )}
             </div>
             <div>
               <label className="form-label">תמונה *</label>
-              <input className="form-input" type="file" accept="image/*" onChange={e => setImage(e.target.files?.[0] || null)} required />
+              <label className="button file-upload">
+                בחרי תמונה
+                <input type="file" accept="image/*" onChange={e => setImage(e.target.files?.[0] || null)} style={{ display: 'none' }} required />
+              </label>
             </div>
           </div>
           <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>

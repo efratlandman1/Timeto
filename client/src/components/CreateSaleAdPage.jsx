@@ -5,6 +5,8 @@ import { fetchSaleCategories } from '../redux/saleCategoriesSlice';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/EditBusinessPage.css';
+import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
+import { PHONE_PREFIXES, PHONE_NUMBER_MAX_LENGTH } from '../constants/globals';
 
 const CreateSaleAdPage = () => {
   const dispatch = useDispatch();
@@ -13,11 +15,29 @@ const CreateSaleAdPage = () => {
   const [title, setTitle] = useState('');
   const [city, setCity] = useState('');
   const [phone, setPhone] = useState('');
+  const [prefix, setPrefix] = useState('');
+  const [hasWhatsapp, setHasWhatsapp] = useState(true);
   const [price, setPrice] = useState('');
   const [currency, setCurrency] = useState('ILS');
   const [categoryId, setCategoryId] = useState('');
   const [description, setDescription] = useState('');
   const [images, setImages] = useState([]);
+  const [auto, setAuto] = useState(null);
+
+  const { isLoaded: mapsLoaded } = useJsApiLoader({
+    id: 'google-maps-script',
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
+    libraries: ['places']
+  });
+
+  const onAutoLoad = (instance) => setAuto(instance);
+  const onPlaceChanged = () => {
+    if (auto) {
+      const place = auto.getPlace();
+      const value = place?.formatted_address || place?.name || '';
+      if (value) setCity(value);
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchSaleCategories());
@@ -31,6 +51,8 @@ const CreateSaleAdPage = () => {
     fd.append('phone', phone);
     if (price) fd.append('price', price);
     if (currency) fd.append('currency', currency);
+    if (prefix) fd.append('prefix', prefix);
+    fd.append('hasWhatsapp', String(!!hasWhatsapp));
     if (categoryId) fd.append('categoryId', categoryId);
     if (description) fd.append('description', description);
     Array.from(images).forEach(f => fd.append('images', f));
@@ -57,11 +79,27 @@ const CreateSaleAdPage = () => {
           <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
               <label className="form-label">עיר/אזור *</label>
-              <input className="form-input" name="city" value={city} onChange={e => setCity(e.target.value)} required />
+              {mapsLoaded ? (
+                <Autocomplete onLoad={onAutoLoad} onPlaceChanged={onPlaceChanged}>
+                  <input className="form-input" name="city" value={city} onChange={e => setCity(e.target.value)} required />
+                </Autocomplete>
+              ) : (
+                <input className="form-input" name="city" value={city} onChange={e => setCity(e.target.value)} required />
+              )}
             </div>
             <div>
               <label className="form-label">טלפון *</label>
-              <input className="form-input" name="phone" value={phone} onChange={e => setPhone(e.target.value)} required />
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <select className="form-input" style={{ width: '80px', textAlign: 'center' }} value={prefix} onChange={e => setPrefix(e.target.value)}>
+                  <option value="">בחרי</option>
+                  {PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+                <input className="form-input" name="phone" value={phone} onChange={e => setPhone(e.target.value)} inputMode="numeric" maxLength={PHONE_NUMBER_MAX_LENGTH} required />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+                  <input type="checkbox" checked={hasWhatsapp} onChange={e => setHasWhatsapp(e.target.checked)} />
+                  <label className="form-label" style={{ margin: 0 }}>וואטסאפ</label>
+                </div>
+              </div>
             </div>
           </div>
           <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>

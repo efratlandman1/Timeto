@@ -9,7 +9,9 @@ const saleAdSchema = new mongoose.Schema({
     categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'sale_categories' },
     price: { type: Number },
     currency: { type: String, enum: CURRENCIES, default: 'ILS' },
+    prefix: { type: String },
     phone: { type: String, required: true },
+    hasWhatsapp: { type: Boolean, default: true },
     city: { type: String, required: true, trim: true },
     address: { type: String, trim: true },
     location: {

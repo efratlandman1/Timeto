@@ -52,7 +52,9 @@ exports.createSaleAd = async (req, res) => {
             categoryId,
             price,
             currency = 'ILS',
+            prefix: req.body.prefix,
             phone,
+            hasWhatsapp: typeof req.body.hasWhatsapp === 'string' ? req.body.hasWhatsapp === 'true' : (req.body.hasWhatsapp ?? true),
             city,
             address
         } = req.body;
@@ -120,6 +122,8 @@ exports.updateSaleAd = async (req, res) => {
         if (price !== undefined) ad.price = Number(price);
         if (currency) ad.currency = currency;
         if (phone) ad.phone = phone;
+        if (req.body.prefix !== undefined) ad.prefix = req.body.prefix;
+        if (req.body.hasWhatsapp !== undefined) ad.hasWhatsapp = typeof req.body.hasWhatsapp === 'string' ? req.body.hasWhatsapp === 'true' : !!req.body.hasWhatsapp;
         if (city) ad.city = city;
         if (address !== undefined) ad.address = address;
 
