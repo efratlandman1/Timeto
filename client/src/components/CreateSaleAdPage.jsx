@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/EditBusinessPage.css';
 import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
 import { PHONE_PREFIXES, PHONE_NUMBER_MAX_LENGTH } from '../constants/globals';
+import ImageUploader from './common/ImageUploader';
 
 const CreateSaleAdPage = () => {
   const dispatch = useDispatch();
@@ -128,12 +129,18 @@ const CreateSaleAdPage = () => {
             <label className="form-label">תיאור</label>
             <textarea className="form-input" rows={4} value={description} onChange={e => setDescription(e.target.value)} />
           </div>
-          <div className="form-group-logo">
-            <label className="button file-upload">
-              תמונות (עד 10)
-              <input type="file" multiple accept="image/*" onChange={e => setImages(e.target.files)} style={{ display: 'none' }} />
-            </label>
-          </div>
+          <ImageUploader
+            multiple
+            files={Array.from(images || [])}
+            label="תמונות (עד 10)"
+            onAdd={(filesList) => setImages(filesList)}
+            onRemove={(idx) => {
+              const arr = Array.from(images || []);
+              arr.splice(idx, 1);
+              // Note: FileList is read-only; keep as array for previews and append in submit
+              setImages(arr);
+            }}
+          />
           <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
             <button type="button" className="nav-button" onClick={() => navigate('/ads')}>ביטול</button>
             <button type="submit" className="save-button">פרסם</button>

@@ -4,6 +4,7 @@ import { createPromoAd } from '../redux/promoAdsSlice';
 import { useNavigate } from 'react-router-dom';
 import '../styles/EditBusinessPage.css';
 import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
+import ImageUploader from './common/ImageUploader';
 
 const CreatePromoAdPage = () => {
   const dispatch = useDispatch();
@@ -71,10 +72,13 @@ const CreatePromoAdPage = () => {
             </div>
             <div>
               <label className="form-label">תמונה *</label>
-              <label className="button file-upload">
-                בחרי תמונה
-                <input type="file" accept="image/*" onChange={e => setImage(e.target.files?.[0] || null)} style={{ display: 'none' }} required />
-              </label>
+              <ImageUploader
+                multiple={false}
+                file={image}
+                label="בחרי תמונה"
+                onAdd={(filesList) => setImage(filesList?.[0] || null)}
+                onRemove={() => setImage(null)}
+              />
             </div>
           </div>
           <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
