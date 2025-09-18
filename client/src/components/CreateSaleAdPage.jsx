@@ -8,6 +8,8 @@ import '../styles/EditBusinessPage.css';
 import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
 import { PHONE_PREFIXES, PHONE_NUMBER_MAX_LENGTH } from '../constants/globals';
 import ImageUploader from './common/ImageUploader';
+import ActionBar from './common/ActionBar';
+import { FaArrowRight } from 'react-icons/fa';
 
 const CreateSaleAdPage = () => {
   const dispatch = useDispatch();
@@ -66,6 +68,10 @@ const CreateSaleAdPage = () => {
   return (
     <div className="narrow-page-container">
       <div className="narrow-page-content">
+        <button className="nav-button above-header" onClick={() => navigate('/') }>
+          <FaArrowRight className="icon" />
+          חזרה לעמוד הבית
+        </button>
         <div className="page-header">
           <div className="page-header__content vertical">
             <h1>יצירת מודעת מכירה</h1>
@@ -77,9 +83,9 @@ const CreateSaleAdPage = () => {
             <label className="form-label">כותרת *</label>
             <input className="form-input" name="title" value={title} onChange={e => setTitle(e.target.value)} required />
           </div>
-          <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="form-group">
             <div>
-              <label className="form-label">עיר/אזור *</label>
+              <label className="form-label">עיר/אזור <span className="required-asterisk">*</span></label>
               {mapsLoaded ? (
                 <Autocomplete onLoad={onAutoLoad} onPlaceChanged={onPlaceChanged}>
                   <input className="form-input" name="city" value={city} onChange={e => setCity(e.target.value)} required />
@@ -88,18 +94,45 @@ const CreateSaleAdPage = () => {
                 <input className="form-input" name="city" value={city} onChange={e => setCity(e.target.value)} required />
               )}
             </div>
-            <div>
-              <label className="form-label">טלפון *</label>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <select className="form-input" style={{ width: '80px', textAlign: 'center' }} value={prefix} onChange={e => setPrefix(e.target.value)}>
-                  <option value="">בחרי</option>
-                  {PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
-                <input className="form-input" name="phone" value={phone} onChange={e => setPhone(e.target.value)} inputMode="numeric" maxLength={PHONE_NUMBER_MAX_LENGTH} required />
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
-                  <input type="checkbox" checked={hasWhatsapp} onChange={e => setHasWhatsapp(e.target.checked)} />
-                  <label className="form-label" style={{ margin: 0 }}>וואטסאפ</label>
-                </div>
+          </div>
+          <div className="form-group" style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+            <label htmlFor="phone" className="form-label" style={{ flexShrink: 0, marginTop: '6px' }}>
+              טלפון <span className="required-asterisk">*</span>
+            </label>
+            <div style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: 'ltr', alignItems: 'center' }}>
+              <select
+                id="phonePrefix"
+                name="prefix"
+                className="form-input"
+                style={{ width: '80px', textAlign: 'center' }}
+                value={prefix}
+                onChange={e => setPrefix(e.target.value)}
+              >
+                <option value="">בחרי</option>
+                {PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                className="form-input"
+                style={{ flexGrow: 1 }}
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
+                inputMode="numeric"
+                maxLength={PHONE_NUMBER_MAX_LENGTH}
+                required
+              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0, direction: 'rtl' }}>
+                <input
+                  type="checkbox"
+                  id="hasWhatsapp"
+                  checked={!!hasWhatsapp}
+                  onChange={e => setHasWhatsapp(e.target.checked)}
+                />
+                <label htmlFor="hasWhatsapp" className="form-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>
+                  יש וואטסאפ
+                </label>
               </div>
             </div>
           </div>
@@ -141,10 +174,12 @@ const CreateSaleAdPage = () => {
               setImages(arr);
             }}
           />
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-            <button type="button" className="nav-button" onClick={() => navigate('/ads')}>ביטול</button>
-            <button type="submit" className="save-button">פרסם</button>
-          </div>
+          <ActionBar
+            onCancel={() => navigate('/')}
+            onConfirm={handleSubmit}
+            cancelText="ביטול"
+            confirmText="פרסם"
+          />
         </form>
       </div>
     </div>

@@ -53,3 +53,9 @@ html, body, .app {
 .line-height-tight { line-height: var(--line-height-tight); }
 .line-height-normal { line-height: var(--line-height-normal); }
 .line-height-relaxed { line-height: var(--line-height-relaxed); }
+
+/* Required asterisk unified style */
+.required-asterisk {
+    color: #d32f2f;
+    margin-inline-start: 4px;
+}

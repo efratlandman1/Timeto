@@ -71,3 +71,39 @@
         padding: 0.4rem 0.8rem;
     }
 } 
+
+/* Generic buttons used in forms/action bar */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.btn.primary { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+.btn.primary:hover { filter: brightness(0.95); }
+.btn.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn.secondary { background: #fff; color: var(--text-primary); border-color: #e0e0e0; }
+.btn.secondary:hover { background: #f8f8f8; }
+
+/* Bottom action bar */
+.action-bar {
+    position: static; /* anchored to document flow, not floating */
+    background: transparent;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+    margin-top: 16px;
+}
+.action-bar .action-bar-content {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 12px;
+    align-items: center;
+}
+.action-bar .btn.right { justify-self: start; }
+.action-bar .btn.left { justify-self: end; }
+.action-bar .action-bar-middle { display: flex; justify-content: center; align-items: center; }

@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/EditBusinessPage.css';
 import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
 import ImageUploader from './common/ImageUploader';
+import ActionBar from './common/ActionBar';
+import { FaArrowRight } from 'react-icons/fa';
 
 const CreatePromoAdPage = () => {
   const dispatch = useDispatch();
@@ -48,6 +50,10 @@ const CreatePromoAdPage = () => {
   return (
     <div className="narrow-page-container">
       <div className="narrow-page-content">
+        <button className="nav-button above-header" onClick={() => navigate('/') }>
+          <FaArrowRight className="icon" />
+          חזרה לעמוד הבית
+        </button>
         <div className="page-header">
           <div className="page-header__content vertical">
             <h1>יצירת מודעת פרסום</h1>
@@ -61,7 +67,7 @@ const CreatePromoAdPage = () => {
           </div>
           <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
-              <label className="form-label">עיר/אזור *</label>
+              <label className="form-label">עיר/אזור <span className="required-asterisk">*</span></label>
               {mapsLoaded ? (
                 <Autocomplete onLoad={onAutoLoad} onPlaceChanged={onPlaceChanged}>
                   <input className="form-input" value={city} onChange={e => setCity(e.target.value)} required />
@@ -70,8 +76,10 @@ const CreatePromoAdPage = () => {
                 <input className="form-input" value={city} onChange={e => setCity(e.target.value)} required />
               )}
             </div>
+          </div>
+          <div className="form-group">
             <div>
-              <label className="form-label">תמונה *</label>
+              <label className="form-label">תמונה <span className="required-asterisk">*</span></label>
               <ImageUploader
                 multiple={false}
                 file={image}
@@ -91,10 +99,12 @@ const CreatePromoAdPage = () => {
               <input className="form-input" type="datetime-local" value={validTo} onChange={e => setValidTo(e.target.value)} required />
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-            <button type="button" className="nav-button" onClick={() => navigate('/ads')}>ביטול</button>
-            <button type="submit" className="save-button">פרסם</button>
-          </div>
+          <ActionBar
+            onCancel={() => navigate('/')}
+            onConfirm={handleSubmit}
+            cancelText="ביטול"
+            confirmText="פרסם"
+          />
         </form>
       </div>
     </div>
