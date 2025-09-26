@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const upload = require('../config/multerConfig');
-const { requireAuth, optionalAuth, requireAdmin } = require('../middlewares/authMiddleware');
+const { requireAuth, publicRoute, requireAdmin } = require('../middlewares/authMiddleware');
 const { writeLimiter, generalLimiter } = require('../middlewares/rateLimiter');
 const { sanitizeRequest, validateMongoIdParam } = require('../middlewares/inputValidation');
 const { fileUploadSecurityArray } = require('../middlewares/fileUploadSecurity');
 const controller = require('../controllers/saleAdsController');
 
 // List & search
-router.get('/', optionalAuth, generalLimiter, sanitizeRequest, controller.getSaleAds);
+router.get('/', publicRoute, generalLimiter, sanitizeRequest, controller.getSaleAds);
 // Create
 router.post('/', requireAuth, writeLimiter, sanitizeRequest, upload.array('images', 10), fileUploadSecurityArray, controller.createSaleAd);
 // User ads

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createSaleAd } from '../redux/saleAdsSlice';
 import { fetchSaleCategories } from '../redux/saleCategoriesSlice';
-import { useEffect } from 'react';
+import { getToken } from '../utils/auth';
 import { useNavigate } from 'react-router-dom';
 import '../styles/EditBusinessPage.css';
 import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
@@ -43,6 +43,11 @@ const CreateSaleAdPage = () => {
   };
 
   useEffect(() => {
+    const token = getToken();
+    if (!token) {
+      navigate('/auth');
+      return;
+    }
     dispatch(fetchSaleCategories());
   }, [dispatch]);
 
@@ -80,7 +85,7 @@ const CreateSaleAdPage = () => {
         </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">כותרת *</label>
+            <label className="form-label">כותרת <span className="required-asterisk">*</span></label>
             <input className="form-input" name="title" value={title} onChange={e => setTitle(e.target.value)} required />
           </div>
           <div className="form-group">
@@ -138,11 +143,11 @@ const CreateSaleAdPage = () => {
           </div>
           <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
-              <label className="form-label">מחיר</label>
+            <label className="form-label">מחיר <span className="required-asterisk">*</span></label>
               <input className="form-input" name="price" value={price} onChange={e => setPrice(e.target.value)} />
             </div>
             <div>
-              <label className="form-label">מטבע</label>
+            <label className="form-label">מטבע <span className="required-asterisk">*</span></label>
               <select className="form-select" value={currency} onChange={e => setCurrency(e.target.value)}>
                 <option value="ILS">₪ ILS</option>
                 <option value="USD">$ USD</option>
@@ -152,14 +157,14 @@ const CreateSaleAdPage = () => {
             </div>
           </div>
           <div className="form-group">
-            <label className="form-label">קטגוריה</label>
+            <label className="form-label">קטגוריה <span className="required-asterisk">*</span></label>
             <select className="form-select" value={categoryId} onChange={e => setCategoryId(e.target.value)}>
               <option value="">בחרי קטגוריה</option>
               {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
             </select>
           </div>
           <div className="form-group">
-            <label className="form-label">תיאור</label>
+            <label className="form-label">תיאור <span className="required-asterisk">*</span></label>
             <textarea className="form-input" rows={4} value={description} onChange={e => setDescription(e.target.value)} />
           </div>
           <ImageUploader

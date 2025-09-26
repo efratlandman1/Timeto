@@ -300,6 +300,13 @@
     box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15) !important;
 }
 
+/* Required asterisk style (reused across forms) */
+.required-asterisk {
+    color: #d32f2f;
+    margin: 0 2px;
+    font-weight: 600;
+}
+
 /* Update logo upload button */
 .button.file-upload {
     display: inline-flex;

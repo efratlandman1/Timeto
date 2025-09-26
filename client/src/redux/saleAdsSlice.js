@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { getToken } from '../utils/auth';
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5050/api/v1';
 
@@ -21,9 +22,12 @@ export const createSaleAd = createAsyncThunk(
   'saleAds/createSaleAd',
   async (formData, { rejectWithValue }) => {
     try {
+      const token = getToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const res = await fetch(`${API_BASE}/sale-ads`, {
         method: 'POST',
         credentials: 'include',
+        headers,
         body: formData
       });
       const json = await res.json();

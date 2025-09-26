@@ -5,9 +5,12 @@ import { fetchPromoAds, clearPromoAds } from '../redux/promoAdsSlice';
 import { fetchSaleCategories } from '../redux/saleCategoriesSlice';
 import SaleAdCard from './SaleAdCard';
 import PromoAdCard from './PromoAdCard';
+import { getToken } from '../utils/auth';
+import { useNavigate } from 'react-router-dom';
 
 const AdsHubPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { items: saleItems, pagination: salePage, loading: saleLoading } = useSelector(s => s.saleAds);
   const { items: promoItems, pagination: promoPage, loading: promoLoading } = useSelector(s => s.promoAds);
   const { items: categories } = useSelector(s => s.saleCategories);
@@ -16,6 +19,11 @@ const AdsHubPage = () => {
   const observerRef = useRef(null);
 
   useEffect(() => {
+    const token = getToken();
+    if (!token) {
+      navigate('/auth');
+      return;
+    }
     dispatch(fetchSaleCategories());
     dispatch(fetchSaleAds({ page: 1, limit: 20 }));
     dispatch(fetchPromoAds({ page: 1, limit: 20 }));

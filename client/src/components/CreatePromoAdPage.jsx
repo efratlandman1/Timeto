@@ -62,7 +62,7 @@ const CreatePromoAdPage = () => {
         </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">כותרת *</label>
+            <label className="form-label">כותרת <span className="required-asterisk">*</span></label>
             <input className="form-input" value={title} onChange={e => setTitle(e.target.value)} required />
           </div>
           <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -91,11 +91,11 @@ const CreatePromoAdPage = () => {
           </div>
           <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
-              <label className="form-label">תאריך התחלה *</label>
+              <label className="form-label">תאריך התחלה <span className="required-asterisk">*</span></label>
               <input className="form-input" type="datetime-local" value={validFrom} onChange={e => setValidFrom(e.target.value)} required />
             </div>
             <div>
-              <label className="form-label">תאריך סיום *</label>
+              <label className="form-label">תאריך סיום <span className="required-asterisk">*</span></label>
               <input className="form-input" type="datetime-local" value={validTo} onChange={e => setValidTo(e.target.value)} required />
             </div>
           </div>

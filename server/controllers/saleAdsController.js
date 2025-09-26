@@ -52,12 +52,14 @@ exports.createSaleAd = async (req, res) => {
             categoryId,
             price,
             currency = 'ILS',
-            prefix: req.body.prefix,
+            prefix,
             phone,
-            hasWhatsapp: typeof req.body.hasWhatsapp === 'string' ? req.body.hasWhatsapp === 'true' : (req.body.hasWhatsapp ?? true),
+            hasWhatsapp,
             city,
             address
         } = req.body;
+
+        const normalizedHasWhatsapp = typeof hasWhatsapp === 'string' ? hasWhatsapp === 'true' : (hasWhatsapp ?? true);
 
         const addressToGeocode = address || city;
         const location = await mapsUtils.geocode(addressToGeocode, req);
@@ -74,7 +76,9 @@ exports.createSaleAd = async (req, res) => {
             categoryId: categoryId && mongoose.Types.ObjectId.isValid(categoryId) ? categoryId : undefined,
             price: price !== undefined ? Number(price) : undefined,
             currency,
+            prefix,
             phone,
+            hasWhatsapp: normalizedHasWhatsapp,
             city,
             address: address || '',
             location: { type: 'Point', coordinates: [location.lng, location.lat] },
