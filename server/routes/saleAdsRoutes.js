@@ -14,7 +14,7 @@ router.post('/', requireAuth, writeLimiter, sanitizeRequest, upload.array('image
 // User ads
 router.get('/my', requireAuth, generalLimiter, sanitizeRequest, controller.getUserSaleAds);
 // Single
-router.get('/:id', optionalAuth, generalLimiter, sanitizeRequest, validateMongoIdParam('id', 'Sale Ad ID'), controller.getSaleAdById);
+router.get('/:id', publicRoute, generalLimiter, sanitizeRequest, validateMongoIdParam('id', 'Sale Ad ID'), controller.getSaleAdById);
 router.put('/:id', requireAuth, writeLimiter, sanitizeRequest, validateMongoIdParam('id', 'Sale Ad ID'), upload.array('images', 10), fileUploadSecurityArray, controller.updateSaleAd);
 router.delete('/:id', requireAuth, writeLimiter, sanitizeRequest, validateMongoIdParam('id', 'Sale Ad ID'), controller.deleteSaleAd);
 router.patch('/restore/:id', requireAuth, writeLimiter, sanitizeRequest, validateMongoIdParam('id', 'Sale Ad ID'), controller.restoreSaleAd);

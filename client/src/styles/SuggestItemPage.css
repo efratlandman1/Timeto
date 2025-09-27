@@ -33,6 +33,22 @@
   width: 100%;
 }
 
+/* Section card wrapper for visual grouping */
+.section-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* Two columns layout for key fields */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -50,6 +66,35 @@
   display: flex;
   gap: 2rem;
   margin-top: 0.25rem;
+}
+
+/* Segmented control for mode toggle */
+.segmented-control {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  background: #f3f3f3;
+  border-radius: 12px;
+  padding: 6px;
+  gap: 0;
+}
+
+.segmented-control .segment {
+  border: none;
+  background: transparent;
+  color: #555;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .2s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.segmented-control .segment.active {
+  background: #fff;
+  color: #d32f2f;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
 .radio-label {
@@ -131,5 +176,9 @@
   .radio-group {
     flex-direction: column;
     gap: 1rem;
+  }
+
+  .two-col {
+    grid-template-columns: 1fr;
   }
 } 
