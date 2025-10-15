@@ -406,20 +406,7 @@ const Header = () => {
                             <FaSearch />
                             {t('header.search')}
                         </button>
-                        <button 
-                            className={`nav-button ${isActive("/ads/sale") ? "active" : ""}`} 
-                            onClick={() => navigate("/ads/sale")}
-                        >
-                            <FaTags />
-                            מודעות מכירה
-                        </button>
-                        <button 
-                            className={`nav-button ${isActive("/ads/promo") ? "active" : ""}`} 
-                            onClick={() => navigate("/ads/promo")}
-                        >
-                            <FaBullhorn />
-                            מודעות פרסום
-                        </button>
+                        {/* Removed sale/promo nav to simplify header */}
                         <div style={{ position: 'relative', display: 'inline-block' }}>
                             <button 
                                 className={`nav-button with-hover`}

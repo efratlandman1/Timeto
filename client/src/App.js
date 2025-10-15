@@ -117,6 +117,7 @@ function App() {
                     pauseOnHover
                     draggable
                 />
+                <main className="page-content" style={{ paddingTop: '60px' }}>
                 <Routes>
                     <Route path="/" element={<MainPage />} />
                     {/* <Route path="/ads" element={<AdsHubPage />} /> */}
@@ -147,6 +148,7 @@ function App() {
                     {/* <Route path="/set-password" element={<SetPasswordPage />} /> */}
                 </Routes>
                 <Accessibility />
+                </main>
             </div>
         </Router>
     );
