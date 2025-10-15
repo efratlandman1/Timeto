@@ -8,6 +8,11 @@
     --font-size-2xl: 2rem;      /* 32px */
     --font-size-3xl: 2.5rem;    /* 40px */
 
+    /* Base scale for the whole app (controls rem-based sizing). 
+       Set to 0.9rem (~90%) for a slightly more compact UI. 
+       Change to 0.8rem if you'd like ~80%. */
+    --base-font-size: 0.9rem;
+
     /* Font Weights */
     --font-weight-normal: 400;
     --font-weight-medium: 500;

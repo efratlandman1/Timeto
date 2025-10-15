@@ -15,6 +15,24 @@
     box-sizing: border-box;
 }
 
+/* Desktop content scale (safe wrapper scaling) */
+:root { --content-scale: 0.8; }
+
+@media (min-width: 1200px) {
+    /* Prefer native zoom when available */
+    @supports (zoom: 1) {
+        .page-content { zoom: var(--content-scale); }
+    }
+    /* Fallback for browsers without zoom support */
+    @supports not (zoom: 1) {
+        .page-content {
+            transform: scale(var(--content-scale));
+            transform-origin: top center;
+            width: calc(100% / var(--content-scale));
+        }
+    }
+}
+
 /* RTL/LTR Support - Complete Layout Mirroring */
 [dir="rtl"] {
     --start: right;

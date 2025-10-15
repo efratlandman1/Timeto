@@ -63,8 +63,8 @@
 .quick-card:hover .quick-card__icon { background: #ffffff; color: #ff0000; }
 
 /* Text styles: icon & title in red, normal weight */
-.quick-card__title { font-weight: 400; color: #e53935; font-family: inherit; font-size: 15px; }
-.quick-card__desc { font-size: 12px; color: #666; font-family: inherit; }
+.quick-card__title { font-weight: 400; color: #e53935; font-family: inherit; font-size: 1rem; }
+.quick-card__desc { font-size: 0.875rem; color: #666; font-family: inherit; }
 
 /* Hover */
 .quick-card:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0,0,0,0.08); background: #ffecec; border-color: #ffd0d0; }
