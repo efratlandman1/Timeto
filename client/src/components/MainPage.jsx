@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import BusinessCard from './BusinessCard';
 import SearchBar from './SearchBar'; // ← חדש
+import QuickCreateStrip from './QuickCreateStrip';
 import axios from 'axios';
 import '../styles/MainPage.css';
 import '../styles/businessCard.css';
@@ -197,10 +198,10 @@ const MainPage = () => {
                 {/* Hero Section */}
                 <section className="hero-section">
                     <div className="hero-content">
-                        {/* Search Section */}
+                        {/* Quick Create strip */}
+                        <QuickCreateStrip />
+                        {/* Search Section (without big title) */}
                         <div className="search-section">
-                            <h1>{t('mainPage.search.title')}</h1>
-                            <p>{t('mainPage.search.subtitle')}</p>
                             <SearchBar />
                         </div>
 
