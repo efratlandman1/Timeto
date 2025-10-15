@@ -282,11 +282,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     >
       <div
         className="business-card-image-container"
-        style={{
-          background: !business.logo && business.categoryId?.color
-            ? business.categoryId.color
-            : '#f8f8f8'
-        }}
+        style={{ background: '#ffffff' }}
       >
         {business.logo ? (
           <img

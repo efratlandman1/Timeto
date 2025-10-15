@@ -14,7 +14,7 @@
   width: 100%;
   max-width: 100%;
   position: relative;
-  background: white;
+  background: #ffffff; /* force white */
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -35,7 +35,7 @@
   width: 100%;
   aspect-ratio: 1 / 1;
   overflow: hidden;
-  background: #f8f8f8;
+  background: #ffffff; /* neutral placeholder */
   border-radius: 12px 12px 0 0;
   display: flex;
   align-items: center;
@@ -48,6 +48,7 @@
   object-fit: contain;
   object-position: center;
   display: block;
+  background: #ffffff; /* prevent category tint */
 }
 
 .business-card:hover .business-card-image {
@@ -433,24 +434,7 @@
   background: #27ae60;
 }
 
-.business-card-placeholder {
-  background: none;
-  /* שאר העיצוב הקיים */
-}
-.business-placeholder-name {
-  margin-top: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #fff;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.15);
-}
-
-.category-logo-in-placeholder {
-  display: block;
-  margin: 0 auto 4px auto;
-  max-width: 40px;
-  max-height: 40px;
-  border-radius: 6px;
-  background: white;
-  object-fit: contain;
-}
+/* Placeholder styles */
+.business-card-placeholder { background: #ffffff; }
+.business-placeholder-name { color: #202125; text-shadow: none; }
+.category-logo-in-placeholder { background: #ffffff; }

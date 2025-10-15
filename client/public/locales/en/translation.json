@@ -78,24 +78,29 @@
     "sections": {
       "popular": "Popular Businesses",
       "new": "New Businesses",
-      "recommended": "Recommended for You"
+      "recommended": "Recommended for You",
+      "newSales": "New Sale Ads Near You",
+      "newPromos": "New Promo Ads Near You"
     },
     "joinBanner": {
-      "title": "Join Time Community",
+      "title": "Join the Time Community",
       "description": "Add your business and start getting new customers today",
+      "descriptionFull": "Add a business, post a sale ad and a promo ad to reach the right customers near you and across the country",
       "button": "Add Business Free",
       "joinNowAndDiscover": "Join now and start discovering interesting things around you"
     },
     "viewAll": "View All",
     "footer": {
       "contact": "Contact",
+      "contactSubtitle": "Looking for info or partnership? We’d love to hear from you.",
       "quickLinks": "Quick Links",
       "search": "Search",
       "suggestItem": "Suggest Item",
       "termsOfService": "Terms of Service",
       "termsComingSoon": "Terms of service will be available soon",
       "about": "About Time",
-      "aboutDescription": "Israel's leading business directory. Find the right business near you.",
+      "aboutDescriptionLine1": "The community that connects people and businesses",
+      "aboutDescriptionLine2": "Discover businesses, sale ads and hot promos — in one place.",
       "copyright": "© Zezman 2023 All rights reserved."
     }
   },
@@ -240,6 +245,11 @@
     "tooManyAttempts": "Too many attempts. Please try again later.",
     "password": "Password",
     "select": "Select"
+  },
+  "quickCreate": {
+    "business": { "title": "Add Business", "desc": "Create a new business card with details and hours" },
+    "sale": { "title": "Sale Ad", "desc": "Post a second‑hand item quickly" },
+    "promo": { "title": "Promo Ad", "desc": "Branding/promo with validity and image" }
   },
   "search": {
     "placeholder": "Search business by name, category or service",

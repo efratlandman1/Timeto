@@ -1,30 +1,32 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaStore, FaTags, FaBullhorn } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 const QuickCreateStrip = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const items = [
     {
       id: 'business',
       icon: <FaStore />,
-      title: 'הוספת עסק',
-      desc: 'פתח כרטיס עסק חדש עם פרטים ושעות',
+      title: t('quickCreate.business.title'),
+      desc: t('quickCreate.business.desc'),
       onClick: () => navigate('/business')
     },
     {
       id: 'sale',
       icon: <FaTags />,
-      title: 'מודעת מכירה',
-      desc: 'פרסמי מוצר ליד שנייה במהירות',
+      title: t('quickCreate.sale.title'),
+      desc: t('quickCreate.sale.desc'),
       onClick: () => navigate('/ads/sale/new')
     },
     {
       id: 'promo',
       icon: <FaBullhorn />,
-      title: 'מודעת פרסום',
-      desc: 'תדמית/קידום עם תוקף ותמונה',
+      title: t('quickCreate.promo.title'),
+      desc: t('quickCreate.promo.desc'),
       onClick: () => navigate('/ads/promo/new')
     }
   ];
