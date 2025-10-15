@@ -1,12 +1,51 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { getToken } from '../utils/auth';
+import { FaPencilAlt, FaTrash, FaRecycle } from 'react-icons/fa';
 import { toggleSaleFavorite } from '../redux/saleFavoritesSlice';
 
 const SaleAdCard = ({ ad }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const mainImage = ad.images && ad.images[0];
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
+  const [localActive, setLocalActive] = React.useState(ad.active !== false);
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    try {
+      const token = getToken();
+      if (!token) { navigate('/auth'); return; }
+      const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-ads/${ad._id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setLocalActive(false);
+        setConfirmDelete(false);
+      }
+    } catch {}
+  };
+  const handleEdit = (e) => {
+    e.stopPropagation();
+    navigate(`/ads/sale/new?edit=${ad._id}` , { state: { ad } });
+  };
+
+  const handleRestore = async (e) => {
+    e.stopPropagation();
+    try {
+      const token = getToken();
+      if (!token) { navigate('/auth'); return; }
+      const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-ads/restore/${ad._id}`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) setLocalActive(true);
+    } catch {}
+  };
+
   return (
-    <div className="business-card" role="article" aria-label={ad.title}>
+    <div className={`business-card ${!localActive ? 'inactive' : ''}`} role="article" aria-label={ad.title} onClick={() => navigate(`/ads/sale/${ad._id}`)} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/ads/sale/${ad._id}`); }}>
       <div className="business-card-image-container" style={{ background: '#f8f8f8' }}>
         {mainImage ? (
           <img className="business-card-image" src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${mainImage}`} alt={ad.title} />
@@ -16,6 +55,9 @@ const SaleAdCard = ({ ad }) => {
           </span>
         )}
         <div className="business-card-overlay" />
+        {!localActive && (
+          <div className="business-card-badge badge-closed">לא פעיל</div>
+        )}
         <button 
           className={`favorite-button ${ad.isFavorite ? 'active' : ''}`}
           onClick={(e) => { e.stopPropagation(); dispatch(toggleSaleFavorite(ad._id)); }}
@@ -37,6 +79,55 @@ const SaleAdCard = ({ ad }) => {
               <div className="font-medium">{ad.price} {ad.currency || 'ILS'}</div>
             )}
           </div>
+          {ad.canManage && (
+            <div className="business-card-actions">
+              {localActive && (
+                <button
+                  className="action-button admin edit-button"
+                  onClick={handleEdit}
+                  title="עריכה"
+                >
+                  <FaPencilAlt />
+                </button>
+              )}
+              {localActive ? (
+                confirmDelete ? (
+                  <>
+                    <button
+                      className="action-button admin confirm-delete"
+                      onClick={handleDelete}
+                      title="אישור מחיקה"
+                    >
+                      <span>✔</span>
+                    </button>
+                    <button
+                      className="action-button admin cancel-delete"
+                      onClick={(e) => { e.stopPropagation(); setConfirmDelete(false); }}
+                      title="ביטול"
+                    >
+                      <span>✖</span>
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="action-button admin delete-button"
+                    onClick={(e) => { e.stopPropagation(); setConfirmDelete(true); }}
+                    title="מחיקה"
+                  >
+                    <FaTrash />
+                  </button>
+                )
+              ) : (
+                <button
+                  className="action-button admin restore-button"
+                  onClick={handleRestore}
+                  title="שחזור"
+                >
+                  <FaRecycle />
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

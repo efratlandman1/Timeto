@@ -8,8 +8,24 @@ const { PROMO_AD_MESSAGES } = require('../messages');
 
 const DEFAULT_LIMIT = 20;
 
-const buildPromoQuery = (q) => {
-    const query = { active: true };
+const buildPromoQuery = (q, status = 'active') => {
+    const now = new Date();
+    let query;
+    switch (status) {
+        case 'upcoming':
+            query = { active: true, validFrom: { $gt: now } };
+            break;
+        case 'expired':
+            query = { active: true, validTo: { $lt: now } };
+            break;
+        case 'all':
+            query = { active: true };
+            break;
+        case 'active':
+        default:
+            query = { active: true, validFrom: { $lte: now }, validTo: { $gte: now } };
+            break;
+    }
     if (q) query.$text = { $search: q };
     return query;
 };
@@ -84,12 +100,12 @@ exports.getPromoAds = async (req, res) => {
     const logSource = 'promoAdsController.getPromoAds';
     const meta = getRequestMeta(req, logSource);
     try {
-        const { q, lat, lng, maxDistance, sort = 'newest', page = 1, limit = DEFAULT_LIMIT } = req.query;
+        const { q, status = 'active', lat, lng, maxDistance, sort = 'newest', page = 1, limit = DEFAULT_LIMIT } = req.query;
         const pageNum = Number(page) || 1;
         const limitNum = Math.min(Number(limit) || DEFAULT_LIMIT, 40);
         const skip = (pageNum - 1) * limitNum;
 
-        const query = buildPromoQuery(q);
+        const query = buildPromoQuery(q, status);
         let data, total;
         const hasGeo = lat && lng && (sort === 'distance' || maxDistance);
         if (hasGeo) {
@@ -137,8 +153,15 @@ exports.getPromoAdById = async (req, res) => {
     const meta = getRequestMeta(req, logSource);
     try {
         const ad = await PromoAd.findById(req.params.id);
-        if (!ad) return errorResponse({ res, req, status: 404, message: PROMO_AD_MESSAGES.NOT_FOUND, logSource });
-        return successResponse({ res, req, data: { ad: { ...ad.toObject(), isCurrentlyActive: isWithinValidity(ad) } }, message: PROMO_AD_MESSAGES.GET_BY_ID_SUCCESS, logSource });
+        if (!ad) {
+            return errorResponse({ res, req, status: 404, message: PROMO_AD_MESSAGES.NOT_FOUND, logSource });
+        }
+        const isOwnerOrAdmin = req.user && (String(ad.userId) === String(req.user._id) || req.user.role === 'admin');
+        const visibleToPublic = ad.active && isWithinValidity(ad);
+        if (!visibleToPublic && !isOwnerOrAdmin) {
+            return errorResponse({ res, req, status: 404, message: PROMO_AD_MESSAGES.NOT_FOUND, logSource });
+        }
+        return successResponse({ res, req, data: { ad: { ...ad.toObject(), isCurrentlyActive: visibleToPublic } }, message: PROMO_AD_MESSAGES.GET_BY_ID_SUCCESS, logSource });
     } catch (err) {
         logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
         Sentry.captureException(err);
@@ -184,4 +207,16 @@ exports.restorePromoAd = async (req, res) => {
     }
 };
 
+exports.getUserPromoAds = async (req, res) => {
+    const logSource = 'promoAdsController.getUserPromoAds';
+    const meta = getRequestMeta(req, logSource);
+    try {
+        const ads = await PromoAd.find({ userId: req.user._id }).sort({ active: -1, createdAt: -1 });
+        return successResponse({ res, req, data: { ads }, message: PROMO_AD_MESSAGES.GET_ALL_SUCCESS, logSource });
+    } catch (err) {
+        logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
+        Sentry.captureException(err);
+        return errorResponse({ res, req, status: 500, message: PROMO_AD_MESSAGES.GET_ALL_ERROR, logSource });
+    }
+};
 

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createSaleAd } from '../redux/saleAdsSlice';
 import { fetchSaleCategories } from '../redux/saleCategoriesSlice';
 import { getToken } from '../utils/auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import '../styles/EditBusinessPage.css';
 import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
 import { PHONE_PREFIXES, PHONE_NUMBER_MAX_LENGTH } from '../constants/globals';
@@ -15,6 +15,9 @@ const CreateSaleAdPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items: categories } = useSelector(s => s.saleCategories);
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const isEditMode = Boolean(searchParams.get('edit'));
   const [title, setTitle] = useState('');
   const [city, setCity] = useState('');
   const [phone, setPhone] = useState('');
@@ -25,6 +28,7 @@ const CreateSaleAdPage = () => {
   const [categoryId, setCategoryId] = useState('');
   const [description, setDescription] = useState('');
   const [images, setImages] = useState([]);
+  const [originalImages, setOriginalImages] = useState([]); // for edit mode diff
   const [auto, setAuto] = useState(null);
 
   const { isLoaded: mapsLoaded } = useJsApiLoader({
@@ -51,8 +55,54 @@ const CreateSaleAdPage = () => {
     dispatch(fetchSaleCategories());
   }, [dispatch]);
 
+  // Load for edit mode
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (!editId) return;
+    const stateAd = location.state?.ad;
+    if (stateAd) {
+      setTitle(stateAd.title || '');
+      setCity(stateAd.city || '');
+      setPhone(stateAd.phone || '');
+      setPrefix(stateAd.prefix || '');
+      setHasWhatsapp(stateAd.hasWhatsapp !== false);
+      setPrice(stateAd.price != null ? String(stateAd.price) : '');
+      setCurrency(stateAd.currency || 'ILS');
+      setCategoryId(stateAd.categoryId?._id || stateAd.categoryId || '');
+      setDescription(stateAd.description || '');
+      if (Array.isArray(stateAd.images)) {
+        setImages(stateAd.images);
+        setOriginalImages(stateAd.images);
+      }
+      return;
+    }
+    (async () => {
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:5050/api/v1'}/sale-ads/${editId}`);
+        const json = await res.json();
+        if (res.ok && json?.data?.ad) {
+          const a = json.data.ad;
+          setTitle(a.title || '');
+          setCity(a.city || '');
+          setPhone(a.phone || '');
+          setPrefix(a.prefix || '');
+          setHasWhatsapp(a.hasWhatsapp !== false);
+          setPrice(a.price != null ? String(a.price) : '');
+          setCurrency(a.currency || 'ILS');
+          setCategoryId(a.categoryId?._id || a.categoryId || '');
+          setDescription(a.description || '');
+          if (Array.isArray(a.images)) {
+            setImages(a.images);
+            setOriginalImages(a.images);
+          }
+        }
+      } catch {}
+    })();
+  }, [searchParams, location.state]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const editId = searchParams.get('edit');
     const fd = new FormData();
     fd.append('title', title);
     fd.append('city', city);
@@ -63,19 +113,41 @@ const CreateSaleAdPage = () => {
     fd.append('hasWhatsapp', String(!!hasWhatsapp));
     if (categoryId) fd.append('categoryId', categoryId);
     if (description) fd.append('description', description);
-    Array.from(images).forEach(f => fd.append('images', f));
-    const res = await dispatch(createSaleAd(fd));
+    // Append only new files; existing strings are already in DB
+    Array.from(images).filter(f => typeof f !== 'string').forEach(f => fd.append('images', f));
+    // For edit mode, compute removed images
+    if (editId) {
+      const currentNames = Array.from(images).filter(f => typeof f === 'string');
+      const removed = (originalImages || []).filter(name => !currentNames.includes(name));
+      removed.forEach(name => fd.append('removeImages', name));
+    }
+    let res;
+    if (editId) {
+      const token = getToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const putRes = await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:5050/api/v1'}/sale-ads/${editId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers,
+        body: fd
+      });
+      res = { meta: { requestStatus: putRes.ok ? 'fulfilled' : 'rejected' } };
+    } else {
+      res = await dispatch(createSaleAd(fd));
+    }
     if (res.meta.requestStatus === 'fulfilled') {
-      navigate('/ads');
+      if (editId) navigate('/user-businesses'); else navigate('/');
     }
   };
 
   return (
     <div className="narrow-page-container">
       <div className="narrow-page-content">
-        <button className="nav-button above-header" onClick={() => navigate('/') }>
+        <button className="nav-button above-header" onClick={() => {
+          if (isEditMode) navigate('/user-businesses'); else navigate('/');
+        }}>
           <FaArrowRight className="icon" />
-          חזרה לעמוד הבית
+          {isEditMode ? 'חזרה לעסקים שלי' : 'חזרה לעמוד הבית'}
         </button>
         <div className="page-header">
           <div className="page-header__content vertical">
@@ -171,7 +243,11 @@ const CreateSaleAdPage = () => {
             multiple
             files={Array.from(images || [])}
             label="תמונות (עד 10)"
-            onAdd={(filesList) => setImages(filesList)}
+            onAdd={(filesList) => setImages(prev => {
+              const prevArr = Array.isArray(prev) ? prev : Array.from(prev || []);
+              const nextArr = Array.from(filesList || []);
+              return [...prevArr, ...nextArr];
+            })}
             onRemove={(idx) => {
               const arr = Array.from(images || []);
               arr.splice(idx, 1);
@@ -180,10 +256,13 @@ const CreateSaleAdPage = () => {
             }}
           />
           <ActionBar
-            onCancel={() => navigate('/')}
+          onCancel={() => {
+            const editId = searchParams.get('edit');
+            if (editId) navigate('/user-businesses'); else navigate('/');
+          }}
             onConfirm={handleSubmit}
             cancelText="ביטול"
-            confirmText="פרסם"
+          confirmText={searchParams.get('edit') ? 'שמור' : 'פרסם'}
           />
         </form>
       </div>

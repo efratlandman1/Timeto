@@ -7,7 +7,8 @@ export const fetchPromoAds = createAsyncThunk(
   'promoAds/fetchPromoAds',
   async (params = {}, { rejectWithValue }) => {
     try {
-      const qs = new URLSearchParams(params).toString();
+      const queryObj = { status: 'all', ...params };
+      const qs = new URLSearchParams(queryObj).toString();
       const res = await fetch(`${API_BASE}/promo-ads?${qs}`, { credentials: 'include' });
       const json = await res.json();
       if (!res.ok) return rejectWithValue(json?.message || 'Failed to fetch promo ads');

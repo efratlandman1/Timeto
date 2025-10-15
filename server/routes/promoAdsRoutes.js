@@ -9,6 +9,7 @@ const controller = require('../controllers/promoAdsController');
 
 router.get('/', optionalAuth, generalLimiter, sanitizeRequest, controller.getPromoAds);
 router.post('/', requireAuth, writeLimiter, sanitizeRequest, upload.single('image'), fileUploadSecurity, controller.createPromoAd);
+router.get('/my', requireAuth, generalLimiter, sanitizeRequest, controller.getUserPromoAds);
 router.get('/:id', optionalAuth, generalLimiter, sanitizeRequest, validateMongoIdParam('id', 'Promo Ad ID'), controller.getPromoAdById);
 router.put('/:id', requireAuth, writeLimiter, sanitizeRequest, validateMongoIdParam('id', 'Promo Ad ID'), upload.single('image'), fileUploadSecurity, controller.updatePromoAd);
 router.delete('/:id', requireAuth, writeLimiter, sanitizeRequest, validateMongoIdParam('id', 'Promo Ad ID'), controller.deletePromoAd);

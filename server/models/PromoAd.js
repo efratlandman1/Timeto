@@ -35,7 +35,8 @@ promoAdSchema.index({ title: 'text', city: 'text' });
 promoAdSchema.index({ location: '2dsphere' });
 promoAdSchema.index({ validFrom: 1, validTo: 1, active: 1 });
 
-const PromoAd = mongoose.model('promo_ads', promoAdSchema);
+// Bind explicit collection name to avoid pluralization mismatch
+const PromoAd = mongoose.model('PromoAd', promoAdSchema, 'promo_ads');
 
 module.exports = PromoAd;
 
