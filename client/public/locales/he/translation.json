@@ -3,7 +3,7 @@
     "home": "בית",
     "search": "חיפוש",
     "addBusiness": "הוסף עסק",
-    "suggest": "הצע פריט",
+    "suggest": "הצעה לערך חדש",
     "register": "הרשמה",
     "login": "כניסה",
     "myBusinesses": "העסקים שלי",
@@ -664,8 +664,13 @@
     "selected": "נבחרו {{count}} פריטים"
   },
   "suggestItem": {
-    "title": "הצעת פריט חדש",
-    "description": "מלא את הפרטים הבאים כדי להציע פריט חדש",
+    "title": "הצע קטגוריה או שירות",
+    "description": "הצע קטגוריות ושירותים שחסרים במערכת",
+    "contextLabel": "יעד ההצעה",
+    "modes": {
+      "business": "עסקים",
+      "sale": "מכירה"
+    },
     "form": {
       "type": {
         "label": "סוג הצעה",
@@ -678,8 +683,10 @@
         "placeholder": "לדוגמה: אינסטלציה מתקדמת"
       },
       "parentCategory": "קטגוריית אב",
+      "saleCategory": "קטגוריית מכירה",
+      "selectSaleCategory": "בחר קטגוריית מכירה",
       "reason": "סיבה או תיאור קצר",
-      "reasonPlaceholder": "מדוע אתה חושב שפריט זה נחוץ?",
+      "reasonPlaceholder": "מדוע לדעתך ערך זה נחוץ?",
       "submit": "שלח הצעה"
     },
     "messages": {

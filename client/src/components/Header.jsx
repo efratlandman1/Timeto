@@ -43,6 +43,7 @@ const Header = () => {
     const userButtonRef = useRef(null);
     const createMenuRef = useRef(null);
     const createButtonRef = useRef(null);
+    const locationButtonRef = useRef(null);
     const loginUser = useSelector(state => state.user.user);
     const isAdmin = loginUser && loginUser.role === 'admin';
     const { t, i18n, ready } = useTranslation();
@@ -53,6 +54,8 @@ const Header = () => {
     const [addressLoading, setAddressLoading] = useState(false);
     const [addressError, setAddressError] = useState('');
     const popoverRef = useRef(null);
+    const [createMenuStyle, setCreateMenuStyle] = useState({});
+    const [popoverStyle, setPopoverStyle] = useState({});
     
     // Get language and direction from Redux with fallback values
     const uiState = useSelector(state => state.ui);
@@ -209,6 +212,42 @@ const Header = () => {
         dispatch(logout());
         setShowUserMenu(false);
         navigate("/");
+    };
+
+    const updateCreateMenuPosition = () => {
+        if (!createButtonRef.current) return;
+        const rect = createButtonRef.current.getBoundingClientRect();
+        const style = { position: 'fixed', top: rect.bottom + 4, minWidth: 200, zIndex: 1000 };
+        if (isRTL) {
+            style.right = window.innerWidth - rect.right;
+        } else {
+            style.left = rect.left;
+        }
+        setCreateMenuStyle(style);
+    };
+
+    const updatePopoverPosition = () => {
+        if (!locationButtonRef.current) return;
+        const rect = locationButtonRef.current.getBoundingClientRect();
+        const style = { position: 'fixed', top: rect.bottom + 8, minWidth: 320, zIndex: 1000 };
+        if (isRTL) {
+            style.right = window.innerWidth - rect.right;
+        } else {
+            style.left = rect.left;
+        }
+        setPopoverStyle(style);
+    };
+
+    const handleToggleCreateMenu = () => {
+        const next = !showCreateMenu;
+        setShowCreateMenu(next);
+        if (next) updateCreateMenuPosition();
+    };
+
+    const handleToggleLocationPopover = () => {
+        const next = !showPopover;
+        setShowPopover(next);
+        if (next) updatePopoverPosition();
     };
 
     const handleLanguageToggle = async () => {
@@ -370,72 +409,70 @@ const Header = () => {
                             {t('header.search')}
                         </button>
                         {/* Removed sale/promo nav to simplify header */}
-                        <span className="create-wrapper">
-                            <button 
-                                    className={`nav-button`}
-                                    onClick={() => setShowCreateMenu(!showCreateMenu)}
-                                    ref={createButtonRef}
-                                    aria-expanded={showCreateMenu}
-                                    aria-haspopup="true"
-                                    title="צור חדש"
+                        <button 
+                                className={`nav-button`}
+                                onClick={handleToggleCreateMenu}
+                                ref={createButtonRef}
+                                aria-expanded={showCreateMenu}
+                                aria-haspopup="true"
+                                title="צור חדש"
+                            >
+                                <FaPlus />
+                                צור
+                            </button>
+                            {showCreateMenu && (
+                                <div 
+                                    className={`${dropdownMenuClass} ${direction}`}
+                                    role="menu"
+                                    aria-label="Create dropdown"
+                                    ref={createMenuRef}
+                                    style={createMenuStyle}
                                 >
-                                    <FaPlus />
-                                    צור
-                                </button>
-                                {showCreateMenu && (
-                                    <div 
-                                        className={`${dropdownMenuClass} ${direction}`}
-                                        role="menu"
-                                        aria-label="Create dropdown"
-                                        ref={createMenuRef}
-                                        style={{ minWidth: 200 }}
+                                    <button 
+                                        className={dropdownItemClass} 
+                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/business"); }}
+                                        role="menuitem"
                                     >
-                                        <button 
-                                            className={dropdownItemClass} 
-                                            onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/business"); }}
-                                            role="menuitem"
-                                        >
-                                            <FaStore />
-                        הוספת עסק
-                                        </button>
-                                        <button 
-                                            className={dropdownItemClass} 
-                                            onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/ads/sale/new"); }}
-                                            role="menuitem"
-                                        >
-                                            <FaTags />
-                                            מודעת מכירה
-                                        </button>
-                                        <button 
-                                            className={dropdownItemClass} 
-                                            onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/ads/promo/new"); }}
-                                            role="menuitem"
-                                        >
-                                            <FaBullhorn />
-                                            מודעת פרסום
-                                        </button>
-                                    </div>
-                                )}
-                        </span>
+                                        <FaStore />
+                                        הוספת עסק
+                                    </button>
+                                    <button 
+                                        className={dropdownItemClass} 
+                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/ads/sale/new"); }}
+                                        role="menuitem"
+                                    >
+                                        <FaTags />
+                                        מודעת מכירה
+                                    </button>
+                                    <button 
+                                        className={dropdownItemClass} 
+                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/ads/promo/new"); }}
+                                        role="menuitem"
+                                    >
+                                        <FaBullhorn />
+                                        מודעת פרסום
+                                    </button>
+                                </div>
+                            )}
                         <button 
                             className={`nav-button ${isActive("/suggest-item") ? "active" : ""}`} 
-                            onClick={() => navigate("/suggest-item")}
+                            onClick={() => navigate("/suggest-item", { state: { background: location } })}
                         >
                             <FaLightbulb />
                             {t('header.suggest')}
                         </button>
-                        <span className="location-wrapper">
-                            <button
-                                onClick={() => setShowPopover(!showPopover)}
-                                className="nav-button"
-                                title={t('header.myLocation')}
-                                type="button"
-                            >
-                                <FaMapMarkerAlt />
-                                {t('header.locationShort')}
-                            </button>
-                            {showPopover && (
-                            <div ref={popoverRef} className={locationPopoverClass}>
+                        <button
+                            onClick={handleToggleLocationPopover}
+                            className="nav-button"
+                            title={t('header.myLocation')}
+                            type="button"
+                            ref={locationButtonRef}
+                        >
+                            <FaMapMarkerAlt />
+                            <span className="loc-label">{t('header.locationShort')}</span>
+                        </button>
+                        {showPopover && (
+                            <div ref={popoverRef} className={locationPopoverClass} style={popoverStyle}>
                                 <div className={popoverHeaderClass}>
                                     <span>{t('header.currentLocation')}</span>
                                     <button className="close-popover-btn" onClick={() => setShowPopover(false)}><FaTimes /></button>
@@ -457,9 +494,8 @@ const Header = () => {
                                         {t('header.refreshLocation')}
                                     </button>
                                 </div>
-                                </div>
-                            )}
-                        </span>
+                            </div>
+                        )}
                     </div>
                 </div>
 

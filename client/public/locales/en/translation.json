@@ -3,7 +3,7 @@
     "home": "Home",
     "search": "Search",
     "addBusiness": "Add Business",
-    "suggest": "Suggest Item",
+    "suggest": "Suggest Cat./Service",
     "register": "Register",
     "login": "Login",
     "myBusinesses": "My Businesses",
@@ -674,8 +674,13 @@
     "apply": "Apply"
   },
   "suggestItem": {
-    "title": "Suggest Item",
-    "description": "Suggest a new category or service",
+    "title": "Suggest Category or Service",
+    "description": "Suggest categories and services missing from the system",
+    "contextLabel": "Suggestion Target",
+    "modes": {
+      "business": "Businesses",
+      "sale": "Sale"
+    },
     "form": {
       "type": {
         "label": "Suggestion Type",
@@ -688,8 +693,10 @@
         "placeholder": "For example: Advanced Plumbing"
       },
       "parentCategory": "Parent Category",
+      "saleCategory": "Sale Category",
+      "selectSaleCategory": "Select Sale Category",
       "reason": "Reason or Brief Description",
-      "reasonPlaceholder": "Why do you think this item is needed?",
+      "reasonPlaceholder": "Why do you think this value is needed?",
       "submit": "Submit Suggestion"
     },
     "messages": {
