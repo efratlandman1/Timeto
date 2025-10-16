@@ -695,13 +695,27 @@
     }
   },
   "userBusinesses": {
-    "title": "העסקים שלי",
-    "description": "נהל את העסקים שהוספת למדריך",
+    "title": "אזור אישי",
+    "description": "נהל את העסקים והמודעות שלך",
     "empty": "אין לך עסקים רשומים עדיין",
     "addBusiness": "הוסף עסק חדש",
     "loading": "טוען עסקים...",
     "error": "שגיאה בטעינת העסקים",
-    "subtitle": "נהל את העסקים שהוספת למדריך",
+    "subtitle": "נהל את העסקים והמודעות שהוספת למדריך",
+    "create": "צור",
+    "createMenuAria": "תפריט יצירה",
+    "createOptions": {
+      "addBusiness": "הוספת עסק",
+      "saleAd": "מודעת מכירה",
+      "promoAd": "מודעת פרסום"
+    },
+    "tabs": {
+      "aria": "קטגוריות התוכן שלי",
+      "business": "עסקים",
+      "sale": "מכירה",
+      "promo": "פרסום",
+      "all": "הכל"
+    },
     "noBusinesses": "אין לך עסקים עדיין",
     "addNewBusiness": "הוספת עסק חדש",
     "filters": {

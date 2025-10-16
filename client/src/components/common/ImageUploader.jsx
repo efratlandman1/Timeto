@@ -70,6 +70,7 @@ const ImageUploader = ({ multiple = false, files = [], file = null, label = 'ב�
       {multiple ? (
         <div style={{ position: 'relative', marginTop: 12 }}>
           {/* Main viewer (single image at a time) */}
+          {Array.isArray(files) && files.length > 0 && (
           <div style={{ position: 'relative', width: '100%', maxWidth: 420, height: 260, margin: '0 auto', overflow: 'hidden', borderRadius: 12, background: '#f8f9fa' }}>
             {Array.isArray(files) && files.length > 0 ? (
               (() => {
@@ -85,9 +86,7 @@ const ImageUploader = ({ multiple = false, files = [], file = null, label = 'ב�
                   />
                 );
               })()
-            ) : (
-              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>אין תמונות</div>
-            )}
+            ) : null}
 
             {/* Remove current */}
             {Array.isArray(files) && files.length > 0 && (
@@ -117,6 +116,7 @@ const ImageUploader = ({ multiple = false, files = [], file = null, label = 'ב�
               </>
             )}
           </div>
+          )}
 
           {/* Thumbnails row */}
           {Array.isArray(files) && files.length > 0 && (

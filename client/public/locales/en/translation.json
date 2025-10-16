@@ -705,13 +705,27 @@
     }
   },
   "userBusinesses": {
-    "title": "My Businesses",
-    "description": "Manage your registered businesses",
+    "title": "My Area",
+    "description": "Manage your businesses and ads",
     "empty": "You don't have any registered businesses yet",
     "addBusiness": "Add New Business",
     "loading": "Loading businesses...",
     "error": "Error loading businesses",
-    "subtitle": "Manage the businesses you've added to the directory",
+    "subtitle": "Manage the businesses and ads you've added to the directory",
+    "create": "Create",
+    "createMenuAria": "Create dropdown",
+    "createOptions": {
+      "addBusiness": "Add Business",
+      "saleAd": "Create Sale Ad",
+      "promoAd": "Create Promo Ad"
+    },
+    "tabs": {
+      "aria": "My content categories",
+      "business": "Businesses",
+      "sale": "Sale",
+      "promo": "Promo",
+      "all": "All"
+    },
     "noBusinesses": "You don't have any businesses yet",
     "addNewBusiness": "Add New Business",
     "filters": {
