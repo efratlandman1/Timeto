@@ -1,10 +1,12 @@
 import React from 'react';
+import '../styles/businessCard.css';
 import { useNavigate } from 'react-router-dom';
 import { getToken } from '../utils/auth';
-import { FaPencilAlt, FaTrash, FaRecycle } from 'react-icons/fa';
+import { FaPencilAlt, FaTrash, FaRecycle, FaHeart } from 'react-icons/fa';
 
 const PromoAdCard = ({ ad }) => {
   const navigate = useNavigate();
+  const [isFavorite, setIsFavorite] = React.useState(ad.isFavorite || false);
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const [localActive, setLocalActive] = React.useState(ad.active !== false);
   const handleDelete = async (e) => {
@@ -42,7 +44,7 @@ const PromoAdCard = ({ ad }) => {
 
   return (
     <div className={`business-card ${!localActive ? 'inactive' : ''}`} role="article" aria-label={ad.title} onClick={() => navigate(`/ads/promo/${ad._id}`)} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/ads/promo/${ad._id}`); }}>
-      <div className="business-card-image-container" style={{ background: '#f8f8f8' }}>
+      <div className="business-card-image-container" style={{ background: '#ffffff' }}>
         {ad.image ? (
           <img className="business-card-image" src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${ad.image}`} alt={ad.title} />
         ) : (
@@ -51,9 +53,34 @@ const PromoAdCard = ({ ad }) => {
           </span>
         )}
         <div className="business-card-overlay" />
-        <div className={`business-card-badge ${localActive ? 'badge-open' : 'badge-closed'}`}>
-          {localActive ? 'פעיל' : 'לא פעיל'}
-        </div>
+        <button 
+          className={`favorite-button ${isFavorite ? 'active' : ''}`}
+          onClick={async (e) => {
+            e.stopPropagation();
+            try {
+              const token = getToken();
+              if (!token) { navigate('/auth'); return; }
+              const res = await fetch(`${process.env.REACT_APP_API_DOMAIN || 'http://localhost:5050'}/api/v1/promo-favorites/toggle`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ promoAdId: ad._id })
+              });
+              const json = await res.json();
+              if (res.ok) {
+                const active = json?.data?.active;
+                setIsFavorite(active);
+                showToast(active ? '✅ נוסף למועדפים' : '✅ הוסר מהמועדפים');
+              } else {
+                showToast(`❌ ${json?.message || 'שגיאה בעדכון מועדפים'}`, true);
+              }
+            } catch (err) {
+              showToast('❌ שגיאה בעדכון מועדפים', true);
+            }
+          }}
+          aria-label={isFavorite ? 'הסר ממועדפים' : 'הוסף למועדפים'}
+        >
+          <FaHeart />
+        </button>
       </div>
       <div className="business-card-content">
         <div className="business-card-header">
@@ -121,4 +148,12 @@ const PromoAdCard = ({ ad }) => {
 
 export default PromoAdCard;
 
+
+function showToast(message, isError = false) {
+  const toast = document.createElement('div');
+  toast.className = `toast ${isError ? 'error' : 'success'}`;
+  toast.innerText = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
 

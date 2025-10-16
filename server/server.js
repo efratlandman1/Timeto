@@ -70,6 +70,7 @@ const saleAdsRoutes = require('./routes/saleAdsRoutes');
 const promoAdsRoutes = require('./routes/promoAdsRoutes');
 const saleCategoriesRoutes = require('./routes/saleCategoriesRoutes');
 const saleFavoritesRoutes = require('./routes/saleFavoritesRoutes');
+const promoFavoritesRoutes = require('./routes/promoFavoritesRoutes');
 const loggingMiddleware = require('./middlewares/loggingMiddleware');
 
 // Security middleware with environment-based settings
@@ -194,6 +195,7 @@ app.use('/api/v1/sale-ads', saleAdsRoutes);
 app.use('/api/v1/promo-ads', promoAdsRoutes);
 app.use('/api/v1/sale-categories', saleCategoriesRoutes);
 app.use('/api/v1/sale-favorites', saleFavoritesRoutes);
+app.use('/api/v1/promo-favorites', promoFavoritesRoutes);
 
 // Global error handler for oversized requests and other errors
 app.use((err, req, res, next) => {

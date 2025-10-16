@@ -1,16 +1,15 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import '../styles/businessCard.css';
 import { useNavigate } from 'react-router-dom';
 import { getToken } from '../utils/auth';
-import { FaPencilAlt, FaTrash, FaRecycle } from 'react-icons/fa';
-import { toggleSaleFavorite } from '../redux/saleFavoritesSlice';
+import { FaPencilAlt, FaTrash, FaRecycle, FaHeart, FaEnvelope, FaWhatsapp, FaPhone } from 'react-icons/fa';
 
 const SaleAdCard = ({ ad }) => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const mainImage = ad.images && ad.images[0];
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const [localActive, setLocalActive] = React.useState(ad.active !== false);
+  const [isFavorite, setIsFavorite] = React.useState(ad.isFavorite || false);
   const handleDelete = async (e) => {
     e.stopPropagation();
     try {
@@ -46,7 +45,7 @@ const SaleAdCard = ({ ad }) => {
 
   return (
     <div className={`business-card ${!localActive ? 'inactive' : ''}`} role="article" aria-label={ad.title} onClick={() => navigate(`/ads/sale/${ad._id}`)} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/ads/sale/${ad._id}`); }}>
-      <div className="business-card-image-container" style={{ background: '#f8f8f8' }}>
+      <div className="business-card-image-container" style={{ background: '#ffffff' }}>
         {mainImage ? (
           <img className="business-card-image" src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${mainImage}`} alt={ad.title} />
         ) : (
@@ -55,15 +54,33 @@ const SaleAdCard = ({ ad }) => {
           </span>
         )}
         <div className="business-card-overlay" />
-        {!localActive && (
-          <div className="business-card-badge badge-closed">לא פעיל</div>
-        )}
         <button 
-          className={`favorite-button ${ad.isFavorite ? 'active' : ''}`}
-          onClick={(e) => { e.stopPropagation(); dispatch(toggleSaleFavorite(ad._id)); }}
-          aria-label={ad.isFavorite ? 'הסר ממועדפים' : 'הוסף למועדפים'}
+          className={`favorite-button ${isFavorite ? 'active' : ''}`}
+          onClick={async (e) => {
+            e.stopPropagation();
+            try {
+              const token = getToken();
+              if (!token) { navigate('/auth'); return; }
+              const res = await fetch(`${process.env.REACT_APP_API_DOMAIN || 'http://localhost:5050'}/api/v1/sale-favorites/toggle`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ saleAdId: ad._id })
+              });
+              const json = await res.json();
+              if (res.ok) {
+                const active = json?.data?.active;
+                setIsFavorite(active);
+                showToast(active ? '✅ נוסף למועדפים' : '✅ הוסר מהמועדפים');
+              } else {
+                showToast(`❌ ${json?.message || 'שגיאה בעדכון מועדפים'}`, true);
+              }
+            } catch (err) {
+              showToast('❌ שגיאה בעדכון מועדפים', true);
+            }
+          }}
+          aria-label={isFavorite ? 'הסר ממועדפים' : 'הוסף למועדפים'}
         >
-          ♥
+          <FaHeart />
         </button>
       </div>
       <div className="business-card-content">
@@ -79,7 +96,7 @@ const SaleAdCard = ({ ad }) => {
               <div className="font-medium">{ad.price} {ad.currency || 'ILS'}</div>
             )}
           </div>
-          {ad.canManage && (
+          {ad.canManage ? (
             <div className="business-card-actions">
               {localActive && (
                 <button
@@ -127,6 +144,36 @@ const SaleAdCard = ({ ad }) => {
                 </button>
               )}
             </div>
+          ) : (
+            <div className="business-card-actions">
+              {ad.email && (
+                <button 
+                  className="action-button email"
+                  onClick={(e) => { e.stopPropagation(); window.location.href = `mailto:${ad.email}`; }}
+                  title="שליחת אימייל"
+                >
+                  <FaEnvelope />
+                </button>
+              )}
+              {ad.phone && ad.hasWhatsapp !== false && (
+                <button 
+                  className="action-button whatsapp"
+                  onClick={(e) => { e.stopPropagation(); window.location.href = `https://wa.me/${ad.phone}`; }}
+                  title="וואטסאפ"
+                >
+                  <FaWhatsapp />
+                </button>
+              )}
+              {ad.phone && (
+                <button 
+                  className="action-button phone"
+                  onClick={(e) => { e.stopPropagation(); window.location.href = `tel:${ad.phone}`; }}
+                  title="התקשרות"
+                >
+                  <FaPhone />
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -136,4 +183,12 @@ const SaleAdCard = ({ ad }) => {
 
 export default SaleAdCard;
 
+
+function showToast(message, isError = false) {
+  const toast = document.createElement('div');
+  toast.className = `toast ${isError ? 'error' : 'success'}`;
+  toast.innerText = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
 

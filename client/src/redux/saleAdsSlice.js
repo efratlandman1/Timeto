@@ -8,7 +8,9 @@ export const fetchSaleAds = createAsyncThunk(
   async (params = {}, { rejectWithValue, getState }) => {
     try {
       const qs = new URLSearchParams(params).toString();
-      const res = await fetch(`${API_BASE}/sale-ads?${qs}`, { credentials: 'include' });
+      const token = getToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await fetch(`${API_BASE}/sale-ads?${qs}`, { headers });
       const json = await res.json();
       if (!res.ok) return rejectWithValue(json?.message || 'Failed to fetch sale ads');
       return json.data;

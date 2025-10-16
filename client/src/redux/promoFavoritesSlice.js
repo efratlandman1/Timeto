@@ -3,31 +3,31 @@ import { getToken } from '../utils/auth';
 
 const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5050/api/v1';
 
-export const toggleSaleFavorite = createAsyncThunk(
-  'saleFavorites/toggle',
-  async (saleAdId, { rejectWithValue }) => {
+export const togglePromoFavorite = createAsyncThunk(
+  'promoFavorites/toggle',
+  async (promoAdId, { rejectWithValue }) => {
     try {
       const token = getToken();
-      const res = await fetch(`${API_BASE}/sale-favorites/toggle`, {
+      const res = await fetch(`${API_BASE}/promo-favorites/toggle`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ saleAdId })
+        body: JSON.stringify({ promoAdId })
       });
       const json = await res.json();
       if (!res.ok) return rejectWithValue(json?.message || 'Failed to toggle favorite');
-      return { saleAdId, active: json.data.active };
+      return { promoAdId, active: json.data.active };
     } catch (e) {
       return rejectWithValue(e.message);
     }
   }
 );
 
-export const fetchMySaleFavorites = createAsyncThunk(
-  'saleFavorites/fetchMy',
+export const fetchMyPromoFavorites = createAsyncThunk(
+  'promoFavorites/fetchMy',
   async (_, { rejectWithValue }) => {
     try {
       const token = getToken();
-      const res = await fetch(`${API_BASE}/sale-favorites/my`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_BASE}/promo-favorites/my`, { headers: { Authorization: `Bearer ${token}` } });
       const json = await res.json();
       if (!res.ok) return rejectWithValue(json?.message || 'Failed to load favorites');
       return json.data.favorites;
@@ -37,33 +37,33 @@ export const fetchMySaleFavorites = createAsyncThunk(
   }
 );
 
-const saleFavoritesSlice = createSlice({
-  name: 'saleFavorites',
+const promoFavoritesSlice = createSlice({
+  name: 'promoFavorites',
   initialState: { items: [], loading: false, error: null },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchMySaleFavorites.pending, (state) => {
+      .addCase(fetchMyPromoFavorites.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchMySaleFavorites.fulfilled, (state, action) => {
+      .addCase(fetchMyPromoFavorites.fulfilled, (state, action) => {
         state.items = action.payload;
         state.loading = false;
       })
-      .addCase(fetchMySaleFavorites.rejected, (state, action) => {
+      .addCase(fetchMyPromoFavorites.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Error loading favorites';
       })
-      .addCase(toggleSaleFavorite.fulfilled, (state, action) => {
-        const { saleAdId, active } = action.payload;
+      .addCase(togglePromoFavorite.fulfilled, (state, action) => {
+        const { promoAdId, active } = action.payload;
         if (!active) {
-          state.items = state.items.filter(f => f.saleAdId?._id !== saleAdId && f.saleAdId !== saleAdId);
+          state.items = state.items.filter(f => f.promoAdId?._id !== promoAdId && f.promoAdId !== promoAdId);
         }
       });
   }
 });
 
-export default saleFavoritesSlice.reducer;
+export default promoFavoritesSlice.reducer;
 
 

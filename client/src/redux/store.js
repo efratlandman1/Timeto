@@ -6,6 +6,7 @@ import saleAdsReducer from './saleAdsSlice';
 import promoAdsReducer from './promoAdsSlice';
 import saleCategoriesReducer from './saleCategoriesSlice';
 import saleFavoritesReducer from './saleFavoritesSlice';
+import promoFavoritesReducer from './promoFavoritesSlice';
 import locationReducer from './locationSlice';
 import uiReducer from './uiSlice';
 
@@ -52,7 +53,8 @@ const store = configureStore({
         saleAds: saleAdsReducer,
         promoAds: promoAdsReducer,
         saleCategories: saleCategoriesReducer,
-        saleFavorites: saleFavoritesReducer
+        saleFavorites: saleFavoritesReducer,
+        promoFavorites: promoFavoritesReducer
     },
     preloadedState: {
         ui: getInitialUIState()

@@ -1,5 +1,6 @@
 const PromoAd = require('../models/PromoAd');
 const mongoose = require('mongoose');
+const PromoFavorite = require('../models/PromoFavorite');
 const mapsUtils = require('../utils/mapsUtils');
 const logger = require('../logger');
 const Sentry = require('../sentry');
@@ -131,8 +132,16 @@ exports.getPromoAds = async (req, res) => {
             ]);
         }
 
-        // compute dynamic status
-        const items = data.map(d => ({ ...d, isCurrentlyActive: isWithinValidity(d) }));
+        // compute dynamic status and favorite flag
+        let items = data.map(d => ({ ...d, isCurrentlyActive: isWithinValidity(d) }));
+        if (req.user) {
+            const ids = data.map(d => d._id);
+            const favs = await PromoFavorite.find({ userId: req.user._id, promoAdId: { $in: ids }, active: true }).select('promoAdId');
+            const setFav = new Set(favs.map(f => String(f.promoAdId)));
+            items = items.map(d => ({ ...d, isFavorite: setFav.has(String(d._id)) }));
+        } else {
+            items = items.map(d => ({ ...d, isFavorite: false }));
+        }
         const pagination = {
             total,
             page: pageNum,
@@ -161,7 +170,12 @@ exports.getPromoAdById = async (req, res) => {
         if (!visibleToPublic && !isOwnerOrAdmin) {
             return errorResponse({ res, req, status: 404, message: PROMO_AD_MESSAGES.NOT_FOUND, logSource });
         }
-        return successResponse({ res, req, data: { ad: { ...ad.toObject(), isCurrentlyActive: visibleToPublic } }, message: PROMO_AD_MESSAGES.GET_BY_ID_SUCCESS, logSource });
+        let isFavorite = false;
+        if (req.user) {
+            const fav = await PromoFavorite.findOne({ userId: req.user._id, promoAdId: ad._id, active: true });
+            isFavorite = !!fav;
+        }
+        return successResponse({ res, req, data: { ad: { ...ad.toObject(), isCurrentlyActive: visibleToPublic, isFavorite } }, message: PROMO_AD_MESSAGES.GET_BY_ID_SUCCESS, logSource });
     } catch (err) {
         logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
         Sentry.captureException(err);
