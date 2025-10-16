@@ -522,7 +522,7 @@
 }
 
 .business-row {
-    background-color: white;
+    background-color:#f8f9fa;
     padding: 1.5rem;
     border-radius: 12px;
     margin-bottom: 2rem;
@@ -707,9 +707,7 @@
     gap: 1rem;
 }
 
-.footer-section {
-    direction: rtl;
-}
+.footer-section { direction: rtl; }
 
 .footer-section h3 {
     color: #333;
@@ -741,6 +739,9 @@
 
 .contact-row { display: flex; align-items: center; gap: 8px; margin-bottom: 0.35rem; }
 .contact-row .icon { color: #ff4d4d; }
+.contact-info { direction: ltr; text-align: left; margin-left: 2rem; }
+.contact-info .contact-row { direction: ltr; text-align: left; justify-content: flex-start; }
+.contact-info .contact-row a { direction: ltr; unicode-bidi: bidi-override; text-align: left; }
 
 .quick-links {
     list-style: none;
@@ -768,6 +769,12 @@
     border-top: 1px solid #ddd;
     text-align: center;
     color: #666;
+}
+
+/* Extra spacing for quick links column so it's not too close to contact */
+.footer-content .footer-section:nth-child(2) {
+    margin-left: 5rem;
+    margin-right: 5rem;
 }
 
 .copyright {

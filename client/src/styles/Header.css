@@ -172,6 +172,8 @@
     text-align: left;
 }
 
+.create-wrapper { position: relative; display: inline-block; }
+
 .dropdown-item {
     display: flex;
     align-items: center;

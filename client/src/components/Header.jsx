@@ -370,51 +370,53 @@ const Header = () => {
                             {t('header.search')}
                         </button>
                         {/* Removed sale/promo nav to simplify header */}
-                        <button 
-                                className={`nav-button`}
-                                onClick={() => setShowCreateMenu(!showCreateMenu)}
-                                ref={createButtonRef}
-                                aria-expanded={showCreateMenu}
-                                aria-haspopup="true"
-                                title="צור חדש"
-                            >
-                                <FaPlus />
-                                צור
-                            </button>
-                            {showCreateMenu && (
-                                <div 
-                                    className={dropdownMenuClass}
-                                    role="menu"
-                                    aria-label="Create dropdown"
-                                    ref={createMenuRef}
-                                    style={{ minWidth: 200 }}
+                        <span className="create-wrapper">
+                            <button 
+                                    className={`nav-button`}
+                                    onClick={() => setShowCreateMenu(!showCreateMenu)}
+                                    ref={createButtonRef}
+                                    aria-expanded={showCreateMenu}
+                                    aria-haspopup="true"
+                                    title="צור חדש"
                                 >
-                                    <button 
-                                        className={dropdownItemClass} 
-                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/business"); }}
-                                        role="menuitem"
+                                    <FaPlus />
+                                    צור
+                                </button>
+                                {showCreateMenu && (
+                                    <div 
+                                        className={`${dropdownMenuClass} ${direction}`}
+                                        role="menu"
+                                        aria-label="Create dropdown"
+                                        ref={createMenuRef}
+                                        style={{ minWidth: 200 }}
                                     >
-                                        <FaStore />
-                                        הוספת עסק
-                                    </button>
-                                    <button 
-                                        className={dropdownItemClass} 
-                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/ads/sale/new"); }}
-                                        role="menuitem"
-                                    >
-                                        <FaTags />
-                                        מודעת מכירה
-                                    </button>
-                                    <button 
-                                        className={dropdownItemClass} 
-                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/ads/promo/new"); }}
-                                        role="menuitem"
-                                    >
-                                        <FaBullhorn />
-                                        מודעת פרסום
-                                    </button>
-                                </div>
-                            )}
+                                        <button 
+                                            className={dropdownItemClass} 
+                                            onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/business"); }}
+                                            role="menuitem"
+                                        >
+                                            <FaStore />
+                        הוספת עסק
+                                        </button>
+                                        <button 
+                                            className={dropdownItemClass} 
+                                            onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/ads/sale/new"); }}
+                                            role="menuitem"
+                                        >
+                                            <FaTags />
+                                            מודעת מכירה
+                                        </button>
+                                        <button 
+                                            className={dropdownItemClass} 
+                                            onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/ads/promo/new"); }}
+                                            role="menuitem"
+                                        >
+                                            <FaBullhorn />
+                                            מודעת פרסום
+                                        </button>
+                                    </div>
+                                )}
+                        </span>
                         <button 
                             className={`nav-button ${isActive("/suggest-item") ? "active" : ""}`} 
                             onClick={() => navigate("/suggest-item")}

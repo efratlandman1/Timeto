@@ -145,6 +145,11 @@
   border-top: 1px solid #f0f0f0;
 }
 
+/* Remove top border for promo cards (no content below) */
+.business-card.promo .business-card-footer {
+  border-top: none;
+}
+
 .business-card-rating {
   display: flex;
   align-items: center;
