@@ -63,7 +63,7 @@
 .quick-card:hover .quick-card__icon { background: #ffffff; color: #ff0000; }
 
 /* Text styles: icon & title in red, normal weight */
-.quick-card__title { font-weight: 400; color: #e53935; font-family: inherit; font-size: 1rem; }
+.quick-card__title { font-weight: bold; color: #e53935; font-family: inherit; font-size: 1rem; }
 .quick-card__desc { font-size: 0.875rem; color: #666; font-family: inherit; }
 
 /* Hover */
@@ -99,7 +99,7 @@
     box-shadow: none;
 }
 .top-join-inner { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
-.top-join-strip h2 { font-size: 1.6rem; margin: 0 0 0.4rem 0; font-weight: 800; color: #1f2d3a; letter-spacing: -0.2px; }
+.top-join-strip h2 { font-size: 1.9rem; margin: 0 0 0.4rem 0; font-weight: 800; color: #1f2d3a; letter-spacing: -0.2px; font-family: inherit; }
 .top-join-accent { width: 56px; height: 4px; background: #ff4d4d; border-radius: 999px; margin-bottom: 0.5rem; }
 .top-join-strip p { margin: 0; font-size: 1rem; color: #4a5568; font-weight: 600; }
 

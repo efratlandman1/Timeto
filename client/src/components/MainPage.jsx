@@ -238,7 +238,8 @@ const MainPage = () => {
                             <div className="top-join-inner">
                                 <h2>{t('mainPage.joinBanner.title')}</h2>
                                 <div className="top-join-accent" aria-hidden="true"></div>
-                                <p>{t('mainPage.joinBanner.descriptionFull')}</p>
+                                <p>{t('mainPage.footer.aboutDescriptionLine1')}</p>
+                                <p>{t('mainPage.footer.aboutDescriptionLine2')}</p>
                             </div>
                         </div>
 
@@ -471,8 +472,7 @@ const MainPage = () => {
 
                         <div className="footer-section">
                             <h3>{t('mainPage.footer.about')}</h3>
-                            <p>{t('mainPage.footer.aboutDescriptionLine1')}</p>
-                            <p>{t('mainPage.footer.aboutDescriptionLine2')}</p>
+                            <p>{t('mainPage.joinBanner.descriptionFull')}</p>
                         </div>
                     </div>
 

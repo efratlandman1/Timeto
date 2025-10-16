@@ -345,48 +345,11 @@ const Header = () => {
         <div className={headerClass}>
             <nav className={navClass}>
                 <div className={navRightClass}>
-                    <div className="logo" onClick={() => navigate("/")}>
+                    <div className="logo" onClick={() => navigate("/")}> 
                         <FaMapMarkerAlt className="logo-icon" />
                         <div className={logoTextClass}>
                             <span className="logo-text-main">{t('header.logo.main')}</span>
-                            <span className="logo-text-sub">{t('header.logo.sub')}</span>
                         </div>
-                    </div>
-                    <div style={{ position: 'relative', display: 'inline-block' }}>
-                        <button
-                            onClick={() => setShowPopover(!showPopover)}
-                            className="refresh-location-btn styled-location-btn"
-                            title={t('header.myLocation')}
-                            type="button"
-                        >
-                            <FaMapMarkerAlt style={{ marginLeft: 6, fontSize: 18 }} />
-                            {t('header.myLocation')}
-                        </button>
-                        {showPopover && (
-                            <div ref={popoverRef} className={locationPopoverClass}>
-                                <div className={popoverHeaderClass}>
-                                    <span>{t('header.currentLocation')}</span>
-                                    <button className="close-popover-btn" onClick={() => setShowPopover(false)}><FaTimes /></button>
-                                </div>
-                                <div className="popover-content">
-                                    {addressLoading || loading ? (
-                                        <span className="address-loading">{t('header.loadingAddress')}</span>
-                                    ) : addressError ? (
-                                        <span className="address-error">{t('header.addressError')}</span>
-                                    ) : address ? (
-                                        <span className="address-text">{formatAddress(address)}</span>
-                                    ) : (
-                                        <span className="address-error">{t('header.noLocation')}</span>
-                                    )}
-                                </div>
-                                <div className={popoverActionsClass}>
-                                    <button className="refresh-popover-btn" onClick={handleRefreshLocation} disabled={loading || addressLoading} title={t('header.refreshLocation')}>
-                                        <FaSyncAlt className={loading ? 'spin' : ''} />
-                                        {t('header.refreshLocation')}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
 
@@ -407,9 +370,8 @@ const Header = () => {
                             {t('header.search')}
                         </button>
                         {/* Removed sale/promo nav to simplify header */}
-                        <div style={{ position: 'relative', display: 'inline-block' }}>
-                            <button 
-                                className={`nav-button with-hover`}
+                        <button 
+                                className={`nav-button`}
                                 onClick={() => setShowCreateMenu(!showCreateMenu)}
                                 ref={createButtonRef}
                                 aria-expanded={showCreateMenu}
@@ -453,7 +415,6 @@ const Header = () => {
                                     </button>
                                 </div>
                             )}
-                        </div>
                         <button 
                             className={`nav-button ${isActive("/suggest-item") ? "active" : ""}`} 
                             onClick={() => navigate("/suggest-item")}
@@ -461,49 +422,60 @@ const Header = () => {
                             <FaLightbulb />
                             {t('header.suggest')}
                         </button>
+                        <span className="location-wrapper">
+                            <button
+                                onClick={() => setShowPopover(!showPopover)}
+                                className="nav-button"
+                                title={t('header.myLocation')}
+                                type="button"
+                            >
+                                <FaMapMarkerAlt />
+                                {t('header.locationShort')}
+                            </button>
+                            {showPopover && (
+                            <div ref={popoverRef} className={locationPopoverClass}>
+                                <div className={popoverHeaderClass}>
+                                    <span>{t('header.currentLocation')}</span>
+                                    <button className="close-popover-btn" onClick={() => setShowPopover(false)}><FaTimes /></button>
+                                </div>
+                                <div className="popover-content">
+                                    {addressLoading || loading ? (
+                                        <span className="address-loading">{t('header.loadingAddress')}</span>
+                                    ) : addressError ? (
+                                        <span className="address-error">{t('header.addressError')}</span>
+                                    ) : address ? (
+                                        <span className="address-text">{formatAddress(address)}</span>
+                                    ) : (
+                                        <span className="address-error">{t('header.noLocation')}</span>
+                                    )}
+                                </div>
+                                <div className={popoverActionsClass}>
+                                    <button className="refresh-popover-btn" onClick={handleRefreshLocation} disabled={loading || addressLoading} title={t('header.refreshLocation')}>
+                                        <FaSyncAlt className={loading ? 'spin' : ''} />
+                                        {t('header.refreshLocation')}
+                                    </button>
+                                </div>
+                                </div>
+                            )}
+                        </span>
                     </div>
                 </div>
 
                 <div className={navLeftClass}>
                     <div className={langSwitchClass}>
-                        <div className={`lang-dropdown ${showLangMenu ? 'open' : ''}`}>
-                            <button
-                                onClick={() => setShowLangMenu(!showLangMenu)}
-                                className="lang-toggle-btn"
-                                title={t('header.selectLanguage')}
-                                type="button"
-                                aria-label={t('header.selectLanguage')}
-                                aria-expanded={showLangMenu}
-                                aria-haspopup="true"
-                            >
-                                <div className="lang-toggle-content">
-                                    <span className="lang-text">
-                                        {language === 'he' ? t('header.languages.he') : t('header.languages.en')}
-                                    </span>
-                                    <span className="lang-arrow">▼</span>
-                                </div>
-                            </button>
-                            
-                            {showLangMenu && (
-                                <div className={`lang-menu ${direction}`} role="menu">
-                                    <button
-                                        className={`lang-menu-item ${language === 'he' ? 'active' : ''}`}
-                                        onClick={() => handleLanguageChange('he')}
-                                        role="menuitem"
-                                    >
-                                        <span className="lang-text">{t('header.languages.he')}</span>
-                                    </button>
-                                    <button
-                                        className={`lang-menu-item ${language === 'en' ? 'active' : ''}`}
-                                        onClick={() => handleLanguageChange('en')}
-                                        role="menuitem"
-                                    >
-                                        <span className="lang-text">{t('header.languages.en')}</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                        <button
+                            className={`lang-toggle-pill ${direction}`}
+                            onClick={handleLanguageToggle}
+                            aria-label={t('header.selectLanguage')}
+                            type="button"
+                        >
+                            {/* <FaGlobe className="lang-globe" aria-hidden="true" /> */}
+                            <span className={`pill-option ${language === 'he' ? 'active' : ''}`}>{t('header.languages.he')}</span>
+                            <span className="pill-sep">|</span>
+                            <span className={`pill-option ${language === 'en' ? 'active' : ''}`}>{t('header.languages.en')}</span>
+                        </button>
                     </div>
+
 
                     {isAuthLoading ? (
                         <div className="auth-buttons">
