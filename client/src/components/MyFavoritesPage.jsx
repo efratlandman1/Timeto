@@ -85,12 +85,12 @@ const MyFavoritesPage = () => {
 
     // Contextual empty message (no hooks to avoid conditional hook issues)
     const emptyMessage = activeTab === 'business'
-        ? 'עדיין לא סימנת עסקים כמועדפים'
+        ? t('favorites.emptyBusiness')
         : activeTab === 'sale'
-        ? 'עדיין לא סימנת פריטים למכירה כמועדפים'
+        ? t('favorites.emptySale')
         : activeTab === 'promo'
-        ? 'עדיין לא סימנת מודעות פרסום כמועדפים'
-        : 'אין פריטים במועדפים';
+        ? t('favorites.emptyPromo')
+        : t('favorites.empty');
 
     if (loading) {
         return <div className="loading">{t('favorites.loading')}</div>;
@@ -114,16 +114,16 @@ const MyFavoritesPage = () => {
                 {/* Segmented tabs */}
                 <div className="favorites-tabs" role="tablist" aria-label="favorites categories">
                     <button className={`favorites-tab ${activeTab==='all'?'active':''}`} role="tab" aria-selected={activeTab==='all'} onClick={() => setActiveTab('all')}>
-                        הכל <span className="count">({counts.all})</span>
+                        {t('favorites.tabs.all')} <span className="count">({counts.all})</span>
                     </button>
                     <button className={`favorites-tab ${activeTab==='business'?'active':''}`} role="tab" aria-selected={activeTab==='business'} onClick={() => setActiveTab('business')}>
-                        עסקים <span className="count">({counts.business})</span>
+                        {t('favorites.tabs.business')} <span className="count">({counts.business})</span>
                     </button>
                     <button className={`favorites-tab ${activeTab==='sale'?'active':''}`} role="tab" aria-selected={activeTab==='sale'} onClick={() => setActiveTab('sale')}>
-                        מכירה <span className="count">({counts.sale})</span>
+                        {t('favorites.tabs.sale')} <span className="count">({counts.sale})</span>
                     </button>
                     <button className={`favorites-tab ${activeTab==='promo'?'active':''}`} role="tab" aria-selected={activeTab==='promo'} onClick={() => setActiveTab('promo')}>
-                        פרסום <span className="count">({counts.promo})</span>
+                        {t('favorites.tabs.promo')} <span className="count">({counts.promo})</span>
                     </button>
                 </div>
 

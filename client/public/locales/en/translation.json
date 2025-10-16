@@ -356,7 +356,17 @@
   "favorites": {
     "loading": "Loading favorites...",
     "title": "My Favorites",
-    "empty": "You haven't marked any businesses as favorites yet"
+    "subtitle": "All the items you marked as favorites in one place",
+    "empty": "You haven't marked any favorites yet",
+    "emptyBusiness": "You haven't marked any businesses as favorites yet",
+    "emptySale": "You haven't marked any sale items as favorites yet",
+    "emptyPromo": "You haven't marked any promo ads as favorites yet",
+    "tabs": {
+      "all": "All",
+      "business": "Businesses",
+      "sale": "Sale",
+      "promo": "Promo"
+    }
   },
   "feedback": {
     "title": "Feedback for {{businessName}}",
