@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { getToken } from '../utils/auth';
 import { FaPencilAlt, FaTrash, FaRecycle, FaHeart } from 'react-icons/fa';
 
-const PromoAdCard = ({ ad }) => {
+const PromoAdCard = ({ ad, onFavoriteRemoved }) => {
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = React.useState(ad.isFavorite || false);
   const [confirmDelete, setConfirmDelete] = React.useState(false);
@@ -70,6 +70,9 @@ const PromoAdCard = ({ ad }) => {
                 const active = json?.data?.active;
                 setIsFavorite(active);
                 showToast(active ? '✅ נוסף למועדפים' : '✅ הוסר מהמועדפים');
+                if (!active && typeof onFavoriteRemoved === 'function') {
+                  onFavoriteRemoved();
+                }
               } else {
                 showToast(`❌ ${json?.message || 'שגיאה בעדכון מועדפים'}`, true);
               }
