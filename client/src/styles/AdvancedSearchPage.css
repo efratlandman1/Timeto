@@ -1,34 +1,26 @@
 /* AdvancedSearchPage.css */
 
 /* רקע כהה חצי שקוף מאחורי המודל */
+/* override to match suggest modal exactly */
 .modal-overlay {
     position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
     display: flex;
-    justify-content: center;
     align-items: center;
-    backdrop-filter: blur(4px);
+    justify-content: center;
+    z-index: 1000;
 }
 
 /* תוכן המודל */
 .modal-content {
-    background-color: #fff;
-    padding: 24px;
+    background: #fff;
+    width: min(600px, 95vw);
+    max-height: 90vh;
     border-radius: 12px;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    position: relative;
-    direction: rtl;
-    height: 600px;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    overflow: auto;
+    padding-bottom: 1rem;
 }
 
 /* אזור התוכן עם גלילה */
@@ -43,7 +35,7 @@
 .close-button {
     position: absolute;
     top: 16px;
-    right: 16px;
+    inset-inline-end: 16px;
     background: none;
     border: none;
     font-size: 24px;
@@ -67,12 +59,7 @@
 }
 
 /* כותרת */
-.modal-content h2 {
-    margin: 0 0 24px;
-    font-size: 20px;
-    color: #333;
-    text-align: right;
-}
+.modal-content h2 { text-align: center; }
 
 /* עיצוב שדות הטופס */
 .form-group {
@@ -226,8 +213,8 @@ input[type="range"] {
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    margin-top: 16px;
-    padding-top: 16px;
+    margin-top: 12px;
+    padding-top: 12px;
     border-top: 1px solid #e0e0e0;
     background: #fff;
 }

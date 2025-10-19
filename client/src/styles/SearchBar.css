@@ -397,6 +397,7 @@ body.blurred::before {
   align-items: center;
   transition: all 0.3s ease;
   border: 2px solid transparent;
+  position: relative; /* anchor absolute icon */
 }
 
 .search-bar-wrapper:focus-within {
@@ -414,9 +415,10 @@ body.blurred::before {
   position: relative;
 }
 
-.search-input {
+.search-bar-wrapper .search-input {
   width: 100%;
-  padding: 14px 48px 14px 16px;
+  padding: 14px 16px; /* base padding */
+  padding-inline-end: 64px; /* more room for icon so text never collides */
   font-size: 16px;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -429,7 +431,20 @@ body.blurred::before {
 
 .main-page .search-input {
   font-size: 1.2rem;
-  text-indent: 2.5rem;
+  padding-inline-end: 68px; /* slightly more room for the larger icon */
+}
+
+/* Explicit RTL/LTR padding to avoid icon overlap */
+body.rtl .search-bar-wrapper .search-input {
+  padding-right: 64px;
+  text-align: right;
+  direction: rtl;
+}
+
+body.ltr .search-bar-wrapper .search-input {
+  padding-left: 64px;
+  text-align: left;
+  direction: ltr;
 }
 
 .search-input:focus {
@@ -440,9 +455,9 @@ body.blurred::before {
   color: #a0a0a0;
 }
 
-.search-icon {
+.search-bar-wrapper .search-icon {
   position: absolute;
-  right: 1rem;
+  inset-inline-end: 1rem; /* RTL/LTR aware */
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.4rem;
@@ -450,6 +465,16 @@ body.blurred::before {
   cursor: pointer;
   transition: transform 0.3s ease;
   z-index: 2;
+  pointer-events: auto; /* ensure clickable even if older rules exist */
+}
+
+body.ltr .search-bar-wrapper .search-icon {
+  inset-inline-end: auto;
+  right: 1rem;
+}
+
+body.rtl .search-bar-wrapper .search-icon {
+  inset-inline-end: 1rem;
 }
 
 .search-icon:hover {
@@ -498,6 +523,14 @@ body.blurred::before {
 .results-page .search-bar-container {
   margin: 1rem auto;
   padding: 0 1rem;
+}
+
+/* On results page show only one frame: remove outer wrapper visuals */
+.results-page .search-bar-wrapper {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  padding: 0;
 }
 
 /* Responsive Design */

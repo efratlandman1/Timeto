@@ -265,7 +265,7 @@
     "promo": { "title": "מודעת פרסום", "desc": "תדמית/קידום עם תוקף ותמונה" }
   },
   "search": {
-    "placeholder": "חפש עסק או שירות...",
+    "placeholder": "חפש עסקים, מודעות מכירה ופרסום...",
     "search": "חפש",
     "results": "תוצאות חיפוש",
     "noResults": "לא נמצאו תוצאות",
@@ -469,8 +469,8 @@
   "searchResults": {
     "title": "תוצאות חיפוש",
     "noResults": "לא נמצאו תוצאות",
-    "pageTitle": "חיפוש עסקים",
-    "pageSubtitle": "מצא את העסק המתאים לך",
+    "pageTitle": "תוצאות חיפוש",
+    "pageSubtitle": "",
     "advancedFilter": "סינון מתקדם",
     "loadingLocation": "טוען מיקום...",
     "filters": {
@@ -619,6 +619,20 @@
   },
   "advancedSearch": {
     "title": "חיפוש מורחב",
+    "city": "עיר",
+    "cityPlaceholder": "לדוגמה: תל אביב",
+    "priceRange": "טווח מחיר",
+    "min": "מינימום",
+    "max": "מקסימום",
+    "status": "סטטוס",
+    "openNow": "פתוח עכשיו",
+    "verifiedOnly": "מאומת בלבד",
+    "reviewsOnly": "עם חוות דעת",
+    "addedWithin": "נוספו ב־",
+    "anytime": "כל הזמן",
+    "last7d": "7 הימים האחרונים",
+    "last30d": "30 הימים האחרונים",
+    "includeNoPrice": "כלול גם ללא מחיר",
     "sort": {
       "title": "מיון תוצאות",
       "rating": "דירוג גבוה",
@@ -634,6 +648,10 @@
     "category": {
       "title": "קטגוריה",
       "select": "בחר קטגוריה"
+    },
+    "categories": {
+      "business": "קטגוריות עסקים",
+      "sale": "קטגוריות מכירה"
     },
     "services": {
       "title": "שירותים"

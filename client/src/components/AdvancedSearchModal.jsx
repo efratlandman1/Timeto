@@ -2,20 +2,34 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FaStar, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import '../styles/AdvancedSearchPage.css';
+import '../styles/SuggestItemPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
 
 const MAX_DISTANCE_KM = 100;
 
 const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   const { t } = useTranslation();
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState([]); // business categories
+  const [saleCategories, setSaleCategories] = useState([]); // sale ad categories
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedServices, setSelectedServices] = useState([]);
   const [services, setServices] = useState([]);
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [distance, setDistance] = useState(0);
+  const [priceMin, setPriceMin] = useState('');
+  const [priceMax, setPriceMax] = useState('');
+  const [city, setCity] = useState('');
+  const [openNow, setOpenNow] = useState(false);
+  const [addedWithin, setAddedWithin] = useState('');
+  const [includeNoPrice, setIncludeNoPrice] = useState(false);
+  const cityAutoRef = useRef(null);
+  const { isLoaded: mapsLoaded } = useJsApiLoader({
+    id: 'google-maps-script',
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
+    libraries: ['places']
+  });
   const navigate = useNavigate();
   const location = useLocation();
   const prevCategoryRef = useRef('');
@@ -28,6 +42,19 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
       setRating(0);
       setHoveredRating(0);
       setDistance(0);
+      setPriceMin('');
+      setPriceMax('');
+      setCity('');
+      setOpenNow(false);
+      
+      setAddedWithin('');
+      setIncludeNoPrice(false);
+      // Freeze background scroll while modal is open
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
     }
   }, [isOpen]);
 
@@ -39,36 +66,36 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   }, [selectedCategory]);
   
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchBoth = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
-        setCategories(response.data.data.categories || []);
+        const [bizRes, saleRes] = await Promise.all([
+          axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`),
+          axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-categories`).catch(() => ({ data: { data: { categories: [] } } }))
+        ]);
+        setCategories(bizRes.data?.data?.categories || []);
+        setSaleCategories(saleRes.data?.data?.categories || []);
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error('Error fetching categories:', error);
       }
     };
-    fetchCategories();
+    fetchBoth();
   }, []);
 
   useEffect(() => {
-    if (selectedCategory) {
-      const category = categories.find(c => c.name === selectedCategory);
-      if (category) {
-        const fetchServices = async () => {
-          try {
-            const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/services/byCategory/${category._id}`);
-            setServices(response.data.data.services);
-          } catch (error) {
-            console.error("Error fetching services:", error);
-            setServices([]);
-          }
-        };
-        // setSelectedServices([]);
-        fetchServices();
+    if (!selectedCategory) { setServices([]); return; }
+    const category = categories.find(c => c.name === selectedCategory);
+    // Only business categories have services to fetch
+    if (!category) { setServices([]); return; }
+    const fetchServices = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/services/byCategory/${category._id}`);
+        setServices(response.data.data.services || []);
+      } catch (error) {
+        console.error('Error fetching services:', error);
+        setServices([]);
       }
-    } else {
-      setServices([]);
-    }
+    };
+    fetchServices();
   }, [selectedCategory, categories]);
  
   useEffect(() => {
@@ -88,6 +115,13 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
       if (filters.categoryName) {
         setSelectedCategory(filters.categoryName);
       }
+      if (filters.city) setCity(filters.city);
+      if (filters.priceMin) setPriceMin(filters.priceMin);
+      if (filters.priceMax) setPriceMax(filters.priceMax);
+      if (filters.openNow) setOpenNow(filters.openNow === 'true' || filters.openNow === true);
+      
+      if (filters.addedWithin) setAddedWithin(filters.addedWithin);
+      if (filters.includeNoPrice) setIncludeNoPrice(filters.includeNoPrice === 'true' || filters.includeNoPrice === true);
       // if (filters.services) {
       //   // Handle both string and array formats from URL
       //   const servicesList = Array.isArray(filters.services) 
@@ -119,6 +153,12 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
     setRating(0);
     setHoveredRating(0);
     setDistance(0);
+    setPriceMin('');
+    setPriceMax('');
+    setCity('');
+    setOpenNow(false);
+    
+    setAddedWithin('');
   };
 
   const handleSubmit = () => {
@@ -132,6 +172,12 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
     selectedServices.forEach(service => newParams.append('services', service));
     if (rating > 0) newParams.set('rating', rating.toString());
     if (distance > 0) newParams.set('maxDistance', distance.toString());
+    if (priceMin) newParams.set('priceMin', priceMin);
+    if (priceMax) newParams.set('priceMax', priceMax);
+    if (city) newParams.set('city', city);
+    if (openNow) newParams.set('openNow', 'true');
+    if (addedWithin) newParams.set('addedWithin', addedWithin);
+    if (includeNoPrice) newParams.set('includeNoPrice', 'true');
     navigate({ pathname: location.pathname, search: newParams.toString() });
     onClose();
   };
@@ -159,22 +205,38 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <button className="close-button" onClick={onClose}>×</button>
-        <h2>{t('advancedSearch.title')}</h2>
-        
+    <div className="modal-overlay-fixed" onClick={onClose}>
+      <div className="modal-container suggest-modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <button className="modal-close" onClick={onClose} aria-label={t('advancedSearch.buttons.cancel')}>
+            <FaTimes />
+          </button>
+          <h1 className="login-title suggest-modal-title">{t('advancedSearch.title')}</h1>
+        </div>
+
         <div className="modal-scroll-content">
           <div className="form-group">
             <label>{t('advancedSearch.category.title')}</label>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
+              className="form-select"
             >
               <option value="">{t('advancedSearch.category.select')}</option>
-              {categories.map((cat) => (
-                <option key={cat._id} value={cat.name}>{cat.name}</option>
-              ))}
+              {categories?.length > 0 && (
+                <optgroup label={t('advancedSearch.categories.business') || 'עסקים'}>
+                  {categories.map((cat) => (
+                    <option key={`biz-${cat._id}`} value={cat.name}>{cat.name}</option>
+                  ))}
+                </optgroup>
+              )}
+              {saleCategories?.length > 0 && (
+                <optgroup label={t('advancedSearch.categories.sale') || 'מכירה'}>
+                  {saleCategories.map((cat) => (
+                    <option key={`sale-${cat._id || cat.name}`} value={cat.name}>{cat.name}</option>
+                  ))}
+                </optgroup>
+              )}
             </select>
           </div>
 
@@ -195,11 +257,87 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
             </div>
           )}
 
+          {/* City */}
+          <div className="form-group">
+            <label>{t('advancedSearch.city') || 'עיר'}</label>
+            {mapsLoaded ? (
+              <Autocomplete
+                onLoad={(ac) => { cityAutoRef.current = ac; }}
+                onPlaceChanged={() => {
+                  const place = cityAutoRef.current?.getPlace();
+                  if (!place) return;
+                  const comp = place.address_components || [];
+                  const cityComp = comp.find(c => c.types.includes('locality')) || comp.find(c => c.types.includes('administrative_area_level_2')) || comp.find(c => c.types.includes('administrative_area_level_1'));
+                  setCity(cityComp?.long_name || place.name || '');
+                }}
+                options={{ types: ['(cities)'], componentRestrictions: { country: 'il' } }}
+              >
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder={t('advancedSearch.cityPlaceholder') || 'לדוגמה: תל אביב'}
+                />
+              </Autocomplete>
+            ) : (
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder={t('advancedSearch.cityPlaceholder') || 'לדוגמה: תל אביב'}
+              />
+            )}
+          </div>
+
+          {/* Price range */}
+          <div className="form-group">
+            <label>{t('advancedSearch.priceRange') || 'טווח מחיר'}</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '12px', alignItems: 'center' }}>
+              <input
+                type="number"
+                min="0"
+                placeholder={t('advancedSearch.min') || 'מינימום'}
+                value={priceMin}
+                onChange={(e) => setPriceMin(e.target.value)}
+              />
+              <input
+                type="number"
+                min="0"
+                placeholder={t('advancedSearch.max') || 'מקסימום'}
+                value={priceMax}
+                onChange={(e) => setPriceMax(e.target.value)}
+              />
+              <label className="radio-label" style={{ margin: 0 }}>
+                <input type="checkbox" checked={includeNoPrice} onChange={(e)=>setIncludeNoPrice(e.target.checked)} /> {t('advancedSearch.includeNoPrice') || 'כלול גם ללא מחיר'}
+              </label>
+            </div>
+          </div>
+
+          {/* Open now only - inline label + checkbox */}
+          <label className="radio-label" style={{ marginInline: '1.25rem' }}>
+            <input
+              type="checkbox"
+              checked={openNow}
+              onChange={(e) => setOpenNow(e.target.checked)}
+              aria-label={t('advancedSearch.openNow') || 'פתוח עכשיו'}
+            />
+            {t('advancedSearch.openNow') || 'פתוח עכשיו'}
+          </label>
+
+          {/* Added within */}
+          <div className="form-group">
+            <label>{t('advancedSearch.addedWithin') || 'נוספו ב־'}</label>
+            <select value={addedWithin} onChange={(e) => setAddedWithin(e.target.value)} className="form-select">
+              <option value="">{t('advancedSearch.anytime') || 'כל הזמן'}</option>
+              <option value="7d">{t('advancedSearch.last7d') || '7 הימים האחרונים'}</option>
+              <option value="30d">{t('advancedSearch.last30d') || '30 הימים האחרונים'}</option>
+            </select>
+          </div>
+
           <div className="form-group">
             <label>{t('advancedSearch.rating.title')}</label>
             {renderStarRating()}
           </div>
-
           <div className="form-group">
             <label htmlFor="distance-slider">{t('advancedSearch.distance.title')}</label>
             <div className="distance-slider-row">
@@ -217,14 +355,9 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
           </div>
         </div>
 
-        <div className="modal-actions">
-          <button className="clear-button" onClick={handleClearAll}>{t('advancedSearch.buttons.clear')}</button>
-          <button className="submit-button" onClick={handleSubmit}>{t('advancedSearch.buttons.apply')}</button>
-        </div>
-        <div style={{display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem'}}>
-          <button className="cancel-button" type="button" onClick={onClose}>
-            {t('advancedSearch.buttons.cancel')}
-          </button>
+        <div className="button-row fullwidth" style={{ gap: '8px' }}>
+          <button className="submit-button clean-full secondary" onClick={handleClearAll}>{t('advancedSearch.buttons.clear')}</button>
+          <button className="submit-button clean-full" onClick={handleSubmit}>{t('advancedSearch.buttons.apply')}</button>
         </div>
       </div>
     </div>

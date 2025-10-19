@@ -59,7 +59,8 @@
     height: 16px;
     border-radius: 50%;
     transition: all 0.2s ease;
-    margin-right: 2px;
+    order: -1; /* place on start side of chip */
+    margin-inline-end: 6px;
 }
 
 .filter-tag button:hover {
@@ -540,7 +541,7 @@
 /* Search Controls */
 .search-controls {
     position: relative;
-    /* margin: 2rem 0; */
+    margin-top: 0.5rem;
 }
 
 .search-controls__main {
@@ -548,7 +549,7 @@
     align-items: center;
     gap: 1rem;
     background: white;
-    padding: 1.5rem;
+    padding: 1rem 1rem;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     /* background: radial-gradient(black, transparent); */
@@ -563,6 +564,20 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
+}
+
+/* Compact header spacing for search page */
+.search-results-page .nav-button.above-header {
+    margin-bottom: 0.75rem;
+}
+
+.search-results-page .page-header {
+    padding: 0.25rem 0 0.75rem;
+}
+
+.search-results-page .favorites-tabs {
+    margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
 }
 
 /* Filter Button */

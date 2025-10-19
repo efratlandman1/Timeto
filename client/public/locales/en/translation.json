@@ -252,7 +252,7 @@
     "promo": { "title": "Promo Ad", "desc": "Branding/promo with validity and image" }
   },
   "search": {
-    "placeholder": "Search business by name, category or service",
+    "placeholder": "Search businesses, sale ads and promo ads...",
     "advancedSearch": "Advanced Search",
     "noResults": "No results found",
     "errors": {
@@ -453,8 +453,8 @@
   "searchResults": {
     "title": "Search Results",
     "noResults": "No results found",
-    "pageTitle": "Business Search",
-    "pageSubtitle": "Find the right business for you",
+    "pageTitle": "Search Results",
+    "pageSubtitle": "",
     "advancedFilter": "Advanced Filter",
     "loadingLocation": "Loading location...",
     "filters": {
@@ -607,6 +607,20 @@
   },
   "advancedSearch": {
     "title": "Advanced Search",
+    "city": "City",
+    "cityPlaceholder": "e.g., Tel Aviv",
+    "priceRange": "Price Range",
+    "min": "Min",
+    "max": "Max",
+    "status": "Status",
+    "openNow": "Open Now",
+    "verifiedOnly": "Verified Only",
+    "reviewsOnly": "With Reviews",
+    "addedWithin": "Added Within",
+    "anytime": "Any time",
+    "last7d": "Last 7 days",
+    "last30d": "Last 30 days",
+    "includeNoPrice": "Include items without price",
     "sort": {
       "title": "Sort Results",
       "rating": "High Rating",
@@ -622,6 +636,10 @@
     "category": {
       "title": "Category",
       "select": "Select Category"
+    },
+    "categories": {
+      "business": "Business Categories",
+      "sale": "Sale Categories"
     },
     "services": {
       "title": "Services"

@@ -60,6 +60,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  margin-block: 0.5rem; /* vertical spacing between fields */
+}
+
+/* Emphasize field titles for forms/modals (used by advanced search) */
+.suggest-modal .form-group > label {
+  font-weight: 700;
+  color: #2d3436;
 }
 
 /* Standalone field styling (not inside section card) */
@@ -140,10 +147,20 @@
 .submit-button:hover { background: #d32f2f; }
 .submit-button:active { transform: translateY(1px); }
 
+/* Secondary (not emphasized) full-width action styled like submit but neutral */
+.submit-button.secondary {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #e0e0e0;
+}
+.submit-button.secondary:hover {
+  background: #ededed;
+}
+
 .radio-label {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem; /* small space so checkbox is close to text */
   cursor: pointer;
   font-weight: normal;
   color: #333;
@@ -227,6 +244,7 @@
   text-align: center !important;
   display: block;
   margin: 0 auto 0.5rem auto;
+  font-size: 1.6rem; /* larger title for advanced search too */
 }
 .modal-subtitle { margin: 0; color: #555; }
 
@@ -234,10 +252,15 @@
   background: none;
   border: none;
   color: #999;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 6px;
+  padding: 8px; /* larger hit area */
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   inset-inline-end: 1rem; /* RTL -> left, LTR -> right */
   top: 1rem;
