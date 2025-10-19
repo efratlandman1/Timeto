@@ -168,6 +168,14 @@ const MySteps = ({
 }) => {
   const { t } = useTranslation();
   const { current } = useSteps();
+  const navigate = useNavigate();
+  const handleCancel = () => {
+    if (window.history && window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+    navigate('/user-businesses');
+  };
 
   return (
     <>
@@ -178,13 +186,20 @@ const MySteps = ({
         <StepBusinessHours {...{ businessData, setBusinessData, categories }} />
       </Steps>
       <NavigationButtons businessData={businessData} />
-      {/* {current === 3 && isValidOpeningHours(businessData.openingHours) &&  ( */}
-      {current === 3  &&  (
-        <button onClick={handleSubmit} className="save-button">
-          {selectedBusiness ? <FaEdit /> : <FaPlus />}
-                          {selectedBusiness ? t('editBusiness.buttons.update') : t('editBusiness.buttons.create')}
+
+      {/* Action buttons per step - aligned to logical sides */}
+      <div className="edit-business-actions">
+        <button type="button" onClick={handleCancel} className="cancel-button">
+          {t('common.cancel')}
         </button>
-      )}
+
+        {(selectedBusiness || current === 3) && (
+          <button onClick={handleSubmit} className="save-button">
+            {selectedBusiness ? <FaEdit /> : <FaPlus />}
+            {selectedBusiness ? t('editBusiness.buttons.update') : t('editBusiness.buttons.create')}
+          </button>
+        )}
+      </div>
     </>
   );
 };
