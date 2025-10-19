@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/userSlice';
 import '../styles/AuthPage.css';
+import '../styles/SuggestItemPage.css';
+import { FaTimes } from 'react-icons/fa';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const AuthPage = () => {
@@ -17,6 +19,7 @@ const AuthPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const currentLocation = useLocation();
     const [searchParams] = useSearchParams();
     const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
 
@@ -82,38 +85,40 @@ const AuthPage = () => {
         }
     };
     
-    const handleClose = () => {
-        navigate('/');
-    };
+    const handleClose = () => { navigate(-1); };
 
     return (
         <GoogleOAuthProvider clientId={clientId}>
-            <div className="auth-page-overlay">
+            <div className="modal-overlay-fixed" onClick={handleClose}>
                 {isLoading && (
                     <div className="spinner-overlay">
                         <div className="spinner"></div>
                     </div>
                 )}
-                <div className="auth-modal" style={{ opacity: isLoading ? 0.7 : 1 }}>
-                    <button onClick={handleClose} className="close-button">×</button>
-                    <h2>{t('header.letsGo')}</h2>
-                    <p>{t('mainPage.joinBanner.joinNowAndDiscover')}</p>
+                <div className="modal-container suggest-modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title" onClick={(e) => e.stopPropagation()} style={{ opacity: isLoading ? 0.7 : 1 }}>
+                    <div className="modal-header">
+                        <button className="modal-close" aria-label={t('common.cancel')} onClick={handleClose}><FaTimes /></button>
+                        <h1 id="auth-modal-title" className="login-title suggest-modal-title">{t('header.letsGo')}</h1>
+                    </div>
+                    <p style={{textAlign:'center', marginInline: '1.25rem'}}>{t('mainPage.joinBanner.joinNowAndDiscover')}</p>
                     
                     <div className="auth-content">
-                        <GoogleLogin
-                            onSuccess={responseGoogle}
-                            onError={() => {
-                                setMessage({
-                                    text: t('auth.login.errors.loginFailed'),
-                                    type: 'error'
-                                });
-                            }}
-                            useOneTap
-                            shape="pill"
-                            width="350px"
-                        />
+                        <div style={{display:'flex', justifyContent:'center'}}>
+                          <GoogleLogin
+                              onSuccess={responseGoogle}
+                              onError={() => {
+                                  setMessage({
+                                      text: t('auth.login.errors.loginFailed'),
+                                      type: 'error'
+                                  });
+                              }}
+                              useOneTap
+                              shape="pill"
+                              width="300"
+                          />
+                        </div>
                         <div className="divider">{t('auth.login.simpleLoginWithEmail')}</div>
-                        <form onSubmit={handleSubmit} className="email-form">
+                        <form onSubmit={handleSubmit} className="email-form" style={{marginInline:'1.25rem'}}>
                             <input
                                 type="email"
                                 value={email}
@@ -137,7 +142,7 @@ const AuthPage = () => {
                                 </span>
                             </div>
                             <button type="submit" className="confirm-button" disabled={isLoading}>{t('auth.login.continue')}</button>
-                             <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password');}} className="forgot-password-link">
+                             <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password', { state: { background: currentLocation } });}} className="forgot-password-link" style={{textAlign:'center', display:'block'}}>
                              {t('auth.forgotPassword.createNewPassword')}
                         </a>
                             {message.text && (
@@ -146,9 +151,7 @@ const AuthPage = () => {
                                 </p>
                             )}
                         </form>
-                        <button className="cancel-button" type="button" onClick={handleClose} style={{marginTop: '1rem'}}>
-                            {t('common.cancel')}
-                        </button>
+                        {/* No cancel button — close via X */}
                     </div>
                 </div>
             </div>

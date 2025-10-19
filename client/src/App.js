@@ -73,6 +73,9 @@ function AppRoutes() {
                     <Route path="/business-profile/:id" element={<BusinessProfilePage />} />
                     <Route path="/ads/sale/:id" element={<SaleAdProfilePage />} />
                     <Route path="/ads/promo/:id" element={<PromoAdProfilePage />} />
+                    <Route path="/auth" element={<AuthPage />} />
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                    <Route path="/reset-password" element={<ResetPasswordPage />} />
                 </Routes>
             )}
         </>

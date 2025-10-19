@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import '../styles/AuthPage.css'; // Use the new unified styles
+import '../styles/AuthPage.css';
+import '../styles/SuggestItemPage.css';
+import { FaTimes } from 'react-icons/fa';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const ResetPasswordPage = () => {
@@ -50,26 +52,28 @@ const ResetPasswordPage = () => {
     };
 
     return (
-        <div className="auth-page-overlay">
+        <div className="modal-overlay-fixed" onClick={() => navigate(-1)}>
             {isLoading && (
                 <div className="spinner-overlay">
                     <div className="spinner"></div>
                 </div>
             )}
-            <div className="auth-modal" style={{ opacity: isLoading ? 0.7 : 1 }}>
-                <button onClick={() => navigate('/auth')} className="close-button">×</button>
+            <div className="modal-container suggest-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="reset-modal-title" style={{ opacity: isLoading ? 0.7 : 1 }}>
+                <div className="modal-header">
+                    <button className="modal-close" aria-label={t('common.cancel')} onClick={() => navigate(-1)}><FaTimes /></button>
+                    <h1 id="reset-modal-title" className="login-title suggest-modal-title">{t('auth.resetPassword.title')}</h1>
+                </div>
 
                 {message.type === 'success' ? (
                     <div className="success-view">
-                        <h2>{t('auth.resetPassword.success')}</h2>
+                        <h2 style={{textAlign:'center'}}>{t('auth.resetPassword.success')}</h2>
                         {/* <p>{message.text}</p> */}
-                        <p>{t('auth.resetPassword.redirecting')}</p>
+                        <p style={{textAlign:'center'}}>{t('auth.resetPassword.redirecting')}</p>
                     </div>
                 ) : (
                     <>
-                        <h2>{t('auth.resetPassword.title')}</h2>
-                        <p>{t('auth.resetPassword.description')}</p>
-                        <form className="email-form" onSubmit={handleSubmit}>
+                        <p style={{textAlign:'center', marginInline: '1.25rem'}}>{t('auth.resetPassword.description')}</p>
+                        <form className="email-form" onSubmit={handleSubmit} style={{marginInline: '1.25rem'}}>
                             <div className="password-input-wrapper">
                                 <input
                                     className="form-input"
@@ -100,9 +104,6 @@ const ResetPasswordPage = () => {
                                 {t('auth.resetPassword.submit')}
                             </button>
                         </form>
-                        <button className="cancel-button" type="button" onClick={() => navigate('/auth')} style={{marginTop: '1rem'}}>
-                            {t('common.cancel')}
-                        </button>
                         {message.type === 'error' && <p className="auth-message error-message">{message.text}</p>}
                     </>
                 )}

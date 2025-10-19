@@ -585,7 +585,7 @@ const Header = () => {
                             </div>
                         ) : (
                             <div className={authButtonsClass}>
-                                <button className="auth-button" onClick={() => navigate("/auth")}>
+                                <button className="auth-button" onClick={() => navigate("/auth", { state: { background: location } })}>
                                     <FaSignInAlt />
                                     {t('header.register')} / {t('header.login')}
                                 </button>
