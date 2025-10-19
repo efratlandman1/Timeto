@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   FaMapMarkerAlt, FaPhoneAlt, FaTags, FaClock,
-  FaStar, FaRegStar, FaEnvelope, FaWhatsapp
+  FaStar, FaRegStar, FaEnvelope, FaWhatsapp, FaTimes
 } from 'react-icons/fa';
 import FeedbackPage from './FeedbackPage';
 import '../styles/BusinessProfilePage.css';
+import '../styles/SuggestItemPage.css';
 import { roundRating, renderStars } from '../utils/ratingUtils';
 
 const daysMap = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
@@ -14,6 +15,7 @@ const daysMap = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי
 const BusinessProfilePage = () => {
   const { t } = useTranslation();
   const { id } = useParams();
+  const navigate = useNavigate();
   const [business, setBusiness] = useState(null);
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -91,7 +93,13 @@ const BusinessProfilePage = () => {
   const currentDayIndex = getCurrentDayIndex();
 
   return (
-    <div className="wide-page-container">
+    <div className="modal-overlay-fixed" onClick={() => navigate(-1)}>
+      <div className="modal-container suggest-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="business-modal-title">
+        <div className="modal-header">
+          <button className="modal-close" aria-label="Close" onClick={() => navigate(-1)}><FaTimes /></button>
+          <h1 id="business-modal-title" className="login-title suggest-modal-title">{business.name}</h1>
+        </div>
+
       <div className="business-hero">
         <img
           className="business-hero-image"
@@ -207,7 +215,7 @@ const BusinessProfilePage = () => {
 
       {/* Feedback Section - Full Width */}
       <div className="feedback-section">
-        <div className="feedback-header">
+        <div className="feedback-header" dir={document?.documentElement?.dir || 'rtl'}>
           <h2>דירוגים ופידבקים</h2>
           <button className="add-feedback-button" onClick={() => setShowFeedbackModal(true)}>
             <FaRegStar />
@@ -215,87 +223,82 @@ const BusinessProfilePage = () => {
           </button>
         </div>
 
-        <div className="feedback-stats">
-          <div className="stat-card">
-            {averageRating !== null && averageRating !== undefined ? (
-              <>
+        {totalReviews === 0 ? (
+          <div className="no-feedbacks" style={{textAlign:'center', color:'#777', margin:'0.5rem 0 0.75rem'}}>
+            היה הראשון להשאיר ביקורת
+          </div>
+        ) : (
+          <>
+            <div className="feedback-stats">
+              <div className="stat-card">
                 <div className="stat-number">{roundRating(averageRating)}</div>
                 <div className="rating-stars">{renderRatingStars(averageRating)}</div>
                 <div className="stat-label">דירוג ממוצע</div>
-              </>
-            ) : (
-              <>
-                <div className="stat-number">-</div>
-                <div className="rating-stars">{renderRatingStars(0)}</div>
-                <div className="stat-label">אין דירוג עדיין</div>
-              </>
-            )}
-          </div>
-          <div className="stat-card">
-            <div className="stat-number">{totalReviews}</div>
-            <div className="stat-label">סך הכל ביקורות</div>
-          </div>
-        </div>
-
-        <div className="feedback-list">
-          {displayedFeedbacks.map((feedback, index) => {
-            const isExpanded = expandedComments.has(feedback._id);
-            const comment = feedback.comment || '-';
-            const shouldShowToggle = comment.length > 100;
-
-            return (
-              <div key={index} className="feedback-card">
-                <div className="feedback-card-header">
-                  <span className="feedback-author">{feedback.user_id?.nickname || 'אננימי'}</span>
-                  <span className="feedback-date">
-                    {new Date(feedback.createdAt).toLocaleDateString('he-IL', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </span>
-                </div>
-                <div className="feedback-rating">
-                  <div className="stars">
-                    {renderRatingStars(feedback.rating)}
-                  </div>
-                </div>
-                <div className={`feedback-comment ${isExpanded ? 'expanded' : ''}`}>
-                  {comment}
-                </div>
-                {shouldShowToggle && (
-                  <button 
-                    className="feedback-comment-toggle"
-                    onClick={() => toggleComment(feedback._id)}
-                  >
-                    {isExpanded ? 'הצג פחות' : 'הצג הכל'}
-                  </button>
-                )}
               </div>
-            );
-          })}
-        </div>
+              <div className="stat-card">
+                <div className="stat-number">{totalReviews}</div>
+                <div className="stat-label">סך הכל ביקורות</div>
+              </div>
+            </div>
 
-        {feedbacks.length > 6 && !showAllFeedbacks && (
-          <button 
-            className="show-more-button"
-            onClick={() => setShowAllFeedbacks(true)}
-          >
-            הצג עוד ביקורות ({feedbacks.length - 6})
-          </button>
+            <div className="feedback-list">
+              {displayedFeedbacks.map((feedback, index) => {
+                const isExpanded = expandedComments.has(feedback._id);
+                const comment = feedback.comment || '-';
+                const shouldShowToggle = comment.length > 100;
+
+                return (
+                  <div key={index} className="feedback-card">
+                    <div className="feedback-card-header">
+                      <span className="feedback-author">{feedback.user_id?.nickname || 'אננימי'}</span>
+                      <span className="feedback-date">
+                        {new Date(feedback.createdAt).toLocaleDateString('he-IL', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                    <div className="feedback-rating">
+                      <div className="stars">
+                        {renderRatingStars(feedback.rating)}
+                      </div>
+                    </div>
+                    <div className={`feedback-comment ${isExpanded ? 'expanded' : ''}`}>
+                      {comment}
+                    </div>
+                    {shouldShowToggle && (
+                      <button 
+                        className="feedback-comment-toggle"
+                        onClick={() => toggleComment(feedback._id)}
+                      >
+                        {isExpanded ? 'הצג פחות' : 'הצג הכל'}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {feedbacks.length > 6 && !showAllFeedbacks && (
+              <button 
+                className="show-more-button"
+                onClick={() => setShowAllFeedbacks(true)}
+              >
+                הצג עוד ביקורות ({feedbacks.length - 6})
+              </button>
+            )}
+          </>
         )}
       </div>
 
       {showFeedbackModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <FeedbackPage
-              businessId={business._id}
-              onClose={handleFeedbackClose}
-            />
-          </div>
-        </div>
+        <FeedbackPage
+          businessId={business._id}
+          onClose={handleFeedbackClose}
+        />
       )}
+      </div>
     </div>
   );
 };

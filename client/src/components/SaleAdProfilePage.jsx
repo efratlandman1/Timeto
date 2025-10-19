@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getToken } from '../utils/auth';
-import { FaMapMarkerAlt, FaPhoneAlt, FaWhatsapp, FaTags } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaPhoneAlt, FaWhatsapp, FaTags, FaTimes } from 'react-icons/fa';
 import '../styles/BusinessProfilePage.css';
+import '../styles/SuggestItemPage.css';
 
 const SaleAdProfilePage = () => {
   const { id } = useParams();
@@ -65,18 +66,17 @@ const SaleAdProfilePage = () => {
   
 
   return (
-    <div className="wide-page-container">
-      <div className="wide-page-content">
-        <div className="page-header">
-          <div className="page-header__content">
-            <h1>{ad.title}</h1>
-            <p>{ad.city}{ad.address ? `, ${ad.address}` : ''}</p>
-          </div>
+    <div className="modal-overlay-fixed" onClick={() => navigate(-1)}>
+      <div className="modal-container suggest-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="sale-modal-title">
+        <div className="modal-header">
+          <button className="modal-close" aria-label="Close" onClick={() => navigate(-1)}><FaTimes /></button>
+          <h1 id="sale-modal-title" className="login-title suggest-modal-title">{ad.title}</h1>
         </div>
 
-        <div className="two-column-section">
-          {/* Images Left */}
-          <div className="column-card">
+        {/* In modal view, show contact below the image for less scrolling and better fit */}
+        <div className="two-column-section" style={{ display: 'block' }}>
+          {/* Image Top */}
+          <div className="column-card" style={{ marginBottom: 16 }}>
             <div style={{ position: 'relative', minHeight: 360 }}>
               {selectedImage ? (
                 <div style={{ height: 360, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa', borderRadius: 12 }}>
@@ -144,9 +144,9 @@ const SaleAdProfilePage = () => {
             )}
           </div>
 
-          {/* Contact + Details Right */}
+          {/* Contact + Details Below */}
           <div className="column-card">
-            <div className="contact-grid">
+            <div className="contact-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 12 }}>
               {(ad.address || ad.city) && (
                 <div className="contact-card">
                   <a

@@ -415,10 +415,10 @@ const Header = () => {
                                 ref={createButtonRef}
                                 aria-expanded={showCreateMenu}
                                 aria-haspopup="true"
-                                title="צור חדש"
+                                title={t('userBusinesses.create')}
                             >
                                 <FaPlus />
-                                צור
+                                {t('userBusinesses.create')}
                             </button>
                             {showCreateMenu && (
                                 <div 
@@ -434,7 +434,7 @@ const Header = () => {
                                         role="menuitem"
                                     >
                                         <FaStore />
-                                        הוספת עסק
+                                        {t('userBusinesses.createOptions.addBusiness')}
                                     </button>
                                     <button 
                                         className={dropdownItemClass} 
@@ -442,7 +442,7 @@ const Header = () => {
                                         role="menuitem"
                                     >
                                         <FaTags />
-                                        מודעת מכירה
+                                        {t('userBusinesses.createOptions.saleAd')}
                                     </button>
                                     <button 
                                         className={dropdownItemClass} 
@@ -450,7 +450,7 @@ const Header = () => {
                                         role="menuitem"
                                     >
                                         <FaBullhorn />
-                                        מודעת פרסום
+                                        {t('userBusinesses.createOptions.promoAd')}
                                     </button>
                                 </div>
                             )}
@@ -544,7 +544,7 @@ const Header = () => {
                                             role="menuitem"
                                         >
                                             <FaIdCard />
-                                            הפרופיל שלי
+                                            {t('profile')}
                                         </button>
                                         <button 
                                             className={dropdownItemClass} 

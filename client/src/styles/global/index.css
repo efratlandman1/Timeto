@@ -197,6 +197,20 @@ body {
     flex-direction: row;
 }
 
+/* Force the close button to logical start (opposite of inline-end) */
+.modal-header .modal-close {
+    position: sticky;
+    top: 0;
+}
+.rtl .modal-header .modal-close {
+    inset-inline-start: 1rem; /* left in RTL */
+    inset-inline-end: auto;
+}
+.ltr .modal-header .modal-close {
+    inset-inline-end: 1rem; /* right in LTR */
+    inset-inline-start: auto;
+}
+
 .rtl .modal-footer {
     flex-direction: row-reverse;
 }

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getToken } from '../utils/auth';
-import { FaMapMarkerAlt } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaTimes } from 'react-icons/fa';
 import '../styles/BusinessProfilePage.css';
+import '../styles/SuggestItemPage.css';
 
 const PromoAdProfilePage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [ad, setAd] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -49,48 +51,23 @@ const PromoAdProfilePage = () => {
   }
 
   return (
-    <div className="wide-page-container">
-      <div className="wide-page-content">
-        <div className="page-header">
-          <div className="page-header__content">
-            <h1>{ad.title}</h1>
-            <p>{ad.city}{ad.address ? `, ${ad.address}` : ''}</p>
-          </div>
+    <div className="modal-overlay-fixed" onClick={() => navigate(-1)}>
+      <div className="modal-container suggest-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="promo-modal-title">
+        <div className="modal-header">
+          <button className="modal-close" aria-label="Close" onClick={() => navigate(-1)}><FaTimes /></button>
+          <h1 id="promo-modal-title" className="login-title suggest-modal-title">{ad.title}</h1>
         </div>
-
-        {/* Image as the main content */}
-        <div className="rounded overflow-hidden border">
+        <div className="rounded overflow-hidden border" style={{ width: '100%', height: 360, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa' }}>
           {ad.image ? (
             <img
               src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${ad.image}`}
               alt={ad.title}
-              className="w-full object-cover"
+              style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }}
             />
           ) : (
-            <div className="w-full h-72 flex items-center justify-center bg-gray-100">אין תמונה</div>
+            <div className="w-full h-full flex items-center justify-center bg-gray-100">אין תמונה</div>
           )}
         </div>
-
-        {/* Contact below the image */}
-        <div className="contact-section">
-          <div className="contact-grid">
-            {(ad.address || ad.city) && (
-              <div className="contact-card">
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${ad.address || ''} ${ad.city || ''}`.trim())}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="contact-icon"><FaMapMarkerAlt /></div>
-                  <span className="contact-label">כתובת</span>
-                  <span className="contact-value">{ad.address ? `${ad.address}, ` : ''}{ad.city}</span>
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Removed details section per request - only contact info remains */}
       </div>
     </div>
   );

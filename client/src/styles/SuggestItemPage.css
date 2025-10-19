@@ -220,13 +220,21 @@
   padding-bottom: 1rem; /* space after last element */
 }
 
+/* Ensure logical directions are respected for inline positioning (X button) */
+.rtl .modal-container.suggest-modal { direction: rtl; }
+.ltr .modal-container.suggest-modal { direction: ltr; }
+
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  padding: 1rem 1.25rem 0 1.25rem;
+  position: sticky;
+  top: 0;
+  padding: 0.75rem 1.25rem 0.25rem 1.25rem;
   border-bottom: none;
+  background: #fff;
+  z-index: 2;
+  direction: inherit; /* mirror inline-start/end from container */
 }
 
 .modal-header h1 { font-size: 1.35rem; margin: 0; font-weight: 700; width: 100%; text-align: end; }
@@ -261,11 +269,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  position: absolute;
-  inset-inline-end: 1rem; /* RTL -> left, LTR -> right */
+  position: absolute; /* pin relative to header */
   top: 1rem;
 }
 .modal-close:hover { background: #f2f2f2; color: #666; }
+
+/* Mirror close button to logical start/end based on direction */
+.rtl .modal-header .modal-close { inset-inline-start: 1rem; inset-inline-end: auto; }
+.ltr .modal-header .modal-close { inset-inline-end: 1rem; inset-inline-start: auto; }
 
 /* Add comfortable horizontal padding for inner content */
 .suggest-modal .section-card,

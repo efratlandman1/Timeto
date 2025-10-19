@@ -70,6 +70,9 @@ function AppRoutes() {
             {state?.background && (
                 <Routes>
                     <Route path="/suggest-item" element={<SuggestItemPage />} />
+                    <Route path="/business-profile/:id" element={<BusinessProfilePage />} />
+                    <Route path="/ads/sale/:id" element={<SaleAdProfilePage />} />
+                    <Route path="/ads/promo/:id" element={<PromoAdProfilePage />} />
                 </Routes>
             )}
         </>

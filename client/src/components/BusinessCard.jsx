@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import FeedbackPage from './FeedbackPage';
 import {
   FaPencilAlt, FaPhone, FaWhatsapp, FaEnvelope,
@@ -17,6 +17,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [localActive, setLocalActive] = useState(business.active);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -127,7 +128,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
 
   const handleCardClick = () => {
     if (localActive) {
-      navigate(`/business-profile/${business._id}`);
+      navigate(`/business-profile/${business._id}`, { state: { background: location } });
     }
   };
 

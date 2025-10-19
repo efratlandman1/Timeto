@@ -61,6 +61,11 @@
     font-size: 1.2rem;
     opacity: 0.8;
 }
+/* LTR/RTL mirroring for input icons and padding */
+.ltr .login-input-icon { right: 16px; left: auto; }
+.rtl .login-input-icon { left: 16px; right: auto; }
+.ltr .login-input { padding-inline-end: 3rem; padding-inline-start: 1rem; text-align: left; }
+.rtl .login-input { padding-inline-start: 3rem; padding-inline-end: 1rem; text-align: right; }
 
 .login-input {
     width: 100%;
@@ -108,6 +113,8 @@
     transform: translateY(-50%);
     z-index: 2;
 }
+.ltr .login-input-icon.inside-prefix { right: 12px; left: auto; }
+.rtl .login-input-icon.inside-prefix { left: 12px; right: auto; }
 
 .login-input-wrapper.phone-split .phone-prefix-wrapper {
     position: relative;
@@ -212,6 +219,8 @@
     font-size: 1.2rem;
     transition: color 0.3s ease;
 }
+.ltr .login-password-toggle { right: 16px; left: auto; }
+.rtl .login-password-toggle { left: 16px; right: auto; }
 
 .login-password-toggle:hover {
     color: #d32f2f;

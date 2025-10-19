@@ -55,6 +55,7 @@ const CreatePromoAdPage = () => {
       setCity(stateAd.city || '');
       setValidFrom(stateAd.validFrom ? new Date(stateAd.validFrom).toISOString().slice(0,16) : '');
       setValidTo(stateAd.validTo ? new Date(stateAd.validTo).toISOString().slice(0,16) : '');
+      if (stateAd.image) setImage(stateAd.image);
       return;
     }
     (async () => {
@@ -67,6 +68,7 @@ const CreatePromoAdPage = () => {
           setCity(a.city || '');
           setValidFrom(a.validFrom ? new Date(a.validFrom).toISOString().slice(0,16) : '');
           setValidTo(a.validTo ? new Date(a.validTo).toISOString().slice(0,16) : '');
+          if (a.image) setImage(a.image);
         }
       } catch {}
     })();
@@ -79,7 +81,8 @@ const CreatePromoAdPage = () => {
     fd.append('city', city);
     fd.append('validFrom', validFrom);
     fd.append('validTo', validTo);
-    if (image) fd.append('image', image);
+    // Append image only if a new File was chosen; keep existing string filename as-is
+    if (image && typeof image !== 'string') fd.append('image', image);
     const editId = searchParams.get('edit');
     let res;
     if (editId) {

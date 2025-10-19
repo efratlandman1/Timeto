@@ -1,11 +1,12 @@
 import React from 'react';
 import '../styles/businessCard.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getToken } from '../utils/auth';
 import { FaPencilAlt, FaTrash, FaRecycle, FaHeart } from 'react-icons/fa';
 
 const PromoAdCard = ({ ad, onFavoriteRemoved }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isFavorite, setIsFavorite] = React.useState(ad.isFavorite || false);
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const [localActive, setLocalActive] = React.useState(ad.active !== false);
@@ -43,7 +44,7 @@ const PromoAdCard = ({ ad, onFavoriteRemoved }) => {
   };
 
   return (
-    <div className={`business-card promo ${!localActive ? 'inactive' : ''}`} role="article" aria-label={ad.title} onClick={() => navigate(`/ads/promo/${ad._id}`)} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/ads/promo/${ad._id}`); }}>
+    <div className={`business-card promo ${!localActive ? 'inactive' : ''}`} role="article" aria-label={ad.title} onClick={() => navigate(`/ads/promo/${ad._id}`, { state: { background: location } })} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/ads/promo/${ad._id}`, { state: { background: location } }); }}>
       <div className="business-card-image-container" style={{ background: '#ffffff' }}>
         {ad.image ? (
           <img className="business-card-image" src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${ad.image}`} alt={ad.title} />

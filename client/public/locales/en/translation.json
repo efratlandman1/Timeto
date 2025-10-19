@@ -23,6 +23,7 @@
       "sub": "Business Directory"
     },
     "myLocation": "My Location",
+    "locationShort": "Location",
     "currentLocation": "Your Current Location",
     "loadingAddress": "Loading address...",
     "addressNotFound": "Address not found",
