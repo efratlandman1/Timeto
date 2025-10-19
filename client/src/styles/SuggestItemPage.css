@@ -208,10 +208,26 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 1rem 1.25rem 0.25rem 1.25rem;
+  padding: 1rem 1.25rem 0 1.25rem;
+  border-bottom: none;
 }
 
 .modal-header h1 { font-size: 1.35rem; margin: 0; font-weight: 700; width: 100%; text-align: end; }
+
+/* Match profile page title spacing */
+.suggest-modal-title {
+  text-align: center;
+  display: block;
+  margin: 0 auto 1.5rem auto;
+  width: 100%;
+}
+
+/* Ensure center alignment cannot be overridden by other title styles */
+.modal-container.suggest-modal h1.suggest-modal-title {
+  text-align: center !important;
+  display: block;
+  margin: 0 auto 0.5rem auto;
+}
 .modal-subtitle { margin: 0; color: #555; }
 
 .modal-close {

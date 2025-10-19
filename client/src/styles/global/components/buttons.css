@@ -33,7 +33,9 @@
 
 /* Above Header Navigation Button */
 .nav-button.above-header {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem; /* slightly tighter gap */
+    display: inline-flex;
+    float: inline-start; /* start side: RTL->right, LTR->left */
 }
 
 .nav-button.primary {

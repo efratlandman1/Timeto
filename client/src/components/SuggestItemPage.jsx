@@ -124,12 +124,9 @@ const SuggestItemPage = () => {
     <div className="modal-overlay-fixed" onClick={handleClose}>
       <div className="modal-container suggest-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="suggest-modal-title">
         <div className="modal-header">
-          <div className="page-header__content" style={{ width: '100%' }}>
-            <h1 id="suggest-modal-title">{t('suggestItem.title')}</h1>
-            <p className="modal-subtitle page-header__subtitle">{t('suggestItem.description')}</p>
-          </div>
           <button className="modal-close" aria-label={t('common.cancel')} onClick={handleClose}><FaTimes /></button>
         </div>
+        <h1 id="suggest-modal-title" className="login-title suggest-modal-title">{t('suggestItem.title')}</h1>
 
         <form className="suggest-form" onSubmit={handleSubmit}>
           <div className="form-group">

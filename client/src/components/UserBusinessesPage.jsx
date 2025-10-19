@@ -107,8 +107,7 @@ const UserBusinessesPage = () => {
                 
                 <div className="page-header">
                     <div className="page-header__content">
-                        <h1>{t('userBusinesses.title')}</h1>
-                        <p>{t('userBusinesses.subtitle')}</p>
+                        <h1 className="login-title">{t('userBusinesses.title')}</h1>
                     </div>
                     <div className="page-header__action" ref={createMenuRef} style={{ position: 'relative' }}>
                         <button 

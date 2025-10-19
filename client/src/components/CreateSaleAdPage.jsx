@@ -149,12 +149,7 @@ const CreateSaleAdPage = () => {
           <FaArrowRight className="icon" />
           {isEditMode ? 'חזרה לעסקים שלי' : 'חזרה לעמוד הבית'}
         </button>
-        <div className="page-header">
-          <div className="page-header__content vertical">
-            <h1>יצירת מודעת מכירה</h1>
-            <p>מלאי את פרטי המודעה באופן קצר וקולע</p>
-          </div>
-        </div>
+        <h1 className="login-title" style={{ textAlign: 'center', marginTop: '8px' }}>הוספת מודעת מכירה</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">כותרת <span className="required-asterisk">*</span></label>

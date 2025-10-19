@@ -390,12 +390,7 @@ const EditBusinessPage = () => {
           {t('common.backToMyBusinesses')}
         </button>
         
-        <div className="page-header">
-          <div className="page-header__content vertical">
-            <h1>{selectedBusiness ? t('businessForm.title.edit') : t('businessForm.title.new')}</h1>
-            <p>{t('businessForm.subtitle')}</p>
-          </div>
-        </div>
+        <h1 className="login-title" style={{ textAlign: 'center', marginTop: '8px' }}>{selectedBusiness ? t('businessForm.title.edit') : t('businessForm.title.new')}</h1>
 
         <StepsProvider>
           <MySteps

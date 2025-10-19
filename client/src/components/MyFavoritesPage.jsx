@@ -101,13 +101,12 @@ const MyFavoritesPage = () => {
             <div className="wide-page-content">
                 <button className="nav-button above-header" onClick={() => navigate('/')}>
                     <FaArrowRight className="icon" />
-                    חזרה לדף הבית
+                    {t('common.backToHome')}
                 </button>
                 
                 <div className="page-header">
                     <div className="page-header__content vertical">
-                        <h1>{t('favorites.title')}</h1>
-                        {subtitle && <p>{subtitle}</p>}
+                        <h1 className="login-title">{t('favorites.title')}</h1>
                     </div>
                 </div>
 
