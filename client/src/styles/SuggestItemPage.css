@@ -204,6 +204,7 @@
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -213,12 +214,18 @@
 .modal-container.suggest-modal {
   background: #fff;
   width: min(600px, 95vw);
+  max-width: min(600px, 95vw);
   max-height: 90vh;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   overflow: auto;
   padding-bottom: 1rem; /* space after last element */
 }
+
+/* Ensure all corners render rounded in all directions */
+/* .modal-container.suggest-modal, .modal-container.suggest-modal * {
+  background-clip: padding-box;
+} */
 
 /* Ensure logical directions are respected for inline positioning (X button) */
 .rtl .modal-container.suggest-modal { direction: rtl; }
@@ -236,6 +243,9 @@
   z-index: 2;
   direction: inherit; /* mirror inline-start/end from container */
 }
+
+/* Add inner scroll wrapper to avoid content touching rounded corners */
+.modal-body-scroll { padding: 0 1rem 1rem; }
 
 .modal-header h1 { font-size: 1.35rem; margin: 0; font-weight: 700; width: 100%; text-align: end; }
 
@@ -273,10 +283,16 @@
   top: 1rem;
 }
 .modal-close:hover { background: #f2f2f2; color: #666; }
+/* Ensure X pins to correct side tightly */
+
+/* Use document direction attribute to ensure flipping works globally */
+html[dir="rtl"] .modal-header .modal-close { inset-inline-start: 1rem; inset-inline-end: auto; left: 1rem; right: auto; }
+html[dir="ltr"] .modal-header .modal-close { inset-inline-end: 1rem; inset-inline-start: auto; right: 1rem; left: auto; }
 
 /* Mirror close button to logical start/end based on direction */
-.rtl .modal-header .modal-close { inset-inline-start: 1rem; inset-inline-end: auto; }
-.ltr .modal-header .modal-close { inset-inline-end: 1rem; inset-inline-start: auto; }
+/* Duplicate safety (can be merged) */
+html[dir="rtl"] .modal-header .modal-close { inset-inline-start: 1rem; inset-inline-end: auto; left: 1rem; right: auto; }
+html[dir="ltr"] .modal-header .modal-close { inset-inline-end: 1rem; inset-inline-start: auto; right: 1rem; left: auto; }
 
 /* Add comfortable horizontal padding for inner content */
 .suggest-modal .section-card,

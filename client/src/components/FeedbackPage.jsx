@@ -3,8 +3,8 @@ import axios from 'axios';
 import { FaRegStar, FaStar, FaTimes } from 'react-icons/fa';
 import ReactDOM from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import '../styles/FeedbackPage.css';
-import '../styles/SuggestItemPage.css';
+// import '../styles/FeedbackPage.css';
+// import '../styles/SuggestItemPage.css';
 import {getToken} from "../utils/auth";
 
 const Toast = ({ message, isError, onClose }) => {

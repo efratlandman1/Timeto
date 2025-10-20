@@ -141,7 +141,8 @@ const UserBusinessesPage = () => {
                     </div>
                 </div>
 
-                {/* Segmented tabs like MyFavorites */}
+                {/* Segmented tabs like MyFavorites - render only once data is loaded */}
+                {!loading && (
                 <div className="favorites-tabs" role="tablist" aria-label={t('userBusinesses.tabs.aria')}>
                     <button className={`favorites-tab ${activeTab==='business'?'active':''}`} role="tab" aria-selected={activeTab==='business'} onClick={() => setActiveTab('business')}>
                         {t('userBusinesses.tabs.business')} <span className="count">({counts.business})</span>
@@ -156,6 +157,7 @@ const UserBusinessesPage = () => {
                         {t('userBusinesses.tabs.all')} <span className="count">({counts.all})</span>
                     </button>
                 </div>
+                )}
 
                 <div className="business-cards-grid">
                     {loading ? (

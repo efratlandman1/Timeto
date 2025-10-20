@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getToken } from '../utils/auth';
-import { FaMapMarkerAlt, FaPhoneAlt, FaWhatsapp, FaTags, FaTimes } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaPhoneAlt, FaWhatsapp, FaTags, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import '../styles/BusinessProfilePage.css';
 import '../styles/SuggestItemPage.css';
 
 const SaleAdProfilePage = () => {
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [ad, setAd] = useState(null);
@@ -93,7 +95,7 @@ const SaleAdProfilePage = () => {
                 <>
                   <button
                     type="button"
-                    aria-label="תמונה קודמת"
+                    aria-label={t('common.prevImage', 'Previous image')}
                     className="category-arrow left"
                     style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', width: 48, height: 48, fontSize: 22 }}
                     onClick={() => {
@@ -102,11 +104,11 @@ const SaleAdProfilePage = () => {
                       setSelectedImage(images[next]);
                     }}
                   >
-                    ›
+                    <FaChevronLeft />
                   </button>
                   <button
                     type="button"
-                    aria-label="תמונה הבאה"
+                    aria-label={t('common.nextImage', 'Next image')}
                     className="category-arrow right"
                     style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 48, height: 48, fontSize: 22 }}
                     onClick={() => {
@@ -115,7 +117,7 @@ const SaleAdProfilePage = () => {
                       setSelectedImage(images[next]);
                     }}
                   >
-                    ‹
+                    <FaChevronRight />
                   </button>
                 </>
               )}
@@ -155,7 +157,7 @@ const SaleAdProfilePage = () => {
                     rel="noopener noreferrer"
                   >
                     <div className="contact-icon"><FaMapMarkerAlt /></div>
-                    <span className="contact-label">כתובת</span>
+                    <span className="contact-label">{t('common.address', 'Address')}</span>
                     <span className="contact-value">{ad.address ? `${ad.address}, ` : ''}{ad.city}</span>
                   </a>
                 </div>
@@ -165,7 +167,7 @@ const SaleAdProfilePage = () => {
                 <div className="contact-card">
                   <a href={`tel:${(ad.prefix || '')}${ad.phone}`}>
                     <div className="contact-icon"><FaPhoneAlt /></div>
-                    <span className="contact-label">טלפון</span>
+                    <span className="contact-label">{t('common.phone', 'Phone')}</span>
                     <span className="contact-value">{(ad.prefix || '')}{ad.phone}</span>
                   </a>
                 </div>
@@ -179,7 +181,7 @@ const SaleAdProfilePage = () => {
                     rel="noopener noreferrer"
                   >
                     <div className="contact-icon"><FaWhatsapp /></div>
-                    <span className="contact-label">WhatsApp</span>
+                    <span className="contact-label">{t('common.whatsapp', 'WhatsApp')}</span>
                     <span className="contact-value">{(ad.prefix || '')}{ad.phone}</span>
                   </a>
                 </div>
@@ -188,14 +190,14 @@ const SaleAdProfilePage = () => {
 
             <div className="info-card-header" style={{ marginTop: '16px' }}>
               <FaTags />
-              <h3 className="info-card-title">פרטים</h3>
+              <h3 className="info-card-title">{t('common.details', 'Details')}</h3>
             </div>
             <div className="services-grid">
               {ad.categoryId?.name && (
-                <div className="service-tag">קטגוריה: {ad.categoryId.name}</div>
+                <div className="service-tag">{t('common.category', 'Category')}: {ad.categoryId.name}</div>
               )}
               {ad.price !== undefined && (
-                <div className="service-tag">מחיר: {ad.price} {ad.currency || 'ILS'}</div>
+                <div className="service-tag">{t('common.price', 'Price')}: {ad.price} {ad.currency || 'ILS'}</div>
               )}
             </div>
           </div>

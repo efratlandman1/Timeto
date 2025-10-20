@@ -451,6 +451,22 @@
     "loading": "Loading business details...",
     "error": "Error"
   },
+  "business": {
+    "services": "Services",
+    "feedback": {
+      "title": "Ratings & Reviews",
+      "add": "Add feedback",
+      "avg": "Average rating",
+      "total": "Total reviews",
+      "anonymous": "Anonymous"
+    },
+    "contact": {
+      "address": "Address",
+      "phone": "Phone",
+      "whatsapp": "WhatsApp",
+      "email": "Email"
+    }
+  },
   "searchResults": {
     "title": "Search Results",
     "noResults": "No results found",

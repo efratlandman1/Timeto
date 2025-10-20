@@ -110,7 +110,8 @@ const MyFavoritesPage = () => {
                     </div>
                 </div>
 
-                {/* Segmented tabs */}
+                {/* Segmented tabs - show only after initial load */}
+                {!loading && (
                 <div className="favorites-tabs" role="tablist" aria-label="favorites categories">
                     <button className={`favorites-tab ${activeTab==='all'?'active':''}`} role="tab" aria-selected={activeTab==='all'} onClick={() => setActiveTab('all')}>
                         {t('favorites.tabs.all')} <span className="count">({counts.all})</span>
@@ -125,6 +126,7 @@ const MyFavoritesPage = () => {
                         {t('favorites.tabs.promo')} <span className="count">({counts.promo})</span>
                     </button>
                 </div>
+                )}
 
                 {items.length === 0 ? (
                     <div className="empty-state">

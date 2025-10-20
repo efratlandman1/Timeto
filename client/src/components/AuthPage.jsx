@@ -11,7 +11,7 @@ import { FaTimes } from 'react-icons/fa';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const AuthPage = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -115,9 +115,12 @@ const AuthPage = () => {
                               useOneTap
                               shape="pill"
                               width="300"
+                              locale={i18n.language === 'he' ? 'he' : 'en'}
                           />
                         </div>
                         <div className="divider">{t('auth.login.simpleLoginWithEmail')}</div>
+                        {/* Force Google translation via data attributes (fallback) */}
+                        <script dangerouslySetInnerHTML={{__html: `try { var el=document.querySelector('div[role="dialog"] .google-login-center'); if(el){ el.setAttribute('data-lang', '${i18n.language==='he'?'he':'en'}'); } } catch(e){}`}} />
                         <form onSubmit={handleSubmit} className="email-form" style={{marginInline:'1.25rem'}}>
                             <input
                                 type="email"

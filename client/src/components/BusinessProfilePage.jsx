@@ -13,7 +13,7 @@ import { roundRating, renderStars } from '../utils/ratingUtils';
 const daysMap = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
 const BusinessProfilePage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [business, setBusiness] = useState(null);
@@ -94,11 +94,13 @@ const BusinessProfilePage = () => {
 
   return (
     <div className="modal-overlay-fixed" onClick={() => navigate(-1)}>
-      <div className="modal-container suggest-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="business-modal-title">
+      <div className="modal-container suggest-modal business-profile-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="business-modal-title">
         <div className="modal-header">
           <button className="modal-close" aria-label="Close" onClick={() => navigate(-1)}><FaTimes /></button>
           <h1 id="business-modal-title" className="login-title suggest-modal-title">{business.name}</h1>
         </div>
+
+      <div className="modal-body-scroll">
 
       <div className="business-hero">
         <img
@@ -128,7 +130,7 @@ const BusinessProfilePage = () => {
               <div className="contact-icon">
                 <FaMapMarkerAlt />
               </div>
-              <span className="contact-label">כתובת</span>
+              <span className="contact-label">{t('business.contact.address', 'כתובת')}</span>
               <span className="contact-value">{business.address}</span>
             </a>
           </div>
@@ -138,7 +140,7 @@ const BusinessProfilePage = () => {
               <div className="contact-icon">
                 <FaPhoneAlt />
               </div>
-              <span className="contact-label">טלפון</span>
+              <span className="contact-label">{t('business.contact.phone', 'טלפון')}</span>
               <span className="contact-value">{business.phone}</span>
             </a>
           </div>
@@ -150,7 +152,7 @@ const BusinessProfilePage = () => {
               <div className="contact-icon">
                 <FaWhatsapp />
               </div>
-              <span className="contact-label">WhatsApp</span>
+              <span className="contact-label">{t('business.contact.whatsapp', 'WhatsApp')}</span>
               <span className="contact-value">{business.phone}</span>
             </a>
           </div>
@@ -161,7 +163,7 @@ const BusinessProfilePage = () => {
                 <div className="contact-icon">
                   <FaEnvelope />
                 </div>
-                <span className="contact-label">אימייל</span>
+                <span className="contact-label">{t('business.contact.email', 'אימייל')}</span>
                 <span className="contact-value">{business.email}</span>
               </a>
             </div>
@@ -201,7 +203,7 @@ const BusinessProfilePage = () => {
         <div className="column-card">
           <div className="info-card-header">
             <FaTags />
-            <h3 className="info-card-title">שירותים</h3>
+            <h3 className="info-card-title">{t('business.services', 'Services')}</h3>
           </div>
           <div className="services-grid">
             {business.services?.map((service, index) => (
@@ -215,11 +217,11 @@ const BusinessProfilePage = () => {
 
       {/* Feedback Section - Full Width */}
       <div className="feedback-section">
-        <div className="feedback-header" dir={document?.documentElement?.dir || 'rtl'}>
-          <h2>דירוגים ופידבקים</h2>
+        <div className="feedback-header" dir={i18n.dir()}>
+          <h2>{t('business.feedback.title', 'Ratings & Reviews')}</h2>
           <button className="add-feedback-button" onClick={() => setShowFeedbackModal(true)}>
             <FaRegStar />
-            הוסף פידבק
+            {t('business.feedback.add', 'Add feedback')}
           </button>
         </div>
 
@@ -233,11 +235,11 @@ const BusinessProfilePage = () => {
               <div className="stat-card">
                 <div className="stat-number">{roundRating(averageRating)}</div>
                 <div className="rating-stars">{renderRatingStars(averageRating)}</div>
-                <div className="stat-label">דירוג ממוצע</div>
+                <div className="stat-label">{t('business.feedback.avg', 'Average rating')}</div>
               </div>
               <div className="stat-card">
                 <div className="stat-number">{totalReviews}</div>
-                <div className="stat-label">סך הכל ביקורות</div>
+                <div className="stat-label">{t('business.feedback.total', 'Total reviews')}</div>
               </div>
             </div>
 
@@ -250,7 +252,7 @@ const BusinessProfilePage = () => {
                 return (
                   <div key={index} className="feedback-card">
                     <div className="feedback-card-header">
-                      <span className="feedback-author">{feedback.user_id?.nickname || 'אננימי'}</span>
+                      <span className="feedback-author">{feedback.user_id?.nickname || t('business.feedback.anonymous', 'Anonymous')}</span>
                       <span className="feedback-date">
                         {new Date(feedback.createdAt).toLocaleDateString('he-IL', {
                           year: 'numeric',
@@ -298,6 +300,7 @@ const BusinessProfilePage = () => {
           onClose={handleFeedbackClose}
         />
       )}
+      </div>
       </div>
     </div>
   );

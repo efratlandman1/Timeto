@@ -529,7 +529,8 @@ const SearchResultPage = () => {
                     );
                 })()}
 
-                {/* Tabs for result types */}
+                {/* Tabs for result types - render only when lists are ready (not loading after first fetch) */}
+                {!isLoading && (
                 <div className="favorites-tabs" role="tablist" aria-label={t('userBusinesses.tabs.aria')}>
                     <button className={`favorites-tab ${activeTab==='all'?'active':''}`} role="tab" aria-selected={activeTab==='all'} onClick={() => handleTabChange('all')}>
                         {t('favorites.tabs.all')} <span className="count">({filteredBusinesses.length + filteredSaleAds.length + filteredPromoAds.length})</span>
@@ -544,6 +545,7 @@ const SearchResultPage = () => {
                         {t('favorites.tabs.promo')} <span className="count">({filteredPromoAds.length})</span>
                     </button>
                 </div>
+                )}
 
                 {/* Results */}
                 <div className="search-results-layout">

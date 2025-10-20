@@ -466,6 +466,22 @@
     "loading": "טוען פרטי עסק...",
     "error": "שגיאה"
   },
+  "business": {
+    "services": "שירותים",
+    "feedback": {
+      "title": "דירוגים ופידבקים",
+      "add": "הוסף פידבק",
+      "avg": "דירוג ממוצע",
+      "total": "סך הכל ביקורות",
+      "anonymous": "אנונימי"
+    },
+    "contact": {
+      "address": "כתובת",
+      "phone": "טלפון",
+      "whatsapp": "WhatsApp",
+      "email": "אימייל"
+    }
+  },
   "searchResults": {
     "title": "תוצאות חיפוש",
     "noResults": "לא נמצאו תוצאות",

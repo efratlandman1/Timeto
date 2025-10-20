@@ -17,19 +17,16 @@
 /* Force feedback modal container to exactly match suggest-modal width */
 .feedback-modal {
   width: min(600px, 95vw) !important;
+  max-width: min(600px, 95vw) !important;
   max-height: 90vh !important;
   border-radius: 12px !important;
   overflow: auto !important;
+  box-sizing: border-box;
+  margin: 0 !important;
 }
 
-.feedback-page-modal {
-  width: min(600px, 95vw);
-  max-height: 90vh;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  overflow: auto;
-}
+/* legacy modal class (unused) kept minimal to avoid overrides */
+.feedback-page-modal { width: auto; max-height: none; background: transparent; border-radius: 0; box-shadow: none; overflow: visible; }
 
 .feedback-page-content {
   position: relative;
