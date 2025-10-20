@@ -19,7 +19,8 @@ import {
     FaCog,
     FaIdCard,
     FaSyncAlt,
-    FaTimes
+    FaTimes,
+    FaBars
 } from "react-icons/fa";
 import "../styles/Header.css";
 import { useSelector, useDispatch } from 'react-redux';
@@ -29,8 +30,10 @@ import { logout } from '../redux/userSlice';
 import { fetchUserLocation } from '../redux/locationSlice';
 import { setLanguage, setDirection } from '../redux/uiSlice';
 import { changeLanguage, getCurrentDirection } from '../i18n';
+import { useResponsive } from '../utils/ResponsiveProvider';
 
 const Header = () => {
+    const { isMobile, isTablet } = useResponsive();
     const navigate = useNavigate();
     const location = useLocation();
     const [showUserMenu, setShowUserMenu] = useState(false);
@@ -56,6 +59,9 @@ const Header = () => {
     const popoverRef = useRef(null);
     const [createMenuStyle, setCreateMenuStyle] = useState({});
     const [popoverStyle, setPopoverStyle] = useState({});
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
+    const mobileMenuRef = useRef(null);
+    const mobileMenuBtnRef = useRef(null);
     
     // Get language and direction from Redux with fallback values
     const uiState = useSelector(state => state.ui);
@@ -135,6 +141,16 @@ const Header = () => {
             ) {
                 setShowCreateMenu(false);
             }
+
+            // Close mobile menu on outside click
+            if (
+                mobileMenuRef.current &&
+                !mobileMenuRef.current.contains(event.target) &&
+                mobileMenuBtnRef.current &&
+                !mobileMenuBtnRef.current.contains(event.target)
+            ) {
+                setShowMobileMenu(false);
+            }
         };
 
         const handleEscape = (event) => {
@@ -142,6 +158,7 @@ const Header = () => {
                 setShowUserMenu(false);
                 setShowLangMenu(false);
                 setShowCreateMenu(false);
+                setShowMobileMenu(false);
             }
         };
 
@@ -153,6 +170,16 @@ const Header = () => {
             document.removeEventListener("keydown", handleEscape);
         };
     }, []);
+
+    // Body scroll lock when mobile menu open
+    useEffect(() => {
+        if (showMobileMenu) {
+            document.body.classList.add('no-scroll');
+        } else {
+            document.body.classList.remove('no-scroll');
+        }
+        return () => document.body.classList.remove('no-scroll');
+    }, [showMobileMenu]);
 
     useEffect(() => {
         const token = getToken(); // Now getToken checks validity automatically
@@ -242,6 +269,10 @@ const Header = () => {
         const next = !showCreateMenu;
         setShowCreateMenu(next);
         if (next) updateCreateMenuPosition();
+    };
+
+    const handleToggleMobileMenu = () => {
+        setShowMobileMenu(prev => !prev);
     };
 
     const handleToggleLocationPopover = () => {
@@ -381,6 +412,7 @@ const Header = () => {
     const popoverActionsClass = `popover-actions ${isRTL ? 'rtl' : 'ltr'}`;
 
     return (
+        <>
         <div className={headerClass}>
             <nav className={navClass}>
                 <div className={navRightClass}>
@@ -390,6 +422,18 @@ const Header = () => {
                             <span className="logo-text-main">{t('header.logo.main')}</span>
                         </div>
                     </div>
+                    {(isMobile || isTablet) && (
+                        <button 
+                            className="mobile-menu-btn"
+                            aria-label="Menu"
+                            type="button"
+                            onClick={handleToggleMobileMenu}
+                            aria-expanded={showMobileMenu}
+                            ref={mobileMenuBtnRef}
+                        >
+                            {showMobileMenu ? <FaTimes /> : <FaBars />}
+                        </button>
+                    )}
                 </div>
 
                 <div className={navCenterClass}>
@@ -399,14 +443,14 @@ const Header = () => {
                             onClick={() => navigate("/")}
                         >
                             <FaHome />
-                            {t('header.home')}
+                            {!isMobile && t('header.home')}
                         </button>
                         <button 
                             className={`nav-button ${isActive("/search-results") ? "active" : ""}`} 
                             onClick={() => navigate("/search-results")}
                         >
                             <FaSearch />
-                            {t('header.search')}
+                            {!isMobile && t('header.search')}
                         </button>
                         {/* Removed sale/promo nav to simplify header */}
                         <button 
@@ -418,7 +462,7 @@ const Header = () => {
                                 title={t('userBusinesses.create')}
                             >
                                 <FaPlus />
-                                {t('userBusinesses.create')}
+                                {!isMobile && t('userBusinesses.create')}
                             </button>
                             {showCreateMenu && (
                                 <div 
@@ -469,7 +513,7 @@ const Header = () => {
                             ref={locationButtonRef}
                         >
                             <FaMapMarkerAlt />
-                            <span className="loc-label">{t('header.locationShort')}</span>
+                            {!isMobile && <span className="loc-label">{t('header.locationShort')}</span>}
                         </button>
                         {showPopover && (
                             <div ref={popoverRef} className={locationPopoverClass} style={popoverStyle}>
@@ -530,7 +574,7 @@ const Header = () => {
                                     aria-haspopup="true"
                                 >
                                     <FaUserCircle />
-                                    <span>{greeting} <span className="username">{username}</span></span>
+                                    {!isMobile && <span>{greeting} <span className="username">{username}</span></span>}
                                 </button>
                                 {showUserMenu && (
                                     <div 
@@ -587,7 +631,7 @@ const Header = () => {
                             <div className={authButtonsClass}>
                                 <button className="auth-button" onClick={() => navigate("/auth", { state: { background: location } })}>
                                     <FaSignInAlt />
-                                    {t('header.register')} / {t('header.login')}
+                                    {!isMobile && (<>{t('header.register')} / {t('header.login')}</>)}
                                 </button>
                             </div>
                         )
@@ -595,6 +639,64 @@ const Header = () => {
                 </div>
             </nav>
         </div>
+        {(isMobile || isTablet) && showMobileMenu && (
+            <div 
+                className={`mobile-menu ${direction}`} 
+                role="menu" 
+                aria-label="Mobile Menu"
+                ref={mobileMenuRef}
+            >
+                <button 
+                    className="mobile-menu-item"
+                    onClick={() => { setShowMobileMenu(false); navigate("/"); }}
+                >
+                    <FaHome />
+                    <span>{t('header.home')}</span>
+                </button>
+                <button 
+                    className="mobile-menu-item"
+                    onClick={() => { setShowMobileMenu(false); navigate("/search-results"); }}
+                >
+                    <FaSearch />
+                    <span>{t('header.search')}</span>
+                </button>
+                <div className="mobile-menu-section">
+                    <div className="mobile-menu-section-title">
+                        <FaPlus />
+                        <span>{t('userBusinesses.create')}</span>
+                    </div>
+                    <button 
+                        className="mobile-menu-item"
+                        onClick={() => { setShowMobileMenu(false); navigate("/business"); }}
+                    >
+                        <FaStore />
+                        <span>{t('userBusinesses.createOptions.addBusiness')}</span>
+                    </button>
+                    <button 
+                        className="mobile-menu-item"
+                        onClick={() => { setShowMobileMenu(false); navigate("/ads/sale/new"); }}
+                    >
+                        <FaTags />
+                        <span>{t('userBusinesses.createOptions.saleAd')}</span>
+                    </button>
+                    <button 
+                        className="mobile-menu-item"
+                        onClick={() => { setShowMobileMenu(false); navigate("/ads/promo/new"); }}
+                    >
+                        <FaBullhorn />
+                        <span>{t('userBusinesses.createOptions.promoAd')}</span>
+                    </button>
+                </div>
+                <button 
+                    className="mobile-menu-item"
+                    onClick={() => { setShowMobileMenu(false); navigate("/suggest-item", { state: { background: location } }); }}
+                >
+                    <FaLightbulb />
+                    <span>{t('header.suggest')}</span>
+                </button>
+            </div>
+        )}
+        </>
     );
 };
 

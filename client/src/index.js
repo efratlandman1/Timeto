@@ -7,6 +7,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import './i18n';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { ResponsiveProvider } from './utils/ResponsiveProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,7 +15,9 @@ root.render(
         {/* <Suspense fallback="Loading..."> */}
             <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
                 <Provider store={store}>
-                    <App />
+                    <ResponsiveProvider>
+                        <App />
+                    </ResponsiveProvider>
                 </Provider>
         {/* </Suspense> */}
             </GoogleOAuthProvider>
