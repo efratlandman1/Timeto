@@ -88,6 +88,20 @@ body {
     margin-top: 60px; /* Add margin to prevent content from being hidden behind fixed header */
 }
 
+/* Constrain native date/datetime pickers and popovers within viewport */
+input[type="date"],
+input[type="datetime-local"] {
+    max-width: 100%;
+}
+
+/* iOS/Safari date picker popover containment hint */
+.narrow-page-content,
+.wide-page-content {
+    position: relative;
+    /* Allow native date pickers to overflow outside without being clipped */
+    overflow-x: visible;
+}
+
 /* Complete Layout Mirroring Classes */
 .rtl {
     direction: rtl;
@@ -239,12 +253,15 @@ select[name="phonePrefix"],
 .phone-prefix-select {
     direction: ltr !important;
     text-align: left !important;
+    max-width: 88px;
+    font-size: 0.9rem;
 }
 select#phonePrefix option,
 select[name="phonePrefix"] option,
 .phone-prefix-select option {
     direction: ltr !important;
     text-align: left !important;
+    font-size: 0.9rem;
 }
 
 /* RTL/LTR Table Mirroring */

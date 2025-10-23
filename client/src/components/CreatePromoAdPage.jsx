@@ -118,7 +118,7 @@ const CreatePromoAdPage = () => {
             <label className="form-label">כותרת <span className="required-asterisk">*</span></label>
             <input className="form-input" value={title} onChange={e => setTitle(e.target.value)} required />
           </div>
-          <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="form-group two-col-grid">
             <div>
               <label className="form-label">עיר/אזור <span className="required-asterisk">*</span></label>
               {mapsLoaded ? (
@@ -142,7 +142,7 @@ const CreatePromoAdPage = () => {
               />
             </div>
           </div>
-          <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="form-group two-col-grid date-grid">
             <div>
               <label className="form-label">תאריך התחלה <span className="required-asterisk">*</span></label>
               <input className="form-input" type="datetime-local" value={validFrom} onChange={e => setValidFrom(e.target.value)} required />

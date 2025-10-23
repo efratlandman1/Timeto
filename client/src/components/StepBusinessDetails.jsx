@@ -122,8 +122,8 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
             name="prefix"
             value={businessData.prefix || ''}
             onChange={handleChange}
-            className="form-input"
-            style={{ width: '80px', textAlign: 'center' }}
+            className="form-input phone-prefix-select"
+            style={{ width: '72px', textAlign: 'center' }}
             required
           >
             <option value="">{t('common.select')}</option>

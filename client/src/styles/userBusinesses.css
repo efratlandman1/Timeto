@@ -29,6 +29,8 @@
     padding: 6px;
     margin: 8px 0 0;
     box-sizing: border-box;
+    overflow: hidden;
+    max-width: 100%;
 }
 
 .favorites-tab {
@@ -43,6 +45,27 @@
     white-space: nowrap;
     font-size: inherit; /* respects global text size (accessibility) */
     line-height: 1.4;
+}
+/* Mobile: horizontal scrollable tabs */
+@media (max-width: 768px) {
+  .favorites-tabs {
+    display: block; /* change to block to allow horizontal scroller */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    padding: 6px;
+    max-width: 100%;
+  }
+  .favorites-tabs::-webkit-scrollbar { display: none; }
+  .favorites-tab {
+    display: inline-block;
+    margin-inline: 4px;
+    padding: 8px 12px;
+    font-size: 0.95rem;
+  }
+
+  /* Prevent the main layout from scrolling horizontally when tabs overflow */
+  .wide-page-content { overflow-x: hidden; }
 }
 
 .favorites-tab .count { color: #b71c1c; margin-inline-start: 6px; font-weight: 600; }

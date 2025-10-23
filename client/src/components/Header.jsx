@@ -58,10 +58,12 @@ const Header = () => {
     const [addressError, setAddressError] = useState('');
     const popoverRef = useRef(null);
     const [createMenuStyle, setCreateMenuStyle] = useState({});
+    const [userMenuStyle, setUserMenuStyle] = useState({});
     const [popoverStyle, setPopoverStyle] = useState({});
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const mobileMenuRef = useRef(null);
     const mobileMenuBtnRef = useRef(null);
+    const [mobileCreateOpen, setMobileCreateOpen] = useState(false);
     
     // Get language and direction from Redux with fallback values
     const uiState = useSelector(state => state.ui);
@@ -159,6 +161,7 @@ const Header = () => {
                 setShowLangMenu(false);
                 setShowCreateMenu(false);
                 setShowMobileMenu(false);
+                setMobileCreateOpen(false);
             }
         };
 
@@ -280,6 +283,60 @@ const Header = () => {
         setShowPopover(next);
         if (next) updatePopoverPosition();
     };
+
+    const handleToggleMobileCreate = () => {
+        setMobileCreateOpen(prev => !prev);
+    };
+
+    // Ensure user menu stays inside viewport
+    useEffect(() => {
+        if (!showUserMenu) return;
+        if (!userButtonRef.current) return;
+        const rect = userButtonRef.current.getBoundingClientRect();
+        const padding = 8;
+        const minWidth = 140;
+        const maxMenuWidth = 220;
+        const viewport = { w: window.innerWidth, h: window.innerHeight };
+        const style = {
+            position: 'fixed',
+            top: Math.max(padding, rect.bottom + 4),
+            minWidth,
+            maxWidth: Math.min(maxMenuWidth, viewport.w - padding * 2),
+            zIndex: 1000,
+            maxHeight: 'calc(100vh - 80px)',
+            overflowY: 'auto'
+        };
+        const distanceFromLeft = rect.left;
+        const distanceFromRight = viewport.w - rect.right;
+        if (direction === 'rtl') {
+            // Clamp so left edge stays inside viewport
+            const maxRight = Math.max(padding, viewport.w - minWidth - padding);
+            const proposedRight = Math.max(padding, distanceFromRight);
+            style.right = Math.min(proposedRight, maxRight);
+        } else {
+            const maxLeft = Math.max(padding, viewport.w - minWidth - padding);
+            const proposedLeft = Math.max(padding, distanceFromLeft);
+            style.left = Math.min(proposedLeft, maxLeft);
+        }
+        setUserMenuStyle(style);
+
+        const onResize = () => {
+            const r = userButtonRef.current?.getBoundingClientRect();
+            if (!r) return;
+            const vw = window.innerWidth;
+            if (direction === 'rtl') {
+                const maxRight = Math.max(padding, vw - minWidth - padding);
+                const proposedRight = Math.max(padding, vw - r.right);
+                setUserMenuStyle(s => ({ ...s, right: Math.min(proposedRight, maxRight), maxWidth: Math.min(maxMenuWidth, vw - padding * 2) }));
+            } else {
+                const maxLeft = Math.max(padding, vw - minWidth - padding);
+                const proposedLeft = Math.max(padding, r.left);
+                setUserMenuStyle(s => ({ ...s, left: Math.min(proposedLeft, maxLeft), maxWidth: Math.min(maxMenuWidth, vw - padding * 2) }));
+            }
+        };
+        window.addEventListener('resize', onResize, { passive: true });
+        return () => window.removeEventListener('resize', onResize);
+    }, [showUserMenu, direction]);
 
     const handleLanguageToggle = async () => {
         const newLang = language === 'he' ? 'en' : 'he';
@@ -581,6 +638,7 @@ const Header = () => {
                                         className={dropdownMenuClass}
                                         role="menu"
                                         aria-labelledby="user-menu-button"
+                                        style={userMenuStyle}
                                     >
                                         <button 
                                             className={dropdownItemClass} 
@@ -661,31 +719,35 @@ const Header = () => {
                     <span>{t('header.search')}</span>
                 </button>
                 <div className="mobile-menu-section">
-                    <div className="mobile-menu-section-title">
+                    <button className="mobile-menu-item" onClick={handleToggleMobileCreate} aria-expanded={mobileCreateOpen} aria-controls="mobile-create-submenu">
                         <FaPlus />
                         <span>{t('userBusinesses.create')}</span>
-                    </div>
-                    <button 
-                        className="mobile-menu-item"
-                        onClick={() => { setShowMobileMenu(false); navigate("/business"); }}
-                    >
-                        <FaStore />
-                        <span>{t('userBusinesses.createOptions.addBusiness')}</span>
                     </button>
-                    <button 
-                        className="mobile-menu-item"
-                        onClick={() => { setShowMobileMenu(false); navigate("/ads/sale/new"); }}
-                    >
-                        <FaTags />
-                        <span>{t('userBusinesses.createOptions.saleAd')}</span>
-                    </button>
-                    <button 
-                        className="mobile-menu-item"
-                        onClick={() => { setShowMobileMenu(false); navigate("/ads/promo/new"); }}
-                    >
-                        <FaBullhorn />
-                        <span>{t('userBusinesses.createOptions.promoAd')}</span>
-                    </button>
+                    {mobileCreateOpen && (
+                        <div id="mobile-create-submenu" role="group" aria-label={t('userBusinesses.create')}>
+                            <button 
+                                className="mobile-menu-item"
+                                onClick={() => { setShowMobileMenu(false); setMobileCreateOpen(false); navigate("/business"); }}
+                            >
+                                <FaStore />
+                                <span>{t('userBusinesses.createOptions.addBusiness')}</span>
+                            </button>
+                            <button 
+                                className="mobile-menu-item"
+                                onClick={() => { setShowMobileMenu(false); setMobileCreateOpen(false); navigate("/ads/sale/new"); }}
+                            >
+                                <FaTags />
+                                <span>{t('userBusinesses.createOptions.saleAd')}</span>
+                            </button>
+                            <button 
+                                className="mobile-menu-item"
+                                onClick={() => { setShowMobileMenu(false); setMobileCreateOpen(false); navigate("/ads/promo/new"); }}
+                            >
+                                <FaBullhorn />
+                                <span>{t('userBusinesses.createOptions.promoAd')}</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
                 <button 
                     className="mobile-menu-item"

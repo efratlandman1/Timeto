@@ -919,11 +919,11 @@
     border-bottom: 1px solid #eee;
     box-shadow: 0 6px 20px rgba(0,0,0,0.06);
     z-index: 1000;
-    padding: 8px 12px 14px 12px;
+    padding: 8px 10px 12px 10px;
     display: flex;
     flex-direction: column;
     gap: 6px;
-    width: min(92vw, 360px);
+    width: min(90vw, 200px);
     border-radius: 12px;
 }
 .mobile-menu.rtl { right: 8px; left: auto; }
@@ -937,12 +937,12 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 12px;
+    padding: 8px 10px;
     background: #fafafa;
     border: 1px solid #eee;
     border-radius: 10px;
     color: #333;
-    font-size: 14px;
+    font-size: 13px;
     cursor: pointer;
 }
 .mobile-menu-item:hover { background: #f2f2f2; }

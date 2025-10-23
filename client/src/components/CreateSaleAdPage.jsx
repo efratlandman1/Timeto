@@ -175,8 +175,8 @@ const CreateSaleAdPage = () => {
               <select
                 id="phonePrefix"
                 name="prefix"
-                className="form-input"
-                style={{ width: '80px', textAlign: 'center' }}
+                className="form-input phone-prefix-select"
+                style={{ width: '72px', textAlign: 'center' }}
                 value={prefix}
                 onChange={e => setPrefix(e.target.value)}
               >
@@ -208,7 +208,7 @@ const CreateSaleAdPage = () => {
               </div>
             </div>
           </div>
-          <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="form-group two-col-grid">
             <div>
             <label className="form-label">מחיר <span className="required-asterisk">*</span></label>
               <input className="form-input" name="price" value={price} onChange={e => setPrice(e.target.value)} />

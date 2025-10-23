@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { FaArrowRight } from 'react-icons/fa';
 import { useSelector, useDispatch } from 'react-redux';
 import { setUser as setReduxUser } from '../redux/userSlice';
 import '../styles/LoginPage.css'; // Reusing the same styles for a consistent look
@@ -139,6 +140,10 @@ const UserProfilePage = () => {
   return (
     <div className="narrow-page-container">
       <div className="narrow-page-content">
+        <button className="nav-button above-header" onClick={() => navigate('/')}> 
+          <FaArrowRight className="icon" />
+          {t('common.backToHome')}
+        </button>
         <form className="login-form profile-form" onSubmit={handleUpdate}>
           <h1 className="login-title">{t('userProfile.title')}</h1>
 
