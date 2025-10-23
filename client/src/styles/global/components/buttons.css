@@ -72,6 +72,12 @@
         font-size: 0.85rem;
         padding: 0.4rem 0.8rem;
     }
+    .nav-button.above-header {
+        float: none; /* stop floating on mobile */
+        display: inline-flex;
+        margin-left: auto;
+        margin-right: auto;
+    }
 } 
 
 /* Generic buttons used in forms/action bar */

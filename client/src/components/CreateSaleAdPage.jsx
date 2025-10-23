@@ -10,8 +10,10 @@ import { PHONE_PREFIXES, PHONE_NUMBER_MAX_LENGTH } from '../constants/globals';
 import ImageUploader from './common/ImageUploader';
 import ActionBar from './common/ActionBar';
 import { FaArrowRight } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 const CreateSaleAdPage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items: categories } = useSelector(s => s.saleCategories);
@@ -147,17 +149,17 @@ const CreateSaleAdPage = () => {
           if (isEditMode) navigate('/user-businesses'); else navigate('/');
         }}>
           <FaArrowRight className="icon" />
-          {isEditMode ? 'חזרה לעסקים שלי' : 'חזרה לעמוד הבית'}
+          {isEditMode ? t('common.backToBusinesses') : t('common.backToHome')}
         </button>
-        <h1 className="login-title" style={{ textAlign: 'center', marginTop: '8px' }}>הוספת מודעת מכירה</h1>
+        <h1 className="login-title" style={{ textAlign: 'center', marginTop: '8px' }}>{t('saleAd.pageTitleNew')}</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">כותרת <span className="required-asterisk">*</span></label>
+            <label className="form-label">{t('saleAd.fields.title')} <span className="required-asterisk">*</span></label>
             <input className="form-input" name="title" value={title} onChange={e => setTitle(e.target.value)} required />
           </div>
           <div className="form-group">
             <div>
-              <label className="form-label">עיר/אזור <span className="required-asterisk">*</span></label>
+              <label className="form-label">{t('saleAd.fields.city')} <span className="required-asterisk">*</span></label>
               {mapsLoaded ? (
                 <Autocomplete onLoad={onAutoLoad} onPlaceChanged={onPlaceChanged}>
                   <input className="form-input" name="city" value={city} onChange={e => setCity(e.target.value)} required />
@@ -169,7 +171,7 @@ const CreateSaleAdPage = () => {
           </div>
           <div className="form-group" style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
             <label htmlFor="phone" className="form-label" style={{ flexShrink: 0, marginTop: '6px' }}>
-              טלפון <span className="required-asterisk">*</span>
+              {t('saleAd.fields.phone')} <span className="required-asterisk">*</span>
             </label>
             <div style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: 'ltr', alignItems: 'center' }}>
               <select
@@ -180,7 +182,7 @@ const CreateSaleAdPage = () => {
                 value={prefix}
                 onChange={e => setPrefix(e.target.value)}
               >
-                <option value="">בחרי</option>
+                <option value="">{t('saleAd.placeholders.select')}</option>
                 {PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
               <input
@@ -202,19 +204,17 @@ const CreateSaleAdPage = () => {
                   checked={!!hasWhatsapp}
                   onChange={e => setHasWhatsapp(e.target.checked)}
                 />
-                <label htmlFor="hasWhatsapp" className="form-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>
-                  יש וואטסאפ
-                </label>
+                <label htmlFor="hasWhatsapp" className="form-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>{t('saleAd.fields.hasWhatsapp')}</label>
               </div>
             </div>
           </div>
           <div className="form-group two-col-grid">
             <div>
-            <label className="form-label">מחיר <span className="required-asterisk">*</span></label>
+            <label className="form-label">{t('saleAd.fields.price')} <span className="required-asterisk">*</span></label>
               <input className="form-input" name="price" value={price} onChange={e => setPrice(e.target.value)} />
             </div>
             <div>
-            <label className="form-label">מטבע <span className="required-asterisk">*</span></label>
+            <label className="form-label">{t('saleAd.fields.currency')} <span className="required-asterisk">*</span></label>
               <select className="form-select" value={currency} onChange={e => setCurrency(e.target.value)}>
                 <option value="ILS">₪ ILS</option>
                 <option value="USD">$ USD</option>
@@ -224,20 +224,20 @@ const CreateSaleAdPage = () => {
             </div>
           </div>
           <div className="form-group">
-            <label className="form-label">קטגוריה <span className="required-asterisk">*</span></label>
+            <label className="form-label">{t('saleAd.fields.category')} <span className="required-asterisk">*</span></label>
             <select className="form-select" value={categoryId} onChange={e => setCategoryId(e.target.value)}>
-              <option value="">בחרי קטגוריה</option>
+              <option value="">{t('saleAd.placeholders.selectCategory')}</option>
               {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
             </select>
           </div>
           <div className="form-group">
-            <label className="form-label">תיאור <span className="required-asterisk">*</span></label>
+            <label className="form-label">{t('saleAd.fields.description')} <span className="required-asterisk">*</span></label>
             <textarea className="form-input" rows={4} value={description} onChange={e => setDescription(e.target.value)} />
           </div>
           <ImageUploader
             multiple
             files={Array.from(images || [])}
-            label="תמונות (עד 10)"
+            label={t('saleAd.fields.images')}
             onAdd={(filesList) => setImages(prev => {
               const prevArr = Array.isArray(prev) ? prev : Array.from(prev || []);
               const nextArr = Array.from(filesList || []);
@@ -256,8 +256,8 @@ const CreateSaleAdPage = () => {
             if (editId) navigate('/user-businesses'); else navigate('/');
           }}
             onConfirm={handleSubmit}
-            cancelText="ביטול"
-          confirmText={searchParams.get('edit') ? 'שמור' : 'פרסם'}
+            cancelText={t('saleAd.actions.cancel')}
+          confirmText={searchParams.get('edit') ? t('saleAd.actions.save') : t('saleAd.actions.publish')}
           />
         </form>
       </div>

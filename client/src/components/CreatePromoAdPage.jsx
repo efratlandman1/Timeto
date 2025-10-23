@@ -8,8 +8,10 @@ import ImageUploader from './common/ImageUploader';
 import ActionBar from './common/ActionBar';
 import { FaArrowRight } from 'react-icons/fa';
 import { getToken } from '../utils/auth';
+import { useTranslation } from 'react-i18next';
 
 const CreatePromoAdPage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
@@ -110,17 +112,17 @@ const CreatePromoAdPage = () => {
           if (isEditMode) navigate('/user-businesses'); else navigate('/');
         }}>
           <FaArrowRight className="icon" />
-          {isEditMode ? 'חזרה לעסקים שלי' : 'חזרה לעמוד הבית'}
+          {isEditMode ? t('common.backToBusinesses') : t('common.backToHome')}
         </button>
-        <h1 className="login-title" style={{ textAlign: 'center', marginTop: '8px' }}>הוספת מודעת פרסום</h1>
+        <h1 className="login-title" style={{ textAlign: 'center', marginTop: '8px' }}>{t('promoAd.pageTitleNew')}</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">כותרת <span className="required-asterisk">*</span></label>
+            <label className="form-label">{t('promoAd.fields.title')} <span className="required-asterisk">*</span></label>
             <input className="form-input" value={title} onChange={e => setTitle(e.target.value)} required />
           </div>
           <div className="form-group two-col-grid">
             <div>
-              <label className="form-label">עיר/אזור <span className="required-asterisk">*</span></label>
+              <label className="form-label">{t('promoAd.fields.city')} <span className="required-asterisk">*</span></label>
               {mapsLoaded ? (
                 <Autocomplete onLoad={onAutoLoad} onPlaceChanged={onPlaceChanged}>
                   <input className="form-input" value={city} onChange={e => setCity(e.target.value)} required />
@@ -132,11 +134,11 @@ const CreatePromoAdPage = () => {
           </div>
           <div className="form-group">
             <div>
-              <label className="form-label">תמונה <span className="required-asterisk">*</span></label>
+              <label className="form-label">{t('promoAd.fields.image')} <span className="required-asterisk">*</span></label>
               <ImageUploader
                 multiple={false}
                 file={image}
-                label="בחרי תמונה"
+                label={t('promoAd.fields.image')}
                 onAdd={(filesList) => setImage(filesList?.[0] || null)}
                 onRemove={() => setImage(null)}
               />
@@ -144,11 +146,11 @@ const CreatePromoAdPage = () => {
           </div>
           <div className="form-group two-col-grid date-grid">
             <div>
-              <label className="form-label">תאריך התחלה <span className="required-asterisk">*</span></label>
+              <label className="form-label">{t('promoAd.fields.validFrom')} <span className="required-asterisk">*</span></label>
               <input className="form-input" type="datetime-local" value={validFrom} onChange={e => setValidFrom(e.target.value)} required />
             </div>
             <div>
-              <label className="form-label">תאריך סיום <span className="required-asterisk">*</span></label>
+              <label className="form-label">{t('promoAd.fields.validTo')} <span className="required-asterisk">*</span></label>
               <input className="form-input" type="datetime-local" value={validTo} onChange={e => setValidTo(e.target.value)} required />
             </div>
           </div>
@@ -158,8 +160,8 @@ const CreatePromoAdPage = () => {
               if (editId) navigate('/user-businesses'); else navigate('/');
             }}
             onConfirm={handleSubmit}
-            cancelText="ביטול"
-            confirmText={searchParams.get('edit') ? 'שמור' : 'פרסם'}
+            cancelText={t('promoAd.actions.cancel')}
+            confirmText={searchParams.get('edit') ? t('promoAd.actions.save') : t('promoAd.actions.publish')}
           />
         </form>
       </div>

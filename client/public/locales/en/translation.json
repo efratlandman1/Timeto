@@ -252,6 +252,50 @@
     "sale": { "title": "Sale Ad", "desc": "Post a second‑hand item quickly" },
     "promo": { "title": "Promo Ad", "desc": "Branding/promo with validity and image" }
   },
+  "saleAd": {
+    "pageTitleNew": "Create Sale Ad",
+    "fields": {
+      "title": "Title",
+      "city": "City/Area",
+      "phone": "Phone",
+      "prefix": "Prefix",
+      "number": "Phone Number",
+      "hasWhatsapp": "Has WhatsApp",
+      "price": "Price",
+      "currency": "Currency",
+      "category": "Category",
+      "description": "Description",
+      "images": "Images (up to 10)"
+    },
+    "actions": {
+      "publish": "Publish",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "placeholders": {
+      "select": "Select",
+      "selectCategory": "Select Category"
+    }
+  },
+  "promoAd": {
+    "pageTitleNew": "Create Promo Ad",
+    "fields": {
+      "title": "Title",
+      "city": "City/Area",
+      "image": "Image",
+      "validFrom": "Start Date",
+      "validTo": "End Date"
+    },
+    "actions": {
+      "publish": "Publish",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "placeholders": {
+      "select": "Select",
+      "selectCategory": "Select Category"
+    }
+  },
   "search": {
     "placeholder": "Search businesses, sale ads and promo ads...",
     "advancedSearch": "Advanced Search",

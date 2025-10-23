@@ -264,6 +264,50 @@
     "sale": { "title": "מודעת מכירה", "desc": "פרסם מוצר יד שנייה במהירות" },
     "promo": { "title": "מודעת פרסום", "desc": "תדמית/קידום עם תוקף ותמונה" }
   },
+  "saleAd": {
+    "pageTitleNew": "הוספת מודעת מכירה",
+    "fields": {
+      "title": "כותרת",
+      "city": "עיר/אזור",
+      "phone": "טלפון",
+      "prefix": "קידומת",
+      "number": "מספר טלפון",
+      "hasWhatsapp": "יש וואטסאפ",
+      "price": "מחיר",
+      "currency": "מטבע",
+      "category": "קטגוריה",
+      "description": "תיאור",
+      "images": "תמונות (עד 10)"
+    },
+    "actions": {
+      "publish": "פרסם",
+      "save": "שמור",
+      "cancel": "ביטול"
+    },
+    "placeholders": {
+      "select": "בחרי",
+      "selectCategory": "בחרי קטגוריה"
+    }
+  },
+  "promoAd": {
+    "pageTitleNew": "הוספת מודעת פרסום",
+    "fields": {
+      "title": "כותרת",
+      "city": "עיר/אזור",
+      "image": "תמונה",
+      "validFrom": "תאריך התחלה",
+      "validTo": "תאריך סיום"
+    },
+    "actions": {
+      "publish": "פרסם",
+      "save": "שמור",
+      "cancel": "ביטול"
+    },
+    "placeholders": {
+      "select": "בחרי",
+      "selectCategory": "בחרי קטגוריה"
+    }
+  },
   "search": {
     "placeholder": "חפש עסקים, מודעות מכירה ופרסום...",
     "search": "חפש",
