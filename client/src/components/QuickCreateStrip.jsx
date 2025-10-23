@@ -1,10 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FaStore, FaTags, FaBullhorn } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import { getToken } from '../utils/auth';
 
 const QuickCreateStrip = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
 
   const items = [
@@ -13,21 +15,33 @@ const QuickCreateStrip = () => {
       icon: <FaStore />,
       title: t('quickCreate.business.title'),
       desc: t('quickCreate.business.desc'),
-      onClick: () => navigate('/business')
+      onClick: () => {
+        const token = getToken();
+        if (!token) { navigate('/auth', { state: { background: location } }); return; }
+        navigate('/business');
+      }
     },
     {
       id: 'sale',
       icon: <FaTags />,
       title: t('quickCreate.sale.title'),
       desc: t('quickCreate.sale.desc'),
-      onClick: () => navigate('/ads/sale/new')
+      onClick: () => {
+        const token = getToken();
+        if (!token) { navigate('/auth', { state: { background: location } }); return; }
+        navigate('/ads/sale/new');
+      }
     },
     {
       id: 'promo',
       icon: <FaBullhorn />,
       title: t('quickCreate.promo.title'),
       desc: t('quickCreate.promo.desc'),
-      onClick: () => navigate('/ads/promo/new')
+      onClick: () => {
+        const token = getToken();
+        if (!token) { navigate('/auth', { state: { background: location } }); return; }
+        navigate('/ads/promo/new');
+      }
     }
   ];
 

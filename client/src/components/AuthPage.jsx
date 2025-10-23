@@ -85,7 +85,19 @@ const AuthPage = () => {
         }
     };
     
-    const handleClose = () => { navigate(-1); };
+    const handleClose = () => {
+        const bg = currentLocation.state && currentLocation.state.background;
+        if (bg) {
+            if (typeof bg === 'string') {
+                navigate(bg, { replace: true });
+            } else {
+                const to = { pathname: bg.pathname, search: bg.search, hash: bg.hash };
+                navigate(to, { replace: true });
+            }
+        } else {
+            navigate(-1);
+        }
+    };
 
     return (
         <GoogleOAuthProvider clientId={clientId}>

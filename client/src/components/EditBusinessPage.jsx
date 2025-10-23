@@ -238,7 +238,7 @@ const EditBusinessPage = () => {
   useEffect(() => {
     const token = getToken();
     if (!token) {
-      navigate('/auth');
+      navigate('/auth', { state: { background: { pathname: '/' } } });
     }
   }, [navigate]);
 

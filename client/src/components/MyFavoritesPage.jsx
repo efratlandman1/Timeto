@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import BusinessCard from './BusinessCard';
 import SaleAdCard from './SaleAdCard';
@@ -14,11 +14,12 @@ const MyFavoritesPage = () => {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('all'); // all | business | sale | promo
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const token = getToken();        
         if (!token) {
-            navigate('/auth');
+            navigate('/auth', { state: { background: location } });
             return;
         }
 
@@ -34,7 +35,7 @@ const MyFavoritesPage = () => {
                 ]);
 
                 if (bizRes.status === 401 || saleRes.status === 401 || promoRes.status === 401) {
-                    navigate('/auth');
+                    navigate('/auth', { state: { background: location } });
                     return;
                 }
 

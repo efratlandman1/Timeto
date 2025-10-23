@@ -22,7 +22,7 @@ const UserBusinessesPage = () => {
     useEffect(() => {
         const token = getToken();
         if (!token) {
-            navigate('/auth');
+            navigate('/auth', { state: { background: { pathname: '/' } } });
             return;
         }
 
@@ -33,7 +33,7 @@ const UserBusinessesPage = () => {
                 });
                 
                 if (response.status !== 200) {
-                    navigate('/auth');
+                    navigate('/auth', { state: { background: { pathname: '/' } } });
                     return;
                 }
                 

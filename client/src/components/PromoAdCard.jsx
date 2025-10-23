@@ -14,7 +14,7 @@ const PromoAdCard = ({ ad, onFavoriteRemoved }) => {
     e.stopPropagation();
     try {
       const token = getToken();
-      if (!token) { navigate('/auth'); return; }
+      if (!token) { navigate('/auth', { state: { background: location } }); return; }
       const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/promo-ads/${ad._id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
@@ -34,7 +34,7 @@ const PromoAdCard = ({ ad, onFavoriteRemoved }) => {
     e.stopPropagation();
     try {
       const token = getToken();
-      if (!token) { navigate('/auth'); return; }
+      if (!token) { navigate('/auth', { state: { background: location } }); return; }
       const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/promo-ads/restore/${ad._id}`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
@@ -60,7 +60,7 @@ const PromoAdCard = ({ ad, onFavoriteRemoved }) => {
             e.stopPropagation();
             try {
               const token = getToken();
-              if (!token) { navigate('/auth'); return; }
+              if (!token) { navigate('/auth', { state: { background: location } }); return; }
               const res = await fetch(`${process.env.REACT_APP_API_DOMAIN || 'http://localhost:5050'}/api/v1/promo-favorites/toggle`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },

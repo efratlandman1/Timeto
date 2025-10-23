@@ -31,7 +31,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     try {
       const token = getToken();
       if (!token) {
-        navigate('/auth');
+        navigate('/auth', { state: { background: location } });
         return;
       }
 
@@ -70,7 +70,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     try {
       const token = getToken();
       if (!token) {
-        window.location.href = '/auth';
+        navigate('/auth', { state: { background: location } });
         return null;
       }
       const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${business._id}`, {
@@ -96,7 +96,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     try {
       const token = getToken();
       if (!token) {
-        window.location.href = '/auth';
+        navigate('/auth', { state: { background: location } });
         return null;
       }
       const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/restore/${business._id}`, {

@@ -39,7 +39,7 @@ const ResetPasswordPage = () => {
         try {
             await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/reset-password`, { token, newPassword: password });
             setMessage({ text: t('auth.resetPassword.success'), type: 'success' });
-            setTimeout(() => navigate('/auth'), 3000);
+            setTimeout(() => navigate('/auth', { state: { background: { pathname: '/' } } }), 3000);
         } catch (error) {
             if (error.response && error.response.status === 429) {
                 setMessage({ text: t('auth.resetPassword.errors.tooManyAttempts'), type: 'error' });
