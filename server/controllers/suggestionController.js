@@ -1,4 +1,4 @@
-const Suggestion = require('../models/suggestion');
+const Suggestion = require('../models/Suggestion');
 const Category = require('../models/category');
 const mongoose = require('mongoose');
 const { successResponse, errorResponse, getRequestMeta, serializeError } = require("../utils/errorUtils");
@@ -11,13 +11,18 @@ const createSuggestion = async (req, res) => {
   const logSource = 'suggestionController.createSuggestion';
   const meta = getRequestMeta(req, logSource);
   
-  logger.info({ ...meta }, `${logSource} enter`);
+  logger.info({ ...meta, bodyPreview: {
+    domain: req.body?.domain,
+    type: req.body?.type,
+    parent_category_id: req.body?.parent_category_id,
+    sale_category_id: req.body?.sale_category_id
+  } }, `${logSource} enter`);
   
   try {
-    const { type, name_he, name_en, parent_category_id, reason } = req.body;
+    const { domain = 'business', type, name_he, name_en, parent_category_id, sale_category_id, reason } = req.body;
 
-    // If type is service, verify that parent_category_id exists
-    if (type === 'service' && parent_category_id) {
+    // If business service, verify that parent_category_id exists
+    if (domain === 'business' && type === 'service' && parent_category_id) {
       const categoryExists = await Category.findById(parent_category_id);
       if (!categoryExists) {
         logger.warn({ ...meta, parent_category_id }, messages.SUGGESTION_MESSAGES.PARENT_CATEGORY_NOT_FOUND);
@@ -33,10 +38,12 @@ const createSuggestion = async (req, res) => {
 
     // Create suggestion
     const suggestion = await Suggestion.create({
+      domain,
       type,
       name_he,
       name_en,
-      parent_category_id: type === 'service' ? parent_category_id : undefined,
+      parent_category_id: domain === 'business' && type === 'service' ? parent_category_id : undefined,
+      sale_category_id: domain === 'sale' ? sale_category_id : undefined,
       reason,
       user: req.user ? req.user._id : undefined
     });
@@ -73,7 +80,8 @@ const getAllSuggestions = async (req, res) => {
   try {
     const suggestions = await Suggestion.find()
       .populate('user', 'firstName lastName email')
-      .populate('parent_category_id', 'name_he name_en');
+      .populate('parent_category_id', 'name_he name_en')
+      .populate('sale_category_id', 'name');
 
     logger.info({ ...meta, count: suggestions.length }, `${logSource} complete`);
     
@@ -118,7 +126,8 @@ const getSuggestion = async (req, res) => {
 
     const suggestion = await Suggestion.findById(req.params.id)
       .populate('user', 'firstName lastName email')
-      .populate('parent_category_id', 'name_he name_en');
+      .populate('parent_category_id', 'name_he name_en')
+      .populate('sale_category_id', 'name');
 
     if (!suggestion) {
       logger.warn({ ...meta, suggestionId: req.params.id }, messages.SUGGESTION_MESSAGES.NOT_FOUND);
@@ -288,7 +297,8 @@ const getUserSuggestions = async (req, res) => {
   
   try {
     const suggestions = await Suggestion.find({ user: req.user._id })
-      .populate('parent_category_id', 'name_he name_en');
+      .populate('parent_category_id', 'name_he name_en')
+      .populate('sale_category_id', 'name');
 
     logger.info({ ...meta, userId: req.user._id, count: suggestions.length }, `${logSource} complete`);
     

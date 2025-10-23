@@ -100,31 +100,31 @@
     --status-busy: #dc3545;
     
     /* RTL/LTR Specific Colors */
-    --rtl-accent: #4a90e2;
+    --rtl-accent: #e53935; /* align RTL brand to red */
     --ltr-accent: #ff4d4d;
-    --rtl-border: #4a90e2;
+    --rtl-border: #e53935;
     --ltr-border: #ff4d4d;
-    --rtl-shadow: rgba(74, 144, 226, 0.2);
+    --rtl-shadow: rgba(229, 57, 53, 0.2);
     --ltr-shadow: rgba(255, 77, 77, 0.2);
 }
 
 /* RTL Color Scheme */
 [dir="rtl"] {
     --primary-color: var(--rtl-accent);
-    --primary-light: #7bb3f0;
-    --primary-dark: #357abd;
-    --primary-hover: #357abd;
-    --primary-active: #2d5aa0;
+    --primary-light: #ff8080;
+    --primary-dark: #c62828;
+    --primary-hover: #ef5350;
+    --primary-active: #d32f2f;
     
     --border-primary: var(--rtl-border);
     --shadow-primary: var(--rtl-shadow);
     --focus-color: var(--rtl-accent);
-    --focus-ring: rgba(74, 144, 226, 0.25);
+    --focus-ring: rgba(229, 57, 53, 0.25);
     
     --link-color: var(--rtl-accent);
-    --link-hover: #357abd;
-    --link-active: #2d5aa0;
-    --link-visited: #2d5aa0;
+    --link-hover: #d32f2f;
+    --link-active: #b71c1c;
+    --link-visited: #b71c1c;
 }
 
 /* LTR Color Scheme */

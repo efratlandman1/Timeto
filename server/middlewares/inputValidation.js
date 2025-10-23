@@ -171,6 +171,10 @@ const favoriteSchema = [
 ];
 
 const validateSuggestion = [
+  body('domain')
+    .isString()
+    .isIn(['business', 'sale'])
+    .withMessage('Domain must be either business or sale'),
   body('type')
     .isString()
     .isIn(['category', 'service'])
@@ -184,10 +188,15 @@ const validateSuggestion = [
     .isLength({ min: 2, max: 100 })
     .withMessage('English name is required (2-100 chars)'),
   body('parent_category_id')
-    .if(body('type').equals('service'))
+    .if((value, { req }) => req.body && req.body.domain === 'business' && req.body.type === 'service')
     .isString()
     .isMongoId()
     .withMessage('parent_category_id is required and must be a valid Mongo ID for service suggestions'),
+  body('sale_category_id')
+    .if((value, { req }) => req.body && req.body.domain === 'sale')
+    .isString()
+    .isMongoId()
+    .withMessage('sale_category_id is required and must be a valid Mongo ID for sale suggestions'),
   (req, res, next) => {
     handleValidationErrors(req, res, next, 'validateSuggestion');
   }

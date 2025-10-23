@@ -3,7 +3,7 @@
     "home": "בית",
     "search": "חיפוש",
     "addBusiness": "הוסף עסק",
-    "suggest": "הצע פריט",
+    "suggest": "הצעה לערך חדש",
     "register": "הרשמה",
     "login": "כניסה",
     "myBusinesses": "העסקים שלי",
@@ -19,10 +19,11 @@
     },
     "selectLanguage": "בחר שפה",
     "logo": {
-      "main": "זמן",
-      "sub": "מדריך העסקים"
+      "main": "זזמן",
+      "sub": ""
     },
     "myLocation": "המיקום שלי",
+    "locationShort": "מיקום",
     "currentLocation": "המיקום הנוכחי שלך",
     "loadingAddress": "טוען כתובת...",
     "addressNotFound": "לא נמצאה כתובת",
@@ -77,26 +78,31 @@
     },
     "sections": {
       "popular": "עסקים פופולריים",
-      "new": "עסקים חדשים",
+      "new": "עסקים חדשים באזורך",
       "recommended": "מומלצים עבורך",
+      "newSales": "פריטים למכירה באזורך",
+      "newPromos": "פרסום חדש באזורך",
       "featuredAds": "מודעות מובילות"
     },
     "joinBanner": {
-      "title": "הצטרף לקהילת זמן",
+      "title": "הצטרף לקהילת זזמן",
       "description": "הוסף את העסק שלך והתחל לקבל לקוחות חדשים עוד היום",
+      "descriptionFull": "הוסף עסק, פרסם מודעת מכירה ומודעת פרסום ותגיע ללקוחות הנכונים באזורך ובכל הארץ",
       "button": "הוסף עסק חינם",
       "joinNowAndDiscover": "הצטרפו עכשיו והתחילו לגלות דברים מעניינים סביבכם"
     },
     "viewAll": "הצג הכל",
     "footer": {
       "contact": "צור קשר",
+      "contactSubtitle": "מחפשים מידע או שיתוף פעולה? נשמח לשמוע מכם.",
       "quickLinks": "קישורים מהירים",
       "search": "חיפוש",
       "suggestItem": "הצע פריט",
       "termsOfService": "תנאי שימוש",
       "termsComingSoon": "תנאי השימוש יהיו זמינים בקרוב",
-      "about": "זה הזמן",
-      "aboutDescription": "מדריך העסקים המוביל בישראל. תמצא את העסק הנכון בקרבתך.",
+      "about": "זזמן",
+      "aboutDescriptionLine1": "הקהילה שמחברת בין אנשים לעסקים",
+      "aboutDescriptionLine2": "מצאו עסקים, מודעות מכירה, פרסום והטבות חמות במקום אחד",
       "copyright": "© Zezman 2023 כל הזכויות שמורות."
     }
   },
@@ -251,10 +257,67 @@
     "generalError": "אירעה שגיאה, נסה שוב מאוחר יותר",
     "tooManyAttempts": "ניסית יותר מדי פעמים. אנא נסה שוב מאוחר יותר.",
     "password": "סיסמה",
-    "select": "בחר"
+    "select": "בחר",
+    "address": "כתובת",
+    "phone": "טלפון",
+    "whatsapp": "וואטסאפ",
+    "details": "פרטים",
+    "category": "קטגוריה",
+    "price": "מחיר",
+    "prevImage": "תמונה קודמת",
+    "nextImage": "תמונה הבאה"
+  },
+  "quickCreate": {
+    "business": { "title": "הוספת עסק", "desc": "פתח כרטיס עסק חדש עם פרטים ושעות" },
+    "sale": { "title": "מודעת מכירה", "desc": "פרסם מוצר יד שנייה במהירות" },
+    "promo": { "title": "מודעת פרסום", "desc": "תדמית/קידום עם תוקף ותמונה" }
+  },
+  "saleAd": {
+    "pageTitleNew": "הוספת מודעת מכירה",
+    "fields": {
+      "title": "כותרת",
+      "city": "עיר/אזור",
+      "phone": "טלפון",
+      "prefix": "קידומת",
+      "number": "מספר טלפון",
+      "hasWhatsapp": "יש וואטסאפ",
+      "price": "מחיר",
+      "currency": "מטבע",
+      "category": "קטגוריה",
+      "description": "תיאור",
+      "images": "תמונות (עד 10)"
+    },
+    "actions": {
+      "publish": "פרסם",
+      "save": "שמור",
+      "cancel": "ביטול"
+    },
+    "placeholders": {
+      "select": "בחרי",
+      "selectCategory": "בחרי קטגוריה"
+    }
+  },
+  "promoAd": {
+    "pageTitleNew": "הוספת מודעת פרסום",
+    "fields": {
+      "title": "כותרת",
+      "city": "עיר/אזור",
+      "image": "תמונה",
+      "validFrom": "תאריך התחלה",
+      "validTo": "תאריך סיום"
+    },
+    "actions": {
+      "publish": "פרסם",
+      "save": "שמור",
+      "cancel": "ביטול"
+    },
+    "placeholders": {
+      "select": "בחרי",
+      "selectCategory": "בחרי קטגוריה"
+    }
   },
   "search": {
-    "placeholder": "חפש עסק או שירות...",
+    "placeholder": "חפש עסקים, מודעות מכירה ופרסום...",
     "search": "חפש",
     "results": "תוצאות חיפוש",
     "noResults": "לא נמצאו תוצאות",
@@ -361,7 +424,17 @@
   "favorites": {
     "loading": "טוען מועדפים...",
     "title": "המועדפים שלי",
-    "empty": "עדיין לא סימנת עסקים כמועדפים"
+    "subtitle": "כל הפריטים שסימנת כמועדפים במקום אחד",
+    "empty": "עדיין לא סימנת מועדפים",
+    "emptyBusiness": "עדיין לא סימנת עסקים כמועדפים",
+    "emptySale": "עדיין לא סימנת פריטים למכירה כמועדפים",
+    "emptyPromo": "עדיין לא סימנת מודעות פרסום כמועדפים",
+    "tabs": {
+      "all": "הכל",
+      "business": "עסקים",
+      "sale": "מכירה",
+      "promo": "פרסום"
+    }
   },
   "feedback": {
     "title": "חוות דעת על {{businessName}}",
@@ -445,11 +518,27 @@
     "loading": "טוען פרטי עסק...",
     "error": "שגיאה"
   },
+  "business": {
+    "services": "שירותים",
+    "feedback": {
+      "title": "דירוגים ופידבקים",
+      "add": "הוסף פידבק",
+      "avg": "דירוג ממוצע",
+      "total": "סך הכל ביקורות",
+      "anonymous": "אנונימי"
+    },
+    "contact": {
+      "address": "כתובת",
+      "phone": "טלפון",
+      "whatsapp": "WhatsApp",
+      "email": "אימייל"
+    }
+  },
   "searchResults": {
     "title": "תוצאות חיפוש",
     "noResults": "לא נמצאו תוצאות",
-    "pageTitle": "חיפוש עסקים",
-    "pageSubtitle": "מצא את העסק המתאים לך",
+    "pageTitle": "תוצאות חיפוש",
+    "pageSubtitle": "",
     "advancedFilter": "סינון מתקדם",
     "loadingLocation": "טוען מיקום...",
     "filters": {
@@ -598,6 +687,20 @@
   },
   "advancedSearch": {
     "title": "חיפוש מורחב",
+    "city": "עיר",
+    "cityPlaceholder": "לדוגמה: תל אביב",
+    "priceRange": "טווח מחיר",
+    "min": "מינימום",
+    "max": "מקסימום",
+    "status": "סטטוס",
+    "openNow": "פתוח עכשיו",
+    "verifiedOnly": "מאומת בלבד",
+    "reviewsOnly": "עם חוות דעת",
+    "addedWithin": "נוספו ב־",
+    "anytime": "כל הזמן",
+    "last7d": "7 הימים האחרונים",
+    "last30d": "30 הימים האחרונים",
+    "includeNoPrice": "כלול גם ללא מחיר",
     "sort": {
       "title": "מיון תוצאות",
       "rating": "דירוג גבוה",
@@ -613,6 +716,10 @@
     "category": {
       "title": "קטגוריה",
       "select": "בחר קטגוריה"
+    },
+    "categories": {
+      "business": "קטגוריות עסקים",
+      "sale": "קטגוריות מכירה"
     },
     "services": {
       "title": "שירותים"
@@ -643,8 +750,13 @@
     "selected": "נבחרו {{count}} פריטים"
   },
   "suggestItem": {
-    "title": "הצעת פריט חדש",
-    "description": "מלא את הפרטים הבאים כדי להציע פריט חדש",
+    "title": "הצע קטגוריה או שירות",
+    "description": "הצע קטגוריות ושירותים שחסרים במערכת",
+    "contextLabel": "יעד ההצעה",
+    "modes": {
+      "business": "עסקים",
+      "sale": "מכירה"
+    },
     "form": {
       "type": {
         "label": "סוג הצעה",
@@ -657,8 +769,10 @@
         "placeholder": "לדוגמה: אינסטלציה מתקדמת"
       },
       "parentCategory": "קטגוריית אב",
+      "saleCategory": "קטגוריית מכירה",
+      "selectSaleCategory": "בחר קטגוריית מכירה",
       "reason": "סיבה או תיאור קצר",
-      "reasonPlaceholder": "מדוע אתה חושב שפריט זה נחוץ?",
+      "reasonPlaceholder": "מדוע לדעתך ערך זה נחוץ?",
       "submit": "שלח הצעה"
     },
     "messages": {
@@ -667,13 +781,27 @@
     }
   },
   "userBusinesses": {
-    "title": "העסקים שלי",
-    "description": "נהל את העסקים שהוספת למדריך",
+    "title": "אזור אישי",
+    "description": "נהל את העסקים והמודעות שלך",
     "empty": "אין לך עסקים רשומים עדיין",
     "addBusiness": "הוסף עסק חדש",
     "loading": "טוען עסקים...",
     "error": "שגיאה בטעינת העסקים",
-    "subtitle": "נהל את העסקים שהוספת למדריך",
+    "subtitle": "נהל את העסקים והמודעות שהוספת למדריך",
+    "create": "צור",
+    "createMenuAria": "תפריט יצירה",
+    "createOptions": {
+      "addBusiness": "הוספת עסק",
+      "saleAd": "מודעת מכירה",
+      "promoAd": "מודעת פרסום"
+    },
+    "tabs": {
+      "aria": "קטגוריות התוכן שלי",
+      "business": "עסקים",
+      "sale": "מכירה",
+      "promo": "פרסום",
+      "all": "הכל"
+    },
     "noBusinesses": "אין לך עסקים עדיין",
     "addNewBusiness": "הוספת עסק חדש",
     "filters": {

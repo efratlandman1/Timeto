@@ -1,14 +1,15 @@
 /* Page Header Component */
 .page-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* center content area */
     align-items: flex-start;
-    padding: 2rem 3rem 2rem;
+    padding: 1rem 0rem 2rem;
     position: relative;
 }
 
 .page-header__content {
-    text-align: right;
+    text-align: center;
+    flex: 1 1 auto; /* allow content to take available width */
 }
 
 .page-header h1 {
@@ -17,6 +18,8 @@
     margin-bottom: var(--spacing-xs);
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-tight);
+    text-align: center;
+    width: 100%;
 }
 
 .page-header p {
@@ -26,8 +29,18 @@
     line-height: var(--line-height-normal);
 }
 
+/* Ensure login-title inside page headers is centered with the underline */
+.page-header__content .login-title {
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .page-header__action {
-    margin-right: var(--spacing-lg);
+    position: absolute; /* detach from flow so title can center */
+    top: 0;
+    inset-inline-end: 0; /* logical end side (RTL/LTR) */
 }
 
 /* Card Header Component */
@@ -54,14 +67,16 @@
     .page-header {
         padding: 2rem 1.5rem 1.5rem;
         flex-direction: column;
-        align-items: stretch;
+        align-items: center; /* keep title truly centered */
         gap: var(--spacing-md);
+        width: 100%;
     }
 
     .page-header__action {
-        margin-right: 0;
+        position: static; /* stack below on mobile */
         display: flex;
-        justify-content: flex-start;
+        justify-content: center; /* center actions below title */
+        width: 100%;
     }
 
     .page-header h1 {
@@ -71,6 +86,17 @@
     .page-header p {
         font-size: var(--font-size-sm);
     }
+}
+
+/* On mobile, ensure any external back button placed above header is centered and does not offset title */
+@media (max-width: 768px) {
+  .wide-page-content > .nav-button.above-header {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0.25rem auto 0.5rem;
+    width: auto;
+  }
 }
 
 /* Print Styles */

@@ -6,6 +6,9 @@ import {
     FaSignInAlt, 
     FaGlobe, 
     FaPlusCircle,
+    FaPlus,
+    FaTags,
+    FaBullhorn,
     FaHeart,
     FaStore,
     FaLightbulb,
@@ -16,7 +19,8 @@ import {
     FaCog,
     FaIdCard,
     FaSyncAlt,
-    FaTimes
+    FaTimes,
+    FaBars
 } from "react-icons/fa";
 import "../styles/Header.css";
 import { useSelector, useDispatch } from 'react-redux';
@@ -26,17 +30,23 @@ import { logout } from '../redux/userSlice';
 import { fetchUserLocation } from '../redux/locationSlice';
 import { setLanguage, setDirection } from '../redux/uiSlice';
 import { changeLanguage, getCurrentDirection } from '../i18n';
+import { useResponsive } from '../utils/ResponsiveProvider';
 
 const Header = () => {
+    const { isMobile, isTablet } = useResponsive();
     const navigate = useNavigate();
     const location = useLocation();
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showLangMenu, setShowLangMenu] = useState(false);
+    const [showCreateMenu, setShowCreateMenu] = useState(false);
     const [username, setUsername] = useState(null);
     const [greeting, setGreeting] = useState("");
     const [isAuthLoading, setIsAuthLoading] = useState(true);
     const userMenuRef = useRef(null);
     const userButtonRef = useRef(null);
+    const createMenuRef = useRef(null);
+    const createButtonRef = useRef(null);
+    const locationButtonRef = useRef(null);
     const loginUser = useSelector(state => state.user.user);
     const isAdmin = loginUser && loginUser.role === 'admin';
     const { t, i18n, ready } = useTranslation();
@@ -47,6 +57,13 @@ const Header = () => {
     const [addressLoading, setAddressLoading] = useState(false);
     const [addressError, setAddressError] = useState('');
     const popoverRef = useRef(null);
+    const [createMenuStyle, setCreateMenuStyle] = useState({});
+    const [userMenuStyle, setUserMenuStyle] = useState({});
+    const [popoverStyle, setPopoverStyle] = useState({});
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
+    const mobileMenuRef = useRef(null);
+    const mobileMenuBtnRef = useRef(null);
+    const [mobileCreateOpen, setMobileCreateOpen] = useState(false);
     
     // Get language and direction from Redux with fallback values
     const uiState = useSelector(state => state.ui);
@@ -116,12 +133,35 @@ const Header = () => {
             if (!langDropdown) {
                 setShowLangMenu(false);
             }
+
+            // Close create dropdown if clicking outside
+            if (
+                createMenuRef.current &&
+                !createMenuRef.current.contains(event.target) &&
+                createButtonRef.current &&
+                !createButtonRef.current.contains(event.target)
+            ) {
+                setShowCreateMenu(false);
+            }
+
+            // Close mobile menu on outside click
+            if (
+                mobileMenuRef.current &&
+                !mobileMenuRef.current.contains(event.target) &&
+                mobileMenuBtnRef.current &&
+                !mobileMenuBtnRef.current.contains(event.target)
+            ) {
+                setShowMobileMenu(false);
+            }
         };
 
         const handleEscape = (event) => {
             if (event.key === 'Escape') {
                 setShowUserMenu(false);
                 setShowLangMenu(false);
+                setShowCreateMenu(false);
+                setShowMobileMenu(false);
+                setMobileCreateOpen(false);
             }
         };
 
@@ -133,6 +173,16 @@ const Header = () => {
             document.removeEventListener("keydown", handleEscape);
         };
     }, []);
+
+    // Body scroll lock when mobile menu open
+    useEffect(() => {
+        if (showMobileMenu) {
+            document.body.classList.add('no-scroll');
+        } else {
+            document.body.classList.remove('no-scroll');
+        }
+        return () => document.body.classList.remove('no-scroll');
+    }, [showMobileMenu]);
 
     useEffect(() => {
         const token = getToken(); // Now getToken checks validity automatically
@@ -193,6 +243,100 @@ const Header = () => {
         setShowUserMenu(false);
         navigate("/");
     };
+
+    const updateCreateMenuPosition = () => {
+        if (!createButtonRef.current) return;
+        const rect = createButtonRef.current.getBoundingClientRect();
+        const style = { position: 'fixed', top: rect.bottom + 4, minWidth: 200, zIndex: 1000 };
+        if (isRTL) {
+            style.right = window.innerWidth - rect.right;
+        } else {
+            style.left = rect.left;
+        }
+        setCreateMenuStyle(style);
+    };
+
+    const updatePopoverPosition = () => {
+        if (!locationButtonRef.current) return;
+        const rect = locationButtonRef.current.getBoundingClientRect();
+        const style = { position: 'fixed', top: rect.bottom + 8, minWidth: 320, zIndex: 1000 };
+        if (isRTL) {
+            style.right = window.innerWidth - rect.right;
+        } else {
+            style.left = rect.left;
+        }
+        setPopoverStyle(style);
+    };
+
+    const handleToggleCreateMenu = () => {
+        const next = !showCreateMenu;
+        setShowCreateMenu(next);
+        if (next) updateCreateMenuPosition();
+    };
+
+    const handleToggleMobileMenu = () => {
+        setShowMobileMenu(prev => !prev);
+    };
+
+    const handleToggleLocationPopover = () => {
+        const next = !showPopover;
+        setShowPopover(next);
+        if (next) updatePopoverPosition();
+    };
+
+    const handleToggleMobileCreate = () => {
+        setMobileCreateOpen(prev => !prev);
+    };
+
+    // Ensure user menu stays inside viewport
+    useEffect(() => {
+        if (!showUserMenu) return;
+        if (!userButtonRef.current) return;
+        const rect = userButtonRef.current.getBoundingClientRect();
+        const padding = 8;
+        const minWidth = 140;
+        const maxMenuWidth = 220;
+        const viewport = { w: window.innerWidth, h: window.innerHeight };
+        const style = {
+            position: 'fixed',
+            top: Math.max(padding, rect.bottom + 4),
+            minWidth,
+            maxWidth: Math.min(maxMenuWidth, viewport.w - padding * 2),
+            zIndex: 1000,
+            maxHeight: 'calc(100vh - 80px)',
+            overflowY: 'auto'
+        };
+        const distanceFromLeft = rect.left;
+        const distanceFromRight = viewport.w - rect.right;
+        if (direction === 'rtl') {
+            // Clamp so left edge stays inside viewport
+            const maxRight = Math.max(padding, viewport.w - minWidth - padding);
+            const proposedRight = Math.max(padding, distanceFromRight);
+            style.right = Math.min(proposedRight, maxRight);
+        } else {
+            const maxLeft = Math.max(padding, viewport.w - minWidth - padding);
+            const proposedLeft = Math.max(padding, distanceFromLeft);
+            style.left = Math.min(proposedLeft, maxLeft);
+        }
+        setUserMenuStyle(style);
+
+        const onResize = () => {
+            const r = userButtonRef.current?.getBoundingClientRect();
+            if (!r) return;
+            const vw = window.innerWidth;
+            if (direction === 'rtl') {
+                const maxRight = Math.max(padding, vw - minWidth - padding);
+                const proposedRight = Math.max(padding, vw - r.right);
+                setUserMenuStyle(s => ({ ...s, right: Math.min(proposedRight, maxRight), maxWidth: Math.min(maxMenuWidth, vw - padding * 2) }));
+            } else {
+                const maxLeft = Math.max(padding, vw - minWidth - padding);
+                const proposedLeft = Math.max(padding, r.left);
+                setUserMenuStyle(s => ({ ...s, left: Math.min(proposedLeft, maxLeft), maxWidth: Math.min(maxMenuWidth, vw - padding * 2) }));
+            }
+        };
+        window.addEventListener('resize', onResize, { passive: true });
+        return () => window.removeEventListener('resize', onResize);
+    }, [showUserMenu, direction]);
 
     const handleLanguageToggle = async () => {
         const newLang = language === 'he' ? 'en' : 'he';
@@ -325,28 +469,111 @@ const Header = () => {
     const popoverActionsClass = `popover-actions ${isRTL ? 'rtl' : 'ltr'}`;
 
     return (
+        <>
         <div className={headerClass}>
             <nav className={navClass}>
                 <div className={navRightClass}>
-                    <div className="logo" onClick={() => navigate("/")}>
+                    <div className="logo" onClick={() => navigate("/")}> 
                         <FaMapMarkerAlt className="logo-icon" />
                         <div className={logoTextClass}>
                             <span className="logo-text-main">{t('header.logo.main')}</span>
-                            <span className="logo-text-sub">{t('header.logo.sub')}</span>
                         </div>
                     </div>
-                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                    {(isMobile || isTablet) && (
+                        <button 
+                            className="mobile-menu-btn"
+                            aria-label="Menu"
+                            type="button"
+                            onClick={handleToggleMobileMenu}
+                            aria-expanded={showMobileMenu}
+                            ref={mobileMenuBtnRef}
+                        >
+                            {showMobileMenu ? <FaTimes /> : <FaBars />}
+                        </button>
+                    )}
+                </div>
+
+                <div className={navCenterClass}>
+                    <div className={navLinksClass}>
+                        <button 
+                            className={`nav-button ${isActive("/") ? "active" : ""}`} 
+                            onClick={() => navigate("/")}
+                        >
+                            <FaHome />
+                            {!isMobile && t('header.home')}
+                        </button>
+                        <button 
+                            className={`nav-button ${isActive("/search-results") ? "active" : ""}`} 
+                            onClick={() => navigate("/search-results")}
+                        >
+                            <FaSearch />
+                            {!isMobile && t('header.search')}
+                        </button>
+                        {/* Removed sale/promo nav to simplify header */}
+                        <button 
+                                className={`nav-button`}
+                                onClick={handleToggleCreateMenu}
+                                ref={createButtonRef}
+                                aria-expanded={showCreateMenu}
+                                aria-haspopup="true"
+                                title={t('userBusinesses.create')}
+                            >
+                                <FaPlus />
+                                {!isMobile && t('userBusinesses.create')}
+                            </button>
+                            {showCreateMenu && (
+                                <div 
+                                    className={`${dropdownMenuClass} ${direction}`}
+                                    role="menu"
+                                    aria-label="Create dropdown"
+                                    ref={createMenuRef}
+                                    style={createMenuStyle}
+                                >
+                                    <button 
+                                        className={dropdownItemClass} 
+                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/business"); }}
+                                        role="menuitem"
+                                    >
+                                        <FaStore />
+                                        {t('userBusinesses.createOptions.addBusiness')}
+                                    </button>
+                                    <button 
+                                        className={dropdownItemClass} 
+                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/ads/sale/new"); }}
+                                        role="menuitem"
+                                    >
+                                        <FaTags />
+                                        {t('userBusinesses.createOptions.saleAd')}
+                                    </button>
+                                    <button 
+                                        className={dropdownItemClass} 
+                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/ads/promo/new"); }}
+                                        role="menuitem"
+                                    >
+                                        <FaBullhorn />
+                                        {t('userBusinesses.createOptions.promoAd')}
+                                    </button>
+                                </div>
+                            )}
+                        <button 
+                            className={`nav-button ${isActive("/suggest-item") ? "active" : ""}`} 
+                            onClick={() => navigate("/suggest-item", { state: { background: location } })}
+                        >
+                            <FaLightbulb />
+                            {t('header.suggest')}
+                        </button>
                         <button
-                            onClick={() => setShowPopover(!showPopover)}
-                            className="refresh-location-btn styled-location-btn"
+                            onClick={handleToggleLocationPopover}
+                            className="nav-button"
                             title={t('header.myLocation')}
                             type="button"
+                            ref={locationButtonRef}
                         >
-                            <FaMapMarkerAlt style={{ marginLeft: 6, fontSize: 18 }} />
-                            {t('header.myLocation')}
+                            <FaMapMarkerAlt />
+                            {!isMobile && <span className="loc-label">{t('header.locationShort')}</span>}
                         </button>
                         {showPopover && (
-                            <div ref={popoverRef} className={locationPopoverClass}>
+                            <div ref={popoverRef} className={locationPopoverClass} style={popoverStyle}>
                                 <div className={popoverHeaderClass}>
                                     <span>{t('header.currentLocation')}</span>
                                     <button className="close-popover-btn" onClick={() => setShowPopover(false)}><FaTimes /></button>
@@ -373,79 +600,21 @@ const Header = () => {
                     </div>
                 </div>
 
-                <div className={navCenterClass}>
-                    <div className={navLinksClass}>
-                        <button 
-                            className={`nav-button ${isActive("/") ? "active" : ""}`} 
-                            onClick={() => navigate("/")}
-                        >
-                            <FaHome />
-                            {t('header.home')}
-                        </button>
-                        <button 
-                            className={`nav-button ${isActive("/search-results") ? "active" : ""}`} 
-                            onClick={() => navigate("/search-results")}
-                        >
-                            <FaSearch />
-                            {t('header.search')}
-                        </button>
-                        <button 
-                            className={`nav-button ${isActive("/business") ? "active" : ""}`} 
-                            onClick={() => navigate("/business")}
-                        >
-                            <FaPlusCircle />
-                            {t('header.addBusiness')}
-                        </button>
-                        <button 
-                            className={`nav-button ${isActive("/suggest-item") ? "active" : ""}`} 
-                            onClick={() => navigate("/suggest-item")}
-                        >
-                            <FaLightbulb />
-                            {t('header.suggest')}
-                        </button>
-                    </div>
-                </div>
-
                 <div className={navLeftClass}>
                     <div className={langSwitchClass}>
-                        <div className={`lang-dropdown ${showLangMenu ? 'open' : ''}`}>
-                            <button
-                                onClick={() => setShowLangMenu(!showLangMenu)}
-                                className="lang-toggle-btn"
-                                title={t('header.selectLanguage')}
-                                type="button"
-                                aria-label={t('header.selectLanguage')}
-                                aria-expanded={showLangMenu}
-                                aria-haspopup="true"
-                            >
-                                <div className="lang-toggle-content">
-                                    <span className="lang-text">
-                                        {language === 'he' ? t('header.languages.he') : t('header.languages.en')}
-                                    </span>
-                                    <span className="lang-arrow">▼</span>
-                                </div>
-                            </button>
-                            
-                            {showLangMenu && (
-                                <div className={`lang-menu ${direction}`} role="menu">
-                                    <button
-                                        className={`lang-menu-item ${language === 'he' ? 'active' : ''}`}
-                                        onClick={() => handleLanguageChange('he')}
-                                        role="menuitem"
-                                    >
-                                        <span className="lang-text">{t('header.languages.he')}</span>
-                                    </button>
-                                    <button
-                                        className={`lang-menu-item ${language === 'en' ? 'active' : ''}`}
-                                        onClick={() => handleLanguageChange('en')}
-                                        role="menuitem"
-                                    >
-                                        <span className="lang-text">{t('header.languages.en')}</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                        <button
+                            className={`lang-toggle-pill ${direction}`}
+                            onClick={handleLanguageToggle}
+                            aria-label={t('header.selectLanguage')}
+                            type="button"
+                        >
+                            {/* <FaGlobe className="lang-globe" aria-hidden="true" /> */}
+                            <span className={`pill-option ${language === 'he' ? 'active' : ''}`}>{t('header.languages.he')}</span>
+                            <span className="pill-sep">|</span>
+                            <span className={`pill-option ${language === 'en' ? 'active' : ''}`}>{t('header.languages.en')}</span>
+                        </button>
                     </div>
+
 
                     {isAuthLoading ? (
                         <div className="auth-buttons">
@@ -462,13 +631,14 @@ const Header = () => {
                                     aria-haspopup="true"
                                 >
                                     <FaUserCircle />
-                                    <span>{greeting} <span className="username">{username}</span></span>
+                                    {!isMobile && <span>{greeting} <span className="username">{username}</span></span>}
                                 </button>
                                 {showUserMenu && (
                                     <div 
                                         className={dropdownMenuClass}
                                         role="menu"
                                         aria-labelledby="user-menu-button"
+                                        style={userMenuStyle}
                                     >
                                         <button 
                                             className={dropdownItemClass} 
@@ -517,9 +687,9 @@ const Header = () => {
                             </div>
                         ) : (
                             <div className={authButtonsClass}>
-                                <button className="auth-button" onClick={() => navigate("/auth")}>
+                                <button className="auth-button" onClick={() => navigate("/auth", { state: { background: location } })}>
                                     <FaSignInAlt />
-                                    {t('header.register')} / {t('header.login')}
+                                    {!isMobile && (<>{t('header.register')} / {t('header.login')}</>)}
                                 </button>
                             </div>
                         )
@@ -527,6 +697,68 @@ const Header = () => {
                 </div>
             </nav>
         </div>
+        {(isMobile || isTablet) && showMobileMenu && (
+            <div 
+                className={`mobile-menu ${direction}`} 
+                role="menu" 
+                aria-label="Mobile Menu"
+                ref={mobileMenuRef}
+            >
+                <button 
+                    className="mobile-menu-item"
+                    onClick={() => { setShowMobileMenu(false); navigate("/"); }}
+                >
+                    <FaHome />
+                    <span>{t('header.home')}</span>
+                </button>
+                <button 
+                    className="mobile-menu-item"
+                    onClick={() => { setShowMobileMenu(false); navigate("/search-results"); }}
+                >
+                    <FaSearch />
+                    <span>{t('header.search')}</span>
+                </button>
+                <div className="mobile-menu-section">
+                    <button className="mobile-menu-item" onClick={handleToggleMobileCreate} aria-expanded={mobileCreateOpen} aria-controls="mobile-create-submenu">
+                        <FaPlus />
+                        <span>{t('userBusinesses.create')}</span>
+                    </button>
+                    {mobileCreateOpen && (
+                        <div id="mobile-create-submenu" role="group" aria-label={t('userBusinesses.create')}>
+                            <button 
+                                className="mobile-menu-item"
+                                onClick={() => { setShowMobileMenu(false); setMobileCreateOpen(false); navigate("/business"); }}
+                            >
+                                <FaStore />
+                                <span>{t('userBusinesses.createOptions.addBusiness')}</span>
+                            </button>
+                            <button 
+                                className="mobile-menu-item"
+                                onClick={() => { setShowMobileMenu(false); setMobileCreateOpen(false); navigate("/ads/sale/new"); }}
+                            >
+                                <FaTags />
+                                <span>{t('userBusinesses.createOptions.saleAd')}</span>
+                            </button>
+                            <button 
+                                className="mobile-menu-item"
+                                onClick={() => { setShowMobileMenu(false); setMobileCreateOpen(false); navigate("/ads/promo/new"); }}
+                            >
+                                <FaBullhorn />
+                                <span>{t('userBusinesses.createOptions.promoAd')}</span>
+                            </button>
+                        </div>
+                    )}
+                </div>
+                <button 
+                    className="mobile-menu-item"
+                    onClick={() => { setShowMobileMenu(false); navigate("/suggest-item", { state: { background: location } }); }}
+                >
+                    <FaLightbulb />
+                    <span>{t('header.suggest')}</span>
+                </button>
+            </div>
+        )}
+        </>
     );
 };
 

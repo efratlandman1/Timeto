@@ -18,6 +18,79 @@
     box-sizing: border-box;
 }
 
+/* Favorites tabs */
+.favorites-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+    gap: 0;
+    background: #f3f3f3; /* match suggest segmented control */
+    border-radius: 12px;
+    padding: 6px;
+    margin: 8px 0 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.favorites-tab {
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #555;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    font-size: inherit; /* respects global text size (accessibility) */
+    line-height: 1.4;
+}
+/* Mobile: horizontal scrollable tabs */
+@media (max-width: 768px) {
+  .favorites-tabs {
+    display: block; /* change to block to allow horizontal scroller */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    padding: 6px;
+    max-width: 100%;
+  }
+  .favorites-tabs::-webkit-scrollbar { display: none; }
+  .favorites-tab {
+    display: inline-block;
+    margin-inline: 4px;
+    padding: 8px 12px;
+    font-size: 0.95rem;
+  }
+
+  /* Prevent the main layout from scrolling horizontally when tabs overflow */
+  .wide-page-content { overflow-x: hidden; }
+}
+
+.favorites-tab .count { color: #b71c1c; margin-inline-start: 6px; font-weight: 600; }
+
+.favorites-tab.active {
+    background: #fff;
+    color: #d32f2f;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.favorites-tab:not(.active):hover {
+    background: transparent;
+    color: #444;
+}
+
+/* Empty state spacing and centering under tabs */
+.empty-state {
+    margin-top: 16px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+}
+
 /* Add Business Button */
 .add-business-container {
     position: fixed;

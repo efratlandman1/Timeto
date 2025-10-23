@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import '../styles/AuthPage.css'; // Use the new unified styles
+import { FaTimes } from 'react-icons/fa';
+import '../styles/AuthPage.css';
+import '../styles/SuggestItemPage.css';
 
 const ForgotPasswordPage = () => {
     const { t } = useTranslation();
@@ -33,26 +35,28 @@ const ForgotPasswordPage = () => {
     };
 
     return (
-        <div className="auth-page-overlay">
+        <div className={`modal-overlay-fixed`} onClick={() => window.history.back()}>
             {isLoading && (
                 <div className="spinner-overlay">
                     <div className="spinner"></div>
                 </div>
             )}
-            <div className="auth-modal" style={{ opacity: isLoading ? 0.7 : 1 }}>
-                <button onClick={() => window.location.href = '/auth'} className="close-button">×</button>
+            <div className="modal-container suggest-modal" role="dialog" aria-modal="true" aria-labelledby="forgot-modal-title" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                    <button className="modal-close" aria-label={t('common.cancel')} onClick={() => window.history.back()}><FaTimes /></button>
+                    <h1 id="forgot-modal-title" className="login-title suggest-modal-title">{t('auth.forgotPassword.title')}</h1>
+                </div>
 
                 {message.type === 'success' ? (
-                    <div className="success-view">
-                        <h2>{t('auth.forgotPassword.requestSent')}</h2>
-                        <p>{message.text}</p>
+                    <div className="success-view" style={{padding: '0 1.25rem 1rem'}}>
+                        <h2 style={{textAlign: 'center'}}>{t('auth.forgotPassword.requestSent')}</h2>
+                        <p style={{textAlign: 'center'}}>{message.text}</p>
                         <Link to="/auth" className="confirm-button" style={{textDecoration: 'none', marginTop: '1rem'}}>{t('auth.forgotPassword.backToLogin')}</Link>
                     </div>
                 ) : (
                     <>
-                        <h2>{t('auth.forgotPassword.title')}</h2>
-                        <p>{t('auth.forgotPassword.subtitle')}</p>
-                        <form className="email-form" onSubmit={handleSubmit}>
+                        <p style={{textAlign: 'center', marginInline: '1.25rem'}}>{t('auth.forgotPassword.subtitle')}</p>
+                        <form className="email-form" onSubmit={handleSubmit} style={{marginInline: '1.25rem'}}>
                             <div className="input-wrapper">
                                 <input
                                     className="form-input"
@@ -67,10 +71,7 @@ const ForgotPasswordPage = () => {
                                 {t('auth.forgotPassword.submit')}
                             </button>
                         </form>
-                        <button className="cancel-button" type="button" onClick={() => window.location.href = '/auth'} style={{marginTop: '1rem'}}>
-                            {t('common.cancel')}
-                        </button>
-                        {message.type === 'error' && <p className="auth-message error-message">{message.text}</p>}
+                        {message.type === 'error' && <p className="auth-message error-message" style={{textAlign:'center', marginInline: '1.25rem'}}>{message.text}</p>}
                     </>
                 )}
             </div>

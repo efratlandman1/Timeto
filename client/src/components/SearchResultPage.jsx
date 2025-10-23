@@ -1,12 +1,15 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import BusinessCard from './BusinessCard';
+import SaleAdCard from './SaleAdCard';
+import PromoAdCard from './PromoAdCard';
 import AdvancedSearchModal from './AdvancedSearchModal';
 import axios from 'axios';
 import '../styles/SearchResultPage.css';
+import '../styles/userBusinesses.css';
 import '../styles/AdvancedSearchPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchBar from './SearchBar';
-import { FaFilter, FaTimes, FaChevronDown, FaSort } from 'react-icons/fa';
+import { FaFilter, FaTimes, FaChevronDown, FaSort, FaArrowRight } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { buildQueryUrl } from '../utils/buildQueryUrl';
 import { getToken } from '../utils/auth';
@@ -15,10 +18,24 @@ import { useTranslation } from 'react-i18next';
 const ITEMS_PER_PAGE = 8;
 
 const SearchResultPage = () => {
-    const { t, ready } = useTranslation();
+    const { t, i18n, ready } = useTranslation();
+    // Active tab: all | business | sale | promo
+    const [activeTab, setActiveTab] = useState('all');
+
+    // Businesses state
     const [businesses, setBusinesses] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+    const [bizPage, setBizPage] = useState(1);
+    const [bizTotalPages, setBizTotalPages] = useState(1);
+
+    // Sale Ads state
+    const [saleAds, setSaleAds] = useState([]);
+    const [salePage, setSalePage] = useState(1);
+    const [saleTotalPages, setSaleTotalPages] = useState(1);
+
+    // Promo Ads state
+    const [promoAds, setPromoAds] = useState([]);
+    const [promoPage, setPromoPage] = useState(1);
+    const [promoTotalPages, setPromoTotalPages] = useState(1);
     const [showFilters, setShowFilters] = useState(false);
     const [activeFilters, setActiveFilters] = useState({});
     const [sortOption, setSortOption] = useState('rating');
@@ -38,25 +55,30 @@ const SearchResultPage = () => {
     const locationError = useSelector(state => state.location.error);
 
     const observer = useRef();
-    const lastBusinessElementRef = useCallback(node => {
+    const lastItemRef = useCallback(node => {
         if (isLoading) return;
         if (observer.current) observer.current.disconnect();
         observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && hasMore) {
-                setCurrentPage(prevPage => prevPage + 1);
+            if (!entries[0].isIntersecting || !hasMore) return;
+            if (activeTab === 'business') setBizPage(prev => prev + 1);
+            else if (activeTab === 'sale') setSalePage(prev => prev + 1);
+            else if (activeTab === 'promo') setPromoPage(prev => prev + 1);
+            else {
+                // all: advance all categories to keep combined stream fresh
+                setBizPage(prev => prev + 1);
+                setSalePage(prev => prev + 1);
+                setPromoPage(prev => prev + 1);
             }
         });
         if (node) observer.current.observe(node);
-    }, [isLoading, hasMore]);
+    }, [isLoading, hasMore, activeTab]);
     
-        useEffect(() => {
+    useEffect(() => {
         const handleClickOutside = (event) => {
             if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target)) {
                 setShowSortDropdown(false);
             }
-            if (advancedSearchRef.current && !advancedSearchRef.current.contains(event.target) && !event.target.closest('.filter-button')) {
-                setShowFilters(false);
-            }
+            // advanced search now manages its own overlay and outside click
         };
 
         document.addEventListener('mousedown', handleClickOutside);
@@ -65,6 +87,7 @@ const SearchResultPage = () => {
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
+        const urlTab = params.get('tab');
         const filters = {};
         const sort = params.get('sort') || 'rating';
         for (const [key, value] of params.entries()) {
@@ -82,6 +105,9 @@ const SearchResultPage = () => {
         }
         setActiveFilters(filters);
         setSortOption(sort);
+        if (urlTab && ['all','business','sale','promo'].includes(urlTab)) {
+            setActiveTab(urlTab);
+        }
     }, [location.search]);
 
     useEffect(() => {
@@ -89,10 +115,12 @@ const SearchResultPage = () => {
         const sort = params.get('sort') || 'rating';
         const filtersString = JSON.stringify(activeFilters);
         if (
-            currentPage !== 1 &&
+            (bizPage !== 1 || salePage !== 1 || promoPage !== 1) &&
             (prevSortRef.current !== sort || prevFiltersRef.current !== filtersString)
         ) {
-            setCurrentPage(1);
+            setBizPage(1);
+            setSalePage(1);
+            setPromoPage(1);
         }
         prevSortRef.current = sort;
         prevFiltersRef.current = filtersString;
@@ -121,7 +149,7 @@ const SearchResultPage = () => {
         if (needsLocation) {
             if (locationLoading) return;
             if (!userLocation && !locationError) return;
-            if (locationError && prevLocationErrorRef.current === locationError && currentPage !== 1) return;
+            if (locationError && prevLocationErrorRef.current === locationError && bizPage !== 1) return;
             prevLocationErrorRef.current = locationError;
         }
 
@@ -134,7 +162,8 @@ const SearchResultPage = () => {
                 paramsObj[key] = value;
             }
         }
-        paramsObj.page = currentPage;
+        // apply global sort/filters to other categories too
+        paramsObj.page = bizPage;
         paramsObj.limit = ITEMS_PER_PAGE;
         if (needsLocation && locationError) {
             paramsObj.sort = 'rating';
@@ -162,17 +191,80 @@ const SearchResultPage = () => {
             .then(res => {
                 const newBusinesses = res.data.data.businesses || [];
                 setBusinesses(prevBusinesses => 
-                    currentPage === 1 ? newBusinesses : [...prevBusinesses, ...newBusinesses]
+                    bizPage === 1 ? newBusinesses : [...prevBusinesses, ...newBusinesses]
                 );
-                setTotalPages(res.data.pagination?.totalPages || 1);
-                setHasMore(currentPage < (res.data.pagination?.totalPages || 1));
+                const total = res.data.pagination?.totalPages || 1;
+                setBizTotalPages(total);
+                setHasMore((bizPage < total) || (salePage < saleTotalPages) || (promoPage < promoTotalPages));
                 setIsLoading(false);
             })
             .catch(error => {
                 console.error('Error fetching businesses:', error);
                 setIsLoading(false);
             });
-    }, [location.search, currentPage, userLocation, locationLoading, locationError]);
+    }, [location.search, bizPage, userLocation, locationLoading, locationError]);
+
+    // Fetch Sale Ads
+    useEffect(() => {
+        const token = getToken();
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const params = new URLSearchParams(location.search);
+        const paramsObj = {};
+        for (const [key, value] of params.entries()) {
+            if (['q','categoryId','categoryName','priceMin','priceMax','sort','maxDistance','services','rating','city','openNow','addedWithin','includeNoPrice'].includes(key)) {
+                paramsObj[key] = value;
+            }
+        }
+        paramsObj.page = salePage;
+        paramsObj.limit = ITEMS_PER_PAGE;
+
+        const qs = new URLSearchParams(paramsObj).toString();
+        setIsLoading(true);
+        axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-ads?${qs}`, { headers })
+            .then(res => {
+                const newAds = res.data.data.ads || [];
+                setSaleAds(prev => salePage === 1 ? newAds : [...prev, ...newAds]);
+                const total = res.data.pagination?.totalPages || 1;
+                setSaleTotalPages(total);
+                setHasMore((bizPage < bizTotalPages) || (salePage < total) || (promoPage < promoTotalPages));
+                setIsLoading(false);
+            })
+            .catch(err => {
+                console.error('Error fetching sale ads:', err);
+                setIsLoading(false);
+            });
+    }, [location.search, salePage]);
+
+    // Fetch Promo Ads
+    useEffect(() => {
+        const token = getToken();
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const params = new URLSearchParams(location.search);
+        const paramsObj = {};
+        for (const [key, value] of params.entries()) {
+            if (['q','categoryId','categoryName','sort','status','maxDistance','services','rating','priceMin','priceMax','city','openNow','addedWithin','includeNoPrice'].includes(key)) {
+                paramsObj[key] = value;
+            }
+        }
+        paramsObj.page = promoPage;
+        paramsObj.limit = ITEMS_PER_PAGE;
+
+        const qs = new URLSearchParams({ status: 'active', ...paramsObj }).toString();
+        setIsLoading(true);
+        axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/promo-ads?${qs}`, { headers })
+            .then(res => {
+                const newAds = res.data.data.ads || [];
+                setPromoAds(prev => promoPage === 1 ? newAds : [...prev, ...newAds]);
+                const total = res.data.pagination?.totalPages || 1;
+                setPromoTotalPages(total);
+                setHasMore((bizPage < bizTotalPages) || (salePage < saleTotalPages) || (promoPage < total));
+                setIsLoading(false);
+            })
+            .catch(err => {
+                console.error('Error fetching promo ads:', err);
+                setIsLoading(false);
+            });
+    }, [location.search, promoPage]);
 
     const SORT_OPTIONS = {
         rating: t('searchResults.sort.rating'),
@@ -182,6 +274,87 @@ const SearchResultPage = () => {
         popular_nearby: t('searchResults.sort.popular_nearby')
     };
     
+  // Price-based client filtering to enforce rules for items without price
+  const priceParams = useMemo(() => {
+    const p = new URLSearchParams(location.search);
+    const min = p.get('priceMin');
+    const max = p.get('priceMax');
+    const include = p.get('includeNoPrice') === 'true';
+    const categoryName = (p.get('categoryName') || '').toLowerCase().trim();
+    return {
+      has: !!(min || max),
+      min: min ? Number(min) : null,
+      max: max ? Number(max) : null,
+      includeNoPrice: include,
+      categoryName,
+    };
+  }, [location.search]);
+
+  const checkPriceInRange = (value) => {
+    if (value === null || value === undefined || value === '') return false;
+    const num = Number(value);
+    if (Number.isNaN(num)) return false;
+    if (priceParams.min !== null && num < priceParams.min) return false;
+    if (priceParams.max !== null && num > priceParams.max) return false;
+    return true;
+  };
+
+  const filteredBusinesses = useMemo(() => {
+    let list = businesses;
+    // Apply category filter on client as a fallback (in case server didn't)
+    if (priceParams.categoryName) {
+      const matchCategory = (b) => {
+        const candidates = [
+          b?.categoryName,
+          b?.category,
+          b?.category?.name,
+          b?.categoryId?.name,
+        ]
+          .filter(Boolean)
+          .map((s) => String(s).toLowerCase());
+        return candidates.includes(priceParams.categoryName);
+      };
+      list = list.filter(matchCategory);
+    }
+    if (!priceParams.has) return list;
+    return priceParams.includeNoPrice ? list : [];
+  }, [businesses, priceParams]);
+
+  const filteredSaleAds = useMemo(() => {
+    let list = saleAds;
+    // Category filter for sale ads - try several common fields
+    if (priceParams.categoryName) {
+      const matchCategory = (ad) => {
+        const candidates = [
+          ad?.categoryName,
+          ad?.category,
+          ad?.category?.name,
+          ad?.categoryId?.name,
+          ad?.saleCategory?.name,
+          ad?.saleCategoryName,
+        ]
+          .filter(Boolean)
+          .map((s) => String(s).toLowerCase());
+        return candidates.includes(priceParams.categoryName);
+      };
+      list = list.filter(matchCategory);
+    }
+    if (!priceParams.has) return list;
+    return list.filter(ad => {
+      const hasPrice = ad && ad.price !== undefined && ad.price !== null && ad.price !== '';
+      if (!hasPrice) return priceParams.includeNoPrice;
+      return checkPriceInRange(ad.price);
+    });
+  }, [saleAds, priceParams]);
+
+  const filteredPromoAds = useMemo(() => {
+    // If a category filter is set, skip promo ads (no category field)
+    if (priceParams.categoryName) return [];
+    if (!priceParams.has) return promoAds;
+    // Promo ads usually ללא מחיר; נכליל רק אם includeNoPrice=true
+    return priceParams.includeNoPrice ? promoAds : [];
+  }, [promoAds, priceParams]);
+
     // Wait for translations to load
     if (!ready) {
         return (
@@ -223,7 +396,9 @@ const SearchResultPage = () => {
 
     const handleClearFilters = () => {
         navigate({ pathname: location.pathname });
-        setCurrentPage(1);
+        setBizPage(1);
+        setSalePage(1);
+        setPromoPage(1);
     };
 
     const handleSortChange = (newSort) => {
@@ -237,17 +412,23 @@ const SearchResultPage = () => {
         navigate({ pathname: location.pathname, search: newParams.toString() });
     };
 
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
+    const handleTabChange = (tab) => {
+        setActiveTab(tab);
+        const params = new URLSearchParams(location.search);
+        params.set('tab', tab);
+        navigate({ pathname: location.pathname, search: params.toString() });
     };
 
     return (
         <div className='wide-page-container'>
-            <div className='wide-page-content'>
+            <div className='wide-page-content search-results-page'>
+                <button className="nav-button above-header" onClick={() => navigate('/')}> 
+                    <FaArrowRight className="icon" />
+                    {t('common.backToHome')}
+                </button>
                 <div className="page-header">
                     <div className="page-header__content">
-                        <h1>{t('searchResults.pageTitle')}</h1>
-                        <p>{t('searchResults.pageSubtitle')}</p>
+                        <h1 className="login-title">{t('searchResults.pageTitle')}</h1>
                     </div>
                 </div>
                 
@@ -295,16 +476,14 @@ const SearchResultPage = () => {
                     </div>
 
                     {showFilters && (
-                        <div className="modal-overlay">
-                            <AdvancedSearchModal
-                                isOpen={showFilters}
-                                onClose={() => setShowFilters(false)}
-                                filters={activeFilters}
-                                onFilterChange={(key, value) => {
-                                    handleFilterChange(key, value);
-                                }}
-                            />
-                        </div>
+                        <AdvancedSearchModal
+                            isOpen={showFilters}
+                            onClose={() => setShowFilters(false)}
+                            filters={activeFilters}
+                            onFilterChange={(key, value) => {
+                                handleFilterChange(key, value);
+                            }}
+                        />
                     )}
                 </div>
 
@@ -315,67 +494,108 @@ const SearchResultPage = () => {
                     <div style={{ color: 'red', margin: '1rem 0', textAlign: 'center' }}>{locationError}</div>
                 )}
 
-                {Object.keys(activeFilters).length > 0 && (
-                    <div className="filters-area">
+                {/* Active filters block - show only when there are filters */}
+                {(() => {
+                    const params = new URLSearchParams(location.search);
+                    const hasAny = ['categoryName','services','rating','maxDistance','priceMin','priceMax','city','openNow','verifiedOnly','reviewsOnly','addedWithin']
+                      .some(k => params.has(k));
+                    if (!hasAny) return null;
+                    const chips = [];
+                    const withColon = (txt) => (txt && /:\s*$/.test(txt) ? txt : `${txt}:`);
+                    if (params.get('categoryName')) chips.push({ key: 'categoryName', value: params.get('categoryName'), label: withColon(t('searchResults.filterTags.category')) });
+                    (params.getAll('services')||[]).forEach(v=>chips.push({ key: 'services', value: v, label: withColon(t('searchResults.filterTags.service')) }));
+                    if (params.get('rating')) chips.push({ key: 'rating', value: params.get('rating'), label: withColon(t('searchResults.filterTags.rating')) });
+                    if (params.get('maxDistance')) chips.push({ key: 'maxDistance', value: `${params.get('maxDistance')} ${t('searchResults.filterTags.km')}`, rawValue: params.get('maxDistance'), label: withColon(t('searchResults.filterTags.maxDistance')) });
+                    if (params.get('priceMin')) chips.push({ key: 'priceMin', value: params.get('priceMin'), label: withColon(t('advancedSearch.min')||'Min') });
+                    if (params.get('priceMax')) chips.push({ key: 'priceMax', value: params.get('priceMax'), label: withColon(t('advancedSearch.max')||'Max') });
+                    if (params.get('city')) chips.push({ key: 'city', value: params.get('city'), label: withColon(t('advancedSearch.city')||'City') });
+                    if (params.get('openNow')) chips.push({ key: 'openNow', value: '', label: `${t('advancedSearch.openNow')||'Open Now'}` });
+                    if (params.get('addedWithin')) chips.push({ key: 'addedWithin', value: params.get('addedWithin'), label: withColon(t('advancedSearch.addedWithin')||'Added') });
+                    return (
+                      <div className="filters-area">
                         <div className="filters-header">
-                            <div className="filters-title">{t('searchResults.filters.active')}</div>
-                            <button 
-                                className="clear-all-filters"
-                                onClick={handleClearFilters}
-                            >
-                                {t('searchResults.filters.clearAll')}
-                                <FaTimes />
-                            </button>
+                          <div className="filters-title">{t('searchResults.filters.active')}</div>
+                          <button className="clear-all-filters" onClick={handleClearFilters}>{t('searchResults.filters.clearAll')}</button>
                         </div>
-
                         <div className="active-filters-container">
-                            {Object.entries(activeFilters).map(([key, value]) => (
-                                Array.isArray(value) ? (
-                                    value.map((v, idx) => (
-                                        <div key={`${key}-${idx}`} className="filter-tag">
-                                            {key === 'categoryName' ? `${t('searchResults.filterTags.category')} ${v}` :
-                                             key === 'rating' ? `${v} ${t('searchResults.filterTags.rating')}` :
-                                             key === 'services' ? `${t('searchResults.filterTags.service')} ${v}` :
-                                             key === 'maxDistance' ? `${t('searchResults.filterTags.maxDistance')} ${v} ${t('searchResults.filterTags.km')}` : v}
-                                            <button onClick={() => handleRemoveFilter(key, v)}>
-                                                <FaTimes />
-                                            </button>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div key={key} className="filter-tag">
-                                        {key === 'categoryName' ? `${t('searchResults.filterTags.category')} ${value}` :
-                                         key === 'rating' ? `${value} ${t('searchResults.filterTags.rating')}` :
-                                         key === 'services' ? `${t('searchResults.filterTags.service')} ${value}` :
-                                         key === 'maxDistance' ? `${t('searchResults.filterTags.maxDistance')} ${value} ${t('searchResults.filterTags.km')}` : value}
-                                        <button onClick={() => handleRemoveFilter(key)}>
-                                            <FaTimes />
-                                        </button>
-                                    </div>
-                                )
-                            ))}
+                          {chips.map((chip, idx)=> (
+                            <div key={`${chip.key}-${idx}`} className="filter-tag">
+                              <span>{chip.label} {chip.value}</span>
+                              <button onClick={() => handleRemoveFilter(chip.key, chip.key==='services' ? chip.value : undefined)} aria-label="remove filter">×</button>
+                            </div>
+                          ))}
                         </div>
-                    </div>
+                      </div>
+                    );
+                })()}
+
+                {/* Tabs for result types - render only when lists are ready (not loading after first fetch) */}
+                {!isLoading && (
+                <div className="favorites-tabs" role="tablist" aria-label={t('userBusinesses.tabs.aria')}>
+                    <button className={`favorites-tab ${activeTab==='all'?'active':''}`} role="tab" aria-selected={activeTab==='all'} onClick={() => handleTabChange('all')}>
+                        {t('favorites.tabs.all')} <span className="count">({filteredBusinesses.length + filteredSaleAds.length + filteredPromoAds.length})</span>
+                    </button>
+                    <button className={`favorites-tab ${activeTab==='business'?'active':''}`} role="tab" aria-selected={activeTab==='business'} onClick={() => handleTabChange('business')}>
+                        {t('favorites.tabs.business')} <span className="count">({filteredBusinesses.length})</span>
+                    </button>
+                    <button className={`favorites-tab ${activeTab==='sale'?'active':''}`} role="tab" aria-selected={activeTab==='sale'} onClick={() => handleTabChange('sale')}>
+                        {t('favorites.tabs.sale')} <span className="count">({filteredSaleAds.length})</span>
+                    </button>
+                    <button className={`favorites-tab ${activeTab==='promo'?'active':''}`} role="tab" aria-selected={activeTab==='promo'} onClick={() => handleTabChange('promo')}>
+                        {t('favorites.tabs.promo')} <span className="count">({filteredPromoAds.length})</span>
+                    </button>
+                </div>
                 )}
 
-                {/* תוצאות חיפוש */}
-                {businesses.length > 0 && (
-                    <div className="search-results-layout">
-                        <div className="business-cards-grid">
-                            {businesses.map((business, index) => {
-                                if (businesses.length === index + 1) {
-                                    return (
-                                        <div key={business._id} ref={lastBusinessElementRef}>
-                                            <BusinessCard business={business} />
-                                        </div>
-                                    );
-                                } else {
-                                    return <BusinessCard key={business._id} business={business} />;
-                                }
-                            })}
-                        </div>
+                {/* Results */}
+                <div className="search-results-layout">
+                    <div className="business-cards-grid">
+                        {activeTab === 'business' && filteredBusinesses.map((business, index) => (
+                            <div key={business._id} ref={index === businesses.length - 1 ? lastItemRef : undefined}>
+                                <BusinessCard business={business} />
+                            </div>
+                        ))}
+
+                        {activeTab === 'sale' && filteredSaleAds.map((ad, index) => (
+                            <div key={ad._id} ref={index === filteredSaleAds.length - 1 ? lastItemRef : undefined}>
+                                <SaleAdCard ad={ad} />
+                            </div>
+                        ))}
+
+                        {activeTab === 'promo' && filteredPromoAds.map((ad, index) => (
+                            <div key={ad._id} ref={index === filteredPromoAds.length - 1 ? lastItemRef : undefined}>
+                                <PromoAdCard ad={ad} />
+                            </div>
+                        ))}
+
+                        {activeTab === 'all' && (() => {
+                            const items = [
+                                ...filteredBusinesses.map(b => ({ type: 'business', data: b })),
+                                ...filteredSaleAds.map(s => ({ type: 'sale', data: s })),
+                                ...filteredPromoAds.map(p => ({ type: 'promo', data: p }))
+                            ];
+                            const getTs = (o) => new Date(o?.updatedAt || o?.createdAt || o?.created_at || 0).getTime();
+                            const getName = (o) => String(o?.name || o?.title || o?.nameEn || o?.titleEn || '');
+                            const collator = new Intl.Collator(i18n?.language || undefined, { sensitivity: 'base', numeric: true });
+                            const getRating = (o) => typeof o?.rating === 'number' ? o.rating : -Infinity;
+                            if (sortOption === 'newest') items.sort((a,b)=> getTs(b.data) - getTs(a.data));
+                            else if (sortOption === 'name') items.sort((a,b)=> collator.compare(getName(a.data), getName(b.data)));
+                            else if (sortOption === 'rating') items.sort((a,b)=> getRating(b.data) - getRating(a.data));
+
+                            return items.map((item, index) => (
+                                <div key={`${item.type}-${item.data._id || index}`} ref={index === items.length - 1 ? lastItemRef : undefined}>
+                                    {item.type === 'business' ? (
+                                        <BusinessCard business={item.data} />
+                                    ) : item.type === 'sale' ? (
+                                        <SaleAdCard ad={item.data} />
+                                    ) : (
+                                        <PromoAdCard ad={item.data} />
+                                    )}
+                                </div>
+                            ));
+                        })()}
                     </div>
-                )}
+                </div>
 
                 {/* לוודר */}
                 {isLoading && (

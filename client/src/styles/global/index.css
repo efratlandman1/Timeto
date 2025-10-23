@@ -2,6 +2,7 @@
 @import './typography.css';
 @import './layout.css';
 @import './spacing.css';
+@import './breakpoints.css';
 
 /* Import Component Styles */
 @import './components/headers.css';
@@ -13,6 +14,24 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+/* Desktop content scale (safe wrapper scaling) */
+:root { --content-scale: 0.8; }
+
+@media (min-width: 1200px) {
+    /* Prefer native zoom when available */
+    @supports (zoom: 1) {
+        .page-content { zoom: var(--content-scale); }
+    }
+    /* Fallback for browsers without zoom support */
+    @supports not (zoom: 1) {
+        .page-content {
+            transform: scale(var(--content-scale));
+            transform-origin: top center;
+            width: calc(100% / var(--content-scale));
+        }
+    }
 }
 
 /* RTL/LTR Support - Complete Layout Mirroring */
@@ -67,6 +86,20 @@ body {
     background-color: var(--bg-secondary);
     text-align: var(--text-align);
     margin-top: 60px; /* Add margin to prevent content from being hidden behind fixed header */
+}
+
+/* Constrain native date/datetime pickers and popovers within viewport */
+input[type="date"],
+input[type="datetime-local"] {
+    max-width: 100%;
+}
+
+/* iOS/Safari date picker popover containment hint */
+.narrow-page-content,
+.wide-page-content {
+    position: relative;
+    /* Allow native date pickers to overflow outside without being clipped */
+    overflow-x: visible;
 }
 
 /* Complete Layout Mirroring Classes */
@@ -179,6 +212,20 @@ body {
     flex-direction: row;
 }
 
+/* Force the close button to logical start (opposite of inline-end) */
+.modal-header .modal-close {
+    position: sticky;
+    top: 0;
+}
+.rtl .modal-header .modal-close {
+    inset-inline-start: 1rem; /* left in RTL */
+    inset-inline-end: auto;
+}
+.ltr .modal-header .modal-close {
+    inset-inline-end: 1rem; /* right in LTR */
+    inset-inline-start: auto;
+}
+
 .rtl .modal-footer {
     flex-direction: row-reverse;
 }
@@ -198,6 +245,23 @@ body {
     text-align: left;
     padding-left: 0;
     padding-right: var(--spacing-md);
+}
+
+/* Phone prefix selects should always read LTR (numbers) */
+select#phonePrefix,
+select[name="phonePrefix"],
+.phone-prefix-select {
+    direction: ltr !important;
+    text-align: left !important;
+    max-width: 88px;
+    font-size: 0.9rem;
+}
+select#phonePrefix option,
+select[name="phonePrefix"] option,
+.phone-prefix-select option {
+    direction: ltr !important;
+    text-align: left !important;
+    font-size: 0.9rem;
 }
 
 /* RTL/LTR Table Mirroring */

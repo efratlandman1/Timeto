@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { FaArrowRight } from 'react-icons/fa';
 import { useSelector, useDispatch } from 'react-redux';
 import { setUser as setReduxUser } from '../redux/userSlice';
 import '../styles/LoginPage.css'; // Reusing the same styles for a consistent look
@@ -32,7 +33,7 @@ const UserProfilePage = () => {
   useEffect(() => {
     const token = getToken();
     if (!token) {
-      navigate('/auth');
+      navigate('/auth', { state: { background: { pathname: '/' } } });
     }
   }, [navigate]);
   
@@ -139,7 +140,11 @@ const UserProfilePage = () => {
   return (
     <div className="narrow-page-container">
       <div className="narrow-page-content">
-        <form className="login-form" onSubmit={handleUpdate}>
+        <button className="nav-button above-header" onClick={() => navigate('/')}> 
+          <FaArrowRight className="icon" />
+          {t('common.backToHome')}
+        </button>
+        <form className="login-form profile-form" onSubmit={handleUpdate}>
           <h1 className="login-title">{t('userProfile.title')}</h1>
 
           <div className="login-input-wrapper">
@@ -158,20 +163,21 @@ const UserProfilePage = () => {
           </div>
           
           <div className="login-input-wrapper phone-split">
-            <FaPhone className="login-input-icon" />
             <div className="phone-inputs-container">
-              <select
-                name="phonePrefix"
-                value={formData.phonePrefix}
-                onChange={handleChange}
-                className="phone-prefix-select"
-              >
-                <option value="">{t('userProfile.fields.phonePrefix')}</option>
-                {PHONE_PREFIXES.map(prefix => (
-                  <option key={prefix} value={prefix}>{prefix}</option>
-                ))}
-              </select>
-
+              <div className="phone-prefix-wrapper">
+                <FaPhone className="login-input-icon inside-prefix" />
+                <select
+                  name="phonePrefix"
+                  value={formData.phonePrefix}
+                  onChange={handleChange}
+                  className={`phone-prefix-select with-icon ${!formData.phonePrefix ? 'empty' : ''}`}
+                >
+                  <option value="">{t('userProfile.fields.phonePrefix')}</option>
+                  {PHONE_PREFIXES.map(prefix => (
+                    <option key={prefix} value={prefix}>{prefix}</option>
+                  ))}
+                </select>
+              </div>
               <input
                 className="phone-number-input"
                 type="text"
@@ -207,7 +213,7 @@ const UserProfilePage = () => {
             </span>
           </div>
 
-          <button className="login-button" type="submit">{t('userProfile.saveChanges')}</button>
+          <button className="submit-button" type="submit">{t('userProfile.saveChanges')}</button>
         </form>
       </div>
     </div>

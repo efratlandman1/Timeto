@@ -1,0 +1,61 @@
+:root {
+    /* 6 global breakpoints - kept in sync with utils/responsive.js */
+    --bp-xs: 0px;      /* phones (small) */
+    --bp-sm: 480px;    /* phones (large) */
+    --bp-md: 640px;    /* small tablets */
+    --bp-lg: 768px;    /* tablets */
+    --bp-xl: 1024px;   /* small desktop */
+    --bp-xxl: 1280px;  /* large desktop */
+
+    /* Mobile flag (CSS-only approximation for progressive enhancement) */
+    --is-mobile: 1; /* default assume mobile until media queries override */
+}
+
+/* Set flags via media queries so pure CSS can leverage them if needed */
+@media (min-width: 768px) {
+    :root { --is-mobile: 0; }
+}
+
+/* Utility classes for visibility control - generic and global */
+.only-mobile { display: initial; }
+.only-desktop { display: none; }
+
+@media (min-width: 768px) {
+    .only-mobile { display: none !important; }
+    .only-desktop { display: initial !important; }
+}
+
+/* Container max widths per breakpoint for generic layout */
+.container {
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    .container { max-width: 640px; }
+}
+
+@media (min-width: 768px) {
+    .container { max-width: 768px; }
+}
+
+@media (min-width: 1024px) {
+    .container { max-width: 1024px; }
+}
+
+@media (min-width: 1280px) {
+    .container { max-width: 1280px; }
+}
+
+/* Body classes applied by ResponsiveProvider for targeting */
+body.bp-xs {}
+body.bp-sm {}
+body.bp-md {}
+body.bp-lg {}
+body.bp-xl {}
+body.bp-xxl {}
+
+body.device-mobile {}
+body.device-tablet {}
+body.device-desktop {}
+
+

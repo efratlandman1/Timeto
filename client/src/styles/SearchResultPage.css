@@ -12,8 +12,20 @@
 .business-cards-grid {
     flex: 1;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 20px;
+}
+
+@media (max-width: 1023px) {
+    .business-cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .business-cards-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Active Filters Section */
@@ -59,7 +71,8 @@
     height: 16px;
     border-radius: 50%;
     transition: all 0.2s ease;
-    margin-right: 2px;
+    order: -1; /* place on start side of chip */
+    margin-inline-end: 6px;
 }
 
 .filter-tag button:hover {
@@ -540,7 +553,7 @@
 /* Search Controls */
 .search-controls {
     position: relative;
-    /* margin: 2rem 0; */
+    margin-top: 0.5rem;
 }
 
 .search-controls__main {
@@ -548,7 +561,7 @@
     align-items: center;
     gap: 1rem;
     background: white;
-    padding: 1.5rem;
+    padding: 1rem 1rem;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     /* background: radial-gradient(black, transparent); */
@@ -563,6 +576,36 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
+}
+
+/* Compact header spacing for search page */
+.search-results-page .nav-button.above-header {
+    margin-bottom: 0.75rem;
+}
+
+.search-results-page .page-header {
+    padding: 0.25rem 0 0.75rem;
+}
+
+.search-results-page .favorites-tabs {
+    margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Make tabs horizontally scrollable on mobile in search page too */
+@media (max-width: 768px) {
+  .search-results-page .favorites-tabs {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+  .search-results-page .favorites-tabs::-webkit-scrollbar { display: none; }
+  .search-results-page .favorites-tab { display: inline-block; margin-inline: 4px; padding: 8px 12px; }
+
+  /* Keep main container from gaining horizontal scroll */
+  .wide-page-content.search-results-page { overflow-x: hidden; }
 }
 
 /* Filter Button */

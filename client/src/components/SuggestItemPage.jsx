@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaPaperPlane, FaArrowRight } from 'react-icons/fa';
+import { FaArrowRight, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -10,29 +10,47 @@ import { useTranslation } from 'react-i18next';
 const SuggestItemPage = () => {
   const { t, ready } = useTranslation();
   const navigate = useNavigate();
+  const [mode, setMode] = useState('business'); // business | sale
   const [formData, setFormData] = useState({
+    domain: 'business',
     type: 'category',
     name_he: '',
     name_en: '',
     parent_category_id: '',
+    sale_category_id: '',
     reason: ''
   });
 
   const [categories, setCategories] = useState([]);
+  const [saleCategories, setSaleCategories] = useState([]);
   
     useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
-        setCategories(response.data.data.categories || []);
+        const [resCat, resSale] = await Promise.all([
+          axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`),
+          axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-categories`)
+        ]);
+        setCategories(resCat.data.data.categories || []);
+        setSaleCategories(resSale.data.data.categories || []);
       } catch (error) {
-        console.error('Error fetching categories:', error);
-        toast.error(t('businessForm.errors.categories'));
-        setCategories([]);
+        console.error('Error fetching suggestion metadata:', error);
+        toast.error('שגיאה בטעינת נתוני מטה');
       }
     };
-    fetchCategories();
+    fetchData();
   }, []);
+  
+  // Reset relevant fields when switching mode (gating)
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      domain: mode,
+      type: 'category',
+      parent_category_id: '',
+      sale_category_id: ''
+    }));
+  }, [mode]);
   
   // Wait for translations to load
   if (!ready) {
@@ -61,29 +79,37 @@ const SuggestItemPage = () => {
     e.preventDefault();
     
     try {
+      const payload = {
+        domain: formData.domain,
+        type: formData.type,
+        name_he: formData.name_he,
+        name_en: formData.name_en,
+        reason: formData.reason,
+        ...(mode === 'business' && formData.type === 'service' ? { parent_category_id: formData.parent_category_id } : {}),
+        ...(mode === 'sale' ? { sale_category_id: formData.sale_category_id } : {})
+      };
+
       const response = await axios.post(
         `${process.env.REACT_APP_API_DOMAIN}/api/v1/suggestions`,
-        formData
+        payload
       );
       
-      toast.success(t('suggestItem.messages.success'), {
-        onClose: () => {
-          navigate('/');
-        }
-      });
+      toast.success(t('suggestItem.messages.success'));
 
       setFormData({
+        domain: mode,
         type: 'category',
         name_he: '',
         name_en: '',
         parent_category_id: '',
+        sale_category_id: '',
         reason: ''
       });
 
-      // Navigate to home page after 2 seconds
+      // Close modal after short delay
       setTimeout(() => {
-        navigate('/');
-      }, 2000);
+        navigate(-1);
+      }, 300);
       
     } catch (error) {
       console.error('Error submitting suggestion:', error);
@@ -91,84 +117,104 @@ const SuggestItemPage = () => {
     }
   };
 
-  const RequiredMark = () => <span style={{ color: '#d32f2f', marginRight: '4px' }}>*</span>;
+  const RequiredMark = () => <span className="required-asterisk">*</span>;
+  const handleClose = () => navigate(-1);
 
   return (
-    <div className="narrow-page-container">
-      <div className="narrow-page-content">
-        <button className="nav-button above-header" onClick={() => navigate('/')}>
-          <FaArrowRight className="icon" />
-          {t('common.backToHome')}
-        </button>
-
-        <div className="page-header">
-          <div className="page-header__content vertical">
-            <h1>{t('suggestItem.title')}</h1>
-            <p>{t('suggestItem.description')}</p>
-          </div>
+    <div className="modal-overlay-fixed" onClick={handleClose}>
+      <div className="modal-container suggest-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="suggest-modal-title">
+        <div className="modal-header">
+          <button className="modal-close" aria-label={t('common.cancel')} onClick={handleClose}><FaTimes /></button>
+          <h1 id="suggest-modal-title" className="login-title suggest-modal-title">{t('suggestItem.title')}</h1>
         </div>
 
         <form className="suggest-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">
-              {t('suggestItem.form.type.label')}<RequiredMark />
-            </label>
-            <div className="radio-group">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="type"
-                  value="category"
-                  checked={formData.type === 'category'}
-                  onChange={handleChange}
-                />
-                {t('suggestItem.form.type.category')}
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="type"
-                  value="service"
-                  checked={formData.type === 'service'}
-                  onChange={handleChange}
-                />
-                {t('suggestItem.form.type.service')}
-              </label>
+            <label className="form-label">{t('suggestItem.contextLabel')}</label>
+            <div className="segmented-control" role="tablist" aria-label="context selector">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mode === 'business'}
+                className={`segment ${mode === 'business' ? 'active' : ''}`}
+                onClick={() => setMode('business')}
+              >
+                {t('suggestItem.modes.business')}
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mode === 'sale'}
+                className={`segment ${mode === 'sale' ? 'active' : ''}`}
+                onClick={() => setMode('sale')}
+              >
+                {t('suggestItem.modes.sale')}
+              </button>
             </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="name_he" className="form-label">
-              {t('suggestItem.form.name.he')}<RequiredMark />
-            </label>
-            <input
-              type="text"
-              id="name_he"
-              name="name_he"
-              value={formData.name_he}
-              onChange={handleChange}
-              required
-              placeholder={t('suggestItem.form.name.he.placeholder')}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="name_en" className="form-label">
-              {t('suggestItem.form.name.en')}<RequiredMark />
-            </label>
-            <input
-              type="text"
-              id="name_en"
-              name="name_en"
-              value={formData.name_en}
-              onChange={handleChange}
-              required
-              placeholder="e.g., Advanced Plumbing"
-            />
-          </div>
-
-          {formData.type === 'service' && categories.length > 0 && (
+          {mode === 'business' && (
             <div className="form-group">
+              <label className="form-label">{t('suggestItem.form.type.label')}</label>
+              <div className="segmented-control" role="tablist" aria-label="type selector">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={formData.type === 'category'}
+                  className={`segment ${formData.type === 'category' ? 'active' : ''}`}
+                  onClick={() => handleChange({ target: { name: 'type', value: 'category' } })}
+                >
+                  {t('suggestItem.form.type.category')}
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={formData.type === 'service'}
+                  className={`segment ${formData.type === 'service' ? 'active' : ''}`}
+                  onClick={() => handleChange({ target: { name: 'type', value: 'service' } })}
+                >
+                  {t('suggestItem.form.type.service')}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="section-card">
+            <div className="two-col">
+              <div className="form-group">
+                <label htmlFor="name_he" className="form-label">
+                  {t('suggestItem.form.name.he')}<RequiredMark />
+                </label>
+                <input
+                  type="text"
+                  id="name_he"
+                  name="name_he"
+                  value={formData.name_he}
+                  onChange={handleChange}
+                  required
+                  placeholder={t('suggestItem.form.name.placeholder')}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="name_en" className="form-label">
+                  {t('suggestItem.form.name.en')}<RequiredMark />
+                </label>
+                <input
+                  type="text"
+                  id="name_en"
+                  name="name_en"
+                  value={formData.name_en}
+                  onChange={handleChange}
+                  required
+                  placeholder={t('suggestItem.form.name.placeholder')}
+                />
+              </div>
+            </div>
+          </div>
+
+          {mode === 'business' && formData.type === 'service' && categories.length > 0 && (
+            <div className="form-group standalone-field">
               <label htmlFor="parent_category_id" className="form-label">
                 {t('suggestItem.form.parentCategory')}<RequiredMark />
               </label>
@@ -189,6 +235,27 @@ const SuggestItemPage = () => {
             </div>
           )}
 
+          
+
+          {mode === 'sale' && (
+            <div className="section-card">
+              <div className="form-group">
+                <label className="form-label">{t('suggestItem.form.saleCategory')} <span className="required-asterisk">*</span></label>
+                <select
+                  className="form-select"
+                  value={formData.sale_category_id}
+                  onChange={(e) => setFormData(prev => ({ ...prev, sale_category_id: e.target.value }))}
+                  required
+                >
+                  <option value="">{t('suggestItem.form.selectSaleCategory')}</option>
+                  {saleCategories.map(sc => (
+                    <option key={sc._id} value={sc._id}>{sc.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
           <div className="form-group">
             <label htmlFor="reason" className="form-label">
               {t('suggestItem.form.reason')}
@@ -198,15 +265,14 @@ const SuggestItemPage = () => {
               name="reason"
               value={formData.reason}
               onChange={handleChange}
-              placeholder={t('suggestItem.form.reason.placeholder')}
+              placeholder={t('suggestItem.form.reasonPlaceholder')}
               rows={3}
             />
           </div>
 
-          <button type="submit" className="submit-button">
-            <FaPaperPlane />
-            {t('suggestItem.form.submit')}
-          </button>
+          <div className="button-row fullwidth">
+            <button type="submit" className="submit-button clean-full">{t('suggestItem.form.submit')}</button>
+          </div>
         </form>
       </div>
     </div>

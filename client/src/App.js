@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import MainPage from './components/MainPage';
 import EditBusinessPage from './components/EditBusinessPage';
 import UserBusinessPage from './components/UserBusinessesPage';
@@ -18,6 +18,13 @@ import AdminPanelPage from './components/AdminPanelPage';
 import UserProfilePage from './components/UserProfilePage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
+import AdsHubPage from './components/AdsHubPage';
+import SaleSearchPage from './components/SaleSearchPage';
+import PromoSearchPage from './components/PromoSearchPage';
+import CreateSaleAdPage from './components/CreateSaleAdPage';
+import SaleAdProfilePage from './components/SaleAdProfilePage';
+import PromoAdProfilePage from './components/PromoAdProfilePage';
+import CreatePromoAdPage from './components/CreatePromoAdPage';
 // import SetPasswordPage from './components/SetPasswordPage';
 import { useDispatch } from 'react-redux';
 import { setUser, logout } from './redux/userSlice';
@@ -29,6 +36,51 @@ import './i18n';
 import { useTranslation } from 'react-i18next';
 import { fetchUserLocation } from './redux/locationSlice';
 import { getToken } from './utils/auth';
+
+// Routes with background-location support for modals
+function AppRoutes() {
+    const location = useLocation();
+    const state = location.state;
+    return (
+        <>
+            <Routes location={state?.background || location}>
+                <Route path="/" element={<MainPage />} />
+                {/* <Route path="/ads" element={<AdsHubPage />} /> */}
+                <Route path="/ads/sale" element={<SaleSearchPage />} />
+                <Route path="/ads/promo" element={<PromoSearchPage />} />
+                <Route path="/ads/sale/new" element={<CreateSaleAdPage />} />
+                <Route path="/ads/sale/:id" element={<SaleAdProfilePage />} />
+                <Route path="/ads/promo/:id" element={<PromoAdProfilePage />} />
+                <Route path="/ads/promo/new" element={<CreatePromoAdPage />} />
+                <Route path="/business" element={<EditBusinessPage />} />
+                <Route path="/business/:id" element={<EditBusinessPage />} />
+                <Route path="/user-businesses" element={<UserBusinessPage />} />
+                <Route path="/user-favorites" element={<MyFavoritesPage />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/user-profile" element={<UserProfilePage />} />
+                <Route path="/search-results" element={<SearchResultPage />} />
+                <Route path="/feedback" element={<FeedbackPage />} />
+                <Route path="/business-profile/:id" element={<BusinessProfilePage />} />
+                <Route path="/suggest-item" element={<SuggestItemPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/admin" element={<AdminPanelPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
+            </Routes>
+            {state?.background && (
+                <Routes>
+                    <Route path="/suggest-item" element={<SuggestItemPage />} />
+                    <Route path="/business-profile/:id" element={<BusinessProfilePage />} />
+                    <Route path="/ads/sale/:id" element={<SaleAdProfilePage />} />
+                    <Route path="/ads/promo/:id" element={<PromoAdProfilePage />} />
+                    <Route path="/auth" element={<AuthPage />} />
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                    <Route path="/reset-password" element={<ResetPasswordPage />} />
+                </Routes>
+            )}
+        </>
+    );
+}
 
 function App() {
     const dispatch = useDispatch();
@@ -110,29 +162,10 @@ function App() {
                     pauseOnHover
                     draggable
                 />
-                <Routes>
-                    <Route path="/" element={<MainPage />} />
-                    <Route path="/business" element={<EditBusinessPage />} />
-                    <Route path="/business/:id" element={<EditBusinessPage />} />
-                    <Route path="/user-businesses" element={<UserBusinessPage />} />
-                    <Route path="/user-favorites" element={<MyFavoritesPage />} />
-                    <Route path="/auth" element={<AuthPage />} />
-                    {/* <Route path="/login" element={<AuthPage />} /> */}
-                    {/* <Route path="/register" element={<AuthPage />} /> */}
-                    {/* <Route path="/login" element={<LoginPage />} /> */}
-                    {/* <Route path="/register" element={<RegistrationPage />} /> */}
-                    <Route path="/user-profile" element={<UserProfilePage />} />
-                    <Route path="/search-results" element={<SearchResultPage />} />
-                    <Route path="/feedback" element={<FeedbackPage />} />
-                    <Route path="/business-profile/:id" element={<BusinessProfilePage />} />
-                    <Route path="/suggest-item" element={<SuggestItemPage />} />
-                    <Route path="/terms" element={<TermsPage />} />
-                    <Route path="/admin" element={<AdminPanelPage />} />
-                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                    <Route path="/reset-password" element={<ResetPasswordPage />} />
-                    {/* <Route path="/set-password" element={<SetPasswordPage />} /> */}
-                </Routes>
-                <Accessibility />
+                <main className="page-content" style={{ paddingTop: '60px' }}>
+                    <AppRoutes />
+                    <Accessibility />
+                </main>
             </div>
         </Router>
     );

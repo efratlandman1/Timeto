@@ -139,15 +139,11 @@
 
 .edit-business-navigation-buttons {
     display: flex;
-    justify-content: center;
+    justify-content: center; /* arrows centered */
+    align-items: center;
     gap: 40px;
     margin: 30px 0;
     padding: 0 20px;
-}
-
-/* RTL support for navigation buttons */
-[dir="rtl"] .edit-business-navigation-buttons {
-    flex-direction: row-reverse;
 }
 
 .edit-business-arrow-button {
@@ -274,6 +270,43 @@
     box-shadow: none;
 }
 
+/* Cancel/Save actions aligned to logical sides with unified sizing */
+.edit-business-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    width: 100%;
+}
+
+.edit-business-actions .save-button {
+    margin: 0;
+    margin-inline-start: auto; /* push save to logical end */
+}
+
+.edit-business-actions .cancel-button {
+    margin: 0; /* keep at logical start */
+}
+
+.cancel-button {
+    padding: 14px 32px; /* unify with save-button */
+    font-size: 1rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cancel-button:hover {
+    background: #f8f8f8;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .save-button {
@@ -298,6 +331,13 @@
 .form-group select:focus {
     border-color: #d32f2f !important;
     box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15) !important;
+}
+
+/* Required asterisk style (reused across forms) */
+.required-asterisk {
+    color: #d32f2f;
+    margin: 0 2px;
+    font-weight: 600;
 }
 
 /* Update logo upload button */

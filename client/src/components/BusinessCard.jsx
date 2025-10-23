@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import FeedbackPage from './FeedbackPage';
 import {
   FaPencilAlt, FaPhone, FaWhatsapp, FaEnvelope,
@@ -17,6 +17,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [localActive, setLocalActive] = useState(business.active);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -30,7 +31,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     try {
       const token = getToken();
       if (!token) {
-        navigate('/auth');
+        navigate('/auth', { state: { background: location } });
         return;
       }
 
@@ -69,7 +70,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     try {
       const token = getToken();
       if (!token) {
-        window.location.href = '/auth';
+        navigate('/auth', { state: { background: location } });
         return null;
       }
       const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/${business._id}`, {
@@ -95,7 +96,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     try {
       const token = getToken();
       if (!token) {
-        window.location.href = '/auth';
+        navigate('/auth', { state: { background: location } });
         return null;
       }
       const res = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses/restore/${business._id}`, {
@@ -127,7 +128,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
 
   const handleCardClick = () => {
     if (localActive) {
-      navigate(`/business-profile/${business._id}`);
+      navigate(`/business-profile/${business._id}`, { state: { background: location } });
     }
   };
 
@@ -282,11 +283,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
     >
       <div
         className="business-card-image-container"
-        style={{
-          background: !business.logo && business.categoryId?.color
-            ? business.categoryId.color
-            : '#f8f8f8'
-        }}
+        style={{ background: '#ffffff' }}
       >
         {business.logo ? (
           <img

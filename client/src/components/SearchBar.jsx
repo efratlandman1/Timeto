@@ -53,25 +53,71 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
         headers.Authorization = `Bearer ${token}`;
       }
 
-      const res = await fetch(
-        `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses?` +
-        `q=${encodeURIComponent(query)}&` +
-        `page=${pageNum}&` +
-        `limit=${ITEMS_PER_PAGE}`,
-        { headers }
-      );
-      
-      if (!res.ok) throw new Error('Search request failed');
-      
-      const data = await res.json();
-      const newResults = data.data.businesses || [];
-      
-      setHasMore(data.pagination?.hasNextPage || newResults.length === ITEMS_PER_PAGE);
-      
+      const API = process.env.REACT_APP_API_DOMAIN;
+      const [bizRes, saleRes, promoRes] = await Promise.all([
+        fetch(`${API}/api/v1/businesses?q=${encodeURIComponent(query)}&page=${pageNum}&limit=${ITEMS_PER_PAGE}`, { headers }),
+        fetch(`${API}/api/v1/sale-ads?q=${encodeURIComponent(query)}&page=${pageNum}&limit=${ITEMS_PER_PAGE}`, { headers }),
+        fetch(`${API}/api/v1/promo-ads?q=${encodeURIComponent(query)}&page=${pageNum}&limit=${ITEMS_PER_PAGE}`, { headers })
+      ]);
+
+      if (!bizRes.ok && !saleRes.ok && !promoRes.ok) throw new Error('Search request failed');
+
+      const [bizJson, saleJson, promoJson] = await Promise.all([
+        bizRes.ok ? bizRes.json() : Promise.resolve({ data: { businesses: [] }, pagination: {} }),
+        saleRes.ok ? saleRes.json() : Promise.resolve({ data: { ads: [] }, pagination: {} }),
+        promoRes.ok ? promoRes.json() : Promise.resolve({ data: { ads: [] }, pagination: {} })
+      ]);
+
+      const bizItems = (bizJson?.data?.businesses || []).map(b => ({ type: 'business', item: b }));
+      const saleItems = (saleJson?.data?.ads || []).map(a => ({ type: 'sale', item: a }));
+      const promoItems = (promoJson?.data?.ads || []).map(a => ({ type: 'promo', item: a }));
+
+      const combined = [...bizItems, ...saleItems, ...promoItems];
+      // Simple sort: newest by createdAt/updatedAt desc within this page
+      combined.sort((a,b) => new Date(b.item.updatedAt || b.item.createdAt || 0) - new Date(a.item.updatedAt || a.item.createdAt || 0));
+
+      let hasNext = (bizJson.pagination?.hasNextPage) || (saleJson.pagination?.hasNextPage) || (promoJson.pagination?.hasNextPage) || (combined.length === ITEMS_PER_PAGE);
+      setHasMore(!!hasNext);
+
       if (append) {
-        setResults(prev => [...prev, ...newResults]);
+        setResults(prev => [...prev, ...combined]);
       } else {
-        setResults(newResults);
+        // If no results for partial input, try a lightweight client-side fallback
+        if (combined.length === 0 && query.trim().length >= 2 && pageNum === 1) {
+          try {
+            const limit = 20;
+            const [fbBizRes, fbSaleRes, fbPromoRes] = await Promise.all([
+              fetch(`${API}/api/v1/businesses?page=1&limit=${limit}`, { headers }),
+              fetch(`${API}/api/v1/sale-ads?page=1&limit=${limit}`, { headers }),
+              fetch(`${API}/api/v1/promo-ads?page=1&limit=${limit}`, { headers })
+            ]);
+            const [fbBizJson, fbSaleJson, fbPromoJson] = await Promise.all([
+              fbBizRes.ok ? fbBizRes.json() : Promise.resolve({ data: { businesses: [] } }),
+              fbSaleRes.ok ? fbSaleRes.json() : Promise.resolve({ data: { ads: [] } }),
+              fbPromoRes.ok ? fbPromoRes.json() : Promise.resolve({ data: { ads: [] } })
+            ]);
+            const ql = query.trim().toLowerCase();
+            const str = (v) => (v ? String(v).toLowerCase() : '');
+            const bizFb = (fbBizJson?.data?.businesses || []).filter(b =>
+              str(b.name).includes(ql) || str(b.address).includes(ql) || str(b.city).includes(ql) || str(b.categoryName).includes(ql)
+            ).map(b => ({ type: 'business', item: b }));
+            const saleFb = (fbSaleJson?.data?.ads || []).filter(a =>
+              str(a.title || a.name).includes(ql) || str(a.description).includes(ql) || str(a.city).includes(ql) || str(a.categoryName).includes(ql)
+            ).map(a => ({ type: 'sale', item: a }));
+            const promoFb = (fbPromoJson?.data?.ads || []).filter(a =>
+              str(a.title || a.name).includes(ql) || str(a.description).includes(ql)
+            ).map(a => ({ type: 'promo', item: a }));
+            const fallbackCombined = [...bizFb, ...saleFb, ...promoFb];
+            fallbackCombined.sort((a,b) => new Date(b.item.updatedAt || b.item.createdAt || 0) - new Date(a.item.updatedAt || a.item.createdAt || 0));
+            hasNext = fallbackCombined.length >= ITEMS_PER_PAGE;
+            setHasMore(!!hasNext);
+            setResults(fallbackCombined);
+          } catch {
+            setResults([]);
+          }
+        } else {
+          setResults(combined);
+        }
         itemRefs.current = [];
       }
       
@@ -236,9 +282,17 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
     }
   };
 
-  const handleSelectResult = (business) => {
-    navigate(`/business-profile/${business._id}`);
-    setSearchQuery(business.name);
+  const handleSelectResult = (result) => {
+    if (result.type === 'business') {
+      navigate(`/business-profile/${result.item._id}`, { state: { background: location } });
+      setSearchQuery(result.item.name);
+    } else if (result.type === 'sale') {
+      navigate(`/ads/sale/${result.item._id}`, { state: { background: location } });
+      setSearchQuery(result.item.title || result.item.name || '');
+    } else if (result.type === 'promo') {
+      navigate(`/ads/promo/${result.item._id}`, { state: { background: location } });
+      setSearchQuery(result.item.title || result.item.name || '');
+    }
     setShowDropdown(false);
   };
 
@@ -310,33 +364,33 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
           </li>
         ) : (
           <>
-            {results.map((business, index) => (
+            {results.map((res, index) => (
               <li
-                key={business._id}
+                key={`${res.type}-${res.item._id}`}
                 ref={el => itemRefs.current[index] = el}
                 role="option"
                 aria-selected={index === highlightedIndex}
                 className={`search-result-item ${index === highlightedIndex ? 'highlighted' : ''}`}
-                onClick={() => handleSelectResult(business)}
+                onClick={() => handleSelectResult(res)}
               >
                 <div className="search-result-header">
                   <div className="business-info">
                     <div className="business-main-info">
                       <div className="business-name">
-                        {renderHighlightedText(business.name)}
+                        {renderHighlightedText(res.item.name || res.item.title)}
                       </div>
                       <div className="business-address">
                         <FaMapMarkerAlt />
-                        {renderHighlightedText(business.address)}
+                        {renderHighlightedText(res.item.address || res.item.city || '')}
                       </div>
                     </div>
                     <div className="business-tags">
-                      {business.categoryName && (
+                      {res.item.categoryName && (
                         <span className="tag">
-                          {renderHighlightedText(business.categoryName)}
+                          {renderHighlightedText(res.item.categoryName)}
                         </span>
                       )}
-                      {renderServices(business)}
+                      {res.type === 'business' ? renderServices(res.item) : null}
                     </div>
                   </div>
                 </div>

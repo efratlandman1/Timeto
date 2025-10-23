@@ -26,17 +26,53 @@
 }
 
 .suggest-form {
-  margin-top: 2rem;
+  margin-top: 1rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   width: 100%;
 }
 
+/* Section card wrapper for visual grouping */
+.section-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* Standalone select without heavy border look */
+.form-group select.form-select {
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+}
+
+/* Two columns layout for key fields */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  margin-block: 0.5rem; /* vertical spacing between fields */
+}
+
+/* Emphasize field titles for forms/modals (used by advanced search) */
+.suggest-modal .form-group > label {
+  font-weight: 700;
+  color: #2d3436;
+}
+
+/* Standalone field styling (not inside section card) */
+.standalone-field {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .form-label {
@@ -52,10 +88,79 @@
   margin-top: 0.25rem;
 }
 
-.radio-label {
+/* Segmented control for mode toggle */
+.segmented-control {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  background: #f3f3f3;
+  border-radius: 12px;
+  padding: 6px;
+  gap: 0;
+}
+
+.segmented-control .segment {
+  border: none;
+  background: transparent;
+  color: #555;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .2s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.segmented-control .segment.active {
+  background: #fff;
+  color: #d32f2f;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Button row: submit only full width */
+.button-row {
   display: flex;
+  justify-content: stretch;
+  gap: 20px;
+  margin-top: 1rem;
+}
+
+/* Full-width clean submit button */
+.submit-button {
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  width: 100%;
+  padding: 0.95rem 1.25rem;
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.05s ease;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.submit-button:hover { background: #d32f2f; }
+.submit-button:active { transform: translateY(1px); }
+
+/* Secondary (not emphasized) full-width action styled like submit but neutral */
+.submit-button.secondary {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #e0e0e0;
+}
+.submit-button.secondary:hover {
+  background: #ededed;
+}
+
+.radio-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem; /* small space so checkbox is close to text */
   cursor: pointer;
   font-weight: normal;
   color: #333;
@@ -89,34 +194,114 @@
   box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15);
 }
 
-.submit-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: white;
-  color: #d32f2f;
-  border: 2px solid #d32f2f;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 1rem;
-  align-self: flex-start;
-}
-
-.submit-button:hover {
-  background: #d32f2f;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
-}
-
 /* RTL Support */
 .suggest-item-container {
   direction: rtl;
 }
+
+/* Modal styles for suggest page */
+.modal-overlay-fixed {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-container.suggest-modal {
+  background: #fff;
+  width: min(600px, 95vw);
+  max-width: min(600px, 95vw);
+  max-height: 90vh;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  overflow: auto;
+  padding-bottom: 1rem; /* space after last element */
+}
+
+/* Ensure all corners render rounded in all directions */
+/* .modal-container.suggest-modal, .modal-container.suggest-modal * {
+  background-clip: padding-box;
+} */
+
+/* Ensure logical directions are respected for inline positioning (X button) */
+.rtl .modal-container.suggest-modal { direction: rtl; }
+.ltr .modal-container.suggest-modal { direction: ltr; }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  top: 0;
+  padding: 0.75rem 1.25rem 0.25rem 1.25rem;
+  border-bottom: none;
+  background: #fff;
+  z-index: 2;
+  direction: inherit; /* mirror inline-start/end from container */
+}
+
+/* Add inner scroll wrapper to avoid content touching rounded corners */
+.modal-body-scroll { padding: 0 1rem 1rem; }
+
+.modal-header h1 { font-size: 1.35rem; margin: 0; font-weight: 700; width: 100%; text-align: end; }
+
+/* Match profile page title spacing */
+.suggest-modal-title {
+  text-align: center;
+  display: block;
+  margin: 0 auto 1.5rem auto;
+  width: 100%;
+}
+
+/* Ensure center alignment cannot be overridden by other title styles */
+.modal-container.suggest-modal h1.suggest-modal-title {
+  text-align: center !important;
+  display: block;
+  margin: 0 auto 0.5rem auto;
+  font-size: 1.6rem; /* larger title for advanced search too */
+}
+.modal-subtitle { margin: 0; color: #555; }
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px; /* larger hit area */
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute; /* pin relative to header */
+  top: 1rem;
+}
+.modal-close:hover { background: #f2f2f2; color: #666; }
+/* Ensure X pins to correct side tightly */
+
+/* Use document direction attribute to ensure flipping works globally */
+html[dir="rtl"] .modal-header .modal-close { inset-inline-start: 1rem; inset-inline-end: auto; left: 1rem; right: auto; }
+html[dir="ltr"] .modal-header .modal-close { inset-inline-end: 1rem; inset-inline-start: auto; right: 1rem; left: auto; }
+
+/* Mirror close button to logical start/end based on direction */
+/* Duplicate safety (can be merged) */
+html[dir="rtl"] .modal-header .modal-close { inset-inline-start: 1rem; inset-inline-end: auto; left: 1rem; right: auto; }
+html[dir="ltr"] .modal-header .modal-close { inset-inline-end: 1rem; inset-inline-start: auto; right: 1rem; left: auto; }
+
+/* Add comfortable horizontal padding for inner content */
+.suggest-modal .section-card,
+.suggest-modal .standalone-field,
+.suggest-modal .button-row,
+.suggest-modal .segmented-control,
+.suggest-modal .two-col,
+.suggest-modal .form-group { margin-inline: 1.25rem; }
+.suggest-modal .segmented-control { width: calc(100% - 2.5rem); }
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -131,5 +316,9 @@
   .radio-group {
     flex-direction: column;
     gap: 1rem;
+  }
+
+  .two-col {
+    grid-template-columns: 1fr;
   }
 } 

@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const SuggestionSchema = new mongoose.Schema({
+  domain: {
+    type: String,
+    required: [true, 'Domain is required'],
+    enum: ['business', 'sale'],
+    default: 'business'
+  },
   type: {
     type: String,
     required: [true, 'Type is required'],
@@ -21,6 +27,13 @@ const SuggestionSchema = new mongoose.Schema({
     ref: 'categories',
     required: function() {
       return this.type === 'service';
+    }
+  },
+  sale_category_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'sale_categories',
+    required: function() {
+      return this.domain === 'sale';
     }
   },
   reason: {

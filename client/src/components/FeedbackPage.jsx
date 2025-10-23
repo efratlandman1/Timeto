@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaRegStar, FaStar } from 'react-icons/fa';
+import { FaRegStar, FaStar, FaTimes } from 'react-icons/fa';
 import ReactDOM from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import '../styles/FeedbackPage.css';
+// import '../styles/FeedbackPage.css';
+// import '../styles/SuggestItemPage.css';
 import {getToken} from "../utils/auth";
 
 const Toast = ({ message, isError, onClose }) => {
@@ -34,7 +35,7 @@ const Toast = ({ message, isError, onClose }) => {
 
 
 const FeedbackPage = ({ businessId, onClose }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState('');
@@ -107,94 +108,83 @@ const FeedbackPage = ({ businessId, onClose }) => {
 
   return ReactDOM.createPortal(
     <>
-    {isLoading ? (
+      {isLoading ? (
         <div className="feedback-page-loader">{t('feedback.loading')}</div>
-        ) : (
+      ) : (
         <>
-            <div className="feedback-page-modal-overlay" onClick={onClose}>
-                <div className="feedback-page-modal">
-                    <div className="feedback-page-content"
-                    dir="rtl"
-                    onClick={(e) => e.stopPropagation()}
+          <div className={`modal-overlay-fixed ${i18n.dir()}`} dir={i18n.dir()} onClick={onClose}>
+            <div className="modal-container suggest-modal feedback-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="suggest-modal-title">
+              <div className="modal-header">
+                <button className="modal-close" aria-label={t('common.cancel')} onClick={onClose}><FaTimes /></button>
+                <h1 id="suggest-modal-title" className="login-title suggest-modal-title">{t('feedback.title', { businessName: businessName || '' })}</h1>
+              </div>
+
+              <div className="form-group rating-group">
+                <label>{t('feedback.form.rating.label')}</label>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <span
+                      key={star}
+                      className={`star ${star <= (hover || rating) ? 'filled' : ''}`}
+                      onClick={() => handleStarClick(star)}
+                      onMouseEnter={() => setHover(star)}
+                      onMouseLeave={() => setHover(0)}
                     >
-                    <button className="feedback-page-close-button close-button" onClick={onClose}>×</button>
-                    <h2 className="feedback-page-title">
-                        חוות דעת על {businessName || 'העסק'}
-                    </h2>
-
-                    <div className="form-group rating-group">
-                        <label>דרג את העסק</label>
-                        <div className="star-rating">
-                            {[1, 2, 3, 4, 5].map(star => (
-                                <span
-                                    key={star}
-                                    className={`star ${star <= (hover || rating) ? "filled" : ""}`}
-                                    onClick={() => handleStarClick(star)}
-                                    onMouseEnter={() => setHover(star)}
-                                    onMouseLeave={() => setHover(0)}
-                                >
-                                    {star <= (hover || rating) ? <FaStar size={36} /> : <FaRegStar size={36} />}
-                                </span>
-                            ))}
-                        </div>
-                        {rating > 0 && (
-                            <div className="rating-text">
-                                {rating} כוכבים
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="form-group">
-                        <label>כתוב את חוות דעתך</label>
-                        <textarea
-                        placeholder="הסבר בקצרה את החוויה שלך..."
-                        value={comment}
-                        onChange={e => setComment(e.target.value)}
-                        rows={5}
-                        className="feedback-page-textarea-input"
-                        />
-                    </div>
-
-                    <button className="confirm-button" onClick={handleSubmit}>שלח פידבק</button>
-                    <button className="cancel-button" type="button" onClick={onClose} style={{marginTop: '1.5rem', width: '100%'}}>
-                      ביטול
-                    </button>
-
-                    <div className="feedback-page-feedback-list">
-                        <h3>חוות דעת קודמות</h3>
-                        {previousFeedbacks.length === 0 && <p className="no-feedbacks">עדיין אין חוות דעת, תהיה הראשון!</p>}
-                        {previousFeedbacks.map((fb, idx) => (
-                        <div key={idx} className="feedback-page-feedback-item">
-                            <div className="feedback-page-feedback-header">
-                            <span className="feedback-name">{fb.user_id?.nickname || 'אנונימי'}</span>
-                            <span className="feedback-date">{new Date(fb.createdAt).toLocaleDateString()}</span>
-                            </div>
-                            <div className="feedback-page-feedback-stars">
-                                {[1, 2, 3, 4, 5].map(i => (
-                                    <span
-                                        key={i}
-                                        className={`star ${i <= fb.rating ? "filled" : ""}`}
-                                    >
-                                        {i <= fb.rating ? <FaStar size={20} /> : <FaRegStar size={20} />}
-                                    </span>
-                                ))}
-                            </div>
-                            <p className="feedback-page-feedback-comment">{fb.comment}</p>
-                        </div>
-                        ))}
-                    </div>
-                    </div>
+                      {star <= (hover || rating) ? <FaStar size={36} /> : <FaRegStar size={36} />}
+                    </span>
+                  ))}
                 </div>
-            </div>
-            {toast && (
-                <Toast
-                message={toast.message}
-                isError={toast.isError}
-                onClose={() => setToast(null)}
+                {rating > 0 && (
+                  <div className="rating-text">
+                    {rating}/5
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>{t('feedback.form.comment.label')}</label>
+                <textarea
+                  placeholder={t('feedback.form.comment.placeholder')}
+                  value={comment}
+                  onChange={e => setComment(e.target.value)}
+                  rows={5}
+                  className="feedback-page-textarea-input"
                 />
-            )}
+              </div>
+
+              <div className="button-row fullwidth">
+                <button className="submit-button clean-full" onClick={handleSubmit}>{t('feedback.form.submit')}</button>
+              </div>
+
+              <div className="feedback-page-feedback-list">
+                <h3>{t('feedback.previousFeedbacks.title')}</h3>
+                {previousFeedbacks.length === 0 && (
+                  <p className="no-feedbacks">{t('feedback.previousFeedbacks.noFeedbacks')}</p>
+                )}
+                {previousFeedbacks.map((fb, idx) => (
+                  <div key={idx} className="feedback-page-feedback-item">
+                    <div className="feedback-page-feedback-header">
+                      <span className="feedback-name">{fb.user_id?.nickname || t('feedback.previousFeedbacks.anonymous')}</span>
+                      <span className="feedback-date">{new Date(fb.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="feedback-page-feedback-stars">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <span key={i} className={`star ${i <= fb.rating ? 'filled' : ''}`}>
+                          {i <= fb.rating ? <FaStar size={20} /> : <FaRegStar size={20} />}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="feedback-page-feedback-comment">{fb.comment}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {toast && (
+            <Toast message={toast.message} isError={toast.isError} onClose={() => setToast(null)} />
+          )}
         </>
-    )}
+      )}
     </>,
     modalRoot
   );

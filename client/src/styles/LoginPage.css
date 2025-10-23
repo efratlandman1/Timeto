@@ -2,12 +2,19 @@
 
 .login-form {
     width: 100%;
-    background: rgba(255, 255, 255, 0.95);
+    background: white;
     padding: 3rem 2.5rem;
     text-align: center;
     direction: rtl;
     position: relative;
     overflow: hidden;
+}
+
+/* Make profile page fields look like other forms */
+.profile-form {
+    background: transparent;
+    box-shadow: none;
+    border: none;
 }
 
 .login-logo {
@@ -23,7 +30,9 @@
     color: #2d3436;
     font-weight: 700;
     position: relative;
-    display: inline-block;
+    display: block; /* ensure new line below floated nav button */
+    clear: both; /* push below the nav button float */
+    text-align: center; /* ensure text centers with underline */
 }
 
 .login-title::after {
@@ -52,16 +61,21 @@
     font-size: 1.2rem;
     opacity: 0.8;
 }
+/* LTR/RTL mirroring for input icons and padding */
+.ltr .login-input-icon { right: 16px; left: auto; }
+.rtl .login-input-icon { left: 16px; right: auto; }
+.ltr .login-input { padding-inline-end: 3rem; padding-inline-start: 1rem; text-align: left; }
+.rtl .login-input { padding-inline-start: 3rem; padding-inline-end: 1rem; text-align: right; }
 
 .login-input {
     width: 100%;
     padding: 1rem 1rem 1rem 3rem;
     border-radius: 12px;
-    border: 1px solid #e0e0e0;
+    border: 1.5px solid #e0e0e0;
     font-size: 1rem;
     text-align: right;
     transition: all 0.3s ease;
-    background: #f0f5fa;
+    background: white;
 }
 
 .login-input-wrapper:has(.login-password-toggle) .login-input {
@@ -84,22 +98,48 @@
 }
 
 .login-input-wrapper.phone-split .phone-inputs-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* prefix 1/3, phone 2/3 */
     gap: 8px;
-    flex-grow: 1;
+    width: 100%;
     direction: ltr;
-    margin-left: 3rem;
+}
+
+/* phone prefix with icon inside */
+.login-input-icon.inside-prefix {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+}
+.ltr .login-input-icon.inside-prefix { right: 12px; left: auto; }
+.rtl .login-input-icon.inside-prefix { left: 12px; right: auto; }
+
+.login-input-wrapper.phone-split .phone-prefix-wrapper {
+    position: relative;
 }
 
 .login-input-wrapper.phone-split .phone-prefix-select {
-    width: 80px;
-    text-align: center;
+    width: 100%;
+    text-align: left;
     padding: 1rem 0.5rem;
     border-radius: 12px;
-    border: 1px solid #e0e0e0;
+    border: 1.5px solid #e0e0e0;
     font-size: 1rem;
     transition: all 0.3s ease;
-    background: #f0f5fa;
+    background: white;
+    color: #2d3436; /* same as inputs */
+    direction: ltr; /* ensure numbers read LTR */
+}
+
+.login-input-wrapper.phone-split .phone-prefix-select.with-icon {
+    padding-left: 2.5rem; /* extra room for icon + small gap */
+    padding-inline-start: 2.5rem; /* logical for RTL/LTR */
+}
+
+.login-input-wrapper.phone-split .phone-prefix-select.empty {
+    color: #9e9e9e; /* placeholder-like color for empty value */
 }
 
 .login-input-wrapper.phone-split .phone-prefix-select:focus {
@@ -113,11 +153,11 @@
     flex-grow: 1;
     padding: 1rem;
     border-radius: 12px;
-    border: 1px solid #e0e0e0;
+    border: 1.5px solid #e0e0e0;
     font-size: 1rem;
     text-align: right;
     transition: all 0.3s ease;
-    background: #f0f5fa;
+    background: white;
 }
 
 .login-input-wrapper.phone-split .phone-number-input:focus {
@@ -179,6 +219,8 @@
     font-size: 1.2rem;
     transition: color 0.3s ease;
 }
+.ltr .login-password-toggle { right: 16px; left: auto; }
+.rtl .login-password-toggle { left: 16px; right: auto; }
 
 .login-password-toggle:hover {
     color: #d32f2f;
@@ -250,4 +292,12 @@
 
 .login-form {
     animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Ensure title centers even under global RTL h1 alignment */
+.rtl .login-form .login-title {
+    text-align: center;
+}
+.ltr .login-form .login-title {
+    text-align: center;
 }

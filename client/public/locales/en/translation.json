@@ -3,7 +3,7 @@
     "home": "Home",
     "search": "Search",
     "addBusiness": "Add Business",
-    "suggest": "Suggest Item",
+    "suggest": "Suggest Cat./Service",
     "register": "Register",
     "login": "Login",
     "myBusinesses": "My Businesses",
@@ -23,6 +23,7 @@
       "sub": "Business Directory"
     },
     "myLocation": "My Location",
+    "locationShort": "Location",
     "currentLocation": "Your Current Location",
     "loadingAddress": "Loading address...",
     "addressNotFound": "Address not found",
@@ -78,24 +79,29 @@
     "sections": {
       "popular": "Popular Businesses",
       "new": "New Businesses",
-      "recommended": "Recommended for You"
+      "recommended": "Recommended for You",
+      "newSales": "New Sale Ads Near You",
+      "newPromos": "New Promo Ads Near You"
     },
     "joinBanner": {
-      "title": "Join Time Community",
+      "title": "Join the Time Community",
       "description": "Add your business and start getting new customers today",
+      "descriptionFull": "Add a business, post a sale ad and a promo ad to reach the right customers near you and across the country",
       "button": "Add Business Free",
       "joinNowAndDiscover": "Join now and start discovering interesting things around you"
     },
     "viewAll": "View All",
     "footer": {
       "contact": "Contact",
+      "contactSubtitle": "Looking for info or partnership? We’d love to hear from you.",
       "quickLinks": "Quick Links",
       "search": "Search",
       "suggestItem": "Suggest Item",
       "termsOfService": "Terms of Service",
       "termsComingSoon": "Terms of service will be available soon",
       "about": "About Time",
-      "aboutDescription": "Israel's leading business directory. Find the right business near you.",
+      "aboutDescriptionLine1": "The community that connects people and businesses",
+      "aboutDescriptionLine2": "Discover businesses, sale ads and hot promos — in one place.",
       "copyright": "© Zezman 2023 All rights reserved."
     }
   },
@@ -239,10 +245,67 @@
     "generalError": "An error occurred, please try again later",
     "tooManyAttempts": "Too many attempts. Please try again later.",
     "password": "Password",
-    "select": "Select"
+    "select": "Select",
+    "address": "Address",
+    "phone": "Phone",
+    "whatsapp": "WhatsApp",
+    "details": "Details",
+    "category": "Category",
+    "price": "Price",
+    "prevImage": "Previous image",
+    "nextImage": "Next image"
+  },
+  "quickCreate": {
+    "business": { "title": "Add Business", "desc": "Create a new business card with details and hours" },
+    "sale": { "title": "Sale Ad", "desc": "Post a second‑hand item quickly" },
+    "promo": { "title": "Promo Ad", "desc": "Branding/promo with validity and image" }
+  },
+  "saleAd": {
+    "pageTitleNew": "Create Sale Ad",
+    "fields": {
+      "title": "Title",
+      "city": "City/Area",
+      "phone": "Phone",
+      "prefix": "Prefix",
+      "number": "Phone Number",
+      "hasWhatsapp": "Has WhatsApp",
+      "price": "Price",
+      "currency": "Currency",
+      "category": "Category",
+      "description": "Description",
+      "images": "Images (up to 10)"
+    },
+    "actions": {
+      "publish": "Publish",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "placeholders": {
+      "select": "Select",
+      "selectCategory": "Select Category"
+    }
+  },
+  "promoAd": {
+    "pageTitleNew": "Create Promo Ad",
+    "fields": {
+      "title": "Title",
+      "city": "City/Area",
+      "image": "Image",
+      "validFrom": "Start Date",
+      "validTo": "End Date"
+    },
+    "actions": {
+      "publish": "Publish",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "placeholders": {
+      "select": "Select",
+      "selectCategory": "Select Category"
+    }
   },
   "search": {
-    "placeholder": "Search business by name, category or service",
+    "placeholder": "Search businesses, sale ads and promo ads...",
     "advancedSearch": "Advanced Search",
     "noResults": "No results found",
     "errors": {
@@ -346,7 +409,17 @@
   "favorites": {
     "loading": "Loading favorites...",
     "title": "My Favorites",
-    "empty": "You haven't marked any businesses as favorites yet"
+    "subtitle": "All the items you marked as favorites in one place",
+    "empty": "You haven't marked any favorites yet",
+    "emptyBusiness": "You haven't marked any businesses as favorites yet",
+    "emptySale": "You haven't marked any sale items as favorites yet",
+    "emptyPromo": "You haven't marked any promo ads as favorites yet",
+    "tabs": {
+      "all": "All",
+      "business": "Businesses",
+      "sale": "Sale",
+      "promo": "Promo"
+    }
   },
   "feedback": {
     "title": "Feedback for {{businessName}}",
@@ -430,11 +503,27 @@
     "loading": "Loading business details...",
     "error": "Error"
   },
+  "business": {
+    "services": "Services",
+    "feedback": {
+      "title": "Ratings & Reviews",
+      "add": "Add feedback",
+      "avg": "Average rating",
+      "total": "Total reviews",
+      "anonymous": "Anonymous"
+    },
+    "contact": {
+      "address": "Address",
+      "phone": "Phone",
+      "whatsapp": "WhatsApp",
+      "email": "Email"
+    }
+  },
   "searchResults": {
     "title": "Search Results",
     "noResults": "No results found",
-    "pageTitle": "Business Search",
-    "pageSubtitle": "Find the right business for you",
+    "pageTitle": "Search Results",
+    "pageSubtitle": "",
     "advancedFilter": "Advanced Filter",
     "loadingLocation": "Loading location...",
     "filters": {
@@ -587,6 +676,20 @@
   },
   "advancedSearch": {
     "title": "Advanced Search",
+    "city": "City",
+    "cityPlaceholder": "e.g., Tel Aviv",
+    "priceRange": "Price Range",
+    "min": "Min",
+    "max": "Max",
+    "status": "Status",
+    "openNow": "Open Now",
+    "verifiedOnly": "Verified Only",
+    "reviewsOnly": "With Reviews",
+    "addedWithin": "Added Within",
+    "anytime": "Any time",
+    "last7d": "Last 7 days",
+    "last30d": "Last 30 days",
+    "includeNoPrice": "Include items without price",
     "sort": {
       "title": "Sort Results",
       "rating": "High Rating",
@@ -602,6 +705,10 @@
     "category": {
       "title": "Category",
       "select": "Select Category"
+    },
+    "categories": {
+      "business": "Business Categories",
+      "sale": "Sale Categories"
     },
     "services": {
       "title": "Services"
@@ -654,8 +761,13 @@
     "apply": "Apply"
   },
   "suggestItem": {
-    "title": "Suggest Item",
-    "description": "Suggest a new category or service",
+    "title": "Suggest Category or Service",
+    "description": "Suggest categories and services missing from the system",
+    "contextLabel": "Suggestion Target",
+    "modes": {
+      "business": "Businesses",
+      "sale": "Sale"
+    },
     "form": {
       "type": {
         "label": "Suggestion Type",
@@ -668,8 +780,10 @@
         "placeholder": "For example: Advanced Plumbing"
       },
       "parentCategory": "Parent Category",
+      "saleCategory": "Sale Category",
+      "selectSaleCategory": "Select Sale Category",
       "reason": "Reason or Brief Description",
-      "reasonPlaceholder": "Why do you think this item is needed?",
+      "reasonPlaceholder": "Why do you think this value is needed?",
       "submit": "Submit Suggestion"
     },
     "messages": {
@@ -678,13 +792,27 @@
     }
   },
   "userBusinesses": {
-    "title": "My Businesses",
-    "description": "Manage your registered businesses",
+    "title": "My Area",
+    "description": "Manage your businesses and ads",
     "empty": "You don't have any registered businesses yet",
     "addBusiness": "Add New Business",
     "loading": "Loading businesses...",
     "error": "Error loading businesses",
-    "subtitle": "Manage the businesses you've added to the directory",
+    "subtitle": "Manage the businesses and ads you've added to the directory",
+    "create": "Create",
+    "createMenuAria": "Create dropdown",
+    "createOptions": {
+      "addBusiness": "Add Business",
+      "saleAd": "Create Sale Ad",
+      "promoAd": "Create Promo Ad"
+    },
+    "tabs": {
+      "aria": "My content categories",
+      "business": "Businesses",
+      "sale": "Sale",
+      "promo": "Promo",
+      "all": "All"
+    },
     "noBusinesses": "You don't have any businesses yet",
     "addNewBusiness": "Add New Business",
     "filters": {

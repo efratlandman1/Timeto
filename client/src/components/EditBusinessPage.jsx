@@ -168,6 +168,14 @@ const MySteps = ({
 }) => {
   const { t } = useTranslation();
   const { current } = useSteps();
+  const navigate = useNavigate();
+  const handleCancel = () => {
+    if (window.history && window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+    navigate('/user-businesses');
+  };
 
   return (
     <>
@@ -178,13 +186,20 @@ const MySteps = ({
         <StepBusinessHours {...{ businessData, setBusinessData, categories }} />
       </Steps>
       <NavigationButtons businessData={businessData} />
-      {/* {current === 3 && isValidOpeningHours(businessData.openingHours) &&  ( */}
-      {current === 3  &&  (
-        <button onClick={handleSubmit} className="save-button">
-          {selectedBusiness ? <FaEdit /> : <FaPlus />}
-                          {selectedBusiness ? t('editBusiness.buttons.update') : t('editBusiness.buttons.create')}
+
+      {/* Action buttons per step - aligned to logical sides */}
+      <div className="edit-business-actions">
+        <button type="button" onClick={handleCancel} className="cancel-button">
+          {t('common.cancel')}
         </button>
-      )}
+
+        {(selectedBusiness || current === 3) && (
+          <button onClick={handleSubmit} className="save-button">
+            {selectedBusiness ? <FaEdit /> : <FaPlus />}
+            {selectedBusiness ? t('editBusiness.buttons.update') : t('editBusiness.buttons.create')}
+          </button>
+        )}
+      </div>
     </>
   );
 };
@@ -223,7 +238,7 @@ const EditBusinessPage = () => {
   useEffect(() => {
     const token = getToken();
     if (!token) {
-      navigate('/auth');
+      navigate('/auth', { state: { background: { pathname: '/' } } });
     }
   }, [navigate]);
 
@@ -390,12 +405,7 @@ const EditBusinessPage = () => {
           {t('common.backToMyBusinesses')}
         </button>
         
-        <div className="page-header">
-          <div className="page-header__content vertical">
-            <h1>{selectedBusiness ? t('businessForm.title.edit') : t('businessForm.title.new')}</h1>
-            <p>{t('businessForm.subtitle')}</p>
-          </div>
-        </div>
+        <h1 className="login-title" style={{ textAlign: 'center', marginTop: '8px' }}>{selectedBusiness ? t('businessForm.title.edit') : t('businessForm.title.new')}</h1>
 
         <StepsProvider>
           <MySteps

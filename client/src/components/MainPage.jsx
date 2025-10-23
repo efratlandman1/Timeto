@@ -1,23 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import BusinessCard from './BusinessCard';
+import SaleAdCard from './SaleAdCard';
+import PromoAdCard from './PromoAdCard';
 import SearchBar from './SearchBar'; // ← חדש
+import QuickCreateStrip from './QuickCreateStrip';
 import axios from 'axios';
 import '../styles/MainPage.css';
 import '../styles/businessCard.css';
 import { useNavigate } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight, FaUserFriends, FaStar, FaCalendarCheck } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaUserFriends, FaStar, FaCalendarCheck, FaEnvelope, FaPhone, FaWhatsapp } from 'react-icons/fa';
 import { buildQueryUrl } from '../utils/buildQueryUrl';
 import { useSelector } from 'react-redux';
 import { getToken } from '../utils/auth';
 import { useTranslation } from 'react-i18next';
+import { useResponsive } from '../utils/ResponsiveProvider';
 
 const MainPage = () => {
     const { t, ready } = useTranslation();
+    const { isMobile, isTablet } = useResponsive();
     const [businesses, setBusinesses] = useState([]);
     const [filteredBusinesses, setFilteredBusinesses] = useState([]);
     const [popularBusinesses, setPopularBusinesses] = useState([]);
     const [newBusinesses, setNewBusinesses] = useState([]);
     const [recommendedBusinesses, setRecommendedBusinesses] = useState([]);
+    const [newSaleAds, setNewSaleAds] = useState([]);
+    const [newPromoAds, setNewPromoAds] = useState([]);
     const [categories, setCategories] = useState([]);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [stats, setStats] = useState({
@@ -53,6 +60,7 @@ const MainPage = () => {
 
     useEffect(() => {
         fetchBusinesses();
+        fetchSaleAndPromo();
     }, [userLocation, locationError]);
     
     // Wait for translations to load
@@ -136,6 +144,36 @@ const MainPage = () => {
         }
     };
 
+    const fetchSaleAndPromo = async () => {
+        try {
+            const headers = {};
+            const token = getToken();
+            if (token) {
+                headers.Authorization = `Bearer ${token}`;
+            }
+
+            // Fetch newest Sale Ads (nearby when location available)
+            const saleUrl = buildQueryUrl(
+                `${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-ads`,
+                { sort: 'newest', limit: 12 },
+                userLocation
+            );
+            const saleRes = await axios.get(saleUrl, { headers });
+            setNewSaleAds((saleRes.data && saleRes.data.data && saleRes.data.data.ads) || []);
+
+            // Fetch newest active Promo Ads (nearby when location available)
+            const promoUrl = buildQueryUrl(
+                `${process.env.REACT_APP_API_DOMAIN}/api/v1/promo-ads`,
+                { status: 'active', sort: 'newest', limit: 12 },
+                userLocation
+            );
+            const promoRes = await axios.get(promoUrl, { headers });
+            setNewPromoAds((promoRes.data && promoRes.data.data && promoRes.data.data.ads) || []);
+        } catch (error) {
+            console.error('Error fetching sale/promo ads:', error);
+        }
+    };
+
     const fetchStats = async () => {
         try {
             setIsStatsLoading(true);
@@ -197,10 +235,20 @@ const MainPage = () => {
                 {/* Hero Section */}
                 <section className="hero-section">
                     <div className="hero-content">
-                        {/* Search Section */}
+                        {/* Top Join Strip above quick-create and banner */}
+                        <div className="top-join-strip" role="region" aria-label="join-community">
+                            <div className="top-join-inner">
+                                <h2>{t('mainPage.joinBanner.title')}</h2>
+                                <div className="top-join-accent" aria-hidden="true"></div>
+                                <p>{t('mainPage.footer.aboutDescriptionLine1')}</p>
+                                <p>{t('mainPage.footer.aboutDescriptionLine2')}</p>
+                            </div>
+                        </div>
+
+                        {/* Quick Create strip placed under the join strip */}
+                        <QuickCreateStrip />
+                        {/* Search Section (without big title) */}
                         <div className="search-section">
-                            <h1>{t('mainPage.search.title')}</h1>
-                            <p>{t('mainPage.search.subtitle')}</p>
                             <SearchBar />
                         </div>
 
@@ -302,6 +350,8 @@ const MainPage = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Quick Create & Search appear only above banner */}
                     </div>
                 </section>
 
@@ -317,7 +367,7 @@ const MainPage = () => {
                         {categories && categories.map((category) => (
                             <div key={category._id}
                                 className="category-business"
-                                style={{ background: category.color || '#fff' }}
+                                style={{ background: '#fff' }}
                                 onClick={() => handleFilterChange(category.name)}>
                                 {category.logo ? (
                                     <img
@@ -326,7 +376,7 @@ const MainPage = () => {
                                         className="category-logo"
                                     />
                                 ) : (
-                                    <span className="category-initial">{category.name?.charAt(0)}</span>
+                                    <span className="category-initial" style={{ background: '#fff' }}></span>
                                 )}
                                 <span>{category.name}</span>
                             </div>
@@ -339,61 +389,82 @@ const MainPage = () => {
 
                 {/* Business Groups */}
                 <div className="business-groups">
-                    <div className="business-row">
-                        <div className="business-row-header">
-                            <h3>{t('mainPage.sections.new')}</h3>
-                            <a href="/search-results?sort=newest" className="view-all">{t('mainPage.viewAll')}</a>
+                    {/* New Businesses in your area */}
+                    {newBusinesses.length > 0 && (
+                        <div className="business-row">
+                            <div className="business-row-header">
+                                <h3>{t('mainPage.sections.new')}</h3>
+                                <a href="/search-results?sort=newest" className="view-all" aria-label={t('mainPage.viewAll')}>
+                                    <span className="view-all-label">{t('mainPage.viewAll')}</span>
+                                    <span className="view-all-icon" aria-hidden="true">›</span>
+                                </a>
+                            </div>
+                            <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
+                                {newBusinesses.slice(0, (isMobile ? 1 : isTablet ? 2 : 3)).map((business) => (
+                                    <BusinessCard key={business._id} business={business} />
+                                ))}
+                            </div>
                         </div>
-                        <div className="card-slider">
-                            {newBusinesses.map((business) => (
-                                <BusinessCard key={business._id} business={business} />
-                            ))}
-                        </div>
-                    </div>
+                    )}
 
-                    <div className="business-row">
-                        <div className="business-row-header">
-                            <h3>{t('mainPage.sections.popular')}</h3>
-                            <a href="/search-results?sort=popular_nearby" className="view-all">{t('mainPage.viewAll')}</a>
+                    {/* New Sale Ads in your area */}
+                    {newSaleAds.length > 0 && (
+                        <div className="business-row">
+                            <div className="business-row-header">
+                                <h3>{t('mainPage.sections.newSales')}</h3>
+                                <a href="/ads/sale?sort=newest" className="view-all" aria-label={t('mainPage.viewAll')}>
+                                    <span className="view-all-label">{t('mainPage.viewAll')}</span>
+                                    <span className="view-all-icon" aria-hidden="true">›</span>
+                                </a>
+                            </div>
+                            <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
+                                {newSaleAds.slice(0, (isMobile ? 1 : isTablet ? 2 : 3)).map((ad) => (
+                                    <SaleAdCard key={ad._id} ad={ad} />
+                                ))}
+                            </div>
                         </div>
-                        <div className="card-slider">
-                            {popularBusinesses.map((business) => (
-                                <BusinessCard key={business._id} business={business} />
-                            ))}
-                        </div>
-                    </div>
+                    )}
 
-                    <div className="business-row">
-                        <div className="business-row-header">
-                            <h3>{t('mainPage.sections.recommended')}</h3>
-                            <a href="/search-results?sort=rating" className="view-all">{t('mainPage.viewAll')}</a>
+                    {/* New Promo Ads in your area */}
+                    {newPromoAds.length > 0 && (
+                        <div className="business-row">
+                            <div className="business-row-header">
+                                <h3>{t('mainPage.sections.newPromos')}</h3>
+                                <a href="/ads/promo?status=active&sort=newest" className="view-all" aria-label={t('mainPage.viewAll')}>
+                                    <span className="view-all-label">{t('mainPage.viewAll')}</span>
+                                    <span className="view-all-icon" aria-hidden="true">›</span>
+                                </a>
+                            </div>
+                            <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
+                                {newPromoAds.slice(0, (isMobile ? 1 : isTablet ? 2 : 3)).map((ad) => (
+                                    <PromoAdCard key={ad._id} ad={ad} />
+                                ))}
+                            </div>
                         </div>
-                        <div className="card-slider">
-                            {recommendedBusinesses.map((business) => (
-                                <BusinessCard key={business._id} business={business} />
-                            ))}
-                        </div>
-                    </div>
+                    )}
                 </div>
 
-                {/* Bottom Banner */}
-                <section className="bottom-banner">
-                    <div className="bottom-banner-content">
-                        <h2>{t('mainPage.joinBanner.title')}</h2>
-                        <p>{t('mainPage.joinBanner.description')}</p>
-                        <button className="banner-button" onClick={() => navigate('/business')}>
-                            {t('mainPage.joinBanner.button')}
-                        </button>
-                    </div>
-                </section>
+                {/* Bottom Banner removed as per request */}
 
                 {/* Footer */}
                 <footer className="footer">
                     <div className="footer-content">
                         <div className="footer-section">
                             <h3>{t('mainPage.footer.contact')}</h3>
+                            <p>{t('mainPage.footer.contactSubtitle')}</p>
                             <div className="contact-info">
-                                <a href="mailto:info@zezman.app">info@zezman.app</a>
+                                <div className="contact-row">
+                                    <FaEnvelope className="icon" />
+                                    <a href="mailto:info@zezman.app" aria-label="אימייל">info@zezman.app</a>
+                                </div>
+                                <div className="contact-row">
+                                    <FaPhone className="icon" />
+                                    <a href="tel:+97235551234" aria-label="טלפון">03-555-1234</a>
+                                </div>
+                                <div className="contact-row">
+                                    <FaWhatsapp className="icon" />
+                                    <a href="https://wa.me/972500000000" target="_blank" rel="noreferrer" aria-label="וואטסאפ">050-000-0000</a>
+                                </div>
                             </div>
                         </div>
 
@@ -412,7 +483,7 @@ const MainPage = () => {
 
                         <div className="footer-section">
                             <h3>{t('mainPage.footer.about')}</h3>
-                            <p>{t('mainPage.footer.aboutDescription')}</p>
+                            <p>{t('mainPage.joinBanner.descriptionFull')}</p>
                         </div>
                     </div>
 
