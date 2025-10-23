@@ -13,9 +13,11 @@ import { buildQueryUrl } from '../utils/buildQueryUrl';
 import { useSelector } from 'react-redux';
 import { getToken } from '../utils/auth';
 import { useTranslation } from 'react-i18next';
+import { useResponsive } from '../utils/ResponsiveProvider';
 
 const MainPage = () => {
     const { t, ready } = useTranslation();
+    const { isMobile, isTablet } = useResponsive();
     const [businesses, setBusinesses] = useState([]);
     const [filteredBusinesses, setFilteredBusinesses] = useState([]);
     const [popularBusinesses, setPopularBusinesses] = useState([]);
@@ -392,10 +394,13 @@ const MainPage = () => {
                         <div className="business-row">
                             <div className="business-row-header">
                                 <h3>{t('mainPage.sections.new')}</h3>
-                                <a href="/search-results?sort=newest" className="view-all">{t('mainPage.viewAll')}</a>
+                                <a href="/search-results?sort=newest" className="view-all" aria-label={t('mainPage.viewAll')}>
+                                    <span className="view-all-label">{t('mainPage.viewAll')}</span>
+                                    <span className="view-all-icon" aria-hidden="true">›</span>
+                                </a>
                             </div>
-                            <div className="card-slider">
-                                {newBusinesses.map((business) => (
+                            <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
+                                {newBusinesses.slice(0, (isMobile ? 1 : isTablet ? 2 : 3)).map((business) => (
                                     <BusinessCard key={business._id} business={business} />
                                 ))}
                             </div>
@@ -407,10 +412,13 @@ const MainPage = () => {
                         <div className="business-row">
                             <div className="business-row-header">
                                 <h3>{t('mainPage.sections.newSales')}</h3>
-                                <a href="/ads/sale?sort=newest" className="view-all">{t('mainPage.viewAll')}</a>
+                                <a href="/ads/sale?sort=newest" className="view-all" aria-label={t('mainPage.viewAll')}>
+                                    <span className="view-all-label">{t('mainPage.viewAll')}</span>
+                                    <span className="view-all-icon" aria-hidden="true">›</span>
+                                </a>
                             </div>
-                            <div className="card-slider">
-                                {newSaleAds.map((ad) => (
+                            <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
+                                {newSaleAds.slice(0, (isMobile ? 1 : isTablet ? 2 : 3)).map((ad) => (
                                     <SaleAdCard key={ad._id} ad={ad} />
                                 ))}
                             </div>
@@ -422,10 +430,13 @@ const MainPage = () => {
                         <div className="business-row">
                             <div className="business-row-header">
                                 <h3>{t('mainPage.sections.newPromos')}</h3>
-                                <a href="/ads/promo?status=active&sort=newest" className="view-all">{t('mainPage.viewAll')}</a>
+                                <a href="/ads/promo?status=active&sort=newest" className="view-all" aria-label={t('mainPage.viewAll')}>
+                                    <span className="view-all-label">{t('mainPage.viewAll')}</span>
+                                    <span className="view-all-icon" aria-hidden="true">›</span>
+                                </a>
                             </div>
-                            <div className="card-slider">
-                                {newPromoAds.map((ad) => (
+                            <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
+                                {newPromoAds.slice(0, (isMobile ? 1 : isTablet ? 2 : 3)).map((ad) => (
                                     <PromoAdCard key={ad._id} ad={ad} />
                                 ))}
                             </div>

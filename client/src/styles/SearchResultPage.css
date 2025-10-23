@@ -12,8 +12,20 @@
 .business-cards-grid {
     flex: 1;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 20px;
+}
+
+@media (max-width: 1023px) {
+    .business-cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .business-cards-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Active Filters Section */
