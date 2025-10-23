@@ -245,7 +245,15 @@
     "generalError": "An error occurred, please try again later",
     "tooManyAttempts": "Too many attempts. Please try again later.",
     "password": "Password",
-    "select": "Select"
+    "select": "Select",
+    "address": "Address",
+    "phone": "Phone",
+    "whatsapp": "WhatsApp",
+    "details": "Details",
+    "category": "Category",
+    "price": "Price",
+    "prevImage": "Previous image",
+    "nextImage": "Next image"
   },
   "quickCreate": {
     "business": { "title": "Add Business", "desc": "Create a new business card with details and hours" },

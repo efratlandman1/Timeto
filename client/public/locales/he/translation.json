@@ -257,7 +257,15 @@
     "generalError": "אירעה שגיאה, נסה שוב מאוחר יותר",
     "tooManyAttempts": "ניסית יותר מדי פעמים. אנא נסה שוב מאוחר יותר.",
     "password": "סיסמה",
-    "select": "בחר"
+    "select": "בחר",
+    "address": "כתובת",
+    "phone": "טלפון",
+    "whatsapp": "וואטסאפ",
+    "details": "פרטים",
+    "category": "קטגוריה",
+    "price": "מחיר",
+    "prevImage": "תמונה קודמת",
+    "nextImage": "תמונה הבאה"
   },
   "quickCreate": {
     "business": { "title": "הוספת עסק", "desc": "פתח כרטיס עסק חדש עם פרטים ושעות" },

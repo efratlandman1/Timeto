@@ -167,8 +167,8 @@
 
 .contact-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.75rem;
 }
 
 .contact-card {
@@ -176,7 +176,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 1rem;
+  padding: 0.75rem;
   background: #f8f9fa;
   border-radius: 12px;
   transition: all 0.2s ease;
@@ -199,8 +199,8 @@
 }
 
 .contact-icon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -211,17 +211,17 @@
 }
 
 .contact-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .contact-label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #666;
 }
 
 .contact-value {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #333;
   word-break: break-word;
 }
@@ -296,8 +296,6 @@
   margin-bottom: 1rem;
   text-align: center;
   position: relative;
-  padding-inline-start: 3.25rem; /* reserve space for button (RTL/LTR aware) */
-  padding-inline-end: 3.25rem;
 }
 
 /* Ensure header obeys global direction classes on body */
@@ -317,6 +315,7 @@
   align-items: center;
   gap: 0.5rem;
   position: absolute;
+  top: -2.25rem; /* place above the title */
 }
 
 .add-feedback-button:hover {
@@ -511,7 +510,7 @@
 /* Responsive Design */
 @media (max-width: 1024px) {
   .contact-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -521,7 +520,8 @@
   }
 
   .contact-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
   }
 
   .business-hero {
@@ -544,6 +544,10 @@
   .feedback-stats {
     grid-template-columns: 1fr;
   }
+
+  /* Ensure the add feedback button stays above the title on tablets */
+  .feedback-header { margin-top: 1.25rem; }
+  .feedback-header .add-feedback-button { top: -2rem; }
 }
 
 @media (max-width: 480px) {
@@ -562,6 +566,11 @@
   .business-hero-category {
     font-size: 1rem;
   }
+  .contact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+  .contact-card { padding: 0.6rem; }
+  .contact-icon { width: 32px; height: 32px; }
+  .contact-icon svg { width: 16px; height: 16px; }
+  .contact-label, .contact-value { font-size: 0.8rem; }
 }
 
 /* Toast */
