@@ -19,8 +19,6 @@ import UserProfilePage from './components/UserProfilePage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
 import AdsHubPage from './components/AdsHubPage';
-import SaleSearchPage from './components/SaleSearchPage';
-import PromoSearchPage from './components/PromoSearchPage';
 import CreateSaleAdPage from './components/CreateSaleAdPage';
 import SaleAdProfilePage from './components/SaleAdProfilePage';
 import PromoAdProfilePage from './components/PromoAdProfilePage';
@@ -46,8 +44,7 @@ function AppRoutes() {
             <Routes location={state?.background || location}>
                 <Route path="/" element={<MainPage />} />
                 {/* <Route path="/ads" element={<AdsHubPage />} /> */}
-                <Route path="/ads/sale" element={<SaleSearchPage />} />
-                <Route path="/ads/promo" element={<PromoSearchPage />} />
+                {/* Unified search page replaces dedicated sale/promo search pages */}
                 <Route path="/ads/sale/new" element={<CreateSaleAdPage />} />
                 <Route path="/ads/sale/:id" element={<SaleAdProfilePage />} />
                 <Route path="/ads/promo/:id" element={<PromoAdProfilePage />} />
