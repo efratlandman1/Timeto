@@ -338,6 +338,65 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
     );
   };
 
+  const getSearchResultImage = (result) => {
+    if (result.type === 'business') {
+      // בדיקה אם הלוגו קיים ולא ריק
+      if (result.item.logo && result.item.logo.trim() !== '') {
+        // הוסף את הנתיב המלא לתמונה כמו בכרטיסי עסקים
+        const logoFileName = result.item.logo.split('/').pop();
+        const imageSrc = `${process.env.REACT_APP_API_DOMAIN}/uploads/${logoFileName}`;
+        return (
+          <img 
+            src={imageSrc} 
+            alt={result.item.name}
+            className="search-result-img"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+        );
+      }
+      return null;
+    } else if (result.type === 'promo') {
+      // בדיקה אם התמונה קיימת ולא ריקה
+      if (result.item.image && result.item.image.trim() !== '') {
+        // הוסף את הנתיב המלא לתמונה כמו במודעות
+        const imageSrc = `${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${result.item.image}`;
+        return (
+          <img 
+            src={imageSrc} 
+            alt={result.item.title}
+            className="search-result-img"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+        );
+      }
+      return null;
+    } else if (result.type === 'sale') {
+      // בדיקה אם יש תמונות ולא ריקות
+      if (result.item.images && result.item.images.length > 0 && result.item.images[0] && result.item.images[0].trim() !== '') {
+        const randomIndex = Math.floor(Math.random() * result.item.images.length);
+        // הוסף את הנתיב המלא לתמונה כמו במודעות
+        const imageSrc = `${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${result.item.images[randomIndex]}`;
+        return (
+          <img 
+            src={imageSrc} 
+            alt={result.item.title || result.item.name}
+            className="search-result-img"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+        );
+      }
+      return null;
+    }
+    
+    return null;
+  };
+
   const renderSearchResults = () => {
     if (!showDropdown) return null;
 
@@ -392,6 +451,9 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
                       )}
                       {res.type === 'business' ? renderServices(res.item) : null}
                     </div>
+                  </div>
+                  <div className="search-result-image">
+                    {getSearchResultImage(res)}
                   </div>
                 </div>
               </li>

@@ -29,6 +29,7 @@ import { setUser, logout } from './redux/userSlice';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Accessibility from './components/Accessibility';
+import MobileBottomNav from './components/MobileBottomNav';
 import './styles/global/index.css';
 import './i18n';
 import { useTranslation } from 'react-i18next';
@@ -163,6 +164,7 @@ function App() {
                     <AppRoutes />
                     <Accessibility />
                 </main>
+                <MobileBottomNav />
             </div>
         </Router>
     );

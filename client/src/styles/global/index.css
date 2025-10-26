@@ -640,7 +640,7 @@ body.ltr {
 .rtl img {
     float: right;
     margin-right: 0;
-    margin-left: var(--spacing-md);
+    /* margin-left: var(--spacing-md); */
 }
 
 .ltr img {

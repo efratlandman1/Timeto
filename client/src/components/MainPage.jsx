@@ -247,12 +247,13 @@ const MainPage = () => {
                             </div>
                         </div>
 
-                        {/* Quick Create strip placed under the join strip */}
-                        <QuickCreateStrip />
                         {/* Search Section (without big title) */}
                         <div className="search-section">
                             <SearchBar />
                         </div>
+
+                        {/* Quick Create strip placed under the search */}
+                        <QuickCreateStrip />
 
                         <div className="banner-stats-container">
                             {/* Banner */}

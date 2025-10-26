@@ -166,6 +166,23 @@ const buildLookupPipeline = (skip, limit) => {
         { $skip: skip },
         { $limit: limit },
         { 
+            $project: {
+                name: 1,
+                address: 1,
+                phone: 1,
+                email: 1,
+                logo: 1,
+                rating: 1,
+                categoryId: 1,
+                services: 1,
+                userId: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                active: 1,
+                location: 1
+            }
+        },
+        { 
             $lookup: {
                 from: 'categories',
                 localField: 'categoryId',
@@ -609,7 +626,7 @@ exports.getItems = async (req, res) => {
 
             const [businesses, total] = await Promise.all([
                 Business.find(query)
-                    .select(q ? { score: { $meta: "textScore" } } : {})
+                    .select(q ? { score: { $meta: "textScore" }, logo: 1, name: 1, address: 1, phone: 1, email: 1, rating: 1, categoryId: 1, services: 1, userId: 1, createdAt: 1, updatedAt: 1, active: 1, location: 1 } : {})
                     .populate('categoryId', 'name color logo')
                     .populate('services', 'name')
                     .populate('userId', 'firstName lastName')
