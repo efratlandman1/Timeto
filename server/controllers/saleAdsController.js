@@ -37,7 +37,28 @@ const buildGeoPipeline = (coordinates, query, sort, skip, limitNum) => {
         }
     };
     const sortStage = { $sort: sort === 'distance' ? { distance: 1 } : { createdAt: -1 } };
-    return [geoNearStage, sortStage, { $skip: skip }, { $limit: limitNum }];
+    const projectStage = {
+        $project: {
+            title: 1,
+            description: 1,
+            price: 1,
+            currency: 1,
+            images: 1,
+            city: 1,
+            address: 1,
+            phone: 1,
+            prefix: 1,
+            hasWhatsapp: 1,
+            categoryId: 1,
+            userId: 1,
+            active: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            location: 1,
+            distance: 1
+        }
+    };
+    return [geoNearStage, sortStage, projectStage, { $skip: skip }, { $limit: limitNum }];
 };
 
 exports.createSaleAd = async (req, res) => {

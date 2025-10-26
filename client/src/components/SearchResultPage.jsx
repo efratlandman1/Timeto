@@ -9,7 +9,8 @@ import '../styles/userBusinesses.css';
 import '../styles/AdvancedSearchPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchBar from './SearchBar';
-import { FaFilter, FaTimes, FaChevronDown, FaSort, FaArrowRight } from 'react-icons/fa';
+import { FaFilter, FaTimes, FaChevronDown, FaSort, FaArrowRight, FaThLarge, FaStore, FaTag, FaBullhorn, FaStar } from 'react-icons/fa';
+import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
 import { useSelector } from 'react-redux';
 import { buildQueryUrl } from '../utils/buildQueryUrl';
 import { getToken } from '../utils/auth';
@@ -37,10 +38,34 @@ const SearchResultPage = () => {
     const [promoPage, setPromoPage] = useState(1);
     const [promoTotalPages, setPromoTotalPages] = useState(1);
     const [showFilters, setShowFilters] = useState(false);
+    const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
+    const [drawerMode, setDrawerMode] = useState('all'); // 'all' | 'category' | 'services' | 'city' | 'price' | 'distance' | 'rating'
+    const contentRef = useRef(null);
+    const [containerRect, setContainerRect] = useState({ left: 0, width: 0 });
+
+    // Data for standalone popovers/drawer
+    const [categories, setCategories] = useState([]);
+    const [services, setServices] = useState([]);
+    const [selectedCategoryId, setSelectedCategoryId] = useState('');
+    const [tempValues, setTempValues] = useState({
+        categoryName: '',
+        services: [],
+        city: '',
+        priceMin: '',
+        priceMax: '',
+        priceMinN: 0,
+        priceMaxN: 10000,
+        maxDistance: 0,
+        rating: 0,
+    });
+    const MAX_PRICE = 10000;
+    const { isLoaded: mapsLoaded } = useJsApiLoader({ id: 'google-maps-script', googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', libraries: ['places'] });
+    const cityAutoRef = useRef(null);
     const [activeFilters, setActiveFilters] = useState({});
     const [sortOption, setSortOption] = useState('rating');
     const [showSortDropdown, setShowSortDropdown] = useState(false);
     const sortDropdownRef = useRef(null);
+    const [tempSort, setTempSort] = useState('rating');
     const advancedSearchRef = useRef(null);
     const prevSortRef = useRef('rating');
     const prevFiltersRef = useRef('');
@@ -78,11 +103,29 @@ const SearchResultPage = () => {
             if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target)) {
                 setShowSortDropdown(false);
             }
-            // advanced search now manages its own overlay and outside click
         };
-
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Measure container rect for drawer width/position
+    useEffect(() => {
+        const updateRect = () => {
+            const el = contentRef.current;
+            if (!el) return;
+            const r = el.getBoundingClientRect();
+            setContainerRect({ left: r.left, width: r.width });
+        };
+        updateRect();
+        window.addEventListener('resize', updateRect);
+        return () => window.removeEventListener('resize', updateRect);
+    }, []);
+
+    // Fetch categories once for popovers/drawer
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`).then(res => {
+            setCategories(res?.data?.data?.categories || []);
+        }).catch(()=>{});
     }, []);
 
     useEffect(() => {
@@ -105,10 +148,27 @@ const SearchResultPage = () => {
         }
         setActiveFilters(filters);
         setSortOption(sort);
+        setTempSort(sort);
+        // Sync temp values from URL on navigation
+        setTempValues(v => ({
+            ...v,
+            categoryName: filters.categoryName || '',
+            services: filters.services ? (Array.isArray(filters.services) ? filters.services : [filters.services]) : [],
+            city: filters.city || '',
+            priceMin: filters.priceMin || '',
+            priceMax: filters.priceMax || '',
+            priceMinN: filters.priceMin ? Number(filters.priceMin) : 0,
+            priceMaxN: filters.priceMax ? Number(filters.priceMax) : MAX_PRICE,
+            maxDistance: filters.maxDistance ? Number(filters.maxDistance) : 0,
+            rating: filters.rating ? Number(filters.rating) : 0,
+        }));
+        const cat = (filters.categoryName || '').toString();
+        const found = categories.find(c => c.name === cat);
+        setSelectedCategoryId(found?._id || '');
         if (urlTab && ['all','business','sale','promo'].includes(urlTab)) {
             setActiveTab(urlTab);
         }
-    }, [location.search]);
+    }, [location.search, categories]);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -419,9 +479,44 @@ const SearchResultPage = () => {
         navigate({ pathname: location.pathname, search: params.toString() });
     };
 
+    const handleApplyMulti = (updates) => {
+        const newParams = new URLSearchParams(location.search);
+        Object.entries(updates).forEach(([k, v]) => {
+            if (Array.isArray(v)) {
+                newParams.delete(k);
+                v.forEach(val => val !== '' && newParams.append(k, val));
+            } else if (v === undefined || v === null || v === '' || (typeof v === 'number' && Number.isNaN(v))) {
+                newParams.delete(k);
+            } else {
+                newParams.set(k, String(v));
+            }
+        });
+        newParams.set('page', 1);
+        navigate({ pathname: location.pathname, search: newParams.toString() });
+        setShowFiltersDrawer(false);
+        setShowFilters(false);
+    };
+
+    const toggleOpenNow = () => {
+        const params = new URLSearchParams(location.search);
+        if (params.has('openNow')) params.delete('openNow'); else params.set('openNow', 'true');
+        params.set('page', 1);
+        navigate({ pathname: location.pathname, search: params.toString() });
+    };
+
+    const fetchServicesByCategoryId = async (catId) => {
+        if (!catId) { setServices([]); return; }
+        try {
+            const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/services/byCategory/${catId}`);
+            setServices(res?.data?.data?.services || []);
+        } catch (_) {
+            setServices([]);
+        }
+    };
+
     return (
         <div className='wide-page-container'>
-            <div className='wide-page-content search-results-page'>
+            <div ref={contentRef} className='wide-page-content search-results-page'>
                 <button className="nav-button above-header" onClick={() => navigate('/')}> 
                     <FaArrowRight className="icon" />
                     {t('common.backToHome')}
@@ -432,58 +527,297 @@ const SearchResultPage = () => {
                     </div>
                 </div>
                 
+                {/* Type pills row above search bar */}
+                <div className="type-pills" role="tablist" aria-label={t('userBusinesses.tabs.aria')}>
+                    <div className="type-pills-grid">
+                        {[
+                          { key: 'all', label: t('favorites.tabs.all'), icon: FaThLarge },
+                          { key: 'business', label: t('favorites.tabs.business'), icon: FaStore },
+                          { key: 'sale', label: t('favorites.tabs.sale'), icon: FaTag },
+                          { key: 'promo', label: t('favorites.tabs.promo'), icon: FaBullhorn },
+                        ].map((tab) => (
+                          <button
+                            key={tab.key}
+                            className={`type-pill ${activeTab===tab.key ? 'active' : ''}`}
+                            role="tab"
+                            aria-selected={activeTab===tab.key}
+                            onClick={() => handleTabChange(tab.key)}
+                          >
+                            {tab.icon ? <tab.icon className="tp-icon" aria-hidden="true" /> : null}
+                            <span className="tp-label">{tab.label}</span>
+                          </button>
+                        ))}
+                    </div>
+                </div>
+
                 <div className="search-controls">
                     <div className="search-controls__main">
                         <div className="search-bar-container">
                             <SearchBar isMainPage={false} />
                         </div>
-                        <div className="search-controls__actions">
-                            <button 
-                                className="filter-button"
-                                onClick={() => setShowFilters(!showFilters)}
-                                aria-expanded={showFilters}
-                            >
-                                <FaFilter />
-                                <span>{t('searchResults.advancedFilter')}</span>
-                            </button>
-                            <div className="sort-control" ref={sortDropdownRef}>
-                                <button 
-                                    className="sort-button"
-                                    onClick={() => setShowSortDropdown(!showSortDropdown)}
-                                    aria-expanded={showSortDropdown}
-                                >
-                                    <span className="sort-text">{SORT_OPTIONS[sortOption]}</span>
-                                    <FaSort className="sort-icon" />
-                                </button>
-                                {showSortDropdown && (
-                                    <div className="sort-dropdown">
-                                        {Object.entries(SORT_OPTIONS).map(([value, label]) => (
-                                            <button
-                                                key={value}
-                                                className={`sort-option ${sortOption === value ? 'selected' : ''}`}
-                                                onClick={() => {
-                                                    handleSortChange(value);
-                                                    setShowSortDropdown(false);
-                                                }}
-                                            >
-                                                {label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                        <div className="search-controls__actions"></div>
                     </div>
 
-                    {showFilters && (
-                        <AdvancedSearchModal
-                            isOpen={showFilters}
-                            onClose={() => setShowFilters(false)}
-                            filters={activeFilters}
-                            onFilterChange={(key, value) => {
-                                handleFilterChange(key, value);
-                            }}
-                        />
+                    {/* Filters row - standalone buttons + drawer trigger */}
+                    {(() => { const p = new URLSearchParams(location.search);
+                      const hasCategory = !!p.get('categoryName');
+                      const hasServices = p.getAll('services').length>0;
+                      const hasCity = !!p.get('city');
+                      const hasPrice = !!(p.get('priceMin')||p.get('priceMax'));
+                      const hasDistance = !!p.get('maxDistance');
+                      const hasOpenNow = p.has('openNow');
+                      const hasRating = !!p.get('rating');
+                      const hasSort = !!(p.get('sort') && p.get('sort') !== 'rating');
+                    return (
+                    <div className="filters-row" role="toolbar" aria-label={t('searchResults.filters.toolbar')}>
+                        <button
+                            className={`chip-button${hasSort ? ' active' : ''}`}
+                            onClick={() => { setDrawerMode('sort'); setShowFiltersDrawer(true); setShowFilters(true); setTempSort(sortOption || 'rating'); }}
+                            aria-expanded={showFiltersDrawer && drawerMode==='sort'}
+                        >
+                            <FaSort aria-hidden="true" /> {SORT_OPTIONS[sortOption]}
+                        </button>
+
+                        <button
+                            className="chip-button"
+                            onClick={() => { setDrawerMode('all'); setShowFiltersDrawer(true); setShowFilters(true); }}
+                            aria-expanded={showFiltersDrawer && drawerMode==='all'}
+                        >
+                            <FaFilter aria-hidden="true" /> {t('searchResults.advancedFilter')}
+                        </button>
+                        {/* Category */}
+                        <button className={`chip-button${hasCategory ? ' active' : ''}`} onClick={() => { setDrawerMode('category'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='category'}>
+                            {t('advancedSearch.category.title')}{tempValues.categoryName?`: ${tempValues.categoryName}`:''}
+                        </button>
+
+                        {/* Services */}
+                        {tempValues.categoryName && (
+                          <button className={`chip-button${hasServices ? ' active' : ''}`} onClick={() => { if (!selectedCategoryId) { const found = categories.find(c=>c.name===tempValues.categoryName); setSelectedCategoryId(found?._id||''); } fetchServicesByCategoryId(selectedCategoryId || (categories.find(c=>c.name===tempValues.categoryName)?._id||'')); setDrawerMode('services'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='services'}>
+                              {t('advancedSearch.services.title')}{tempValues.services?.length?` (${tempValues.services.length})`:''}
+                          </button>
+                        )}
+
+                        {/* City */}
+                        <button className={`chip-button${hasCity ? ' active' : ''}`} onClick={() => { setDrawerMode('city'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='city'}>
+                            {t('advancedSearch.city')}
+                        </button>
+
+                        {/* Price */}
+                        <button className={`chip-button${hasPrice ? ' active' : ''}`} onClick={() => { setDrawerMode('price'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='price'}>
+                            {t('advancedSearch.priceRange')}
+                        </button>
+
+                        {/* Distance */}
+                        <button className={`chip-button${hasDistance ? ' active' : ''}`} onClick={() => { setDrawerMode('distance'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='distance'}>
+                            {t('advancedSearch.distance.title')}
+                        </button>
+
+                        {/* Open Now quick toggle */}
+                        <button className={`chip-button${hasOpenNow ? ' active' : ''}`} onClick={toggleOpenNow} aria-pressed={hasOpenNow}>
+                            {t('advancedSearch.openNow')}
+                        </button>
+
+                        {/* Rating */}
+                        <button className={`chip-button${hasRating ? ' active' : ''}`} onClick={() => { setDrawerMode('rating'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='rating'}>
+                            {t('advancedSearch.rating.title')}
+                        </button>
+                    </div>
+                    ); })()}
+
+                    {/* Drawer overlay */}
+                    {showFiltersDrawer && (
+                        <div className="filters-drawer-overlay" role="dialog" aria-modal="true" onClick={() => { setShowFiltersDrawer(false); setShowFilters(false); }}>
+                            <div
+                                className="filters-drawer"
+                                style={{
+                                    width: `${(() => {
+                                        const vw = typeof window !== 'undefined' ? window.innerWidth : 1024;
+                                        const isMobile = vw <= 640;
+                                        const base = Math.min(containerRect.width, 720);
+                                        const w = isMobile ? base : Math.max(480, Math.floor(base * 0.75));
+                                        return w;
+                                    })()}px`,
+                                    left: (() => {
+                                        const vw = typeof window !== 'undefined' ? window.innerWidth : 1024;
+                                        const isMobile = vw <= 640;
+                                        const base = Math.min(containerRect.width, 720);
+                                        const width = isMobile ? base : Math.max(480, Math.floor(base * 0.75));
+                                        return `calc(50% - ${width / 2}px)`;
+                                    })()
+                                }}
+                                onClick={(e)=>e.stopPropagation()}
+                            >
+                                <div className="fd-header">
+                                    <button className="fd-close" aria-label={t('common.close')} onClick={() => { setShowFiltersDrawer(false); setShowFilters(false); }}>
+                                        <FaTimes />
+                                    </button>
+                                    <h2 className="fd-title">{
+                                        drawerMode==='all' ? t('advancedSearch.title') :
+                                        drawerMode==='category' ? t('advancedSearch.category.title') :
+                                        drawerMode==='services' ? t('advancedSearch.services.title') :
+                                        drawerMode==='city' ? (t('advancedSearch.city')||'City') :
+                                        drawerMode==='price' ? (t('advancedSearch.priceRange')||'Price') :
+                                        drawerMode==='distance' ? t('advancedSearch.distance.title') :
+                                        t('advancedSearch.rating.title')
+                                    }</h2>
+                                    <button
+                                      className="fd-clear"
+                                      onClick={() => {
+                                        if (drawerMode==='category') { setTempValues(v=>({ ...v, categoryName:'', services:[] })); setSelectedCategoryId(''); handleApplyMulti({ categoryName:'', services:[] }); return; }
+                                        if (drawerMode==='services') { setTempValues(v=>({ ...v, services:[] })); handleApplyMulti({ services:[] }); return; }
+                                        if (drawerMode==='city') { setTempValues(v=>({ ...v, city:'' })); handleApplyMulti({ city:'' }); return; }
+                                        if (drawerMode==='price') { setTempValues(v=>({ ...v, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE })); handleApplyMulti({ priceMin:'', priceMax:'' }); return; }
+                                        if (drawerMode==='distance') { setTempValues(v=>({ ...v, maxDistance:0 })); handleApplyMulti({ maxDistance:'' }); return; }
+                                        if (drawerMode==='rating') { setTempValues(v=>({ ...v, rating:0 })); handleApplyMulti({ rating:'' }); return; }
+                                        // all
+                                        setTempValues(v=>({ ...v, categoryName:'', services:[], city:'', priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE, maxDistance:0, rating:0 })); setSelectedCategoryId(''); handleApplyMulti({ categoryName:'', services:[], city:'', priceMin:'', priceMax:'', maxDistance:'', rating:'' });
+                                      }}
+                                    >{t('advancedSearch.buttons.clear')}</button>
+                                </div>
+                                <div className="fd-content">
+                                    {/* Category - pills, single-select */}
+                                    {(drawerMode==='all' || drawerMode==='category') && (
+                                      <div className="fd-row">
+                                        {drawerMode==='all' ? <label>{t('advancedSearch.category.title')}</label> : null}
+                                        <div className="tags-scroll">
+                                          {categories.map(c => (
+                                            <button
+                                              key={c._id}
+                                              type="button"
+                                              className={`tag-chip ${tempValues.categoryName===c.name ? 'selected' : ''}`}
+                                              onClick={async () => {
+                                                const isSame = tempValues.categoryName===c.name;
+                                                const nextName = isSame ? '' : c.name;
+                                                const nextId = isSame ? '' : c._id;
+                                                setTempValues(v=>({ ...v, categoryName: nextName, services: [] }));
+                                                setSelectedCategoryId(nextId);
+                                                await fetchServicesByCategoryId(nextId);
+                                              }}
+                                            >{c.name}</button>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Services */}
+                                    {(drawerMode==='all' || drawerMode==='services') && services.length>0 && (
+                                        <div className="fd-row">
+                                            {drawerMode==='all' ? <label>{t('advancedSearch.services.title')}</label> : null}
+                                            <div className="tags-scroll">
+                                                {services.map(s => (
+                                                    <label key={s._id} className={`tag-check ${tempValues.services.includes(s.name)?'selected':''}`}>
+                                                        <input type="checkbox" checked={tempValues.services.includes(s.name)} onChange={(e)=>{
+                                                            setTempValues(v=>{
+                                                                const exists = v.services.includes(s.name);
+                                                                const next = exists ? v.services.filter(x=>x!==s.name) : [...v.services, s.name];
+                                                                return { ...v, services: next };
+                                                            });
+                                                        }} />
+                                                        <span>{s.name}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Sort */}
+                                    {drawerMode==='sort' && (
+                                      <div className="fd-row">
+                                        <div className="tags-scroll">
+                                          {Object.entries(SORT_OPTIONS).map(([value, label]) => (
+                                            <button
+                                              key={value}
+                                              type="button"
+                                              className={`tag-chip ${tempSort===value ? 'selected' : ''}`}
+                                              onClick={() => setTempSort(value)}
+                                            >{label}</button>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* City */}
+                                    {(drawerMode==='all' || drawerMode==='city') && (
+                                    <div className="fd-row">
+                                        {drawerMode==='all' ? <label>{t('advancedSearch.city')}</label> : null}
+                                        {mapsLoaded ? (
+                                            <Autocomplete
+                                                onLoad={(ac)=>{ cityAutoRef.current = ac; }}
+                                                onPlaceChanged={()=>{
+                                                    const place = cityAutoRef.current?.getPlace();
+                                                    if (!place) return;
+                                                    const comp = place.address_components || [];
+                                                    const cityComp = comp.find(c => c.types.includes('locality')) || comp.find(c => c.types.includes('administrative_area_level_2')) || comp.find(c => c.types.includes('administrative_area_level_1'));
+                                                    setTempValues(v=>({ ...v, city: cityComp?.long_name || place.name || '' }));
+                                                }}
+                                                options={{ types: ['(cities)'], componentRestrictions: { country: 'il' } }}
+                                            >
+                                                <input className="mini-input full" type="text" value={tempValues.city} onChange={(e)=>setTempValues(v=>({...v, city:e.target.value}))} placeholder={t('advancedSearch.cityPlaceholder')||''} />
+                                            </Autocomplete>
+                                        ) : (
+                                            <input className="mini-input full" type="text" value={tempValues.city} onChange={(e)=>setTempValues(v=>({...v, city:e.target.value}))} />
+                                        )}
+                                    </div>
+                                    )}
+
+                                    {/* Price */}
+                                    {(drawerMode==='all' || drawerMode==='price') && (
+                                      <div className="fd-row two">
+                                        <div>
+                                          {drawerMode==='all' ? <label>{t('advancedSearch.min')}</label> : null}
+                                          <input className="mini-input full" type="number" min="0" placeholder={t('advancedSearch.min')} value={tempValues.priceMin} onChange={(e)=>setTempValues(v=>({...v, priceMin:e.target.value}))} />
+                                        </div>
+                                        <div>
+                                          {drawerMode==='all' ? <label>{t('advancedSearch.max')}</label> : null}
+                                          <input className="mini-input full" type="number" min="0" placeholder={t('advancedSearch.max')} value={tempValues.priceMax} onChange={(e)=>setTempValues(v=>({...v, priceMax:e.target.value}))} />
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Distance */}
+                                    {(drawerMode==='all' || drawerMode==='distance') && (
+                                    <div className="fd-row">
+                                        {drawerMode==='all' ? <label>{t('advancedSearch.distance.title')}</label> : null}
+                                        <input className="mini-range full" type="range" min="0" max="100" step="1" value={tempValues.maxDistance} onChange={(e)=>setTempValues(v=>({...v, maxDistance:Number(e.target.value)}))} />
+                                        <div className="range-value">{tempValues.maxDistance} {t('advancedSearch.distance.km')}</div>
+                                    </div>
+                                    )}
+
+                                    {/* Open now - show only in all mode to avoid confusion; quick toggle chip handles single */}
+                                    {drawerMode==='all' && (
+                                    <div className="fd-row">
+                                        <label className="inline">
+                                            <input type="checkbox" checked={new URLSearchParams(location.search).has('openNow')} onChange={toggleOpenNow} /> {t('advancedSearch.openNow')}
+                                        </label>
+                                    </div>
+                                    )}
+
+                                    {/* Rating */}
+                                    {(drawerMode==='all' || drawerMode==='rating') && (
+                                    <div className="fd-row">
+                                        {drawerMode==='all' ? <label>{t('advancedSearch.rating.title')}</label> : null}
+                                        <div className="stars-inline">
+                                            {[1,2,3,4,5].map(st => (
+                                                <FaStar key={st} className={`rating-star ${tempValues.rating>=st?'active':''}`} onClick={()=>setTempValues(v=>({...v, rating: v.rating===st?0:st}))} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    )}
+                                </div>
+                                <div className="fd-footer">
+                                    <button className="submit-button" onClick={() => {
+                                        if (drawerMode==='category') { handleApplyMulti({ categoryName: tempValues.categoryName, services: [] }); return; }
+                                        if (drawerMode==='services') { handleApplyMulti({ services: tempValues.services }); return; }
+                                        if (drawerMode==='city') { handleApplyMulti({ city: tempValues.city }); return; }
+                                        if (drawerMode==='price') { handleApplyMulti({ priceMin: tempValues.priceMin || '', priceMax: tempValues.priceMax || '' }); return; }
+                                        if (drawerMode==='distance') { handleApplyMulti({ maxDistance: tempValues.maxDistance || '' }); return; }
+                                        if (drawerMode==='rating') { handleApplyMulti({ rating: tempValues.rating || '' }); return; }
+                                        if (drawerMode==='sort') { handleApplyMulti({ sort: tempSort==='rating' ? 'rating' : tempSort }); return; }
+                                        handleApplyMulti({ categoryName: tempValues.categoryName, services: tempValues.services, city: tempValues.city, priceMin: tempValues.priceMinN>0 ? String(tempValues.priceMinN) : '', priceMax: tempValues.priceMaxN<MAX_PRICE ? String(tempValues.priceMaxN) : '', maxDistance: tempValues.maxDistance || '', rating: tempValues.rating || '' });
+                                    }}>{t('advancedSearch.buttons.apply')}</button>
+                                </div>
+                            </div>
+                        </div>
                     )}
                 </div>
 
@@ -529,23 +863,7 @@ const SearchResultPage = () => {
                     );
                 })()}
 
-                {/* Tabs for result types - render only when lists are ready (not loading after first fetch) */}
-                {!isLoading && (
-                <div className="favorites-tabs" role="tablist" aria-label={t('userBusinesses.tabs.aria')}>
-                    <button className={`favorites-tab ${activeTab==='all'?'active':''}`} role="tab" aria-selected={activeTab==='all'} onClick={() => handleTabChange('all')}>
-                        {t('favorites.tabs.all')} <span className="count">({filteredBusinesses.length + filteredSaleAds.length + filteredPromoAds.length})</span>
-                    </button>
-                    <button className={`favorites-tab ${activeTab==='business'?'active':''}`} role="tab" aria-selected={activeTab==='business'} onClick={() => handleTabChange('business')}>
-                        {t('favorites.tabs.business')} <span className="count">({filteredBusinesses.length})</span>
-                    </button>
-                    <button className={`favorites-tab ${activeTab==='sale'?'active':''}`} role="tab" aria-selected={activeTab==='sale'} onClick={() => handleTabChange('sale')}>
-                        {t('favorites.tabs.sale')} <span className="count">({filteredSaleAds.length})</span>
-                    </button>
-                    <button className={`favorites-tab ${activeTab==='promo'?'active':''}`} role="tab" aria-selected={activeTab==='promo'} onClick={() => handleTabChange('promo')}>
-                        {t('favorites.tabs.promo')} <span className="count">({filteredPromoAds.length})</span>
-                    </button>
-                </div>
-                )}
+                {/* Tabs removed in favor of type pills above */}
 
                 {/* Results */}
                 <div className="search-results-layout">

@@ -8,7 +8,7 @@ import axios from 'axios';
 import '../styles/MainPage.css';
 import '../styles/businessCard.css';
 import { useNavigate } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight, FaUserFriends, FaStar, FaCalendarCheck, FaEnvelope, FaPhone, FaWhatsapp } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaArrowLeft, FaArrowRight, FaUserFriends, FaStar, FaCalendarCheck, FaEnvelope, FaPhone, FaWhatsapp } from 'react-icons/fa';
 import { buildQueryUrl } from '../utils/buildQueryUrl';
 import { useSelector } from 'react-redux';
 import { getToken } from '../utils/auth';
@@ -34,6 +34,8 @@ const MainPage = () => {
     });
     const [isStatsLoading, setIsStatsLoading] = useState(true);
     const navigate = useNavigate();
+    const htmlDir = typeof document !== 'undefined' ? (document.documentElement.getAttribute('dir') || 'ltr') : 'ltr';
+    const isRTL = htmlDir === 'rtl';
     
     const userLocation = useSelector(state => state.location.coords);
     const locationLoading = useSelector(state => state.location.loading);
@@ -245,12 +247,13 @@ const MainPage = () => {
                             </div>
                         </div>
 
-                        {/* Quick Create strip placed under the join strip */}
-                        <QuickCreateStrip />
                         {/* Search Section (without big title) */}
                         <div className="search-section">
                             <SearchBar />
                         </div>
+
+                        {/* Quick Create strip placed under the search */}
+                        <QuickCreateStrip />
 
                         <div className="banner-stats-container">
                             {/* Banner */}
@@ -394,9 +397,10 @@ const MainPage = () => {
                         <div className="business-row">
                             <div className="business-row-header">
                                 <h3>{t('mainPage.sections.new')}</h3>
-                                <a href="/search-results?sort=newest" className="view-all" aria-label={t('mainPage.viewAll')}>
-                                    <span className="view-all-label">{t('mainPage.viewAll')}</span>
-                                    <span className="view-all-icon" aria-hidden="true">›</span>
+                                <a href="/search-results?tab=business&sort=newest" className="view-all" aria-label={t('mainPage.viewAll')}
+                                   onClick={(e)=>{ e.preventDefault(); navigate('/search-results?tab=business&sort=newest'); }}>
+                                    <span className="view-all-label visually-hidden">{t('mainPage.viewAll')}</span>
+                                    <span className="view-all-icon" aria-hidden="true">{isRTL ? <FaArrowLeft /> : <FaArrowRight />}</span>
                                 </a>
                             </div>
                             <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
@@ -412,9 +416,10 @@ const MainPage = () => {
                         <div className="business-row">
                             <div className="business-row-header">
                                 <h3>{t('mainPage.sections.newSales')}</h3>
-                                <a href="/ads/sale?sort=newest" className="view-all" aria-label={t('mainPage.viewAll')}>
-                                    <span className="view-all-label">{t('mainPage.viewAll')}</span>
-                                    <span className="view-all-icon" aria-hidden="true">›</span>
+                                <a href="/search-results?tab=sale&sort=newest" className="view-all" aria-label={t('mainPage.viewAll')}
+                                   onClick={(e)=>{ e.preventDefault(); navigate('/search-results?tab=sale&sort=newest'); }}>
+                                    <span className="view-all-label visually-hidden">{t('mainPage.viewAll')}</span>
+                                    <span className="view-all-icon" aria-hidden="true">{isRTL ? <FaArrowLeft /> : <FaArrowRight />}</span>
                                 </a>
                             </div>
                             <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
@@ -430,9 +435,10 @@ const MainPage = () => {
                         <div className="business-row">
                             <div className="business-row-header">
                                 <h3>{t('mainPage.sections.newPromos')}</h3>
-                                <a href="/ads/promo?status=active&sort=newest" className="view-all" aria-label={t('mainPage.viewAll')}>
-                                    <span className="view-all-label">{t('mainPage.viewAll')}</span>
-                                    <span className="view-all-icon" aria-hidden="true">›</span>
+                                <a href="/search-results?tab=promo&status=active&sort=newest" className="view-all" aria-label={t('mainPage.viewAll')}
+                                   onClick={(e)=>{ e.preventDefault(); navigate('/search-results?tab=promo&status=active&sort=newest'); }}>
+                                    <span className="view-all-label visually-hidden">{t('mainPage.viewAll')}</span>
+                                    <span className="view-all-icon" aria-hidden="true">{isRTL ? <FaArrowLeft /> : <FaArrowRight />}</span>
                                 </a>
                             </div>
                             <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>

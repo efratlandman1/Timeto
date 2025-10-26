@@ -120,8 +120,24 @@ exports.getPromoAds = async (req, res) => {
                 }
             };
             const sortStage = { $sort: sort === 'distance' ? { distance: 1 } : { validFrom: -1 } };
+            const projectStage = {
+                $project: {
+                    title: 1,
+                    city: 1,
+                    address: 1,
+                    image: 1,
+                    validFrom: 1,
+                    validTo: 1,
+                    active: 1,
+                    userId: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    location: 1,
+                    distance: 1
+                }
+            };
             [data, total] = await Promise.all([
-                PromoAd.aggregate([geoNearStage, sortStage, { $skip: skip }, { $limit: limitNum }]),
+                PromoAd.aggregate([geoNearStage, sortStage, projectStage, { $skip: skip }, { $limit: limitNum }]),
                 PromoAd.countDocuments(query)
             ]);
         } else {

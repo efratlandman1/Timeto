@@ -156,7 +156,7 @@ const AuthPage = () => {
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
                             </div>
-                            <button type="submit" className="confirm-button" disabled={isLoading}>{t('auth.login.continue')}</button>
+                            <button type="submit" className="submit-button" disabled={isLoading}>{t('auth.login.continue')}</button>
                              <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password', { state: { background: currentLocation } });}} className="forgot-password-link" style={{textAlign:'center', display:'block'}}>
                              {t('auth.forgotPassword.createNewPassword')}
                         </a>
