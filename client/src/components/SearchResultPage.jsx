@@ -70,7 +70,10 @@ const SearchResultPage = () => {
     const prevSortRef = useRef('rating');
     const prevFiltersRef = useRef('');
     const prevLocationErrorRef = useRef(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingBiz, setIsLoadingBiz] = useState(false);
+    const [isLoadingSale, setIsLoadingSale] = useState(false);
+    const [isLoadingPromo, setIsLoadingPromo] = useState(false);
+    const isLoadingAny = isLoadingBiz || isLoadingSale || isLoadingPromo;
     const [hasMore, setHasMore] = useState(true);
 
     const navigate = useNavigate();
@@ -81,7 +84,7 @@ const SearchResultPage = () => {
 
     const observer = useRef();
     const lastItemRef = useCallback(node => {
-        if (isLoading) return;
+        if (isLoadingAny) return;
         if (observer.current) observer.current.disconnect();
         observer.current = new IntersectionObserver(entries => {
             if (!entries[0].isIntersecting || !hasMore) return;
@@ -96,7 +99,7 @@ const SearchResultPage = () => {
             }
         });
         if (node) observer.current.observe(node);
-    }, [isLoading, hasMore, activeTab]);
+    }, [isLoadingAny, hasMore, activeTab]);
     
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -231,7 +234,7 @@ const SearchResultPage = () => {
         
         console.log('SearchResultPage - Final params:', paramsObj);
         
-        setIsLoading(true);
+        setIsLoadingBiz(true);
         const url = buildQueryUrl(
             `${process.env.REACT_APP_API_DOMAIN}/api/v1/businesses`,
             paramsObj,
@@ -256,11 +259,11 @@ const SearchResultPage = () => {
                 const total = res.data.pagination?.totalPages || 1;
                 setBizTotalPages(total);
                 setHasMore((bizPage < total) || (salePage < saleTotalPages) || (promoPage < promoTotalPages));
-                setIsLoading(false);
+                setIsLoadingBiz(false);
             })
             .catch(error => {
                 console.error('Error fetching businesses:', error);
-                setIsLoading(false);
+                setIsLoadingBiz(false);
             });
     }, [location.search, bizPage, userLocation, locationLoading, locationError]);
 
@@ -279,7 +282,7 @@ const SearchResultPage = () => {
         paramsObj.limit = ITEMS_PER_PAGE;
 
         const qs = new URLSearchParams(paramsObj).toString();
-        setIsLoading(true);
+        setIsLoadingSale(true);
         axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-ads?${qs}`, { headers })
             .then(res => {
                 const newAds = res.data.data.ads || [];
@@ -287,11 +290,11 @@ const SearchResultPage = () => {
                 const total = res.data.pagination?.totalPages || 1;
                 setSaleTotalPages(total);
                 setHasMore((bizPage < bizTotalPages) || (salePage < total) || (promoPage < promoTotalPages));
-                setIsLoading(false);
+                setIsLoadingSale(false);
             })
             .catch(err => {
                 console.error('Error fetching sale ads:', err);
-                setIsLoading(false);
+                setIsLoadingSale(false);
             });
     }, [location.search, salePage]);
 
@@ -310,7 +313,7 @@ const SearchResultPage = () => {
         paramsObj.limit = ITEMS_PER_PAGE;
 
         const qs = new URLSearchParams({ status: 'active', ...paramsObj }).toString();
-        setIsLoading(true);
+        setIsLoadingPromo(true);
         axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/promo-ads?${qs}`, { headers })
             .then(res => {
                 const newAds = res.data.data.ads || [];
@@ -318,11 +321,11 @@ const SearchResultPage = () => {
                 const total = res.data.pagination?.totalPages || 1;
                 setPromoTotalPages(total);
                 setHasMore((bizPage < bizTotalPages) || (salePage < saleTotalPages) || (promoPage < total));
-                setIsLoading(false);
+                setIsLoadingPromo(false);
             })
             .catch(err => {
                 console.error('Error fetching promo ads:', err);
-                setIsLoading(false);
+                setIsLoadingPromo(false);
             });
     }, [location.search, promoPage]);
 
@@ -887,6 +890,12 @@ const SearchResultPage = () => {
                         ))}
 
                         {activeTab === 'all' && (() => {
+                            const isInitialAllLoading = (bizPage === 1 && isLoadingBiz) || (salePage === 1 && isLoadingSale) || (promoPage === 1 && isLoadingPromo);
+                            if (isInitialAllLoading) {
+                                return Array.from({ length: ITEMS_PER_PAGE }).map((_, idx) => (
+                                    <div key={`skeleton-${idx}`} className="animate-pulse rounded-lg bg-gray-200 h-40" />
+                                ));
+                            }
                             const items = [
                                 ...filteredBusinesses.map(b => ({ type: 'business', data: b })),
                                 ...filteredSaleAds.map(s => ({ type: 'sale', data: s })),
@@ -916,7 +925,7 @@ const SearchResultPage = () => {
                 </div>
 
                 {/* לוודר */}
-                {isLoading && (
+                {isLoadingAny && (
                     <div className="loader-container">
                         <div className="loader"></div>
                     </div>

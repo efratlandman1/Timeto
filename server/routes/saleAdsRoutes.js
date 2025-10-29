@@ -8,7 +8,7 @@ const { fileUploadSecurityArray } = require('../middlewares/fileUploadSecurity')
 const controller = require('../controllers/saleAdsController');
 
 // List & search
-router.get('/', optionalAuth, generalLimiter, sanitizeRequest, controller.getSaleAds);
+router.get('/', optionalAuth, sanitizeRequest, controller.getSaleAds);
 // Create
 router.post('/', requireAuth, writeLimiter, sanitizeRequest, upload.array('images', 10), fileUploadSecurityArray, controller.createSaleAd);
 // User ads
