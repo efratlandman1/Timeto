@@ -42,9 +42,9 @@ const MainPage = () => {
     const locationError = useSelector(state => state.location.error);
     
     const bannerImages = [
-        '/uploads/business1.jpeg',
+        '/uploads/business1.png',
         '/uploads/business2.png',
-        '/uploads/business3.jpg'
+        '/uploads/business3.png'
     ];
 
         // Auto-advance banner

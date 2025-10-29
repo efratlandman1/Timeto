@@ -3,7 +3,7 @@
     width: 100%;
     margin: 0 auto;
     padding-top: 4.5rem;
-    direction: rtl;
+    direction: inherit; /* follow document direction (RTL/LTR) */
     background-color: white;
     min-height: 100vh;
 }
@@ -185,7 +185,8 @@
     display: flex;
     gap: 4px;
     z-index: 2;
-    direction: ltr; /* Ensure left-to-right progress */
+    direction: ltr !important; /* force LTR regardless of page dir */
+    flex-direction: row !important; /* keep visual order left -> right */
 }
 
 .story-indicator {
@@ -196,6 +197,7 @@
     overflow: hidden;
     cursor: pointer;
     position: relative;
+    text-align: left; /* anchor progress to the left */
 }
 
 .story-indicator.active {
@@ -211,23 +213,19 @@
     left: 0;
     top: 0;
     height: 100%;
-    width: 100%;
+    width: 0; /* always start from the left */
+    right: auto;
     background-color: white;
-    transform: scaleX(0);
-    transform-origin: left;
+    will-change: width;
 }
 
 .story-indicator.active .indicator-progress {
-    animation: progressBar 5s linear forwards;
+    animation: progressBarLTR 5s linear forwards; /* always LTR */
 }
 
-@keyframes progressBar {
-    0% {
-        transform: scaleX(0);
-    }
-    100% {
-        transform: scaleX(1);
-    }
+@keyframes progressBarLTR {
+    0% { width: 0; }
+    100% { width: 100%; }
 }
 
 /* Banner Navigation */
