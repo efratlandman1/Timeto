@@ -9,6 +9,7 @@ const logger = require('../logger');
 const Sentry = require('../sentry');
 const { errorResponse, successResponse, getRequestMeta,serializeError } = require('../utils/errorUtils');
 const { BUSINESS_MESSAGES } = require('../messages');
+const { indexEntityById, setEmbeddingActiveByEntity } = require('../services/indexingService');
 
 const DEFAULT_ITEMS_PER_PAGE = 8;
 const CACHE_TTL = 3600; // זמן חיים של הקאש בשניות (שעה)
@@ -331,6 +332,10 @@ const createBusiness = async (req, res, userId) => {
         });
 
         const savedItem = await newBusiness.save();
+        // Fire-and-forget indexing
+        indexEntityById('business', savedItem._id).catch(err => {
+            logger.error({ error: serializeError(err), logSource: 'businessesController.createBusiness' }, 'indexing error');
+        });
         
         logger.info({ ...meta, businessId: savedItem._id }, `${logSource} complete`);
         return successResponse({
@@ -424,6 +429,9 @@ const updateBusiness = async (req, res, userId) => {
         existingBusiness.openingHours = typeof req.body.openingHours === 'string' ? JSON.parse(req.body.openingHours) : (req.body.openingHours || existingBusiness.openingHours);
 
         await existingBusiness.save();
+        indexEntityById('business', existingBusiness._id).catch(err => {
+            logger.error({ error: serializeError(err), logSource: 'businessesController.updateBusiness' }, 'indexing error');
+        });
         
         logger.info({ ...meta, businessId: req.body.id }, `${logSource} complete`);
         return successResponse({
@@ -790,6 +798,7 @@ exports.deleteBusiness = async (req, res) => {
 
         business.active = false;
         await business.save();
+        setEmbeddingActiveByEntity('business', businessId, false).catch(() => {});
 
         logger.info({ ...meta, businessId }, `${logSource} complete`);
         return successResponse({
@@ -851,6 +860,7 @@ exports.restoreBusiness = async (req, res) => {
 
         business.active = true;
         await business.save();
+        setEmbeddingActiveByEntity('business', businessId, true).catch(() => {});
 
         logger.info({ ...meta, businessId }, `${logSource} complete`);
         return successResponse({

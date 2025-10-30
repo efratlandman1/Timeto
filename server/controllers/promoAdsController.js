@@ -6,6 +6,7 @@ const logger = require('../logger');
 const Sentry = require('../sentry');
 const { errorResponse, successResponse, getRequestMeta, serializeError } = require('../utils/errorUtils');
 const { PROMO_AD_MESSAGES } = require('../messages');
+const { indexEntityById, setEmbeddingActiveByEntity } = require('../services/indexingService');
 
 const DEFAULT_LIMIT = 20;
 
@@ -58,6 +59,10 @@ exports.createPromoAd = async (req, res) => {
             active: true
         });
         const saved = await doc.save();
+        // Index embedding (fire-and-forget)
+        indexEntityById('promo', saved._id).catch(err => {
+            logger.error({ ...meta, error: serializeError(err) }, 'indexing error');
+        });
         return successResponse({ res, req, status: 201, data: { ad: saved }, message: PROMO_AD_MESSAGES.CREATE_SUCCESS, logSource });
     } catch (err) {
         logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
@@ -89,6 +94,9 @@ exports.updatePromoAd = async (req, res) => {
         }
         if (req.file) ad.image = req.file.filename;
         await ad.save();
+        indexEntityById('promo', ad._id).catch(err => {
+            logger.error({ ...meta, error: serializeError(err) }, 'indexing error');
+        });
         return successResponse({ res, req, data: { ad }, message: PROMO_AD_MESSAGES.UPDATE_SUCCESS, logSource });
     } catch (err) {
         logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
@@ -210,6 +218,7 @@ exports.deletePromoAd = async (req, res) => {
         }
         ad.active = false;
         await ad.save();
+        setEmbeddingActiveByEntity('promo', ad._id, false).catch(() => {});
         return successResponse({ res, req, data: null, message: PROMO_AD_MESSAGES.DELETE_SUCCESS, logSource });
     } catch (err) {
         logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
@@ -229,6 +238,7 @@ exports.restorePromoAd = async (req, res) => {
         }
         ad.active = true;
         await ad.save();
+        setEmbeddingActiveByEntity('promo', ad._id, true).catch(() => {});
         return successResponse({ res, req, data: { ad }, message: PROMO_AD_MESSAGES.RESTORE_SUCCESS, logSource });
     } catch (err) {
         logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);

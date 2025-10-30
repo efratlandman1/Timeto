@@ -54,6 +54,94 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
       }
 
       const API = process.env.REACT_APP_API_DOMAIN;
+
+      // 1) Vector search first
+      const vecRes = await fetch(`${API}/api/v1/embeddings/search`, {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, topK: ITEMS_PER_PAGE, includeContent: false })
+      });
+
+      if (vecRes.ok) {
+        const vecJson = await vecRes.json();
+        const vecItems = Array.isArray(vecJson?.data) ? vecJson.data : [];
+
+        if (vecItems.length > 0) {
+          // Group IDs by entity type
+          const bizIds = [];
+          const saleIds = [];
+          const promoIds = [];
+          vecItems.forEach((r) => {
+            const et = (r?.metadata?.entityType || '').toLowerCase();
+            const id = r?.metadata?.entityId || r?.id;
+            if (!id) return;
+            if (et === 'business') bizIds.push(id);
+            else if (et === 'sale') saleIds.push(id);
+            else if (et === 'promo') promoIds.push(id);
+          });
+
+          // Fetch details in parallel (hydrate)
+          const fetchById = async (url) => {
+            try {
+              const res = await fetch(url, { headers });
+              return res.ok ? res.json() : null;
+            } catch {
+              return null;
+            }
+          };
+
+          const [bizDetails, saleDetails, promoDetails] = await Promise.all([
+            Promise.all(bizIds.map(id => fetchById(`${API}/api/v1/businesses/${id}`))),
+            Promise.all(saleIds.map(id => fetchById(`${API}/api/v1/sale-ads/${id}`))),
+            Promise.all(promoIds.map(id => fetchById(`${API}/api/v1/promo-ads/${id}`)))
+          ]);
+
+          // Build lookup maps
+          const bizMap = new Map();
+          bizDetails.forEach((j, i) => {
+            const id = bizIds[i];
+            const item = j?.data?.business;
+            if (id && item) bizMap.set(String(id), item);
+          });
+          const saleMap = new Map();
+          saleDetails.forEach((j, i) => {
+            const id = saleIds[i];
+            const item = j?.data?.ad;
+            if (id && item) saleMap.set(String(id), item);
+          });
+          const promoMap = new Map();
+          promoDetails.forEach((j, i) => {
+            const id = promoIds[i];
+            const item = j?.data?.ad;
+            if (id && item) promoMap.set(String(id), item);
+          });
+
+          // Reconstruct ordered results by vector ranking
+          const combined = [];
+          vecItems.forEach((r) => {
+            const et = (r?.metadata?.entityType || '').toLowerCase();
+            const id = String(r?.metadata?.entityId || r?.id || '');
+            if (!id) return;
+            if (et === 'business' && bizMap.has(id)) combined.push({ type: 'business', item: bizMap.get(id), score: r.score });
+            if (et === 'sale' && saleMap.has(id)) combined.push({ type: 'sale', item: saleMap.get(id), score: r.score });
+            if (et === 'promo' && promoMap.has(id)) combined.push({ type: 'promo', item: promoMap.get(id), score: r.score });
+          });
+
+          // Vector results are final (no infinite paging for now)
+          setHasMore(false);
+          if (append) {
+            setResults(prev => [...prev, ...combined]);
+          } else {
+            setResults(combined);
+            itemRefs.current = [];
+          }
+          setShowDropdown(true);
+          setHighlightedIndex(-1);
+          return;
+        }
+      }
+
+      // 2) Fallback to legacy text search endpoints if vector is empty or failed
       const [bizRes, saleRes, promoRes] = await Promise.all([
         fetch(`${API}/api/v1/businesses?q=${encodeURIComponent(query)}&page=${pageNum}&limit=${ITEMS_PER_PAGE}`, { headers }),
         fetch(`${API}/api/v1/sale-ads?q=${encodeURIComponent(query)}&page=${pageNum}&limit=${ITEMS_PER_PAGE}`, { headers }),
@@ -73,7 +161,6 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
       const promoItems = (promoJson?.data?.ads || []).map(a => ({ type: 'promo', item: a }));
 
       const combined = [...bizItems, ...saleItems, ...promoItems];
-      // Simple sort: newest by createdAt/updatedAt desc within this page
       combined.sort((a,b) => new Date(b.item.updatedAt || b.item.createdAt || 0) - new Date(a.item.updatedAt || a.item.createdAt || 0));
 
       let hasNext = (bizJson.pagination?.hasNextPage) || (saleJson.pagination?.hasNextPage) || (promoJson.pagination?.hasNextPage) || (combined.length === ITEMS_PER_PAGE);
@@ -82,7 +169,6 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
       if (append) {
         setResults(prev => [...prev, ...combined]);
       } else {
-        // If no results for partial input, try a lightweight client-side fallback
         if (combined.length === 0 && query.trim().length >= 2 && pageNum === 1) {
           try {
             const limit = 20;

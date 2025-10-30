@@ -21,7 +21,8 @@ const requiredEnvVars = [
   'EMAIL_SERVICE',
   'EMAIL_USER',
   'EMAIL_PASS',
-  'SERVER_URL'
+  'SERVER_URL',
+  'OPENAI_API_KEY'
 ];
 
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
@@ -71,6 +72,7 @@ const promoAdsRoutes = require('./routes/promoAdsRoutes');
 const saleCategoriesRoutes = require('./routes/saleCategoriesRoutes');
 const saleFavoritesRoutes = require('./routes/saleFavoritesRoutes');
 const promoFavoritesRoutes = require('./routes/promoFavoritesRoutes');
+const embeddingsRoutes = require('./routes/embeddingsRoutes');
 const loggingMiddleware = require('./middlewares/loggingMiddleware');
 
 // Security middleware with environment-based settings
@@ -196,6 +198,7 @@ app.use('/api/v1/promo-ads', promoAdsRoutes);
 app.use('/api/v1/sale-categories', saleCategoriesRoutes);
 app.use('/api/v1/sale-favorites', saleFavoritesRoutes);
 app.use('/api/v1/promo-favorites', promoFavoritesRoutes);
+app.use('/api/v1/embeddings', embeddingsRoutes);
 
 // Global error handler for oversized requests and other errors
 app.use((err, req, res, next) => {
