@@ -86,7 +86,7 @@ const SuggestItemPage = () => {
         name_en: formData.name_en,
         reason: formData.reason,
         ...(mode === 'business' && formData.type === 'service' ? { parent_category_id: formData.parent_category_id } : {}),
-        ...(mode === 'sale' ? { sale_category_id: formData.sale_category_id } : {})
+        ...(mode === 'sale' && formData.type === 'subcategory' ? { sale_category_id: formData.sale_category_id } : {})
       };
 
       const response = await axios.post(
@@ -179,6 +179,32 @@ const SuggestItemPage = () => {
             </div>
           )}
 
+          {mode === 'sale' && (
+            <div className="form-group">
+              <label className="form-label">סוג הצעה</label>
+              <div className="segmented-control" role="tablist" aria-label="sale type selector">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={formData.type === 'category'}
+                  className={`segment ${formData.type === 'category' ? 'active' : ''}`}
+                  onClick={() => handleChange({ target: { name: 'type', value: 'category' } })}
+                >
+                  קטגוריה
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={formData.type === 'subcategory'}
+                  className={`segment ${formData.type === 'subcategory' ? 'active' : ''}`}
+                  onClick={() => handleChange({ target: { name: 'type', value: 'subcategory' } })}
+                >
+                  תת קטגוריה
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="section-card">
             <div className="two-col">
               <div className="form-group">
@@ -237,7 +263,7 @@ const SuggestItemPage = () => {
 
           
 
-          {mode === 'sale' && (
+          {mode === 'sale' && formData.type === 'subcategory' && (
             <div className="section-card">
               <div className="form-group">
                 <label className="form-label">{t('suggestItem.form.saleCategory')} <span className="required-asterisk">*</span></label>

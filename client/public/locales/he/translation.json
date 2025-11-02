@@ -713,6 +713,8 @@
       "title": "דירוג מינימלי",
       "andAbove": "ומעלה"
     },
+    "subcategories": "תת קטגוריות",
+    "subcategory": "תת קטגוריה",
     "category": {
       "title": "קטגוריה",
       "select": "בחר קטגוריה"

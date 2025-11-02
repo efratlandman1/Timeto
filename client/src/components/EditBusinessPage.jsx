@@ -1,7 +1,7 @@
 // ... כל הייבוא נשאר כמו שהיה
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { FaSave, FaPlus, FaEdit, FaArrowRight } from 'react-icons/fa';
@@ -209,6 +209,7 @@ const EditBusinessPage = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const selectedBusiness = useSelector(
     (state) =>
@@ -233,6 +234,29 @@ const EditBusinessPage = () => {
 
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const resetKey = location.state?.reset || 0;
+
+  // Scroll to top on open/reset
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Reset form values to pristine for new business flow
+    if (!id) {
+      dispatch(setSelectedBusiness(null));
+      setBusinessData({
+        name: '',
+        address: '',
+        prefix: '',
+        phone: '',
+        email: '',
+        categoryId: '',
+        description: '',
+        logo: null,
+        services: [],
+        openingHours: [],
+        hasWhatsapp: true,
+      });
+    }
+  }, [resetKey]);
 
   // Redirect unauthenticated users immediately on page load (add/edit business requires auth)
   useEffect(() => {
@@ -407,7 +431,7 @@ const EditBusinessPage = () => {
         
         <h1 className="login-title" style={{ textAlign: 'center', marginTop: '8px' }}>{selectedBusiness ? t('businessForm.title.edit') : t('businessForm.title.new')}</h1>
 
-        <StepsProvider>
+        <StepsProvider key={resetKey}>
           <MySteps
             businessData={businessData}
             setBusinessData={setBusinessData}

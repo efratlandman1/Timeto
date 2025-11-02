@@ -8,7 +8,9 @@ exports.getAll = async (req, res) => {
     const logSource = 'saleCategoriesController.getAll';
     const meta = getRequestMeta(req, logSource);
     try {
-        const categories = await SaleCategory.find({ active: true }).sort({ sortOrder: 1, name: 1 });
+        // Include categories where active is true or not set (backward compatibility)
+        const matchActive = { $or: [{ active: true }, { active: { $exists: false } }] };
+        const categories = await SaleCategory.find(matchActive).sort({ sortOrder: 1, name: 1 });
         return successResponse({ res, req, data: { categories }, message: SALE_CATEGORY_MESSAGES.GET_ALL_SUCCESS, logSource });
     } catch (err) {
         logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
@@ -21,8 +23,8 @@ exports.create = async (req, res) => {
     const logSource = 'saleCategoriesController.create';
     const meta = getRequestMeta(req, logSource);
     try {
-        const { name, description, icon, color, sortOrder } = req.body;
-        const doc = new SaleCategory({ name, description, icon, color, sortOrder });
+        const { name, description, icon, color, sortOrder, parentId } = req.body;
+        const doc = new SaleCategory({ name, description, icon, color, sortOrder, parentId: parentId || null });
         const saved = await doc.save();
         return successResponse({ res, req, status: 201, data: { category: saved }, message: SALE_CATEGORY_MESSAGES.CREATE_SUCCESS, logSource });
     } catch (err) {

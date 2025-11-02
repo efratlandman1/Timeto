@@ -127,7 +127,7 @@ const UserBusinessesPage = () => {
                                 className="dropdown-menu"
                                 style={{ position: 'absolute', zIndex: 10, marginTop: 8, left: 0, minWidth: 220 }}
                             >
-                                <button className="dropdown-item" role="menuitem" onClick={() => { setShowCreateMenu(false); navigate('/business'); }}>
+                                <button className="dropdown-item" role="menuitem" onClick={() => { setShowCreateMenu(false); navigate('/business', { state: { reset: Date.now() } }); }}>
                                     <FaStore style={{ marginInlineEnd: 8 }} /> {t('userBusinesses.createOptions.addBusiness')}
                                 </button>
                                 <button className="dropdown-item" role="menuitem" onClick={() => { setShowCreateMenu(false); navigate('/ads/sale/new'); }}>

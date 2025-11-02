@@ -531,7 +531,7 @@ const Header = () => {
                                 >
                                     <button 
                                         className={dropdownItemClass} 
-                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/business"); }}
+                                        onClick={() => { setShowCreateMenu(false); navigate('/business', { state: { reset: Date.now() } }); setShowUserMenu(false); }}
                                         role="menuitem"
                                     >
                                         <FaStore />
@@ -727,7 +727,7 @@ const Header = () => {
                         <div id="mobile-create-submenu" role="group" aria-label={t('userBusinesses.create')}>
                             <button 
                                 className="mobile-menu-item"
-                                onClick={() => { setShowMobileMenu(false); setMobileCreateOpen(false); navigate("/business"); }}
+                                onClick={() => { setShowMobileMenu(false); setMobileCreateOpen(false); navigate('/business', { state: { reset: Date.now() } }); }}
                             >
                                 <FaStore />
                                 <span>{t('userBusinesses.createOptions.addBusiness')}</span>

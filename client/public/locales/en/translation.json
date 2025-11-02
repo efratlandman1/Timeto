@@ -702,6 +702,8 @@
       "title": "Minimum Rating",
       "andAbove": "and above"
     },
+    "subcategories": "Subcategories",
+    "subcategory": "Subcategory",
     "category": {
       "title": "Category",
       "select": "Select Category"

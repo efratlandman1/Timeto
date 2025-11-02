@@ -19,7 +19,7 @@ const createSuggestion = async (req, res) => {
   } }, `${logSource} enter`);
   
   try {
-    const { domain = 'business', type, name_he, name_en, parent_category_id, sale_category_id, reason } = req.body;
+    const { domain = 'business', type, name_he, name_en, parent_category_id, sale_category_id, sale_subcategory_id, reason } = req.body;
 
     // If business service, verify that parent_category_id exists
     if (domain === 'business' && type === 'service' && parent_category_id) {
@@ -43,7 +43,8 @@ const createSuggestion = async (req, res) => {
       name_he,
       name_en,
       parent_category_id: domain === 'business' && type === 'service' ? parent_category_id : undefined,
-      sale_category_id: domain === 'sale' ? sale_category_id : undefined,
+      sale_category_id: domain === 'sale' && type === 'subcategory' ? sale_category_id : undefined,
+      sale_subcategory_id: domain === 'sale' && type === 'subcategory' ? sale_subcategory_id : undefined,
       reason,
       user: req.user ? req.user._id : undefined
     });
@@ -81,7 +82,8 @@ const getAllSuggestions = async (req, res) => {
     const suggestions = await Suggestion.find()
       .populate('user', 'firstName lastName email')
       .populate('parent_category_id', 'name_he name_en')
-      .populate('sale_category_id', 'name');
+      .populate('sale_category_id', 'name')
+      .populate('sale_subcategory_id', 'name');
 
     logger.info({ ...meta, count: suggestions.length }, `${logSource} complete`);
     
@@ -127,7 +129,8 @@ const getSuggestion = async (req, res) => {
     const suggestion = await Suggestion.findById(req.params.id)
       .populate('user', 'firstName lastName email')
       .populate('parent_category_id', 'name_he name_en')
-      .populate('sale_category_id', 'name');
+      .populate('sale_category_id', 'name')
+      .populate('sale_subcategory_id', 'name');
 
     if (!suggestion) {
       logger.warn({ ...meta, suggestionId: req.params.id }, messages.SUGGESTION_MESSAGES.NOT_FOUND);
@@ -298,7 +301,8 @@ const getUserSuggestions = async (req, res) => {
   try {
     const suggestions = await Suggestion.find({ user: req.user._id })
       .populate('parent_category_id', 'name_he name_en')
-      .populate('sale_category_id', 'name');
+      .populate('sale_category_id', 'name')
+      .populate('sale_subcategory_id', 'name');
 
     logger.info({ ...meta, userId: req.user._id, count: suggestions.length }, `${logSource} complete`);
     

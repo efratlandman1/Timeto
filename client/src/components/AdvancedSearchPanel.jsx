@@ -22,6 +22,7 @@ const AdvancedSearchPanel = ({
   });
 
   const [categories, setCategories] = useState([]);
+  const [saleCategories, setSaleCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const panelRef = useRef(null);
 
@@ -39,18 +40,23 @@ const AdvancedSearchPanel = ({
   }, [isMobile, onClose]);
 
   useEffect(() => {
-    // Fetch categories from your API
-    const fetchCategories = async () => {
+    // Fetch categories (business + sale)
+    const fetchBoth = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`);
-        const data = await response.json();
-        setCategories(data.data.categories || []);
+        const [bizRes, saleRes] = await Promise.all([
+          fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`),
+          fetch(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-categories`)
+        ]);
+        const bizJson = await bizRes.json();
+        const saleJson = await saleRes.json();
+        setCategories(bizJson?.data?.categories || []);
+        setSaleCategories(saleJson?.data?.categories || []);
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
     };
 
-    fetchCategories();
+    fetchBoth();
   }, []);
 
   // Keep selectedCategories in sync with filters
@@ -207,10 +213,20 @@ const AdvancedSearchPanel = ({
                 value=""
               >
                 <option value="">{t('advancedSearch.category.select')}</option>
+                {/* Business categories */}
                 {categories
                   .filter(category => !selectedCategories.includes(category.name))
                   .map((category) => (
                     <option key={category._id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))
+                }
+                {/* Sale categories */}
+                {saleCategories
+                  .filter(category => !selectedCategories.includes(category.name))
+                  .map((category) => (
+                    <option key={`sale-${category._id}`} value={category.name}>
                       {category.name}
                     </option>
                   ))

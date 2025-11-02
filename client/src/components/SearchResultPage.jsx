@@ -45,8 +45,11 @@ const SearchResultPage = () => {
 
     // Data for standalone popovers/drawer
     const [categories, setCategories] = useState([]);
+    const [saleCategoriesSmall, setSaleCategoriesSmall] = useState([]);
     const [services, setServices] = useState([]);
     const [selectedCategoryId, setSelectedCategoryId] = useState('');
+    const [categoryTab, setCategoryTab] = useState('business'); // 'business' | 'sale'
+    const [saleSubcategoriesSmall, setSaleSubcategoriesSmall] = useState([]);
     const [tempValues, setTempValues] = useState({
         categoryName: '',
         services: [],
@@ -57,6 +60,8 @@ const SearchResultPage = () => {
         priceMaxN: 10000,
         maxDistance: 0,
         rating: 0,
+        saleCategoryId: '',
+        saleSubcategoryId: '',
     });
     const MAX_PRICE = 10000;
     const { isLoaded: mapsLoaded } = useJsApiLoader({ id: 'google-maps-script', googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', libraries: ['places'] });
@@ -75,31 +80,99 @@ const SearchResultPage = () => {
     const [isLoadingPromo, setIsLoadingPromo] = useState(false);
     const isLoadingAny = isLoadingBiz || isLoadingSale || isLoadingPromo;
     const [hasMore, setHasMore] = useState(true);
+    // Unified 'all' state
+    const [unifiedItems, setUnifiedItems] = useState([]);
+    const [unifiedPage, setUnifiedPage] = useState(1);
+    const [unifiedTotalPages, setUnifiedTotalPages] = useState(1);
+    const [isLoadingUnified, setIsLoadingUnified] = useState(false);
+  // Cache of sale subcategory id->name for chips
+  const [saleSubMap, setSaleSubMap] = useState({});
 
     const navigate = useNavigate();
     const location = useLocation();
+    // Local text filter (client-side) from SearchBar
+    const [searchText, setSearchText] = useState('');
+
+    useEffect(() => {
+        const q = new URLSearchParams(location.search).get('q') || '';
+        setSearchText(q);
+    }, [location.search]);
+
     const userLocation = useSelector(state => state.location.coords);
     const locationLoading = useSelector(state => state.location.loading);
     const locationError = useSelector(state => state.location.error);
 
     const observer = useRef();
     const lastItemRef = useCallback(node => {
-        if (isLoadingAny) return;
+        if (isLoadingAny || (activeTab === 'all' && isLoadingUnified)) return;
         if (observer.current) observer.current.disconnect();
         observer.current = new IntersectionObserver(entries => {
             if (!entries[0].isIntersecting || !hasMore) return;
             if (activeTab === 'business') setBizPage(prev => prev + 1);
             else if (activeTab === 'sale') setSalePage(prev => prev + 1);
             else if (activeTab === 'promo') setPromoPage(prev => prev + 1);
-            else {
-                // all: advance all categories to keep combined stream fresh
-                setBizPage(prev => prev + 1);
-                setSalePage(prev => prev + 1);
-                setPromoPage(prev => prev + 1);
-            }
+            else setUnifiedPage(prev => prev + 1);
         });
         if (node) observer.current.observe(node);
-    }, [isLoadingAny, hasMore, activeTab]);
+    }, [isLoadingAny, isLoadingUnified, hasMore, activeTab]);
+
+    // Centralize hasMore computation to avoid race conditions
+    useEffect(() => {
+        const more = activeTab === 'all'
+          ? (unifiedPage < unifiedTotalPages)
+          : (bizPage < bizTotalPages) || (salePage < saleTotalPages) || (promoPage < promoTotalPages);
+        setHasMore(more);
+    }, [activeTab, unifiedPage, unifiedTotalPages, bizPage, salePage, promoPage, bizTotalPages, saleTotalPages, promoTotalPages]);
+
+    // Auto-fill viewport: if still not enough content and hasMore, advance next page sequentially
+    useEffect(() => {
+        if (!hasMore || isLoadingAny) return;
+        const contentEl = contentRef.current;
+        if (!contentEl) return;
+        const pageHeight = document.documentElement.scrollHeight;
+        const winHeight = window.innerHeight;
+        if (pageHeight <= winHeight + 100) {
+            if (activeTab === 'all') {
+                if (unifiedPage < unifiedTotalPages) setUnifiedPage(p => p + 1);
+            } else if (activeTab === 'business' && bizPage < bizTotalPages) {
+                setBizPage(p => p + 1);
+            } else if (activeTab === 'sale' && salePage < saleTotalPages) {
+                setSalePage(p => p + 1);
+            } else if (activeTab === 'promo' && promoPage < promoTotalPages) {
+                setPromoPage(p => p + 1);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoadingBiz, isLoadingSale, isLoadingPromo, isLoadingUnified, hasMore, activeTab, unifiedPage, unifiedTotalPages, bizPage, salePage, promoPage, bizTotalPages, saleTotalPages, promoTotalPages]);
+
+    // Reset unified on tab change
+    useEffect(() => {
+        if (activeTab !== 'all') return;
+        setUnifiedItems([]);
+        setUnifiedPage(1);
+        setUnifiedTotalPages(1);
+    }, [activeTab, location.search]);
+
+    // Fetch unified items
+    useEffect(() => {
+        if (activeTab !== 'all') return;
+        setIsLoadingUnified(true);
+        const headers = {};
+        const token = getToken();
+        if (token) headers.Authorization = `Bearer ${token}`;
+        const params = new URLSearchParams(location.search);
+        params.set('page', unifiedPage.toString());
+        params.set('limit', ITEMS_PER_PAGE.toString());
+        axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/search/all?${params.toString()}`, { headers })
+          .then(res => {
+            const newItems = res.data?.data?.items || [];
+            const totalPages = res.data?.data?.pagination?.totalPages || 1;
+            setUnifiedItems(prev => unifiedPage === 1 ? newItems : [...prev, ...newItems]);
+            setUnifiedTotalPages(totalPages);
+          })
+          .catch(() => {})
+          .finally(() => setIsLoadingUnified(false));
+    }, [activeTab, unifiedPage, location.search]);
     
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -126,10 +199,32 @@ const SearchResultPage = () => {
 
     // Fetch categories once for popovers/drawer
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`).then(res => {
-            setCategories(res?.data?.data?.categories || []);
-        }).catch(()=>{});
+        const load = async () => {
+            try {
+                const [biz, sale] = await Promise.all([
+                    axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/categories`),
+                    axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-categories`)
+                ]);
+                setCategories(biz?.data?.data?.categories || []);
+                setSaleCategoriesSmall(sale?.data?.data?.categories || []);
+            } catch {}
+        };
+        load();
     }, []);
+
+  // Load all sale subcategories once to resolve names in active chips
+  useEffect(() => {
+      const loadSubs = async () => {
+          try {
+              const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-subcategories`);
+              const list = res?.data?.data?.subcategories || [];
+              const map = {};
+              list.forEach(s => { if (s && s._id) map[s._id] = s.name; });
+              setSaleSubMap(map);
+          } catch {}
+      };
+      loadSubs();
+  }, []);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -164,16 +259,50 @@ const SearchResultPage = () => {
             priceMaxN: filters.priceMax ? Number(filters.priceMax) : MAX_PRICE,
             maxDistance: filters.maxDistance ? Number(filters.maxDistance) : 0,
             rating: filters.rating ? Number(filters.rating) : 0,
+            saleCategoryId: filters.saleCategoryId || '',
+            saleSubcategoryId: filters.saleSubcategoryId || '',
         }));
+        // Select correct tab according to selected category type
+        if (filters.saleCategoryId) {
+            setCategoryTab('sale');
+        } else if (filters.categoryName) {
+            setCategoryTab('business');
+        }
         const cat = (filters.categoryName || '').toString();
         const found = categories.find(c => c.name === cat);
         setSelectedCategoryId(found?._id || '');
+        // Infer sale category when user selected a category name outside advanced filter
+        if (!filters.saleCategoryId && cat) {
+            const saleFound = saleCategoriesSmall.find(sc => sc.name === cat);
+            if (saleFound) {
+                setCategoryTab('sale');
+                setSelectedCategoryId('');
+                setServices([]);
+                setTempValues(v => ({ ...v, saleCategoryId: saleFound._id, saleSubcategoryId: '' }));
+                (async () => {
+                    try {
+                        const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-subcategories/category/${saleFound._id}`);
+                        setSaleSubcategoriesSmall(res.data?.data?.subcategories || []);
+                    } catch {}
+                })();
+            }
+        }
+        // Ensure sale subcategories are loaded if saleCategoryId exists
+        if (filters.saleCategoryId && (!saleSubcategoriesSmall.length || saleSubcategoriesSmall[0]?.saleCategoryId !== filters.saleCategoryId)) {
+            (async () => {
+                try {
+                    const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-subcategories/category/${filters.saleCategoryId}`);
+                    setSaleSubcategoriesSmall(res.data?.data?.subcategories || []);
+                } catch {}
+            })();
+        }
         if (urlTab && ['all','business','sale','promo'].includes(urlTab)) {
             setActiveTab(urlTab);
         }
-    }, [location.search, categories]);
+    }, [location.search, categories, saleSubcategoriesSmall.length]);
 
     useEffect(() => {
+        if (activeTab === 'all') return;
         const params = new URLSearchParams(location.search);
         const sort = params.get('sort') || 'rating';
         const filtersString = JSON.stringify(activeFilters);
@@ -190,6 +319,7 @@ const SearchResultPage = () => {
     }, [activeFilters, sortOption, location.search]);
 
     useEffect(() => {
+        if (activeTab === 'all') return;
         const params = new URLSearchParams(location.search);
         const sort = params.get('sort') || 'rating';
         const maxDistance = params.get('maxDistance');
@@ -258,26 +388,34 @@ const SearchResultPage = () => {
                 );
                 const total = res.data.pagination?.totalPages || 1;
                 setBizTotalPages(total);
-                setHasMore((bizPage < total) || (salePage < saleTotalPages) || (promoPage < promoTotalPages));
                 setIsLoadingBiz(false);
             })
             .catch(error => {
                 console.error('Error fetching businesses:', error);
                 setIsLoadingBiz(false);
             });
-    }, [location.search, bizPage, userLocation, locationLoading, locationError]);
+    }, [location.search, bizPage, userLocation, locationLoading, locationError, activeTab]);
 
     // Fetch Sale Ads
     useEffect(() => {
+        if (activeTab === 'all') return;
         const token = getToken();
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const params = new URLSearchParams(location.search);
         const paramsObj = {};
         for (const [key, value] of params.entries()) {
-            if (['q','categoryId','categoryName','priceMin','priceMax','sort','maxDistance','services','rating','city','openNow','addedWithin','includeNoPrice'].includes(key)) {
+            if (['q','categoryId','saleCategoryId','saleSubcategoryId','categoryName','priceMin','priceMax','sort','maxDistance','services','rating','city','openNow','addedWithin','includeNoPrice'].includes(key)) {
                 paramsObj[key] = value;
             }
         }
+        // Map saleCategoryId / saleSubcategoryId to sale endpoint filters
+        if (paramsObj.saleCategoryId) paramsObj.categoryId = paramsObj.saleCategoryId;
+        if (paramsObj.saleSubcategoryId) paramsObj.subcategoryId = paramsObj.saleSubcategoryId;
+        delete paramsObj.saleCategoryId;
+        delete paramsObj.saleSubcategoryId;
+        // Map price keys to API expected names
+        if (paramsObj.priceMin) { paramsObj.minPrice = paramsObj.priceMin; delete paramsObj.priceMin; }
+        if (paramsObj.priceMax) { paramsObj.maxPrice = paramsObj.priceMax; delete paramsObj.priceMax; }
         paramsObj.page = salePage;
         paramsObj.limit = ITEMS_PER_PAGE;
 
@@ -289,17 +427,17 @@ const SearchResultPage = () => {
                 setSaleAds(prev => salePage === 1 ? newAds : [...prev, ...newAds]);
                 const total = res.data.pagination?.totalPages || 1;
                 setSaleTotalPages(total);
-                setHasMore((bizPage < bizTotalPages) || (salePage < total) || (promoPage < promoTotalPages));
                 setIsLoadingSale(false);
             })
             .catch(err => {
                 console.error('Error fetching sale ads:', err);
                 setIsLoadingSale(false);
             });
-    }, [location.search, salePage]);
+    }, [location.search, salePage, activeTab]);
 
     // Fetch Promo Ads
     useEffect(() => {
+        if (activeTab === 'all') return;
         const token = getToken();
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const params = new URLSearchParams(location.search);
@@ -320,14 +458,13 @@ const SearchResultPage = () => {
                 setPromoAds(prev => promoPage === 1 ? newAds : [...prev, ...newAds]);
                 const total = res.data.pagination?.totalPages || 1;
                 setPromoTotalPages(total);
-                setHasMore((bizPage < bizTotalPages) || (salePage < saleTotalPages) || (promoPage < total));
                 setIsLoadingPromo(false);
             })
             .catch(err => {
                 console.error('Error fetching promo ads:', err);
                 setIsLoadingPromo(false);
             });
-    }, [location.search, promoPage]);
+    }, [location.search, promoPage, activeTab]);
 
     const SORT_OPTIONS = {
         rating: t('searchResults.sort.rating'),
@@ -417,6 +554,45 @@ const SearchResultPage = () => {
     // Promo ads usually ללא מחיר; נכליל רק אם includeNoPrice=true
     return priceParams.includeNoPrice ? promoAds : [];
   }, [promoAds, priceParams]);
+
+  // Apply client-side text filter
+  const normalize = (v) => (v ? String(v).toLowerCase() : '');
+  const ql = normalize(searchText);
+
+  const queryFilteredBusinesses = useMemo(() => {
+    if (!ql) return filteredBusinesses;
+    return filteredBusinesses.filter(b => {
+      return [
+        b?.name,
+        b?.description,
+        b?.address,
+        b?.city,
+        b?.categoryName,
+      ].some(f => normalize(f).includes(ql));
+    });
+  }, [filteredBusinesses, ql]);
+
+  const queryFilteredSaleAds = useMemo(() => {
+    if (!ql) return filteredSaleAds;
+    return filteredSaleAds.filter(a => {
+      return [
+        a?.title || a?.name,
+        a?.description,
+        a?.city,
+        a?.categoryName,
+      ].some(f => normalize(f).includes(ql));
+    });
+  }, [filteredSaleAds, ql]);
+
+  const queryFilteredPromoAds = useMemo(() => {
+    if (!ql) return filteredPromoAds;
+    return filteredPromoAds.filter(a => {
+      return [
+        a?.title || a?.name,
+        a?.description,
+      ].some(f => normalize(f).includes(ql));
+    });
+  }, [filteredPromoAds, ql]);
 
     // Wait for translations to load
     if (!ready) {
@@ -556,7 +732,7 @@ const SearchResultPage = () => {
                 <div className="search-controls">
                     <div className="search-controls__main">
                         <div className="search-bar-container">
-                            <SearchBar isMainPage={false} />
+                            <SearchBar isMainPage={false} onSearch={setSearchText} />
                         </div>
                         <div className="search-controls__actions"></div>
                     </div>
@@ -593,11 +769,22 @@ const SearchResultPage = () => {
                             {t('advancedSearch.category.title')}{tempValues.categoryName?`: ${tempValues.categoryName}`:''}
                         </button>
 
-                        {/* Services */}
-                        {tempValues.categoryName && (
+                        {/* Services (business only) */}
+                        {tempValues.categoryName && !tempValues.saleCategoryId && services.length>0 && (
                           <button className={`chip-button${hasServices ? ' active' : ''}`} onClick={() => { if (!selectedCategoryId) { const found = categories.find(c=>c.name===tempValues.categoryName); setSelectedCategoryId(found?._id||''); } fetchServicesByCategoryId(selectedCategoryId || (categories.find(c=>c.name===tempValues.categoryName)?._id||'')); setDrawerMode('services'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='services'}>
                               {t('advancedSearch.services.title')}{tempValues.services?.length?` (${tempValues.services.length})`:''}
                           </button>
+                        )}
+
+                        {/* Sale subcategories chip (sale only) */}
+                        {tempValues.saleCategoryId && (
+                          <button className={`chip-button${tempValues.saleSubcategoryId ? ' active' : ''}`} onClick={async () => { 
+                              if (saleSubcategoriesSmall.length===0 && tempValues.saleCategoryId) {
+                                try { const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-subcategories/category/${tempValues.saleCategoryId}`); setSaleSubcategoriesSmall(res.data?.data?.subcategories || []);} catch {}
+                              }
+                              setDrawerMode('saleSubs'); setCategoryTab('sale'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='saleSubs'}>
+                              {(t('advancedSearch.subcategories')==='advancedSearch.subcategories' ? 'תת קטגוריות' : t('advancedSearch.subcategories'))}
+                           </button>
                         )}
 
                         {/* City */}
@@ -661,49 +848,108 @@ const SearchResultPage = () => {
                                         drawerMode==='city' ? (t('advancedSearch.city')||'City') :
                                         drawerMode==='price' ? (t('advancedSearch.priceRange')||'Price') :
                                         drawerMode==='distance' ? t('advancedSearch.distance.title') :
+                                        drawerMode==='saleSubs' ? ((t('advancedSearch.subcategories')==='advancedSearch.subcategories' ? 'תת קטגוריות' : t('advancedSearch.subcategories'))) :
                                         t('advancedSearch.rating.title')
                                     }</h2>
                                     <button
                                       className="fd-clear"
                                       onClick={() => {
-                                        if (drawerMode==='category') { setTempValues(v=>({ ...v, categoryName:'', services:[] })); setSelectedCategoryId(''); handleApplyMulti({ categoryName:'', services:[] }); return; }
+                                        if (drawerMode==='category') { setTempValues(v=>({ ...v, categoryName:'', services:[], saleCategoryId:'', saleSubcategoryId:'' })); setSelectedCategoryId(''); handleApplyMulti({ categoryName:'', services:[], saleCategoryId:'', saleSubcategoryId:'' }); return; }
                                         if (drawerMode==='services') { setTempValues(v=>({ ...v, services:[] })); handleApplyMulti({ services:[] }); return; }
                                         if (drawerMode==='city') { setTempValues(v=>({ ...v, city:'' })); handleApplyMulti({ city:'' }); return; }
                                         if (drawerMode==='price') { setTempValues(v=>({ ...v, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE })); handleApplyMulti({ priceMin:'', priceMax:'' }); return; }
                                         if (drawerMode==='distance') { setTempValues(v=>({ ...v, maxDistance:0 })); handleApplyMulti({ maxDistance:'' }); return; }
                                         if (drawerMode==='rating') { setTempValues(v=>({ ...v, rating:0 })); handleApplyMulti({ rating:'' }); return; }
+                                        if (drawerMode==='saleSubs') { setTempValues(v=>({ ...v, saleSubcategoryId:'' })); handleApplyMulti({ saleSubcategoryId:'' }); return; }
                                         // all
-                                        setTempValues(v=>({ ...v, categoryName:'', services:[], city:'', priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE, maxDistance:0, rating:0 })); setSelectedCategoryId(''); handleApplyMulti({ categoryName:'', services:[], city:'', priceMin:'', priceMax:'', maxDistance:'', rating:'' });
+                                        setTempValues(v=>({ ...v, categoryName:'', services:[], city:'', priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE, maxDistance:0, rating:0, saleCategoryId:'', saleSubcategoryId:'' })); setSelectedCategoryId(''); handleApplyMulti({ categoryName:'', services:[], city:'', priceMin:'', priceMax:'', maxDistance:'', rating:'', saleCategoryId:'', saleSubcategoryId:'', openNow:'' });
                                       }}
                                     >{t('advancedSearch.buttons.clear')}</button>
                                 </div>
-                                <div className="fd-content">
-                                    {/* Category - pills, single-select */}
+                                <div className="fd-content" style={{ paddingBottom: 88 }}>
+                                    {/* Category - tabs + lists */}
                                     {(drawerMode==='all' || drawerMode==='category') && (
                                       <div className="fd-row">
                                         {drawerMode==='all' ? <label>{t('advancedSearch.category.title')}</label> : null}
-                                        <div className="tags-scroll">
-                                          {categories.map(c => (
-                                            <button
-                                              key={c._id}
-                                              type="button"
-                                              className={`tag-chip ${tempValues.categoryName===c.name ? 'selected' : ''}`}
-                                              onClick={async () => {
-                                                const isSame = tempValues.categoryName===c.name;
-                                                const nextName = isSame ? '' : c.name;
-                                                const nextId = isSame ? '' : c._id;
-                                                setTempValues(v=>({ ...v, categoryName: nextName, services: [] }));
-                                                setSelectedCategoryId(nextId);
-                                                await fetchServicesByCategoryId(nextId);
-                                              }}
-                                            >{c.name}</button>
-                                          ))}
+                                        <div className="segmented-control" role="tablist" aria-label="category source selector" style={{ marginBottom: 8 }}>
+                                          <button type="button" role="tab" aria-selected={categoryTab==='business'} className={`segment ${categoryTab==='business'?'active':''}`} onClick={()=>{ setCategoryTab('business'); setTempValues(v=>({ ...v, saleCategoryId:'', saleSubcategoryId:'' })); setSaleSubcategoriesSmall([]); }}>
+                                            {t('advancedSearch.categories.business')||'עסקים'}
+                                          </button>
+                                          <button type="button" role="tab" aria-selected={categoryTab==='sale'} className={`segment ${categoryTab==='sale'?'active':''}`} onClick={()=>{ setCategoryTab('sale'); setTempValues(v=>({ ...v, categoryName:'', services:[], })); setSelectedCategoryId(''); setServices([]); }}>
+                                            {t('advancedSearch.categories.sale')||'מכירה'}
+                                          </button>
                                         </div>
+                                        {categoryTab==='business' ? (
+                                          <div className="tags-scroll">
+                                            {categories.map(c => (
+                                              <button
+                                                key={`biz-${c._id}`}
+                                                type="button"
+                                                className={`tag-chip ${tempValues.categoryName===c.name ? 'selected' : ''}`}
+                                                onClick={async () => {
+                                                  const isSame = tempValues.categoryName===c.name;
+                                                  const nextName = isSame ? '' : c.name;
+                                                  const nextId = isSame ? '' : c._id;
+                                                  setTempValues(v=>({ ...v, categoryName: nextName, services: [], saleCategoryId: '', saleSubcategoryId:'' }));
+                                                  setSelectedCategoryId(nextId);
+                                                  await fetchServicesByCategoryId(nextId);
+                                                }}
+                                              >{c.name}</button>
+                                            ))}
+                                          </div>
+                                        ) : (
+                                          <>
+                                            <div className="tags-scroll">
+                                              {saleCategoriesSmall.map(sc => (
+                                                <button
+                                                  key={`sale-${sc._id}`}
+                                                  type="button"
+                                                  className={`tag-chip ${tempValues.saleCategoryId===sc._id ? 'selected' : ''}`}
+                                                  onClick={async () => {
+                                                    const isSame = tempValues.saleCategoryId===sc._id;
+                                                    const nextId = isSame ? '' : sc._id;
+                                                    const nextName = isSame ? '' : sc.name;
+                                                    setTempValues(v=>({ ...v, categoryName: nextName, saleCategoryId: nextId, saleSubcategoryId:'' }));
+                                                    setSelectedCategoryId('');
+                                                    setServices([]);
+                                                    if (nextId) {
+                                                      try {
+                                                        const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-subcategories/category/${nextId}`);
+                                                        setSaleSubcategoriesSmall(res.data?.data?.subcategories || []);
+                                                      } catch { setSaleSubcategoriesSmall([]); }
+                                                    } else {
+                                                      setSaleSubcategoriesSmall([]);
+                                                    }
+                                                  }}
+                                                >{sc.name}</button>
+                                              ))}
+                                            </div>
+                                            {/* Inline subcategories inside advanced drawer only */}
+                                            {tempValues.saleCategoryId && saleSubcategoriesSmall.length>0 && (
+                                              <>
+                                                <label style={{ display: 'block', marginTop: 8, marginBottom: 6 }}>{(t('advancedSearch.subcategories')==='advancedSearch.subcategories' ? 'תת קטגוריות' : t('advancedSearch.subcategories'))}</label>
+                                                <div className="tags-scroll">
+                                                  {saleSubcategoriesSmall.map(ssc => (
+                                                    <button
+                                                      key={`sale-sub-${ssc._id}`}
+                                                      type="button"
+                                                      className={`tag-chip ${tempValues.saleSubcategoryId===ssc._id ? 'selected' : ''}`}
+                                                      onClick={() => {
+                                                        const isSame = tempValues.saleSubcategoryId===ssc._id;
+                                                        setTempValues(v=>({ ...v, saleSubcategoryId: isSame ? '' : ssc._id }));
+                                                      }}
+                                                    >{ssc.name}</button>
+                                                  ))}
+                                                </div>
+                                              </>
+                                            )}
+                                          </>
+                                        )}
                                       </div>
                                     )}
 
                                     {/* Services */}
-                                    {(drawerMode==='all' || drawerMode==='services') && services.length>0 && (
+                                    {(drawerMode==='all' || drawerMode==='services') && services.length>0 && categoryTab==='business' && (
                                         <div className="fd-row">
                                             {drawerMode==='all' ? <label>{t('advancedSearch.services.title')}</label> : null}
                                             <div className="tags-scroll">
@@ -721,6 +967,26 @@ const SearchResultPage = () => {
                                                 ))}
                                             </div>
                                         </div>
+                                    )}
+
+                                    {/* Sale Subcategories - separate drawer */}
+                                    {drawerMode==='saleSubs' && (
+                                      <div className="fd-row">
+                                        <label>{t('advancedSearch.subcategories') || 'תת קטגוריות'}</label>
+                                        <div className="tags-scroll">
+                                          {saleSubcategoriesSmall.map(ssc => (
+                                            <button
+                                              key={`sale-sub-${ssc._id}`}
+                                              type="button"
+                                              className={`tag-chip ${tempValues.saleSubcategoryId===ssc._id ? 'selected' : ''}`}
+                                              onClick={() => {
+                                                const isSame = tempValues.saleSubcategoryId===ssc._id;
+                                                setTempValues(v=>({ ...v, saleSubcategoryId: isSame ? '' : ssc._id }));
+                                              }}
+                                            >{ssc.name}</button>
+                                          ))}
+                                        </div>
+                                      </div>
                                     )}
 
                                     {/* Sort */}
@@ -809,8 +1075,9 @@ const SearchResultPage = () => {
                                 </div>
                                 <div className="fd-footer">
                                     <button className="submit-button" onClick={() => {
-                                        if (drawerMode==='category') { handleApplyMulti({ categoryName: tempValues.categoryName, services: [] }); return; }
+                                        if (drawerMode==='category') { handleApplyMulti({ categoryName: tempValues.categoryName, services: [], saleCategoryId: tempValues.saleCategoryId || '', saleSubcategoryId: tempValues.saleSubcategoryId || '' }); return; }
                                         if (drawerMode==='services') { handleApplyMulti({ services: tempValues.services }); return; }
+                                        if (drawerMode==='saleSubs') { handleApplyMulti({ saleSubcategoryId: tempValues.saleSubcategoryId || '' }); return; }
                                         if (drawerMode==='city') { handleApplyMulti({ city: tempValues.city }); return; }
                                         if (drawerMode==='price') { handleApplyMulti({ priceMin: tempValues.priceMin || '', priceMax: tempValues.priceMax || '' }); return; }
                                         if (drawerMode==='distance') { handleApplyMulti({ maxDistance: tempValues.maxDistance || '' }); return; }
@@ -840,6 +1107,13 @@ const SearchResultPage = () => {
                     const chips = [];
                     const withColon = (txt) => (txt && /:\s*$/.test(txt) ? txt : `${txt}:`);
                     if (params.get('categoryName')) chips.push({ key: 'categoryName', value: params.get('categoryName'), label: withColon(t('searchResults.filterTags.category')) });
+                    if (params.get('saleSubcategoryId')) {
+                      const subId = params.get('saleSubcategoryId');
+                      const byMap = saleSubMap[subId];
+                      const bySmall = (saleSubcategoriesSmall.find(s => String(s._id) === String(subId)) || {}).name;
+                      const name = byMap || bySmall || '';
+                      chips.push({ key: 'saleSubcategoryId', value: name, label: withColon(t('advancedSearch.subcategory')||'תת קטגוריה') });
+                    }
                     (params.getAll('services')||[]).forEach(v=>chips.push({ key: 'services', value: v, label: withColon(t('searchResults.filterTags.service')) }));
                     if (params.get('rating')) chips.push({ key: 'rating', value: params.get('rating'), label: withColon(t('searchResults.filterTags.rating')) });
                     if (params.get('maxDistance')) chips.push({ key: 'maxDistance', value: `${params.get('maxDistance')} ${t('searchResults.filterTags.km')}`, rawValue: params.get('maxDistance'), label: withColon(t('searchResults.filterTags.maxDistance')) });
@@ -871,56 +1145,41 @@ const SearchResultPage = () => {
                 {/* Results */}
                 <div className="search-results-layout">
                     <div className="business-cards-grid">
-                        {activeTab === 'business' && filteredBusinesses.map((business, index) => (
+                        {activeTab === 'business' && queryFilteredBusinesses.map((business, index) => (
                             <div key={business._id} ref={index === businesses.length - 1 ? lastItemRef : undefined}>
                                 <BusinessCard business={business} />
                             </div>
                         ))}
 
-                        {activeTab === 'sale' && filteredSaleAds.map((ad, index) => (
-                            <div key={ad._id} ref={index === filteredSaleAds.length - 1 ? lastItemRef : undefined}>
+                        {activeTab === 'sale' && queryFilteredSaleAds.map((ad, index) => (
+                            <div key={ad._id} ref={index === queryFilteredSaleAds.length - 1 ? lastItemRef : undefined}>
                                 <SaleAdCard ad={ad} />
                             </div>
                         ))}
 
-                        {activeTab === 'promo' && filteredPromoAds.map((ad, index) => (
-                            <div key={ad._id} ref={index === filteredPromoAds.length - 1 ? lastItemRef : undefined}>
+                        {activeTab === 'promo' && queryFilteredPromoAds.map((ad, index) => (
+                            <div key={ad._id} ref={index === queryFilteredPromoAds.length - 1 ? lastItemRef : undefined}>
                                 <PromoAdCard ad={ad} />
                             </div>
                         ))}
 
-                        {activeTab === 'all' && (() => {
-                            const isInitialAllLoading = (bizPage === 1 && isLoadingBiz) || (salePage === 1 && isLoadingSale) || (promoPage === 1 && isLoadingPromo);
-                            if (isInitialAllLoading) {
-                                return Array.from({ length: ITEMS_PER_PAGE }).map((_, idx) => (
-                                    <div key={`skeleton-${idx}`} className="animate-pulse rounded-lg bg-gray-200 h-40" />
-                                ));
-                            }
-                            const items = [
-                                ...filteredBusinesses.map(b => ({ type: 'business', data: b })),
-                                ...filteredSaleAds.map(s => ({ type: 'sale', data: s })),
-                                ...filteredPromoAds.map(p => ({ type: 'promo', data: p }))
-                            ];
-                            const getTs = (o) => new Date(o?.updatedAt || o?.createdAt || o?.created_at || 0).getTime();
-                            const getName = (o) => String(o?.name || o?.title || o?.nameEn || o?.titleEn || '');
-                            const collator = new Intl.Collator(i18n?.language || undefined, { sensitivity: 'base', numeric: true });
-                            const getRating = (o) => typeof o?.rating === 'number' ? o.rating : -Infinity;
-                            if (sortOption === 'newest') items.sort((a,b)=> getTs(b.data) - getTs(a.data));
-                            else if (sortOption === 'name') items.sort((a,b)=> collator.compare(getName(a.data), getName(b.data)));
-                            else if (sortOption === 'rating') items.sort((a,b)=> getRating(b.data) - getRating(a.data));
-
-                            return items.map((item, index) => (
-                                <div key={`${item.type}-${item.data._id || index}`} ref={index === items.length - 1 ? lastItemRef : undefined}>
-                                    {item.type === 'business' ? (
-                                        <BusinessCard business={item.data} />
-                                    ) : item.type === 'sale' ? (
-                                        <SaleAdCard ad={item.data} />
-                                    ) : (
-                                        <PromoAdCard ad={item.data} />
-                                    )}
-                                </div>
-                            ));
-                        })()}
+                        {activeTab === 'all' && (
+                            (isLoadingUnified && unifiedPage === 1)
+                              ? Array.from({ length: ITEMS_PER_PAGE }).map((_, idx) => (
+                                  <div key={`skeleton-${idx}`} className="animate-pulse rounded-lg bg-gray-200 h-40" />
+                                ))
+                              : unifiedItems.map((item, index) => (
+                                  <div key={`${item.type}-${item.data._id || index}`} ref={index === unifiedItems.length - 1 ? lastItemRef : undefined}>
+                                      {item.type === 'business' ? (
+                                          <BusinessCard business={item.data} />
+                                      ) : item.type === 'sale' ? (
+                                          <SaleAdCard ad={item.data} />
+                                      ) : (
+                                          <PromoAdCard ad={item.data} />
+                                      )}
+                                  </div>
+                                ))
+                        )}
                     </div>
                 </div>
 

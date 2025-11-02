@@ -24,7 +24,11 @@ const CreateOptionsModal = ({ isOpen, onClose }) => {
     } else {
       console.log('User logged in, navigating to:', path);
       // אם המשתמש מחובר, נווט לדף הרלוונטי
-      navigate(path);
+      if (path === '/business') {
+        navigate(path, { state: { reset: Date.now() } });
+      } else {
+        navigate(path);
+      }
     }
     onClose();
   };
