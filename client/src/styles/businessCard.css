@@ -319,7 +319,7 @@
 }
 
 .business-card.inactive::after {
-  content: 'לא פעיל';
+  content: '\2716  לא פעיל';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -329,6 +329,11 @@
   padding: 8px 40px;
   font-weight: 500;
   font-size: 1.2rem;
+  display: inline-flex;       /* מרכזת תוכן בתוך הרקע */
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
   z-index: 2;
   pointer-events: none;
 }

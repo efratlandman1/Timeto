@@ -115,7 +115,7 @@ const AuthPage = () => {
                     <p style={{textAlign:'center', marginInline: '1.25rem'}}>{t('mainPage.joinBanner.joinNowAndDiscover')}</p>
                     
                     <div className="auth-content">
-                        <div style={{display:'flex', justifyContent:'center'}}>
+                        <div dir="ltr" style={{display:'flex', justifyContent:'center', marginTop: '12px', direction: 'ltr', unicodeBidi: 'isolate', textAlign: 'left'}}>
                           <GoogleLogin
                               onSuccess={responseGoogle}
                               onError={() => {
@@ -127,7 +127,10 @@ const AuthPage = () => {
                               useOneTap
                               shape="pill"
                               width="300"
-                              locale={i18n.language === 'he' ? 'he' : 'en'}
+                              locale={'en'}
+                              theme="outline"
+                              text="signin_with"
+                              logo_alignment="left"
                           />
                         </div>
                         <div className="divider">{t('auth.login.simpleLoginWithEmail')}</div>
