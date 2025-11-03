@@ -21,10 +21,22 @@ const mapsUtils = {
     });
 
     try {
+      const resolveLanguage = () => {
+        // Prefer explicit header language; fallback to he
+        const header = req?.headers?.['accept-language'];
+        if (typeof header === 'string' && header.length) {
+          const first = header.split(',')[0].trim();
+          const code = first.split('-')[0].trim();
+          if (code) return code;
+        }
+        return 'he';
+      };
+      const language = resolveLanguage();
       const response = await client.geocode({
         params: {
           address,
-          key: process.env.GOOGLE_MAPS_API_KEY
+          key: process.env.GOOGLE_MAPS_API_KEY,
+          language
         }
       });
 

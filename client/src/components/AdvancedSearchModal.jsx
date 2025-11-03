@@ -9,7 +9,7 @@ import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
 const MAX_DISTANCE_KM = 100;
 
 const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [categories, setCategories] = useState([]); // business categories
   const [saleCategories, setSaleCategories] = useState([]); // sale ad categories
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -27,10 +27,13 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   const [addedWithin, setAddedWithin] = useState('');
   const [includeNoPrice, setIncludeNoPrice] = useState(false);
   const cityAutoRef = useRef(null);
+  const stableLangRef = React.useRef(i18n?.language || 'he');
   const { isLoaded: mapsLoaded } = useJsApiLoader({
     id: 'google-maps-script',
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-    libraries: ['places']
+    libraries: ['places'],
+    language: stableLangRef.current,
+    region: 'IL'
   });
   const navigate = useNavigate();
   const location = useLocation();

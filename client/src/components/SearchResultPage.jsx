@@ -64,7 +64,8 @@ const SearchResultPage = () => {
         saleSubcategoryId: '',
     });
     const MAX_PRICE = 10000;
-    const { isLoaded: mapsLoaded } = useJsApiLoader({ id: 'google-maps-script', googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', libraries: ['places'] });
+    const stableLangRef = useRef(i18n?.language || 'he');
+    const { isLoaded: mapsLoaded } = useJsApiLoader({ id: 'google-maps-script', googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', libraries: ['places'], language: stableLangRef.current, region: 'IL' });
     const cityAutoRef = useRef(null);
     const [activeFilters, setActiveFilters] = useState({});
     const [sortOption, setSortOption] = useState('rating');

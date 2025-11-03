@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
 const CreateSaleAdPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items: categories, loading: catLoading } = useSelector(s => s.saleCategories || { items: [], loading: false });
@@ -37,19 +37,25 @@ const CreateSaleAdPage = () => {
   const [originalImages, setOriginalImages] = useState([]); // for edit mode diff
   const [auto, setAuto] = useState(null);
 
+  const stableLangRef = React.useRef(i18n?.language || 'he');
   const { isLoaded: mapsLoaded } = useJsApiLoader({
     id: 'google-maps-script',
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-    libraries: ['places']
+    libraries: ['places'],
+    language: stableLangRef.current,
+    region: 'IL'
   });
 
   const onAutoLoad = (instance) => setAuto(instance);
   const onPlaceChanged = () => {
-    if (auto) {
-      const place = auto.getPlace();
-      const value = place?.formatted_address || place?.name || '';
-      if (value) setCity(value);
-    }
+    if (!auto) return;
+    const place = auto.getPlace();
+    const comps = place?.address_components || [];
+    const cityComp = comps.find(c => c.types.includes('locality'))
+      || comps.find(c => c.types.includes('administrative_area_level_2'))
+      || comps.find(c => c.types.includes('administrative_area_level_1'));
+    const value = cityComp?.long_name || place?.name || place?.formatted_address || '';
+    if (value) setCity(value);
   };
 
   useEffect(() => {
