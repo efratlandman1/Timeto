@@ -821,6 +821,11 @@
 [dir="ltr"] .fd-clear { inset-inline-end: 8px; }
 .fd-content { padding: 12px; overflow: auto; max-height: calc(85vh - 98px); }
 .fd-footer { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #eee; position: sticky; bottom: 0; background: #fff; }
+.filters-drawer.compact { max-height: 300px; }
+.filters-drawer.compact .fd-content { max-height: calc(300px - 98px); }
+.filters-drawer.compact .fd-header { padding: 8px; }
+.filters-drawer.compact .fd-footer { padding: 8px; }
+.filters-drawer.compact .fd-row { margin-bottom: 6px; }
 .fd-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
 .fd-row.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .fd-row label.inline { display: inline-flex; align-items: center; gap: 8px; }

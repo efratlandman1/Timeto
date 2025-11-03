@@ -845,8 +845,9 @@ const SearchResultPage = () => {
                     {/* Drawer overlay */}
                     {showFiltersDrawer && (
                         <div className="filters-drawer-overlay" role="dialog" aria-modal="true" onClick={() => { setShowFiltersDrawer(false); setShowFilters(false); }}>
+                            {(() => { const compact = !['all','category','services','saleSubs'].includes(drawerMode); return (
                             <div
-                                className="filters-drawer"
+                                className={`filters-drawer ${compact ? 'compact' : ''}`}
                                 style={{
                                     width: `${(() => {
                                         const vw = typeof window !== 'undefined' ? window.innerWidth : 1024;
@@ -894,7 +895,7 @@ const SearchResultPage = () => {
                                       }}
                                     >{t('advancedSearch.buttons.clear')}</button>
                                 </div>
-                                <div className="fd-content" style={{ paddingBottom: 88 }}>
+                                <div className="fd-content" style={{ paddingBottom: compact ? 24 : 88 }}>
                                     {/* Category - tabs + lists */}
                                     {(drawerMode==='all' || drawerMode==='category') && (
                                       <div className="fd-row">
@@ -908,23 +909,45 @@ const SearchResultPage = () => {
                                           </button>
                                         </div>
                                         {categoryTab==='business' ? (
-                                          <div className="tags-scroll">
-                                            {categories.map(c => (
-                                              <button
-                                                key={`biz-${c._id}`}
-                                                type="button"
-                                                className={`tag-chip ${tempValues.categoryName===c.name ? 'selected' : ''}`}
-                                                onClick={async () => {
-                                                  const isSame = tempValues.categoryName===c.name;
-                                                  const nextName = isSame ? '' : c.name;
-                                                  const nextId = isSame ? '' : c._id;
-                                                  setTempValues(v=>({ ...v, categoryName: nextName, services: [], saleCategoryId: '', saleSubcategoryId:'' }));
-                                                  setSelectedCategoryId(nextId);
-                                                  await fetchServicesByCategoryId(nextId);
-                                                }}
-                                              >{c.name}</button>
-                                            ))}
-                                          </div>
+                                          <>
+                                            <div className="tags-scroll">
+                                              {categories.map(c => (
+                                                <button
+                                                  key={`biz-${c._id}`}
+                                                  type="button"
+                                                  className={`tag-chip ${tempValues.categoryName===c.name ? 'selected' : ''}`}
+                                                  onClick={async () => {
+                                                    const isSame = tempValues.categoryName===c.name;
+                                                    const nextName = isSame ? '' : c.name;
+                                                    const nextId = isSame ? '' : c._id;
+                                                    setTempValues(v=>({ ...v, categoryName: nextName, services: [], saleCategoryId: '', saleSubcategoryId:'' }));
+                                                    setSelectedCategoryId(nextId);
+                                                    await fetchServicesByCategoryId(nextId);
+                                                  }}
+                                                >{c.name}</button>
+                                              ))}
+                                            </div>
+                                            {/* Inline services after selecting a business category */}
+                                            {tempValues.categoryName && services.length>0 && (
+                                              <div className="fd-row" style={{ marginTop: 8 }}>
+                                                <label>{t('advancedSearch.services.title')}</label>
+                                                <div className="tags-scroll">
+                                                  {services.map(s => (
+                                                    <label key={s._id} className={`tag-check ${tempValues.services.includes(s.name)?'selected':''}`}>
+                                                      <input type="checkbox" checked={tempValues.services.includes(s.name)} onChange={() => {
+                                                        setTempValues(v => {
+                                                          const exists = v.services.includes(s.name);
+                                                          const next = exists ? v.services.filter(x=>x!==s.name) : [...v.services, s.name];
+                                                          return { ...v, services: next };
+                                                        });
+                                                      }} />
+                                                      <span>{s.name}</span>
+                                                    </label>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            )}
+                                          </>
                                         ) : (
                                           <>
                                             <div className="tags-scroll">
@@ -1103,7 +1126,7 @@ const SearchResultPage = () => {
                                 </div>
                                 <div className="fd-footer">
                                     <button className="submit-button" onClick={() => {
-                                        if (drawerMode==='category') { handleApplyMulti({ categoryName: tempValues.categoryName, services: [], saleCategoryId: tempValues.saleCategoryId || '', saleSubcategoryId: tempValues.saleSubcategoryId || '' }); return; }
+                                        if (drawerMode==='category') { handleApplyMulti({ categoryName: tempValues.categoryName, services: (categoryTab==='business' ? tempValues.services : []), saleCategoryId: tempValues.saleCategoryId || '', saleSubcategoryId: tempValues.saleSubcategoryId || '' }); return; }
                                         if (drawerMode==='services') { handleApplyMulti({ services: tempValues.services }); return; }
                                         if (drawerMode==='saleSubs') { handleApplyMulti({ saleSubcategoryId: tempValues.saleSubcategoryId || '' }); return; }
                                         if (drawerMode==='city') { handleApplyMulti({ city: tempValues.city }); return; }
@@ -1115,6 +1138,7 @@ const SearchResultPage = () => {
                                     }}>{t('advancedSearch.buttons.apply')}</button>
                                 </div>
                             </div>
+                            ); })()}
                         </div>
                     )}
                 </div>
