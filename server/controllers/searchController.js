@@ -98,8 +98,9 @@ exports.getAllUnified = async (req, res) => {
       saleQuery.price.$exists = true;
     }
 
-    // Build Promo query
-    let promoQuery = { active: true };
+    // Build Promo query - only valid and active promos should appear in unified search
+    const now = new Date();
+    let promoQuery = { active: true, validFrom: { $lte: now }, validTo: { $gte: now } };
     if (q) promoQuery.$text = { $search: q };
     if (city) promoQuery.city = { $regex: new RegExp(city, 'i') };
 
