@@ -25,13 +25,10 @@ const CreatePromoAdPage = () => {
   const location = useLocation();
   const isEditMode = Boolean(searchParams.get('edit'));
 
-  const stableLangRef = React.useRef(i18n?.language || 'he');
   const { isLoaded: mapsLoaded } = useJsApiLoader({
     id: 'google-maps-script',
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-    libraries: ['places'],
-    language: stableLangRef.current,
-    region: 'IL'
+    libraries: ['places']
   });
 
   const onAutoLoad = (instance) => setAuto(instance);

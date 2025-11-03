@@ -8,13 +8,10 @@ import { useTranslation } from 'react-i18next';
 const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
   const { t, i18n } = useTranslation();
   const [autocomplete, setAutocomplete] = useState(null);
-  const stableLangRef = React.useRef(i18n?.language || 'he');
   const { isLoaded: mapsLoaded } = useJsApiLoader({
     id: 'google-maps-script',
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-    libraries: ['places'],
-    language: stableLangRef.current,
-    region: 'IL'
+    libraries: ['places']
   });
 
 

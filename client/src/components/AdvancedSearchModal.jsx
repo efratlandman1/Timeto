@@ -27,13 +27,10 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   const [addedWithin, setAddedWithin] = useState('');
   const [includeNoPrice, setIncludeNoPrice] = useState(false);
   const cityAutoRef = useRef(null);
-  const stableLangRef = React.useRef(i18n?.language || 'he');
   const { isLoaded: mapsLoaded } = useJsApiLoader({
     id: 'google-maps-script',
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-    libraries: ['places'],
-    language: stableLangRef.current,
-    region: 'IL'
+    libraries: ['places']
   });
   const navigate = useNavigate();
   const location = useLocation();

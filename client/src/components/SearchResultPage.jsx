@@ -64,8 +64,7 @@ const SearchResultPage = () => {
         saleSubcategoryId: '',
     });
     const MAX_PRICE = 10000;
-    const stableLangRef = useRef(i18n?.language || 'he');
-    const { isLoaded: mapsLoaded } = useJsApiLoader({ id: 'google-maps-script', googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', libraries: ['places'], language: stableLangRef.current, region: 'IL' });
+    const { isLoaded: mapsLoaded } = useJsApiLoader({ id: 'google-maps-script', googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', libraries: ['places'] });
     const cityAutoRef = useRef(null);
     const [activeFilters, setActiveFilters] = useState({});
     const [sortOption, setSortOption] = useState('rating');
@@ -119,11 +118,20 @@ const SearchResultPage = () => {
 
     // Centralize hasMore computation to avoid race conditions
     useEffect(() => {
-        const more = activeTab === 'all'
-          ? (unifiedPage < unifiedTotalPages)
-          : (bizPage < bizTotalPages) || (salePage < saleTotalPages) || (promoPage < promoTotalPages);
+        let more;
+        if (activeTab === 'all') {
+            more = unifiedPage < unifiedTotalPages;
+        } else if (activeTab === 'business') {
+            more = bizPage < bizTotalPages;
+        } else if (activeTab === 'sale') {
+            more = salePage < saleTotalPages;
+        } else if (activeTab === 'promo') {
+            more = promoPage < promoTotalPages;
+        } else {
+            more = false;
+        }
         setHasMore(more);
-    }, [activeTab, unifiedPage, unifiedTotalPages, bizPage, salePage, promoPage, bizTotalPages, saleTotalPages, promoTotalPages]);
+    }, [activeTab, unifiedPage, unifiedTotalPages, bizPage, bizTotalPages, salePage, saleTotalPages, promoPage, promoTotalPages]);
 
     // Auto-fill viewport: if still not enough content and hasMore, advance next page sequentially
     useEffect(() => {
@@ -400,13 +408,13 @@ const SearchResultPage = () => {
             headers.Authorization = `Bearer ${token}`;
         }
         
-        axios.get(url, { headers })
+                axios.get(url, { headers })
             .then(res => {
-                const newBusinesses = res.data.data.businesses || [];
+                const newBusinesses = res.data?.data?.businesses || [];
                 setBusinesses(prevBusinesses => 
                     bizPage === 1 ? newBusinesses : [...prevBusinesses, ...newBusinesses]
                 );
-                const total = res.data.pagination?.totalPages || 1;
+                const total = res.data?.data?.pagination?.totalPages || 1;
                 setBizTotalPages(total);
                 setIsLoadingBiz(false);
             })
@@ -443,9 +451,9 @@ const SearchResultPage = () => {
         setIsLoadingSale(true);
         axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-ads?${qs}`, { headers })
             .then(res => {
-                const newAds = res.data.data.ads || [];
+                const newAds = res.data?.data?.ads || [];
                 setSaleAds(prev => salePage === 1 ? newAds : [...prev, ...newAds]);
-                const total = res.data.pagination?.totalPages || 1;
+                const total = res.data?.data?.pagination?.totalPages || 1;
                 setSaleTotalPages(total);
                 setIsLoadingSale(false);
             })
@@ -474,9 +482,9 @@ const SearchResultPage = () => {
         setIsLoadingPromo(true);
         axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/promo-ads?${qs}`, { headers })
             .then(res => {
-                const newAds = res.data.data.ads || [];
+                const newAds = res.data?.data?.ads || [];
                 setPromoAds(prev => promoPage === 1 ? newAds : [...prev, ...newAds]);
-                const total = res.data.pagination?.totalPages || 1;
+                const total = res.data?.data?.pagination?.totalPages || 1;
                 setPromoTotalPages(total);
                 setIsLoadingPromo(false);
             })
@@ -1166,7 +1174,7 @@ const SearchResultPage = () => {
                 <div className="search-results-layout">
                     <div className="business-cards-grid">
                         {activeTab === 'business' && queryFilteredBusinesses.map((business, index) => (
-                            <div key={business._id} ref={index === businesses.length - 1 ? lastItemRef : undefined}>
+                            <div key={business._id} ref={index === queryFilteredBusinesses.length - 1 ? lastItemRef : undefined}>
                                 <BusinessCard business={business} />
                             </div>
                         ))}
