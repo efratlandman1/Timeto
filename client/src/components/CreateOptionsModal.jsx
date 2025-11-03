@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTimes, FaStore, FaTag, FaBullhorn } from 'react-icons/fa';
+import { FaTimes, FaStore, FaTag, FaBullhorn, FaLightbulb } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -54,6 +54,13 @@ const CreateOptionsModal = ({ isOpen, onClose }) => {
       description: 'פרסם מבצעים והנחות',
       icon: <FaBullhorn />,
       path: '/ads/promo/new'
+    },
+    {
+      id: 'suggest',
+      title: t('header.suggest'),
+      description: t('mainPage.joinBanner.joinNowAndDiscover'),
+      icon: <FaLightbulb />,
+      path: '/suggest-item'
     }
   ];
 
