@@ -161,6 +161,8 @@
   display: flex;
   gap: 1px;
   font-size: 0.85rem;
+  pointer-events: none; /* view-only */
+  user-select: none;
 }
 
 .rating-number {

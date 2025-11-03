@@ -427,12 +427,12 @@ body.blurred::before {
 .search-bar-wrapper {
   background: transparent;
   border-radius: 16px;
-  box-shadow: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   padding: 1rem;
   display: flex;
   align-items: center;
   transition: all 0.3s ease;
-  border: 2px solid transparent;
+  border: 2px solid #e5e7eb; /* subtle visible frame by default */
   position: relative; /* anchor absolute icon */
 }
 

@@ -298,7 +298,9 @@ const SearchResultPage = () => {
         }
         const cat = (filters.categoryName || '').toString();
         const found = categories.find(c => c.name === cat);
-        setSelectedCategoryId(found?._id || '');
+        const catId = found?._id || '';
+        setSelectedCategoryId(catId);
+        if (catId) { fetchServicesByCategoryId(catId); }
         // Infer sale category when user selected a category name outside advanced filter
         if (!filters.saleCategoryId && cat) {
             const saleFound = saleCategoriesSmall.find(sc => sc.name === cat);
@@ -798,7 +800,7 @@ const SearchResultPage = () => {
                         </button>
 
                         {/* Services (business only) */}
-                        {tempValues.categoryName && !tempValues.saleCategoryId && services.length>0 && (
+                        {tempValues.categoryName && !tempValues.saleCategoryId && (
                           <button className={`chip-button${hasServices ? ' active' : ''}`} onClick={() => { if (!selectedCategoryId) { const found = categories.find(c=>c.name===tempValues.categoryName); setSelectedCategoryId(found?._id||''); } fetchServicesByCategoryId(selectedCategoryId || (categories.find(c=>c.name===tempValues.categoryName)?._id||'')); setDrawerMode('services'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='services'}>
                               {t('advancedSearch.services.title')}{tempValues.services?.length?` (${tempValues.services.length})`:''}
                           </button>
