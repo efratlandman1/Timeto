@@ -161,6 +161,25 @@ const SearchResultPage = () => {
         const token = getToken();
         if (token) headers.Authorization = `Bearer ${token}`;
         const params = new URLSearchParams(location.search);
+        const sort = params.get('sort') || 'rating';
+        const maxDistance = params.get('maxDistance');
+        const needsLocationSorting = sort === 'distance' || sort === 'popular_nearby';
+        const needsLocationFiltering = !!maxDistance;
+        const needsLocation = needsLocationSorting || needsLocationFiltering;
+
+        // Handle location requirements similar to other tabs
+        if (needsLocation) {
+            if (locationLoading) { setIsLoadingUnified(false); return; }
+            if (!userLocation && !locationError) { setIsLoadingUnified(false); return; }
+            if (locationError) {
+                // Fallback to rating sort when location unavailable
+                params.set('sort', 'rating');
+            } else if (userLocation && userLocation.lat !== undefined && userLocation.lng !== undefined) {
+                params.set('lat', userLocation.lat);
+                params.set('lng', userLocation.lng);
+            }
+        }
+
         params.set('page', unifiedPage.toString());
         params.set('limit', ITEMS_PER_PAGE.toString());
         axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/search/all?${params.toString()}`, { headers })
@@ -172,7 +191,7 @@ const SearchResultPage = () => {
           })
           .catch(() => {})
           .finally(() => setIsLoadingUnified(false));
-    }, [activeTab, unifiedPage, location.search]);
+    }, [activeTab, unifiedPage, location.search, userLocation, locationLoading, locationError]);
     
     useEffect(() => {
         const handleClickOutside = (event) => {

@@ -103,10 +103,17 @@ exports.getAllUnified = async (req, res) => {
     if (q) promoQuery.$text = { $search: q };
     if (city) promoQuery.city = { $regex: new RegExp(city, 'i') };
 
-    // Fetch extra to allow merging then slicing
-    const batchSize = limitNum * 3;
+    // Determine openNow requirement before fetching
+    const requireOpenNow = String(openNow) === 'true';
+
+    // Fetch extra to allow merging then slicing.
+    // When openNow=true we need a larger prefetch, otherwise many closed businesses inside
+    // the batch will drop and lead to too few results and inconsistent totals across sort modes.
+    const batchMultiplier = requireOpenNow ? 10 : 3;
+    const batchSize = Math.min(200, limitNum * batchMultiplier);
     const [bizRaw, salesRaw, promosRaw] = await Promise.all([
-      Business.find(businessQuery).sort(sort === 'name' ? { name: 1 } : { updatedAt: -1, createdAt: -1 }).limit(batchSize).lean(),
+      // Avoid pre-sorting by name here to prevent bias before openNow filtering; final sort applied later
+      Business.find(businessQuery).sort({ updatedAt: -1, createdAt: -1 }).limit(batchSize).lean(),
       SaleAd.find(saleQuery).sort({ createdAt: -1 }).limit(batchSize).lean(),
       PromoAd.find(promoQuery).sort({ createdAt: -1 }).limit(batchSize).lean()
     ]);
@@ -143,7 +150,7 @@ exports.getAllUnified = async (req, res) => {
       return now >= from && now <= to;
     };
 
-    const requireOpenNow = String(openNow) === 'true';
+    // already computed above
     const biz = requireOpenNow ? bizRaw.filter(isBusinessOpenNow) : bizRaw;
     const promos = requireOpenNow ? promosRaw.filter(isPromoCurrentlyActive) : promosRaw;
     const sales = salesRaw; // openNow not applicable for sale ads
@@ -217,7 +224,20 @@ exports.getAllUnified = async (req, res) => {
       });
       const maxD = maxDistance !== undefined && maxDistance !== '' ? Number(maxDistance) : null;
       if (maxD !== null) items = items.filter(it => it.distanceKm <= maxD);
-      if (sort === 'distance') items.sort((a,b)=> (a.distanceKm||Infinity) - (b.distanceKm||Infinity));
+      if (sort === 'distance') {
+        items.sort((a, b) => {
+          const da = (typeof a.distanceKm === 'number') ? a.distanceKm : Infinity;
+          const db = (typeof b.distanceKm === 'number') ? b.distanceKm : Infinity;
+          if (da !== db) return da - db;
+          // Stable, deterministic tiebreakers to avoid apparent "ערבוב"
+          const ta = new Date(a?.data?.updatedAt || a?.data?.createdAt || 0).getTime();
+          const tb = new Date(b?.data?.updatedAt || b?.data?.createdAt || 0).getTime();
+          if (ta !== tb) return tb - ta; // newer first
+          const na = (a?.data?.name || a?.data?.title || '').toString();
+          const nb = (b?.data?.name || b?.data?.title || '').toString();
+          return na.localeCompare(nb);
+        });
+      }
     } else {
       // Default newest
       const getTs = (o) => new Date(o?.data?.updatedAt || o?.data?.createdAt || 0).getTime();
