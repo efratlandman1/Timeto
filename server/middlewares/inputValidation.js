@@ -177,26 +177,29 @@ const validateSuggestion = [
     .withMessage('Domain must be either business or sale'),
   body('type')
     .isString()
-    .isIn(['category', 'service'])
-    .withMessage('Type must be either category or service'),
+    .isIn(['category', 'service', 'subcategory'])
+    .withMessage('Type must be either category, service, or subcategory'),
   body('name_he')
     .isString()
     .isLength({ min: 2, max: 100 })
     .withMessage('Hebrew name is required (2-100 chars)'),
   body('name_en')
+    .optional()
     .isString()
     .isLength({ min: 2, max: 100 })
-    .withMessage('English name is required (2-100 chars)'),
+    .withMessage('English name must be 2-100 chars when provided'),
   body('parent_category_id')
     .if((value, { req }) => req.body && req.body.domain === 'business' && req.body.type === 'service')
     .isString()
     .isMongoId()
     .withMessage('parent_category_id is required and must be a valid Mongo ID for service suggestions'),
   body('sale_category_id')
-    .if((value, { req }) => req.body && req.body.domain === 'sale')
+    .if((value, { req }) => req.body && req.body.domain === 'sale' && req.body.type === 'subcategory')
     .isString()
     .isMongoId()
     .withMessage('sale_category_id is required and must be a valid Mongo ID for sale suggestions'),
+  body('notifyEmail').optional().isEmail().withMessage('notifyEmail must be a valid email'),
+  body('notifyPhone').optional().isString().isLength({ min: 5, max: 20 }).withMessage('notifyPhone must be a valid phone string'),
   (req, res, next) => {
     handleValidationErrors(req, res, next, 'validateSuggestion');
   }

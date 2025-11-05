@@ -5,14 +5,17 @@ import { useTranslation } from 'react-i18next';
 import '../styles/SuggestItemPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
+const GOOGLE_LIBRARIES = ['places'];
 
 const MAX_DISTANCE_KM = 100;
 
 const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [categories, setCategories] = useState([]); // business categories
   const [saleCategories, setSaleCategories] = useState([]); // sale ad categories
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedSaleSubId, setSelectedSaleSubId] = useState('');
+  const [saleSubcategories, setSaleSubcategories] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
   const [services, setServices] = useState([]);
   const [rating, setRating] = useState(0);
@@ -28,7 +31,7 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   const { isLoaded: mapsLoaded } = useJsApiLoader({
     id: 'google-maps-script',
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-    libraries: ['places']
+    libraries: GOOGLE_LIBRARIES
   });
   const navigate = useNavigate();
   const location = useLocation();
@@ -62,6 +65,20 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
     if (selectedCategory && prevCategoryRef.current !== selectedCategory) {
       setSelectedServices([]);  // מנקה שירותים כשקטגוריה משתנה
       prevCategoryRef.current = selectedCategory;
+      setSelectedSaleSubId('');
+      const saleCat = (saleCategories || []).find(sc => sc.name === selectedCategory);
+      if (saleCat?._id) {
+        (async () => {
+          try {
+            const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-subcategories/category/${saleCat._id}`);
+            setSaleSubcategories(res.data?.data?.subcategories || []);
+          } catch {
+            setSaleSubcategories([]);
+          }
+        })();
+      } else {
+        setSaleSubcategories([]);
+      }
     }
   }, [selectedCategory]);
   
@@ -168,7 +185,20 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
     const sortParam = currentParams.get('sort');
     if (searchQuery) newParams.set('q', searchQuery);
     if (sortParam) newParams.set('sort', sortParam);
-    if (selectedCategory) newParams.set('categoryName', selectedCategory);
+    if (selectedCategory) {
+      newParams.set('categoryName', selectedCategory);
+      // If selectedCategory is a sale category, also include saleCategoryId for server-side filtering
+      const saleCat = (saleCategories || []).find(sc => sc.name === selectedCategory);
+      if (selectedSaleSubId) newParams.set('saleSubcategoryId', selectedSaleSubId);
+      else if (saleCat?._id) newParams.set('saleCategoryId', saleCat._id);
+      else {
+        newParams.delete('saleCategoryId');
+        newParams.delete('saleSubcategoryId');
+      }
+    } else {
+      newParams.delete('saleCategoryId');
+      newParams.delete('saleSubcategoryId');
+    }
     selectedServices.forEach(service => newParams.append('services', service));
     if (rating > 0) newParams.set('rating', rating.toString());
     if (distance > 0) newParams.set('maxDistance', distance.toString());
@@ -239,6 +269,19 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
               )}
             </select>
           </div>
+
+          {/* Sale subcategories from dedicated collection */}
+          {saleSubcategories.length > 0 && (
+            <div className="form-group">
+              <label>תת קטגוריה</label>
+              <select className="form-select" value={selectedSaleSubId} onChange={(e) => setSelectedSaleSubId(e.target.value)}>
+                <option value="">{t('advancedSearch.category.select')}</option>
+                {saleSubcategories.map(sc => (
+                  <option key={`sale-sub-${sc._id}`} value={sc._id}>{sc.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {services.length > 0 && (
             <div className="form-group tags-section">

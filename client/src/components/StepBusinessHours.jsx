@@ -66,7 +66,7 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
 
   const addRange = (dayIndex) => {
     const updated = [...hours];
-    updated[dayIndex].ranges.push({ open: '', close: '' });
+    updated[dayIndex].ranges.push({ open: '08:00', close: '16:00' });
     updateOpeningHours(updated);
   };
 
@@ -74,7 +74,7 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
     const updated = [...hours];
     const isClosed = !updated[dayIndex].closed;
     updated[dayIndex].closed = isClosed;
-    updated[dayIndex].ranges = isClosed ? [] : [{ open: '', close: '' }];
+    updated[dayIndex].ranges = isClosed ? [] : [{ open: '08:00', close: '16:00' }];
     updateOpeningHours(updated);
   };
 
@@ -108,7 +108,7 @@ const StepBusinessHours = ({ businessData, setBusinessData }) => {
 
             {!day.closed &&
               day.ranges.map((range, rangeIndex) => (
-                <div key={rangeIndex} className="time-range" >
+                <div key={rangeIndex} className="time-range" style={{ direction: 'ltr' }}>
                   <input
                     type="time"
                     id='open'

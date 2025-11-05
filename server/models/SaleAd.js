@@ -7,6 +7,7 @@ const saleAdSchema = new mongoose.Schema({
     title: { type: String, required: true, trim: true },
     description: { type: String, trim: true },
     categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'sale_categories' },
+    subcategoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'sale_subcategories' },
     price: { type: Number },
     currency: { type: String, enum: CURRENCIES, default: 'ILS' },
     prefix: { type: String },
@@ -35,6 +36,7 @@ const saleAdSchema = new mongoose.Schema({
 saleAdSchema.index({ title: 'text', description: 'text', city: 'text' });
 saleAdSchema.index({ location: '2dsphere' });
 saleAdSchema.index({ categoryId: 1, active: 1, createdAt: -1 });
+saleAdSchema.index({ subcategoryId: 1, active: 1, createdAt: -1 });
 saleAdSchema.index({ price: 1, active: 1 });
 
 const SaleAd = mongoose.model('sale_ads', saleAdSchema);

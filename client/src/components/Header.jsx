@@ -259,7 +259,7 @@ const Header = () => {
     const updatePopoverPosition = () => {
         if (!locationButtonRef.current) return;
         const rect = locationButtonRef.current.getBoundingClientRect();
-        const style = { position: 'fixed', top: rect.bottom + 8, minWidth: 320, zIndex: 1000 };
+        const style = { position: 'fixed', top: rect.bottom + 8, minWidth: 320, zIndex: 3000 };
         if (isRTL) {
             style.right = window.innerWidth - rect.right;
         } else {
@@ -279,9 +279,15 @@ const Header = () => {
     };
 
     const handleToggleLocationPopover = () => {
+        // Refresh location each time the popover opens
+        if (!showPopover) {
+            dispatch(fetchUserLocation());
+        }
         const next = !showPopover;
         setShowPopover(next);
-        if (next) updatePopoverPosition();
+        if (next) {
+            requestAnimationFrame(() => updatePopoverPosition());
+        }
     };
 
     const handleToggleMobileCreate = () => {
@@ -380,26 +386,22 @@ const Header = () => {
         setAddressLoading(true);
         setAddressError('');
         try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=he`);
-            const data = await res.json();
-    
-            if (data.address) {
-                const { road, house_number, city, town, village, country } = data.address;
-    
-                // בונים את הרחוב ומספר הבית יחד בלי פסיק
-                const streetWithNumber = [road, house_number].filter(Boolean).join(' ');
-    
-                const cityName = city || town || village || '';
-                const formatted = [
-                    streetWithNumber,
-                    cityName,
-                    country || 'ישראל'
-                ].filter(Boolean).join(', ');
-    
-                setAddress(formatted);
-            } else {
-                setAddressError(t('header.addressNotFound'));
+            // 1) Try Google Geocoding API (avoids CORS issues)
+            const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+            let resolved = '';
+            if (apiKey) {
+                const gUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&language=${i18n.language || 'he'}&key=${apiKey}`;
+                const gRes = await fetch(gUrl);
+                if (gRes.ok) {
+                    const gData = await gRes.json();
+                    if (Array.isArray(gData.results) && gData.results.length) {
+                        resolved = gData.results[0].formatted_address || '';
+                    }
+                }
             }
+            // No browser fallback to Nominatim to avoid CORS/403
+
+            if (resolved) setAddress(resolved); else setAddressError(t('header.addressNotFound'));
         } catch (e) {
             setAddressError(t('header.addressError'));
         } finally {
@@ -480,15 +482,16 @@ const Header = () => {
                         </div>
                     </div>
                     {(isMobile || isTablet) && (
-                        <button 
-                            className="mobile-menu-btn"
-                            aria-label="Menu"
+                        <button
+                            onClick={handleToggleLocationPopover}
+                            className="nav-button"
+                            title={t('header.myLocation')}
                             type="button"
-                            onClick={handleToggleMobileMenu}
-                            aria-expanded={showMobileMenu}
-                            ref={mobileMenuBtnRef}
+                            ref={locationButtonRef}
+                            aria-expanded={showPopover}
+                            aria-haspopup="true"
                         >
-                            {showMobileMenu ? <FaTimes /> : <FaBars />}
+                            <FaMapMarkerAlt />
                         </button>
                     )}
                 </div>
@@ -531,7 +534,7 @@ const Header = () => {
                                 >
                                     <button 
                                         className={dropdownItemClass} 
-                                        onClick={() => { setShowCreateMenu(false); handleMenuItemClick("/business"); }}
+                                        onClick={() => { setShowCreateMenu(false); navigate('/business', { state: { reset: Date.now() } }); setShowUserMenu(false); }}
                                         role="menuitem"
                                     >
                                         <FaStore />
@@ -562,41 +565,19 @@ const Header = () => {
                             <FaLightbulb />
                             {t('header.suggest')}
                         </button>
-                        <button
-                            onClick={handleToggleLocationPopover}
-                            className="nav-button"
-                            title={t('header.myLocation')}
-                            type="button"
-                            ref={locationButtonRef}
-                        >
-                            <FaMapMarkerAlt />
-                            {!isMobile && <span className="loc-label">{t('header.locationShort')}</span>}
-                        </button>
-                        {showPopover && (
-                            <div ref={popoverRef} className={locationPopoverClass} style={popoverStyle}>
-                                <div className={popoverHeaderClass}>
-                                    <span>{t('header.currentLocation')}</span>
-                                    <button className="close-popover-btn" onClick={() => setShowPopover(false)}><FaTimes /></button>
-                                </div>
-                                <div className="popover-content">
-                                    {addressLoading || loading ? (
-                                        <span className="address-loading">{t('header.loadingAddress')}</span>
-                                    ) : addressError ? (
-                                        <span className="address-error">{t('header.addressError')}</span>
-                                    ) : address ? (
-                                        <span className="address-text">{formatAddress(address)}</span>
-                                    ) : (
-                                        <span className="address-error">{t('header.noLocation')}</span>
-                                    )}
-                                </div>
-                                <div className={popoverActionsClass}>
-                                    <button className="refresh-popover-btn" onClick={handleRefreshLocation} disabled={loading || addressLoading} title={t('header.refreshLocation')}>
-                                        <FaSyncAlt className={loading ? 'spin' : ''} />
-                                        {t('header.refreshLocation')}
-                                    </button>
-                                </div>
-                            </div>
+                        {!(isMobile || isTablet) && (
+                          <button
+                              onClick={handleToggleLocationPopover}
+                              className="nav-button"
+                              title={t('header.myLocation')}
+                              type="button"
+                              ref={locationButtonRef}
+                          >
+                              <FaMapMarkerAlt />
+                              <span className="loc-label">{t('header.locationShort')}</span>
+                          </button>
                         )}
+                        {/* Popover moved outside center on mobile */}
                     </div>
                 </div>
 
@@ -697,6 +678,31 @@ const Header = () => {
                 </div>
             </nav>
         </div>
+        {showPopover && (
+            <div ref={popoverRef} className={locationPopoverClass} style={popoverStyle}>
+                <div className={popoverHeaderClass}>
+                    <span>{t('header.currentLocation')}</span>
+                    <button className="close-popover-btn" onClick={() => setShowPopover(false)}><FaTimes /></button>
+                </div>
+                <div className="popover-content">
+                    {addressLoading || loading ? (
+                        <span className="address-loading">{t('header.loadingAddress')}</span>
+                    ) : addressError ? (
+                        <span className="address-error">{t('header.addressError')}</span>
+                    ) : address ? (
+                        <span className="address-text">{formatAddress(address)}</span>
+                    ) : (
+                        <span className="address-error">{t('header.noLocation')}</span>
+                    )}
+                </div>
+                <div className={popoverActionsClass}>
+                    <button className="refresh-popover-btn" onClick={handleRefreshLocation} disabled={loading || addressLoading} title={t('header.refreshLocation')}>
+                        <FaSyncAlt className={loading ? 'spin' : ''} />
+                        {t('header.refreshLocation')}
+                    </button>
+                </div>
+            </div>
+        )}
         {(isMobile || isTablet) && showMobileMenu && (
             <div 
                 className={`mobile-menu ${direction}`} 
@@ -727,7 +733,7 @@ const Header = () => {
                         <div id="mobile-create-submenu" role="group" aria-label={t('userBusinesses.create')}>
                             <button 
                                 className="mobile-menu-item"
-                                onClick={() => { setShowMobileMenu(false); setMobileCreateOpen(false); navigate("/business"); }}
+                                onClick={() => { setShowMobileMenu(false); setMobileCreateOpen(false); navigate('/business', { state: { reset: Date.now() } }); }}
                             >
                                 <FaStore />
                                 <span>{t('userBusinesses.createOptions.addBusiness')}</span>

@@ -9,7 +9,7 @@ const { fileUploadSecurity } = require('../middlewares/fileUploadSecurity');
 
 router
     .route('/')
-    .get(optionalAuth, generalLimiter, sanitizeRequest, validateSearchQuery, businessesController.getItems)
+    .get(optionalAuth, sanitizeRequest, validateSearchQuery, businessesController.getItems)
     .post(requireAuth, writeLimiter, sanitizeRequest, upload.single('logo'), fileUploadSecurity,  parseArrayFieldsGeneric(['services', 'openingHours']), validateBusiness, businessesController.uploadBusinesses);
 
 router

@@ -1,7 +1,7 @@
 ---
 alwaysApply: true
 ---
-# 🔄 Redux State Management - Timeto Application
+# 🔄 Redux State Management - Zezman Application
 
 ## 🎯 Redux Architecture Overview
 
@@ -745,4 +745,4 @@ alwaysApply: true
 - Test user interactions
 - Test async operations
 
-This comprehensive Redux specification provides a complete state management solution for the Timeto application with proper separation of concerns, performance optimizations, and maintainable code structure.
+This comprehensive Redux specification provides a complete state management solution for the Zezman application with proper separation of concerns, performance optimizations, and maintainable code structure.

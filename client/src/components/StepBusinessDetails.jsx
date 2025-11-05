@@ -6,7 +6,7 @@ import { PHONE_PREFIXES, PHONE_NUMBER_MAX_LENGTH } from '../constants/globals';
 import { useTranslation } from 'react-i18next';
 
 const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [autocomplete, setAutocomplete] = useState(null);
   const { isLoaded: mapsLoaded } = useJsApiLoader({
     id: 'google-maps-script',
@@ -37,14 +37,11 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
   };
 
   const onPlaceChanged = () => {
-    if (autocomplete) {
-      const place = autocomplete.getPlace();
-      if (place.formatted_address) {
-        setBusinessData(prev => ({
-          ...prev,
-          address: place.formatted_address
-        }));
-      }
+    if (!autocomplete) return;
+    const place = autocomplete.getPlace();
+    const value = place?.formatted_address || place?.name || '';
+    if (value) {
+      setBusinessData(prev => ({ ...prev, address: value }));
     }
   };
 

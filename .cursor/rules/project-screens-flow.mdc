@@ -1,4 +1,4 @@
-# 📱 Screen Flow & Navigation - Timeto Application
+# 📱 Screen Flow & Navigation - Zezman Application
 
 ## 🎯 Navigation Architecture
 
@@ -856,4 +856,4 @@ const prefetchRoute = (route) => {
 }
 ```
 
-This comprehensive screen flow specification ensures intuitive navigation and optimal user experience across all devices and user types for the Timeto application.
+This comprehensive screen flow specification ensures intuitive navigation and optimal user experience across all devices and user types for the Zezman application.

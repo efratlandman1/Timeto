@@ -11,12 +11,14 @@ import ImageUploader from './common/ImageUploader';
 import ActionBar from './common/ActionBar';
 import { FaArrowRight } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
 const CreateSaleAdPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { items: categories } = useSelector(s => s.saleCategories);
+  const { items: categories, loading: catLoading } = useSelector(s => s.saleCategories || { items: [], loading: false });
+  const [fallbackCategories, setFallbackCategories] = useState([]);
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const isEditMode = Boolean(searchParams.get('edit'));
@@ -28,6 +30,8 @@ const CreateSaleAdPage = () => {
   const [price, setPrice] = useState('');
   const [currency, setCurrency] = useState('ILS');
   const [categoryId, setCategoryId] = useState('');
+  const [subCategoryId, setSubCategoryId] = useState('');
+  const [subcategories, setSubcategories] = useState([]);
   const [description, setDescription] = useState('');
   const [images, setImages] = useState([]);
   const [originalImages, setOriginalImages] = useState([]); // for edit mode diff
@@ -41,11 +45,14 @@ const CreateSaleAdPage = () => {
 
   const onAutoLoad = (instance) => setAuto(instance);
   const onPlaceChanged = () => {
-    if (auto) {
-      const place = auto.getPlace();
-      const value = place?.formatted_address || place?.name || '';
-      if (value) setCity(value);
-    }
+    if (!auto) return;
+    const place = auto.getPlace();
+    const comps = place?.address_components || [];
+    const cityComp = comps.find(c => c.types.includes('locality'))
+      || comps.find(c => c.types.includes('administrative_area_level_2'))
+      || comps.find(c => c.types.includes('administrative_area_level_1'));
+    const value = cityComp?.long_name || place?.name || place?.formatted_address || '';
+    if (value) setCity(value);
   };
 
   useEffect(() => {
@@ -56,6 +63,19 @@ const CreateSaleAdPage = () => {
     }
     dispatch(fetchSaleCategories());
   }, [dispatch]);
+
+  // Fallback fetch if Redux did not populate for any reason
+  useEffect(() => {
+    if ((categories || []).length > 0) return;
+    (async () => {
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:5050/api/v1'}/sale-categories`);
+        const json = await res.json();
+        const list = json?.data?.categories || [];
+        if (Array.isArray(list) && list.length) setFallbackCategories(list);
+      } catch {}
+    })();
+  }, [categories]);
 
   // Load for edit mode
   useEffect(() => {
@@ -102,9 +122,41 @@ const CreateSaleAdPage = () => {
     })();
   }, [searchParams, location.state]);
 
+  // Reset subcategory when category changes
+  useEffect(() => {
+    setSubCategoryId('');
+    if (!categoryId) { setSubcategories([]); return; }
+    // Fetch subcategories from API
+    (async () => {
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:5050/api/v1'}/sale-subcategories/category/${categoryId}`);
+        const json = await res.json();
+        setSubcategories(json?.data?.subcategories || []);
+      } catch {
+        setSubcategories([]);
+      }
+    })();
+  }, [categoryId]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const editId = searchParams.get('edit');
+    // Pre-submit validation
+    const missing = [];
+    if (!title.trim()) missing.push(t('saleAd.fields.title'));
+    if (!city.trim()) missing.push(t('saleAd.fields.city'));
+    if (!prefix.trim()) missing.push(t('saleAd.fields.prefix'));
+    if (!phone.trim()) missing.push(t('saleAd.fields.phone'));
+    if (!categoryId) missing.push(t('saleAd.fields.category'));
+    if (missing.length) {
+      toast.error(`נא למלא את השדות הנדרשים: ${missing.join(', ')}`, { position: 'top-center', className: 'custom-toast' });
+      return;
+    }
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (phoneDigits.length < 6) {
+      toast.error(t('editBusiness.validation.phone'), { position: 'top-center', className: 'custom-toast' });
+      return;
+    }
     const fd = new FormData();
     fd.append('title', title);
     fd.append('city', city);
@@ -113,7 +165,9 @@ const CreateSaleAdPage = () => {
     if (currency) fd.append('currency', currency);
     if (prefix) fd.append('prefix', prefix);
     fd.append('hasWhatsapp', String(!!hasWhatsapp));
+    // Prefer subcategory if selected
     if (categoryId) fd.append('categoryId', categoryId);
+    if (subCategoryId) fd.append('subcategoryId', subCategoryId);
     if (description) fd.append('description', description);
     // Append only new files; existing strings are already in DB
     Array.from(images).filter(f => typeof f !== 'string').forEach(f => fd.append('images', f));
@@ -138,7 +192,12 @@ const CreateSaleAdPage = () => {
       res = await dispatch(createSaleAd(fd));
     }
     if (res.meta.requestStatus === 'fulfilled') {
-      if (editId) navigate('/user-businesses'); else navigate('/');
+      toast.success(editId ? t('common.success') : 'המודעה פורסמה בהצלחה', { position: 'top-center', className: 'custom-toast' });
+      setTimeout(() => {
+        if (editId) navigate('/user-businesses'); else navigate('/');
+      }, 800);
+    } else {
+      toast.error(t('common.generalError'), { position: 'top-center', className: 'custom-toast' });
     }
   };
 
@@ -225,13 +284,25 @@ const CreateSaleAdPage = () => {
           </div>
           <div className="form-group">
             <label className="form-label">{t('saleAd.fields.category')} <span className="required-asterisk">*</span></label>
-            <select className="form-select" value={categoryId} onChange={e => setCategoryId(e.target.value)}>
+            <select className="form-select" value={categoryId} onChange={e => setCategoryId(e.target.value)} disabled={catLoading}>
               <option value="">{t('saleAd.placeholders.selectCategory')}</option>
-              {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+              {(categories.length ? categories : fallbackCategories).map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
             </select>
           </div>
+          {/* Subcategory (if exists) */}
+          {categoryId && subcategories.length > 0 && (
+            <div className="form-group">
+              <label className="form-label">תת קטגוריה</label>
+              <select className="form-select" value={subCategoryId} onChange={e => setSubCategoryId(e.target.value)}>
+                <option value="">{t('saleAd.placeholders.selectCategory')}</option>
+                {subcategories.map(sc => (
+                  <option key={sc._id} value={sc._id}>{sc.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="form-group">
-            <label className="form-label">{t('saleAd.fields.description')} <span className="required-asterisk">*</span></label>
+            <label className="form-label">{t('saleAd.fields.description')}</label>
             <textarea className="form-input" rows={4} value={description} onChange={e => setDescription(e.target.value)} />
           </div>
           <ImageUploader

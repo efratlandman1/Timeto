@@ -30,7 +30,7 @@ const FloatingCreateButton = () => {
     <div className="fab-root" ref={menuRef}>
       {open && (
         <div className="fab-menu" role="menu" aria-label="Create options">
-          <button className="fab-menu-item" onClick={() => { setOpen(false); navigate('/business'); }} role="menuitem">
+          <button className="fab-menu-item" onClick={() => { setOpen(false); navigate('/business', { state: { reset: Date.now() } }); }} role="menuitem">
             <FaStore className="fab-icon store" />
             <span>הוספת עסק</span>
           </button>

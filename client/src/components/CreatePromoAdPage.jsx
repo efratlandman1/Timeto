@@ -9,9 +9,10 @@ import ActionBar from './common/ActionBar';
 import { FaArrowRight } from 'react-icons/fa';
 import { getToken } from '../utils/auth';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
 const CreatePromoAdPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
@@ -32,11 +33,14 @@ const CreatePromoAdPage = () => {
 
   const onAutoLoad = (instance) => setAuto(instance);
   const onPlaceChanged = () => {
-    if (auto) {
-      const place = auto.getPlace();
-      const value = place?.formatted_address || place?.name || '';
-      if (value) setCity(value);
-    }
+    if (!auto) return;
+    const place = auto.getPlace();
+    const comps = place?.address_components || [];
+    const cityComp = comps.find(c => c.types.includes('locality'))
+      || comps.find(c => c.types.includes('administrative_area_level_2'))
+      || comps.find(c => c.types.includes('administrative_area_level_1'));
+    const value = cityComp?.long_name || place?.name || place?.formatted_address || '';
+    if (value) setCity(value);
   };
 
   useEffect(() => {
@@ -78,6 +82,21 @@ const CreatePromoAdPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Pre-submit validation
+    const missing = [];
+    if (!title.trim()) missing.push(t('promoAd.fields.title'));
+    if (!city.trim()) missing.push(t('promoAd.fields.city'));
+    if (!validFrom) missing.push(t('promoAd.fields.validFrom'));
+    if (!validTo) missing.push(t('promoAd.fields.validTo'));
+    if (!image) missing.push(t('promoAd.fields.image'));
+    if (missing.length) {
+      toast.error(`נא למלא את השדות הנדרשים: ${missing.join(', ')}`, { position: 'top-center', className: 'custom-toast' });
+      return;
+    }
+    if (validFrom && validTo && new Date(validTo) <= new Date(validFrom)) {
+      toast.error('טווח תוקף לא תקין', { position: 'top-center', className: 'custom-toast' });
+      return;
+    }
     const fd = new FormData();
     fd.append('title', title);
     fd.append('city', city);
@@ -101,7 +120,12 @@ const CreatePromoAdPage = () => {
       res = await dispatch(createPromoAd(fd));
     }
     if (res.meta.requestStatus === 'fulfilled') {
-      if (editId) navigate('/user-businesses'); else navigate('/');
+      toast.success(editId ? t('common.success') : 'המודעה פורסמה בהצלחה', { position: 'top-center', className: 'custom-toast' });
+      setTimeout(() => {
+        if (editId) navigate('/user-businesses'); else navigate('/');
+      }, 800);
+    } else {
+      toast.error(t('common.generalError'), { position: 'top-center', className: 'custom-toast' });
     }
   };
 
@@ -144,14 +168,14 @@ const CreatePromoAdPage = () => {
               />
             </div>
           </div>
-          <div className="form-group two-col-grid date-grid">
+          <div className="form-group two-col-grid date-grid" style={{ direction: 'ltr' }}>
             <div>
               <label className="form-label">{t('promoAd.fields.validFrom')} <span className="required-asterisk">*</span></label>
-              <input className="form-input" type="datetime-local" value={validFrom} onChange={e => setValidFrom(e.target.value)} required />
+              <input className="form-input" type="datetime-local" value={validFrom} onChange={e => setValidFrom(e.target.value)} required style={{ direction: 'ltr', textAlign: 'left' }} />
             </div>
             <div>
               <label className="form-label">{t('promoAd.fields.validTo')} <span className="required-asterisk">*</span></label>
-              <input className="form-input" type="datetime-local" value={validTo} onChange={e => setValidTo(e.target.value)} required />
+              <input className="form-input" type="datetime-local" value={validTo} onChange={e => setValidTo(e.target.value)} required style={{ direction: 'ltr', textAlign: 'left' }} />
             </div>
           </div>
           <ActionBar

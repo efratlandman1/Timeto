@@ -8,12 +8,13 @@ import axios from 'axios';
 import '../styles/MainPage.css';
 import '../styles/businessCard.css';
 import { useNavigate } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight, FaArrowLeft, FaArrowRight, FaUserFriends, FaStar, FaCalendarCheck, FaEnvelope, FaPhone, FaWhatsapp } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaArrowLeft, FaArrowRight, FaUserFriends, FaBullhorn, FaCalendarCheck, FaEnvelope, FaPhone, FaWhatsapp } from 'react-icons/fa';
 import { buildQueryUrl } from '../utils/buildQueryUrl';
 import { useSelector } from 'react-redux';
 import { getToken } from '../utils/auth';
 import { useTranslation } from 'react-i18next';
 import { useResponsive } from '../utils/ResponsiveProvider';
+import PromoBanner from './PromoBanner';
 
 const MainPage = () => {
     const { t, ready } = useTranslation();
@@ -25,8 +26,9 @@ const MainPage = () => {
     const [recommendedBusinesses, setRecommendedBusinesses] = useState([]);
     const [newSaleAds, setNewSaleAds] = useState([]);
     const [newPromoAds, setNewPromoAds] = useState([]);
+    const [isPromoLoading, setIsPromoLoading] = useState(true);
     const [categories, setCategories] = useState([]);
-    const [currentSlide, setCurrentSlide] = useState(0);
+    // PromoBanner manages its own slide index
     const [stats, setStats] = useState({
         users: null,
         businesses: null,
@@ -34,6 +36,7 @@ const MainPage = () => {
     });
     const [isStatsLoading, setIsStatsLoading] = useState(true);
     const navigate = useNavigate();
+    
     const htmlDir = typeof document !== 'undefined' ? (document.documentElement.getAttribute('dir') || 'ltr') : 'ltr';
     const isRTL = htmlDir === 'rtl';
     
@@ -41,19 +44,12 @@ const MainPage = () => {
     const locationLoading = useSelector(state => state.location.loading);
     const locationError = useSelector(state => state.location.error);
     
-    const bannerImages = [
-        '/uploads/business1.jpeg',
-        '/uploads/business2.png',
-        '/uploads/business3.jpg'
-    ];
+    const bannerImages = (newPromoAds || [])
+        .filter(a => !!a?.image)
+        .map(a => `/uploads/${String(a.image).split('/').pop()}`);
+    const bannerFullImages = bannerImages.map(src => `${process.env.REACT_APP_API_DOMAIN}${src}`);
 
-        // Auto-advance banner
-    useEffect(() => {
-        const timer = setInterval(() => {
-            handleNextSlide();
-        }, 5000);
-        return () => clearInterval(timer);
-    }, [currentSlide]);
+    // PromoBanner handles auto-play
 
     useEffect(() => {
         fetchCategories();
@@ -65,35 +61,13 @@ const MainPage = () => {
         fetchSaleAndPromo();
     }, [userLocation, locationError]);
     
-    // Wait for translations to load
-    if (!ready) {
-        return (
-            <div className="wide-page-container">
-                <div className="wide-page-content">
-                    <div className="loading-container">
-                        <div className="loader"></div>
-                        <span>Loading translations...</span>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    // No direct banner ref needed; handled in PromoBanner
+
+    // No preload/gating for banner; render immediately
+
+    // Do not block render on translations; UI renders and updates as i18n becomes ready
     
-    const handleNextSlide = () => {
-        setCurrentSlide((prev) => (prev + 1) % bannerImages.length);
-    };
-
-    const handlePrevSlide = () => {
-        setCurrentSlide((prev) => (prev - 1 + bannerImages.length) % bannerImages.length);
-    };
-
-    const handleSlideClick = () => {
-        handleNextSlide();
-    };
-
-    const handleIndicatorClick = (index) => {
-        setCurrentSlide(index);
-    };
+    // Banner controls handled in PromoBanner
 
     const fetchCategories = async () => {
         try {
@@ -173,6 +147,8 @@ const MainPage = () => {
             setNewPromoAds((promoRes.data && promoRes.data.data && promoRes.data.data.ads) || []);
         } catch (error) {
             console.error('Error fetching sale/promo ads:', error);
+        } finally {
+            setIsPromoLoading(false);
         }
     };
 
@@ -231,6 +207,8 @@ const MainPage = () => {
         return shuffled.slice(0, count);
     };
 
+    
+
     return (
         <div className='wide-page-container'>
             <div className='wide-page-content'>
@@ -256,58 +234,7 @@ const MainPage = () => {
                         <QuickCreateStrip />
 
                         <div className="banner-stats-container">
-                            {/* Banner */}
-                            <div className="banner-container" onClick={handleSlideClick}>
-                                {bannerImages.map((src, index) => (
-                                    <div key={index} 
-                                        className={`banner-slide ${index === currentSlide ? 'active' : ''}`}>
-                                        <img 
-                                            src={`${process.env.REACT_APP_API_DOMAIN}${src}`} 
-                                            alt={`Banner ${index + 1}`} 
-                                            className="banner-image" 
-                                        />
-                                    </div>
-                                ))}
-                                
-                                {/* Story Indicators */}
-                                <div className="story-indicators">
-                                    {bannerImages.map((_, index) => (
-                                        <div 
-                                            key={index}
-                                            className={`story-indicator ${index === currentSlide ? 'active' : ''} 
-                                                      ${index < currentSlide ? 'viewed' : ''}`}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleIndicatorClick(index);
-                                            }}
-                                        >
-                                            <div className="indicator-progress"></div>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {/* Navigation Arrows */}
-                                <button 
-                                    className="banner-nav prev" 
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handlePrevSlide();
-                                    }}
-                                >
-                                    <FaChevronRight />
-                                </button>
-                                <button 
-                                    className="banner-nav next" 
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleNextSlide();
-                                    }}
-                                >
-                                    <FaChevronLeft />
-                                </button>
-                            </div>
-
-                            {/* Stats */}
+                            {/* Stats first */}
                             <div className="stats-container">
                                 <div className="stat-box">
                                     <div className="stat-icon-wrapper">
@@ -315,7 +242,7 @@ const MainPage = () => {
                                     </div>
                                     <div className="stat-content">
                                         <div className="stat-number">
-                                            {!isStatsLoading && stats.users !== null && (() => {
+                                            {stats.users !== null && (() => {
                                                 const f = formatStat(stats.users);
                                                 return <>{f.plus && '+ '}{f.value}</>;
                                             })()}
@@ -325,16 +252,13 @@ const MainPage = () => {
                                 </div>
                                 <div className="stat-box">
                                     <div className="stat-icon-wrapper">
-                                        <FaStar className="stat-icon" />
+                                        <FaBullhorn className="stat-icon" />
                                     </div>
                                     <div className="stat-content">
                                         <div className="stat-number">
-                                            {!isStatsLoading && stats.reviews !== null && (() => {
-                                                const f = formatStat(stats.reviews);
-                                                return <>{f.plus && '+ '}{f.value}</>;
-                                            })()}
+                                            {!isPromoLoading && (() => { const f = formatStat(newPromoAds.length || 0); return <>+ {f.value}</>; })()}
                                         </div>
-                                        <div className="stat-label">{t('mainPage.stats.verifiedReviews')}</div>
+                                        <div className="stat-label">פרסומים חדשים</div>
                                     </div>
                                 </div>
                                 <div className="stat-box">
@@ -343,7 +267,7 @@ const MainPage = () => {
                                     </div>
                                     <div className="stat-content">
                                         <div className="stat-number">
-                                            {!isStatsLoading && stats.businesses !== null && (() => {
+                                            {stats.businesses !== null && (() => {
                                                 const f = formatStat(stats.businesses);
                                                 return <>{f.plus && '+ '}{f.value}</>;
                                             })()}
@@ -352,6 +276,11 @@ const MainPage = () => {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Banner second */}
+                            {bannerFullImages.length > 0 && (
+                              <PromoBanner images={bannerFullImages} autoPlayInterval={5000} />
+                            )}
                         </div>
 
                         {/* Quick Create & Search appear only above banner */}

@@ -11,33 +11,23 @@ const Sentry = require('../sentry');
 function loggingMiddleware(req, res, next) {
   // Always generate a unique requestId for every request
   req.requestId = uuidv4();
-  // נזהה משתמש (בהנחה שיש req.user או req.session.user)
-  let userId = null;
-  if (req.user && req.user._id) {
-    userId = req.user._id;
+  // נזהה משתמש אם קיים (אחרת לא ניצור visitorId)
+  const userId = req.user && req.user._id ? req.user._id : null;
+  const userEmail = req.user && req.user.email ? req.user.email : undefined;
+
+  if (userId) {
+    Sentry.setUser({ id: userId, email: userEmail });
+  } else {
+    Sentry.setUser(null);
   }
-
-  // אם אין משתמש – נייצר visitorId זמני (UUID)
-  let visitorId = userId;
-  if (!visitorId) {
-    visitorId = uuidv4();
-    // אפשרות עתידית: לשמור visitorId בקוקי
-    // res.cookie('visitorId', visitorId, { httpOnly: true, sameSite: 'lax' });
-    // אפשרות עתידית: לקבל visitorId מה־header
-    // if (req.headers['x-visitor-id']) visitorId = req.headers['x-visitor-id'];
-  }
-
-  req.visitorId = visitorId;
-
-  Sentry.setUser(userId ? { id: userId } : { id: visitorId, isGuest: true });
 
   logger.info({
     msg: 'Incoming request',
     requestId: req.requestId,
     method: req.method,
-    url: req.originalUrl,
+    url: `${process.env.SERVER_URL || `${req.protocol}://${req.get('host')}`}${req.originalUrl}`,
     userId: userId || undefined,
-    visitorId,
+    userEmail,
     ip: req.ip,
     userAgent: req.headers['user-agent'],
     referer: req.headers['referer'],

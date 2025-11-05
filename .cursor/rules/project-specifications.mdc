@@ -1,4 +1,4 @@
-# 📋 Project Specifications - Timeto Application
+# 📋 Project Specifications - Zezman Application
 
 ## 📑 תוכן עניינים
 - [מבנה מסכים מפורט](#מבנה-מסכים-מפורט)
@@ -1057,4 +1057,4 @@ Category deletion → Check if businesses exist
 User deletion → Handle owned businesses and reviews
 ```
 
-This comprehensive specification provides a complete blueprint for building the Timeto business directory application.
+This comprehensive specification provides a complete blueprint for building the Zezman business directory application.

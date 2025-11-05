@@ -71,6 +71,7 @@ exports.createSaleAd = async (req, res) => {
             title,
             description = '',
             categoryId,
+            subcategoryId,
             price,
             currency = 'ILS',
             prefix,
@@ -95,6 +96,7 @@ exports.createSaleAd = async (req, res) => {
             title,
             description,
             categoryId: categoryId && mongoose.Types.ObjectId.isValid(categoryId) ? categoryId : undefined,
+            subcategoryId: subcategoryId && mongoose.Types.ObjectId.isValid(subcategoryId) ? subcategoryId : undefined,
             price: price !== undefined ? Number(price) : undefined,
             currency,
             prefix,
@@ -185,12 +187,21 @@ exports.getSaleAds = async (req, res) => {
     const meta = getRequestMeta(req, logSource);
     try {
         logger.info({ ...meta, query: req.query }, `${logSource} enter`);
-        const { q, categoryId, minPrice, maxPrice, lat, lng, maxDistance, sort = 'newest', page = 1, limit = DEFAULT_LIMIT } = req.query;
+        const { q, categoryId, subcategoryId, minPrice, maxPrice, includeNoPrice, lat, lng, maxDistance, sort = 'newest', page = 1, limit = DEFAULT_LIMIT } = req.query;
         const pageNum = Number(page) || 1;
         const limitNum = Math.min(Number(limit) || DEFAULT_LIMIT, 40);
         const skip = (pageNum - 1) * limitNum;
 
         const query = buildSaleSearchQuery(q, categoryId, minPrice, maxPrice);
+        if (subcategoryId && mongoose.Types.ObjectId.isValid(subcategoryId)) {
+            query.subcategoryId = new mongoose.Types.ObjectId(subcategoryId);
+        }
+        // Enforce only items with price unless explicitly allowed
+        const allowNoPrice = includeNoPrice === 'true' || includeNoPrice === true;
+        if (!allowNoPrice) {
+            query.price = query.price || {};
+            query.price.$exists = true;
+        }
 
         let data, total;
         const hasGeo = lat && lng && (sort === 'distance' || maxDistance);

@@ -508,7 +508,8 @@ exports.getItems = async (req, res) => {
             maxDistance, 
             sort = 'rating', 
             page = 1, 
-            limit = DEFAULT_ITEMS_PER_PAGE 
+            limit = DEFAULT_ITEMS_PER_PAGE,
+            openNow 
         } = req.query;
 
         const pageNum = Number(page) || 1;
@@ -666,6 +667,32 @@ exports.getItems = async (req, res) => {
                     ...business,
                     isFavorite: false
                 }));
+            }
+            // openNow post-filter (applies to current page set)
+            const requireOpenNow = String(openNow) === 'true';
+            if (requireOpenNow) {
+                const isBusinessOpenNow = (b) => {
+                    try {
+                        if (!Array.isArray(b.openingHours) || !b.openingHours.length) return true;
+                        const now = new Date();
+                        const day = now.getDay();
+                        const todays = (b.openingHours || []).find(h => Number(h.day) === day);
+                        if (!todays || todays.closed) return false;
+                        const toMinutes = (str) => {
+                            if (!str || typeof str !== 'string') return null;
+                            const [hh, mm] = str.split(':').map(Number);
+                            return (hh * 60) + (mm || 0);
+                        };
+                        const minutesNow = now.getHours() * 60 + now.getMinutes();
+                        return (todays.ranges || []).some(r => {
+                            const o = toMinutes(r.open);
+                            const c = toMinutes(r.close);
+                            if (o === null || c === null) return false;
+                            return minutesNow >= o && minutesNow <= c;
+                        });
+                    } catch (_) { return false; }
+                };
+                businessesWithFavorites = businessesWithFavorites.filter(isBusinessOpenNow);
             }
 
             result = {

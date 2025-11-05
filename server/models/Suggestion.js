@@ -10,7 +10,7 @@ const SuggestionSchema = new mongoose.Schema({
   type: {
     type: String,
     required: [true, 'Type is required'],
-    enum: ['category', 'service'],
+    enum: ['category', 'service', 'subcategory'],
   },
   name_he: {
     type: String,
@@ -19,7 +19,7 @@ const SuggestionSchema = new mongoose.Schema({
   },
   name_en: {
     type: String,
-    required: [true, 'English name is required'],
+    required: false,
     trim: true
   },
   parent_category_id: {
@@ -33,10 +33,23 @@ const SuggestionSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'sale_categories',
     required: function() {
-      return this.domain === 'sale';
+      return this.domain === 'sale' && this.type === 'subcategory';
     }
   },
+  sale_subcategory_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'sale_subcategories',
+    required: false
+  },
   reason: {
+    type: String,
+    trim: true
+  },
+  notifyEmail: {
+    type: String,
+    trim: true
+  },
+  notifyPhone: {
     type: String,
     trim: true
   },

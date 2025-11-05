@@ -19,7 +19,7 @@
     },
     "selectLanguage": "Select Language",
     "logo": {
-      "main": "Time",
+      "main": "Zezman",
       "sub": "Business Directory"
     },
     "myLocation": "My Location",
@@ -84,7 +84,7 @@
       "newPromos": "New Promo Ads Near You"
     },
     "joinBanner": {
-      "title": "Join the Time Community",
+      "title": "Join the Zezman Community",
       "description": "Add your business and start getting new customers today",
       "descriptionFull": "Add a business, post a sale ad and a promo ad to reach the right customers near you and across the country",
       "button": "Add Business Free",
@@ -99,7 +99,7 @@
       "suggestItem": "Suggest Item",
       "termsOfService": "Terms of Service",
       "termsComingSoon": "Terms of service will be available soon",
-      "about": "About Time",
+        "about": "About Zezman",
       "aboutDescriptionLine1": "The community that connects people and businesses",
       "aboutDescriptionLine2": "Discover businesses, sale ads and hot promos — in one place.",
       "copyright": "© Zezman 2023 All rights reserved."
@@ -460,13 +460,13 @@
       "terms": "Terms of Use"
     },
     "about": {
-      "title": "Time To",
+      "title": "Zezman",
       "description": "Israel's leading business directory. Find the right business near you."
     },
     "copyright": "© Zezman 2023 All rights reserved."
   },
   "joinBanner": {
-    "title": "Join Time Community",
+      "title": "Join Zezman Community",
     "subtitle": "Add your business and start getting new customers today",
     "button": "Add Business Free"
   },
@@ -534,7 +534,8 @@
       "clear": "Clear Filters",
       "apply": "Apply Filters",
       "active": "Active Filters:",
-      "clearAll": "Clear All"
+      "clearAll": "Clear All",
+      "toolbar": "View"
     },
     "sort": {
       "title": "Sort By",
@@ -702,6 +703,8 @@
       "title": "Minimum Rating",
       "andAbove": "and above"
     },
+    "subcategories": "Subcategories",
+    "subcategory": "Subcategory",
     "category": {
       "title": "Category",
       "select": "Select Category"
@@ -828,11 +831,11 @@
     "sections": {
       "general": {
         "title": "1. General",
-        "content": "Welcome to the Time website. The use of the website and the services offered on it is subject to the terms of use detailed below. Using the website constitutes your agreement to these terms."
+      "content": "Welcome to the Zezman website. The use of the website and the services offered on it is subject to the terms of use detailed below. Using the website constitutes your agreement to these terms."
       },
       "definitions": {
         "title": "2. Definitions",
-        "content": "\"Website\" - This Time website with all its content and services.<br />\"User\" - Any person browsing the website or using its services."
+      "content": "\"Website\" - This Zezman website with all its content and services.<br />\"User\" - Any person browsing the website or using its services."
       },
       "usage": {
         "title": "3. Website Usage",
