@@ -534,7 +534,8 @@
       "clear": "Clear Filters",
       "apply": "Apply Filters",
       "active": "Active Filters:",
-      "clearAll": "Clear All"
+      "clearAll": "Clear All",
+      "toolbar": "View"
     },
     "sort": {
       "title": "Sort By",

@@ -118,26 +118,36 @@
 .banner-container {
     flex: 1;
     position: relative;
-    height: 400px;
-    min-height: 240px;
+    height: auto;           /* stretch to match stats column */
+    min-height: 416px;      /* +30% from previous 320px */
     width: 100%;
-    display: block;
+    display: flex;          /* center image within */
+    align-items: center;
+    justify-content: center;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(180deg, #f6f7f9 0%, #eceff3 100%); /* subtle, non-white background */
+    --story-bar-h: 28px; /* reserved area for story indicators */
 }
 
 .banner-slide {
     position: absolute;
-    top: 0;
+    top: var(--story-bar-h);
     left: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100% - var(--story-bar-h));
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
     display: flex;
     align-items: center;
     justify-content: center;
+    pointer-events: none; /* prevent hover flicker with nav buttons */
+    padding: 10px 12px 12px; /* thin gap around image */
+    box-sizing: border-box; /* ensure padding reduces content box */
+    border: none; /* remove thin dividing line */
+    border-radius: 10px;
+    background: transparent;
 }
 
 .banner-slide.active {
@@ -145,9 +155,12 @@
 }
 
 .banner-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain; /* avoid cropping */
+    display: block;
 }
 
 .banner-content {
@@ -179,20 +192,24 @@
 /* Story Indicators */
 .story-indicators {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    right: 10px;
+    top: 0;
+    left: 0;
+    right: 0;
     display: flex;
     gap: 4px;
     z-index: 2;
     direction: ltr !important; /* force LTR regardless of page dir */
     flex-direction: row !important; /* keep visual order left -> right */
+    background: rgba(0, 0, 0, 0.35); /* darker neutral for contrast */
+    padding: 6px 10px;
+    border-radius: 8px;
+    height: var(--story-bar-h);
 }
 
 .story-indicator {
     flex: 1;
     height: 2px;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.35); /* light on dark bg */
     border-radius: 2px;
     overflow: hidden;
     cursor: pointer;
@@ -201,11 +218,11 @@
 }
 
 .story-indicator.active {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.6);
 }
 
 .story-indicator.viewed {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.85);
 }
 
 .indicator-progress {
@@ -233,34 +250,33 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background-color: rgba(255, 255, 255, 0.2);
-    border: none;
-    width: 40px;
-    height: 40px;
+    background-color: #ffffff;
+    border: 1px solid #eee;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: #333;
     cursor: pointer;
-    transition: all 0.3s ease;
-    opacity: 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: none;
+    opacity: 1; /* always visible */
+    z-index: 3; /* keep above slides */
 }
 
-.banner-container:hover .banner-nav {
-    opacity: 1;
-}
-
-.banner-nav:hover {
-    background-color: rgba(255, 255, 255, 0.4);
-}
+.banner-nav:hover { background-color: #ffffff; color: #333; border-color: #eee; }
+.banner-nav svg { font-size: 20px; pointer-events: none; }
 
 .banner-nav.prev {
-    right: 20px;
+    left: 20px;
+    right: auto;
 }
 
 .banner-nav.next {
-    left: 20px;
+    right: 20px;
+    left: auto;
 }
 
 /* Search Section */
@@ -287,10 +303,11 @@
     display: flex;
     gap: 2rem;
     margin-top: 2rem;
+    align-items: stretch; /* ensure banner matches stats height */
 }
 
 @media (max-width: 1023px) {
-    .banner-container { height: 280px; display: block; }
+    .banner-container { height: 364px; display: block; } /* +30% from previous 280px */
     .banner-stats-container { flex-direction: column; align-items: center; }
     .stats-container { width: auto; order: 2; display: flex; flex-wrap: nowrap; gap: 10px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 0.75rem; margin-inline: auto; }
     .stats-container::-webkit-scrollbar { display: none; }
@@ -307,6 +324,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 12px; /* spacing between stat cards */
     padding: 1.5rem;
     background: white;
     border-radius: 12px;
@@ -472,7 +490,10 @@
     overscroll-behavior-x: contain;
     scroll-behavior: smooth;
     padding: 1rem 0;
+    scrollbar-width: none; /* hide scrollbar (Firefox) */
 }
+
+.categories::-webkit-scrollbar { display: none; } /* hide scrollbar (WebKit) */
 
 .category-business {
     min-width: 150px;
@@ -682,7 +703,7 @@
     }
 
     .banner-container {
-        height: 200px;
+        height: 260px; /* +30% from previous 200px */
         margin: 0.75rem auto;
         display: block;
     }
@@ -730,7 +751,7 @@
     }
     
     .banner-container {
-        height: 200px;
+        height: 260px; /* +30% from previous 200px */
         display: block;
     }
 }
@@ -746,6 +767,11 @@
         height: 2rem; /* אייקונים קטנים יותר */
         font-size: 1.125rem;
     }
+
+    /* Hide banner nav on mobile */
+    .banner-nav,
+    .banner-nav.prev,
+    .banner-nav.next { display: none !important; }
 }
 
 /* Footer */

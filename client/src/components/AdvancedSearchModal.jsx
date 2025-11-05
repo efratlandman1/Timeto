@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import '../styles/SuggestItemPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
+const GOOGLE_LIBRARIES = ['places'];
 
 const MAX_DISTANCE_KM = 100;
 
@@ -30,7 +31,7 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   const { isLoaded: mapsLoaded } = useJsApiLoader({
     id: 'google-maps-script',
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-    libraries: ['places']
+    libraries: GOOGLE_LIBRARIES
   });
   const navigate = useNavigate();
   const location = useLocation();

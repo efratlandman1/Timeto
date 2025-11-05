@@ -19,7 +19,7 @@ const createSuggestion = async (req, res) => {
   } }, `${logSource} enter`);
   
   try {
-    const { domain = 'business', type, name_he, name_en, parent_category_id, sale_category_id, sale_subcategory_id, reason } = req.body;
+    const { domain = 'business', type, name_he, name_en, parent_category_id, sale_category_id, sale_subcategory_id, reason, notifyEmail, notifyPhone } = req.body;
 
     // If business service, verify that parent_category_id exists
     if (domain === 'business' && type === 'service' && parent_category_id) {
@@ -46,6 +46,8 @@ const createSuggestion = async (req, res) => {
       sale_category_id: domain === 'sale' && type === 'subcategory' ? sale_category_id : undefined,
       sale_subcategory_id: domain === 'sale' && type === 'subcategory' ? sale_subcategory_id : undefined,
       reason,
+      notifyEmail,
+      notifyPhone,
       user: req.user ? req.user._id : undefined
     });
 

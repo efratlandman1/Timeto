@@ -9,19 +9,23 @@ import '../styles/userBusinesses.css';
 import '../styles/AdvancedSearchPage.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchBar from './SearchBar';
-import { FaFilter, FaTimes, FaChevronDown, FaSort, FaArrowRight, FaThLarge, FaStore, FaTag, FaBullhorn, FaStar } from 'react-icons/fa';
+import { FaFilter, FaTimes, FaChevronDown, FaSort, FaArrowRight, FaThLarge, FaStore, FaTag, FaBullhorn, FaStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
 import { useSelector } from 'react-redux';
 import { buildQueryUrl } from '../utils/buildQueryUrl';
 import { getToken } from '../utils/auth';
 import { useTranslation } from 'react-i18next';
+import PromoBanner from './PromoBanner';
+const GOOGLE_LIBRARIES = ['places'];
 
 const ITEMS_PER_PAGE = 8;
 
 const SearchResultPage = () => {
     const { t, i18n, ready } = useTranslation();
     // Active tab: all | business | sale | promo
-    const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState('all');
+  const [viewMode, setViewMode] = useState('grid'); // grid | carousel
+  const [currentPromoSlide, setCurrentPromoSlide] = useState(0);
 
     // Businesses state
     const [businesses, setBusinesses] = useState([]);
@@ -64,7 +68,7 @@ const SearchResultPage = () => {
         saleSubcategoryId: '',
     });
     const MAX_PRICE = 10000;
-    const { isLoaded: mapsLoaded } = useJsApiLoader({ id: 'google-maps-script', googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', libraries: ['places'] });
+    const { isLoaded: mapsLoaded } = useJsApiLoader({ id: 'google-maps-script', googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', libraries: GOOGLE_LIBRARIES });
     const cityAutoRef = useRef(null);
     const [activeFilters, setActiveFilters] = useState({});
     const [sortOption, setSortOption] = useState('rating');
@@ -211,6 +215,15 @@ const SearchResultPage = () => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    // Auto-advance promo banner when viewing promo in carousel mode
+    useEffect(() => {
+        if (activeTab !== 'promo' || viewMode !== 'carousel') return;
+        const timer = setInterval(() => {
+            setCurrentPromoSlide((s) => s + 1);
+        }, 5000);
+        return () => clearInterval(timer);
+    }, [activeTab, viewMode]);
 
     // Measure container rect for drawer width/position
     useEffect(() => {
@@ -1177,6 +1190,7 @@ const SearchResultPage = () => {
                     if (params.get('openNow')) chips.push({ key: 'openNow', value: '', label: `${t('advancedSearch.openNow')||'Open Now'}` });
                     if (params.get('addedWithin')) chips.push({ key: 'addedWithin', value: params.get('addedWithin'), label: withColon(t('advancedSearch.addedWithin')||'Added') });
                     return (
+                      <>
                       <div className="filters-area">
                         <div className="filters-header">
                           <div className="filters-title">{t('searchResults.filters.active')}</div>
@@ -1191,13 +1205,42 @@ const SearchResultPage = () => {
                           ))}
                         </div>
                       </div>
+                      
+                      </>
                     );
                 })()}
+
+                {/* View mode switcher - always visible under filters */}
+                {activeTab==='promo' && (
+                  <div className="promo-view-switch" aria-label={t('searchResults.filters.toolbar') || 'סרגל תצוגה'}>
+                    <div className="results-view-switch" role="group" aria-label="view switcher">
+                      <button type="button" className={`rvs-btn ${viewMode==='grid'?'active':''}`} onClick={()=>setViewMode('grid')} aria-pressed={viewMode==='grid'} title="Grid">▦</button>
+                      <button type="button" className={`rvs-btn ${viewMode==='carousel'?'active':''}`} onClick={()=>setViewMode('carousel')} aria-pressed={viewMode==='carousel'} title="Carousel">❚►</button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Tabs removed in favor of type pills above */}
 
                 {/* Results */}
-                <div className="search-results-layout">
+                <div className={`search-results-layout ${viewMode==='carousel' ? 'as-carousel' : ''}`}>
+                    {viewMode==='carousel' && activeTab==='promo' ? (
+                      (() => {
+                        const images = queryFilteredPromoAds
+                          .filter(a => !!a?.image)
+                          .map(a => `${process.env.REACT_APP_API_DOMAIN}/uploads/${String(a.image).split('/').pop()}`);
+                        if (images.length === 0) return <div className="no-results" style={{textAlign:'center'}}>{t('search.noResults')||'לא נמצאו תוצאות'}</div>;
+                        return <PromoBanner images={images} autoPlayInterval={5000} />;
+                      })()
+                    ) : viewMode==='carousel' && activeTab==='sale' ? (
+                      <div className="carousel-track">
+                        {queryFilteredSaleAds.filter(ad => Array.isArray(ad?.images) && ad.images.length > 0).map((ad, index)=> (
+                          <div key={ad._id} className="carousel-item" ref={index === (queryFilteredSaleAds.length - 1) ? lastItemRef : undefined}>
+                            <SaleAdCard ad={ad} />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
                     <div className="business-cards-grid">
                         {activeTab === 'business' && queryFilteredBusinesses.map((business, index) => (
                             <div key={business._id} ref={index === queryFilteredBusinesses.length - 1 ? lastItemRef : undefined}>
@@ -1235,6 +1278,7 @@ const SearchResultPage = () => {
                                 ))
                         )}
                     </div>
+                    )}
                 </div>
 
                 {/* לוודר */}

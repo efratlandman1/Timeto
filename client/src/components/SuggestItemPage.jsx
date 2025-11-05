@@ -15,10 +15,11 @@ const SuggestItemPage = () => {
     domain: 'business',
     type: 'category',
     name_he: '',
-    name_en: '',
     parent_category_id: '',
     sale_category_id: '',
-    reason: ''
+    reason: '',
+    notifyEmail: '',
+    notifyPhone: ''
   });
 
   const [categories, setCategories] = useState([]);
@@ -83,8 +84,10 @@ const SuggestItemPage = () => {
         domain: formData.domain,
         type: formData.type,
         name_he: formData.name_he,
-        name_en: formData.name_en,
+        // backend no longer requires english
         reason: formData.reason,
+        notifyEmail: formData.notifyEmail || undefined,
+        notifyPhone: formData.notifyPhone || undefined,
         ...(mode === 'business' && formData.type === 'service' ? { parent_category_id: formData.parent_category_id } : {}),
         ...(mode === 'sale' && formData.type === 'subcategory' ? { sale_category_id: formData.sale_category_id } : {})
       };
@@ -100,10 +103,11 @@ const SuggestItemPage = () => {
         domain: mode,
         type: 'category',
         name_he: '',
-        name_en: '',
         parent_category_id: '',
         sale_category_id: '',
-        reason: ''
+        reason: '',
+        notifyEmail: '',
+        notifyPhone: ''
       });
 
       // Close modal after short delay
@@ -206,36 +210,19 @@ const SuggestItemPage = () => {
           )}
 
           <div className="section-card">
-            <div className="two-col">
-              <div className="form-group">
-                <label htmlFor="name_he" className="form-label">
-                  {t('suggestItem.form.name.he')}<RequiredMark />
-                </label>
-                <input
-                  type="text"
-                  id="name_he"
-                  name="name_he"
-                  value={formData.name_he}
-                  onChange={handleChange}
-                  required
-                  placeholder={t('suggestItem.form.name.placeholder')}
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="name_en" className="form-label">
-                  {t('suggestItem.form.name.en')}<RequiredMark />
-                </label>
-                <input
-                  type="text"
-                  id="name_en"
-                  name="name_en"
-                  value={formData.name_en}
-                  onChange={handleChange}
-                  required
-                  placeholder={t('suggestItem.form.name.placeholder')}
-                />
-              </div>
+            <div className="form-group">
+              <label htmlFor="name_he" className="form-label">
+                שם ההצעה<RequiredMark />
+              </label>
+              <input
+                type="text"
+                id="name_he"
+                name="name_he"
+                value={formData.name_he}
+                onChange={handleChange}
+                required
+                placeholder={t('suggestItem.form.name.placeholder')}
+              />
             </div>
           </div>
 
@@ -283,17 +270,21 @@ const SuggestItemPage = () => {
           )}
 
           <div className="form-group">
-            <label htmlFor="reason" className="form-label">
-              {t('suggestItem.form.reason')}
-            </label>
-            <textarea
-              id="reason"
-              name="reason"
-              value={formData.reason}
-              onChange={handleChange}
-              placeholder={t('suggestItem.form.reasonPlaceholder')}
-              rows={3}
-            />
+            <label htmlFor="reason" className="form-label">סיבה והסבר (אופציונלי)</label>
+            <textarea id="reason" name="reason" value={formData.reason} onChange={handleChange} rows={3} />
+          </div>
+
+          <div className="section-card">
+            <div className="two-col">
+              <div className="form-group">
+                <label className="form-label" htmlFor="notifyEmail">אימייל לעדכון (אופציונלי)</label>
+                <input type="email" id="notifyEmail" name="notifyEmail" value={formData.notifyEmail} onChange={handleChange} placeholder="name@example.com" />
+              </div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="notifyPhone">טלפון לעדכון (אופציונלי)</label>
+                <input type="tel" id="notifyPhone" name="notifyPhone" value={formData.notifyPhone} onChange={handleChange} placeholder="050-0000000" />
+              </div>
+            </div>
           </div>
 
           <div className="button-row fullwidth">

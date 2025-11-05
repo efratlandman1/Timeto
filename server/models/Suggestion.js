@@ -19,7 +19,7 @@ const SuggestionSchema = new mongoose.Schema({
   },
   name_en: {
     type: String,
-    required: [true, 'English name is required'],
+    required: false,
     trim: true
   },
   parent_category_id: {
@@ -42,6 +42,14 @@ const SuggestionSchema = new mongoose.Schema({
     required: false
   },
   reason: {
+    type: String,
+    trim: true
+  },
+  notifyEmail: {
+    type: String,
+    trim: true
+  },
+  notifyPhone: {
     type: String,
     trim: true
   },
