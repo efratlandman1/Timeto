@@ -49,13 +49,12 @@
 
 /* RTL support for close button */
 [dir="rtl"] .close-button {
-    right: auto;
-    left: 16px;
+    right: false; /* placeholder */
 }
 
 .close-button:hover {
     color: #ff4d4d;
-    transform: scale(1.1);
+    transition: all 0.2s ease;
 }
 
 /* כותרת */
@@ -92,42 +91,14 @@
 .form-group select:focus {
     outline: none;
     border-color: #ff4d4d;
-    box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.1);
+    box-shadow: 0 0 0 3px rgba(255, 77, 0, 0.1);
 }
 
-.tags-section {
-    margin-top: 16px;
-}
-
-.tags-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-}
-
-.tag {
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: #f8f8f8;
-    color: #666;
-    border: 1px solid #e0e0e0;
-}
-
-.tag.selectable:hover {
-    background: #fff0f0;
-    border-color: #ff4d4d;
-    color: #ff4d4d;
-}
-
-.tag.selected {
-    background: #ff4d4d;
-    color: white;
-    border-color: #ff4d4d;
-}
+.tags-section { margin-top: 16px; }
+.tags-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.tag { padding: 6px 12px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: all 0.2s ease; background: #f8f8f8; color: #666; border: 1px solid #e0e0e0; }
+.tag.selectable:hover { background: #fff0f0; border-color: #ff4d4d; color: #ff4d4d; }
+.tag.highlite { background: #ff4d4d; color: #fff; border-color: #ff4d4d; }
 
 .rating-selector {
     margin-top: 12px;
@@ -232,28 +203,36 @@ input[type="range"] {
     min-width: 120px;
 }
 
-.clear-button {
-    background: #fff;
-    color: #ff4d4d;
-    border: 2px solid #ff4d4d;
-}
+/* --- Unified styling for SearchResultPage advanced modal (suggest-modal) --- */
+.modal-container.suggest-modal { font-size: 14px; background:#fff; border-radius:12px; width:min(720px,95vw); max-height:85vh; display:flex; flex-direction:column; overflow:hidden; position: relative; }
+.modal-container.suggest-modal .fd-row { margin: 12px 0; }
+.modal-container.suggest-modal .modal-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid #e0e0e0; position:sticky; top:0; background:#fff; z-index:2; }
+.modal-container.suggest-modal .suggest-modal-title { margin:0; font-weight:700; }
+.modal-container.suggest-modal .modal-close{ position:absolute; inset-inline-end:16px; top:12px; background:none; border:none; font-size:20px; cursor:pointer; z-index:3; }
+.modal-container.suggest-modal .fd-content { padding:16px; flex:1; overflow:auto; }
+.modal-container.suggest-modal .fd-footer { display:flex; gap:8px; padding:12px 16px; border-top:1px solid #e0e0e0; position:sticky; bottom:0; background:#fff; z-index:2; }
 
-.submit-button {
-    background: #ff4d4d;
-    color: white;
-    border: none;
-}
+/* Ensure bottom action row in modal stays clickable and above scroll content */
+.modal-container.suggest-modal .button-row.fullwidth { position: sticky; bottom: 0; background: #fff; padding: 12px 16px; z-index: 2; }
+.modal-container.suggest-modal .tags-scroll { display:flex; flex-wrap:wrap; gap:8px; }
+.modal-container.suggest-modal .tag-chip { padding:8px 12px; border:1px solid #e0e0e0; border-radius:9999px; background:#fff; cursor:pointer; transition:.15s; font-size:14px; }
+.modal-container.suggest-modal .tag-chip.selected { background:#ff4d4d; color:#fff; border-color:#ff4d4d; }
+.modal-container.suggest-modal .chip-button { padding:8px 12px; border:1px solid #e0e0e0; border-radius:9999px; background:#fff; cursor:pointer; transition:.15s; font-size:14px; }
+.modal-container.suggest-modal .chip-button.active { border-color:#ff4d4d; color:#ff4d4d; }
+.modal-container.suggest-modal .chip-button.danger { border-color:#ef4444; color:#ef4444; }
+.modal-container.suggest-modal label { font-weight:600; display:block; margin-bottom:6px; }
+.modal-container.suggest-modal .two { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+.modal-container.suggest-modal .mini-input.full { width:100%; padding:10px 12px; border:1px solid #e0e0e0; border-radius:8px; }
+.modal-container.suggest-modal .mini-range.full { width:100%; }
+.modal-container.suggest-modal .fd-card { background:#fff; border:1px solid #efefef; border-radius:12px; padding:12px 16px; margin:12px 0; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+
+.clear-button { background:#fff; color:#ff4d4d; border:2px solid #ff4d4d; }
+.submit-button { background:#ff4d4d; color:#fff; border:none; }
+
+@import url('./SearchResultPage.css');
 
 @media (max-width: 480px) {
-    .modal-content {
-        padding: 12px;
-    }
-    .modal-actions {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .clear-button, .submit-button {
-        width: 100%;
-        padding: 10px 0;
-    }
+  .modal-content { padding: 12px; }
+  .modal-actions { display:flex; flex-direction: column; gap:10px; }
+  .clear-button, .submit-button { width:100%; padding:10px 0; }
 }

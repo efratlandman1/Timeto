@@ -83,7 +83,12 @@ exports.getAllUnified = async (req, res) => {
     let saleQuery = { active: true };
     if (q) saleQuery.$text = { $search: q };
     if (saleCategoryId && toObjectId(saleCategoryId)) saleQuery.categoryId = toObjectId(saleCategoryId);
-    if (saleSubcategoryId && toObjectId(saleSubcategoryId)) saleQuery.subcategoryId = toObjectId(saleSubcategoryId);
+    const saleSubIds = toObjectIdArray(req.query.saleSubcategoryId);
+    if (saleSubIds.length) {
+      saleQuery.subcategoryId = { $in: saleSubIds };
+    } else if (saleSubcategoryId && toObjectId(saleSubcategoryId)) {
+      saleQuery.subcategoryId = toObjectId(saleSubcategoryId);
+    }
     if (city) saleQuery.city = { $regex: new RegExp(city, 'i') };
     const min = priceMin !== undefined && priceMin !== '' ? Number(priceMin) : null;
     const max = priceMax !== undefined && priceMax !== '' ? Number(priceMax) : null;

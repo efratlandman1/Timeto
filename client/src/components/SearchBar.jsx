@@ -37,11 +37,11 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
     if (!isMainPage) {
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {
-        const params = new URLSearchParams(location.search);
-        if (value.trim()) params.set('q', value);
-        else params.delete('q');
-        navigate({ pathname: location.pathname, search: params.toString() });
-        if (onSearch) onSearch(value);
+      const params = new URLSearchParams(location.search);
+      if (value.trim()) params.set('q', value);
+      else params.delete('q');
+      navigate({ pathname: location.pathname, search: params.toString() });
+      if (onSearch) onSearch(value);
       }, 300);
     }
   };

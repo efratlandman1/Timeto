@@ -67,7 +67,9 @@ const SearchResultPage = () => {
         maxDistance: 0,
         rating: 0,
         saleCategoryId: '',
+        saleCategoryName: '',
         saleSubcategoryId: '',
+        saleSubcategoryIds: [],
     });
     const MAX_PRICE = 10000;
     const { isLoaded: mapsLoaded } = useJsApiLoader({ id: 'google-maps-script', googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', libraries: GOOGLE_LIBRARIES });
@@ -277,14 +279,11 @@ const SearchResultPage = () => {
         const sort = params.get('sort') || 'rating';
         for (const [key, value] of params.entries()) {
             if (key !== 'sort' && key !== 'q' && key !== 'page' && key !== 'limit') {
-                if (key in filters) {
-                    if (Array.isArray(filters[key])) {
-                        filters[key].push(value);
-                    } else {
-                        filters[key] = value;
-                    }
-                } else {
+                if (filters[key] === undefined) {
                     filters[key] = value;
+                } else {
+                    const prev = filters[key];
+                    filters[key] = Array.isArray(prev) ? [...prev, value] : [prev, value];
                 }
             }
         }
@@ -304,7 +303,9 @@ const SearchResultPage = () => {
             maxDistance: filters.maxDistance ? Number(filters.maxDistance) : 0,
             rating: filters.rating ? Number(filters.rating) : 0,
             saleCategoryId: filters.saleCategoryId || '',
-            saleSubcategoryId: filters.saleSubcategoryId || '',
+            saleCategoryName: filters.saleCategoryName || '',
+            saleSubcategoryId: (Array.isArray(filters.saleSubcategoryId) ? filters.saleSubcategoryId[0] : (filters.saleSubcategoryId || '')),
+            saleSubcategoryIds: params.getAll('saleSubcategoryId') || [],
         }));
         // Select correct tab according to selected category type
         if (filters.saleCategoryId) {
@@ -345,7 +346,7 @@ const SearchResultPage = () => {
         if (urlTab && ['all','business','sale','promo'].includes(urlTab)) {
             setActiveTab(urlTab);
         }
-    }, [location.search, categories, saleSubcategoriesSmall.length]);
+    }, [location.search, categories]);
 
     useEffect(() => {
         if (activeTab === 'all') return;
@@ -460,12 +461,20 @@ const SearchResultPage = () => {
         const paramsObj = {};
         for (const [key, value] of params.entries()) {
             if (['q','categoryId','saleCategoryId','saleSubcategoryId','categoryName','priceMin','priceMax','sort','maxDistance','services','rating','city','openNow','addedWithin','includeNoPrice'].includes(key)) {
-                paramsObj[key] = value;
+                if (key === 'saleSubcategoryId') {
+                    if (!Array.isArray(paramsObj.saleSubcategoryId)) paramsObj.saleSubcategoryId = [];
+                    paramsObj.saleSubcategoryId.push(value);
+                } else if (key === 'services') {
+                    if (!Array.isArray(paramsObj.services)) paramsObj.services = [];
+                    paramsObj.services.push(value);
+                } else {
+                    paramsObj[key] = value;
+                }
             }
         }
-        // Map saleCategoryId / saleSubcategoryId to sale endpoint filters
+        // Map saleCategoryId / saleSubcategoryId to sale endpoint filters (support multi)
+        const subIds = Array.isArray(paramsObj.saleSubcategoryId) ? paramsObj.saleSubcategoryId : (paramsObj.saleSubcategoryId ? [paramsObj.saleSubcategoryId] : []);
         if (paramsObj.saleCategoryId) paramsObj.categoryId = paramsObj.saleCategoryId;
-        if (paramsObj.saleSubcategoryId) paramsObj.subcategoryId = paramsObj.saleSubcategoryId;
         delete paramsObj.saleCategoryId;
         delete paramsObj.saleSubcategoryId;
         // Map price keys to API expected names
@@ -475,7 +484,13 @@ const SearchResultPage = () => {
         paramsObj.page = requestedSalePage;
         paramsObj.limit = ITEMS_PER_PAGE;
 
-        const qs = new URLSearchParams(paramsObj).toString();
+        const qsParams = new URLSearchParams();
+        Object.entries(paramsObj).forEach(([k,v]) => {
+            if (Array.isArray(v)) v.forEach(val => qsParams.append(k, val));
+            else if (v !== undefined && v !== null && v !== '') qsParams.append(k, v);
+        });
+        subIds.forEach(id => qsParams.append('subcategoryId', id));
+        const qs = qsParams.toString();
         setIsLoadingSale(true);
         axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-ads?${qs}`, { headers })
             .then(res => {
@@ -798,7 +813,7 @@ const SearchResultPage = () => {
 
                     {/* Filters row - standalone buttons + drawer trigger */}
                     {(() => { const p = new URLSearchParams(location.search);
-                      const hasCategory = !!p.get('categoryName');
+                      const hasCategory = !!(p.get('categoryName') || p.get('saleCategoryId'));
                       const hasServices = p.getAll('services').length>0;
                       const hasCity = !!p.get('city');
                       const hasPrice = !!(p.get('priceMin')||p.get('priceMax'));
@@ -813,7 +828,7 @@ const SearchResultPage = () => {
                             onClick={() => { setDrawerMode('sort'); setShowFiltersDrawer(true); setShowFilters(true); setTempSort(sortOption || 'rating'); }}
                             aria-expanded={showFiltersDrawer && drawerMode==='sort'}
                         >
-                            <FaSort aria-hidden="true" /> {SORT_OPTIONS[sortOption]}
+                            <FaSort aria-hidden="true" /> מיון לפי: {SORT_OPTIONS[sortOption]}
                         </button>
 
                         <button
@@ -825,40 +840,45 @@ const SearchResultPage = () => {
                         </button>
                         {/* Category */}
                         <button className={`chip-button${hasCategory ? ' active' : ''}`} onClick={() => { setDrawerMode('category'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='category'}>
-                            {t('advancedSearch.category.title')}{tempValues.categoryName?`: ${tempValues.categoryName}`:''}
+                            {(() => {
+                              const isSale = Boolean(tempValues.saleCategoryId);
+                              const saleName = isSale ? (tempValues.saleCategoryName || (saleCategoriesSmall.find(sc => sc._id === tempValues.saleCategoryId)?.name || '')) : '';
+                              const label = isSale ? saleName : (tempValues.categoryName || '');
+                              return `${t('advancedSearch.category.title')}${label ? `: ${label}` : ''}`;
+                            })()}
                         </button>
 
                         {/* Services (business only) */}
                         {tempValues.categoryName && !tempValues.saleCategoryId && (
                           <button className={`chip-button${hasServices ? ' active' : ''}`} onClick={() => { if (!selectedCategoryId) { const found = categories.find(c=>c.name===tempValues.categoryName); setSelectedCategoryId(found?._id||''); } fetchServicesByCategoryId(selectedCategoryId || (categories.find(c=>c.name===tempValues.categoryName)?._id||'')); setDrawerMode('services'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='services'}>
                               {t('advancedSearch.services.title')}{tempValues.services?.length?` (${tempValues.services.length})`:''}
-                          </button>
+                           </button>
                         )}
 
                         {/* Sale subcategories chip (sale only) */}
                         {tempValues.saleCategoryId && (
-                          <button className={`chip-button${tempValues.saleSubcategoryId ? ' active' : ''}`} onClick={async () => { 
+                          <button className={`chip-button${(tempValues.saleSubcategoryIds && tempValues.saleSubcategoryIds.length>0) ? ' active' : ''}`} onClick={async () => { 
                               if (saleSubcategoriesSmall.length===0 && tempValues.saleCategoryId) {
                                 try { const res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-subcategories/category/${tempValues.saleCategoryId}`); setSaleSubcategoriesSmall(res.data?.data?.subcategories || []);} catch {}
                               }
                               setDrawerMode('saleSubs'); setCategoryTab('sale'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='saleSubs'}>
-                              {(t('advancedSearch.subcategories')==='advancedSearch.subcategories' ? 'תת קטגוריות' : t('advancedSearch.subcategories'))}
+                              {(t('advancedSearch.subcategories')==='advancedSearch.subcategories' ? 'תת קטגוריות' : t('advancedSearch.subcategories'))}{(tempValues.saleSubcategoryIds && tempValues.saleSubcategoryIds.length>0)?` (${tempValues.saleSubcategoryIds.length})`:''}
                            </button>
                         )}
 
                         {/* City */}
                         <button className={`chip-button${hasCity ? ' active' : ''}`} onClick={() => { setDrawerMode('city'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='city'}>
-                            {t('advancedSearch.city')}
+                            {t('advancedSearch.city')}{tempValues.city?`: ${tempValues.city}`:''}
                         </button>
 
                         {/* Price */}
                         <button className={`chip-button${hasPrice ? ' active' : ''}`} onClick={() => { setDrawerMode('price'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='price'}>
-                            {t('advancedSearch.priceRange')}
+                            {t('advancedSearch.priceRange')}{(tempValues.priceMin||tempValues.priceMax)?`: ${tempValues.priceMin||0}-${tempValues.priceMax||MAX_PRICE}`:''}
                         </button>
 
                         {/* Distance */}
                         <button className={`chip-button${hasDistance ? ' active' : ''}`} onClick={() => { setDrawerMode('distance'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='distance'}>
-                            {t('advancedSearch.distance.title')}
+                            {t('advancedSearch.distance.title')}{tempValues.maxDistance?`: ${tempValues.maxDistance} ${t('advancedSearch.distance.km')}`:''}
                         </button>
 
                         {/* Open Now quick toggle */}
@@ -868,17 +888,29 @@ const SearchResultPage = () => {
 
                         {/* Rating */}
                         <button className={`chip-button${hasRating ? ' active' : ''}`} onClick={() => { setDrawerMode('rating'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='rating'}>
-                            {t('advancedSearch.rating.title')}
+                            {t('advancedSearch.rating.title')}{tempValues.rating?`: ${tempValues.rating}`:''}
+                        </button>
+
+                        {/* Clear all (global) */}
+                        <button
+                          className="chip-button danger"
+                          onClick={() => {
+                            setTempValues(v=>({ ...v, categoryName:'', services:[], city:'', cityLat: undefined, cityLng: undefined, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE, maxDistance:0, rating:0, saleCategoryId:'', saleSubcategoryId:'', saleSubcategoryIds:[] }));
+                            handleClearFilters();
+                          }}
+                          aria-label="clear all filters"
+                        >
+                          נקה הכל
                         </button>
                     </div>
                     ); })()}
 
                     {/* Drawer overlay */}
                     {showFiltersDrawer && (
-                        <div className="filters-drawer-overlay" role="dialog" aria-modal="true" onClick={() => { setShowFiltersDrawer(false); setShowFilters(false); }}>
+                        <div className="modal-overlay" role="dialog" aria-modal="true" onClick={() => { setShowFiltersDrawer(false); setShowFilters(false); }}>
                             {(() => { const compact = !['all','category','services','saleSubs'].includes(drawerMode); return (
                             <div
-                                className={`filters-drawer ${compact ? 'compact' : ''}`}
+                                className={`modal-container suggest-modal ${!!compact ? 'compact' : ''}`}
                                 style={{
                                     width: `${(() => {
                                         const vw = typeof window !== 'undefined' ? window.innerWidth : 1024;
@@ -887,21 +919,14 @@ const SearchResultPage = () => {
                                         const w = isMobile ? base : Math.max(480, Math.floor(base * 0.75));
                                         return w;
                                     })()}px`,
-                                    left: (() => {
-                                        const vw = typeof window !== 'undefined' ? window.innerWidth : 1024;
-                                        const isMobile = vw <= 640;
-                                        const base = Math.min(containerRect.width, 720);
-                                        const width = isMobile ? base : Math.max(480, Math.floor(base * 0.75));
-                                        return `calc(50% - ${width / 2}px)`;
-                                    })()
                                 }}
                                 onClick={(e)=>e.stopPropagation()}
                             >
-                                <div className="fd-header">
-                                    <button className="fd-close" aria-label={t('common.close')} onClick={() => { setShowFiltersDrawer(false); setShowFilters(false); }}>
+                                <div className="modal-header">
+                                    <button className="modal-close" aria-label={t('common.close')} onClick={() => { setShowFiltersDrawer(false); setShowFilters(false); }}>
                                         <FaTimes />
                                     </button>
-                                    <h2 className="fd-title">{
+                                    <h1 className="login-title suggest-modal-title">{
                                         drawerMode==='all' ? t('advancedSearch.title') :
                                         drawerMode==='category' ? t('advancedSearch.category.title') :
                                         drawerMode==='services' ? t('advancedSearch.services.title') :
@@ -910,32 +935,33 @@ const SearchResultPage = () => {
                                         drawerMode==='distance' ? t('advancedSearch.distance.title') :
                                         drawerMode==='saleSubs' ? ((t('advancedSearch.subcategories')==='advancedSearch.subcategories' ? 'תת קטגוריות' : t('advancedSearch.subcategories'))) :
                                         t('advancedSearch.rating.title')
-                                    }</h2>
+                                    }</h1>
                                     <button
                                       className="fd-clear"
                                       onClick={() => {
-                                        if (drawerMode==='category') { setTempValues(v=>({ ...v, categoryName:'', services:[], saleCategoryId:'', saleSubcategoryId:'' })); setSelectedCategoryId(''); handleApplyMulti({ categoryName:'', services:[], saleCategoryId:'', saleSubcategoryId:'' }); return; }
-                                        if (drawerMode==='services') { setTempValues(v=>({ ...v, services:[] })); handleApplyMulti({ services:[] }); return; }
-                                        if (drawerMode==='city') { setTempValues(v=>({ ...v, city:'' })); handleApplyMulti({ city:'' }); return; }
-                                        if (drawerMode==='price') { setTempValues(v=>({ ...v, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE })); handleApplyMulti({ priceMin:'', priceMax:'' }); return; }
-                                        if (drawerMode==='distance') { setTempValues(v=>({ ...v, maxDistance:0 })); handleApplyMulti({ maxDistance:'' }); return; }
-                                        if (drawerMode==='rating') { setTempValues(v=>({ ...v, rating:0 })); handleApplyMulti({ rating:'' }); return; }
-                                        if (drawerMode==='saleSubs') { setTempValues(v=>({ ...v, saleSubcategoryId:'' })); handleApplyMulti({ saleSubcategoryId:'' }); return; }
+                                        // Clear current drawer values ONLY (לא סוגר חלון ולא שולח בקשה)
+                                        if (drawerMode==='category') { setTempValues(v=>({ ...v, categoryName:'', services:[], saleCategoryId:'', saleCategoryName:'', saleSubcategoryId:'', saleSubcategoryIds:[] })); setSelectedCategoryId(''); return; }
+                                        if (drawerMode==='services') { setTempValues(v=>({ ...v, services:[] })); return; }
+                                        if (drawerMode==='city') { setTempValues(v=>({ ...v, city:'', cityLat: undefined, cityLng: undefined })); return; }
+                                        if (drawerMode==='price') { setTempValues(v=>({ ...v, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE })); return; }
+                                        if (drawerMode==='distance') { setTempValues(v=>({ ...v, maxDistance:0 })); return; }
+                                        if (drawerMode==='rating') { setTempValues(v=>({ ...v, rating:0 })); return; }
+                                        if (drawerMode==='saleSubs') { setTempValues(v=>({ ...v, saleSubcategoryId:'', saleSubcategoryIds:[] })); return; }
                                         // all
-                                        setTempValues(v=>({ ...v, categoryName:'', services:[], city:'', priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE, maxDistance:0, rating:0, saleCategoryId:'', saleSubcategoryId:'' })); setSelectedCategoryId(''); handleApplyMulti({ categoryName:'', services:[], city:'', priceMin:'', priceMax:'', maxDistance:'', rating:'', saleCategoryId:'', saleSubcategoryId:'', openNow:'' });
+                                        setTempValues(v=>({ ...v, categoryName:'', services:[], city:'', cityLat: undefined, cityLng: undefined, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE, maxDistance:0, rating:0, saleCategoryId:'', saleCategoryName:'', saleSubcategoryId:'', saleSubcategoryIds:[] })); setSelectedCategoryId('');
                                       }}
                                     >{t('advancedSearch.buttons.clear')}</button>
                                 </div>
                                 <div className="fd-content" style={{ paddingBottom: compact ? 24 : 88 }}>
                                     {/* Category - tabs + lists */}
                                     {(drawerMode==='all' || drawerMode==='category') && (
-                                      <div className="fd-row">
+                                      <div className="fd-card"><div className="fd-row">
                                         {drawerMode==='all' ? <label>{t('advancedSearch.category.title')}</label> : null}
                                         <div className="segmented-control" role="tablist" aria-label="category source selector" style={{ marginBottom: 8 }}>
-                                          <button type="button" role="tab" aria-selected={categoryTab==='business'} className={`segment ${categoryTab==='business'?'active':''}`} onClick={()=>{ setCategoryTab('business'); setTempValues(v=>({ ...v, saleCategoryId:'', saleSubcategoryId:'' })); setSaleSubcategoriesSmall([]); }}>
+                                          <button type="button" role="tab" aria-selected={categoryTab==='business'} className={`segment ${categoryTab==='business'?'active':''}`} onClick={()=>{ setCategoryTab('business'); }}>
                                             {t('advancedSearch.categories.business')||'עסקים'}
                                           </button>
-                                          <button type="button" role="tab" aria-selected={categoryTab==='sale'} className={`segment ${categoryTab==='sale'?'active':''}`} onClick={()=>{ setCategoryTab('sale'); setTempValues(v=>({ ...v, categoryName:'', services:[], })); setSelectedCategoryId(''); setServices([]); }}>
+                                          <button type="button" role="tab" aria-selected={categoryTab==='sale'} className={`segment ${categoryTab==='sale'?'active':''}`} onClick={()=>{ setCategoryTab('sale'); }}>
                                             {t('advancedSearch.categories.sale')||'מכירה'}
                                           </button>
                                         </div>
@@ -951,33 +977,13 @@ const SearchResultPage = () => {
                                                     const isSame = tempValues.categoryName===c.name;
                                                     const nextName = isSame ? '' : c.name;
                                                     const nextId = isSame ? '' : c._id;
-                                                    setTempValues(v=>({ ...v, categoryName: nextName, services: [], saleCategoryId: '', saleSubcategoryId:'' }));
+                                                    setTempValues(v=>({ ...v, categoryName: nextName, services: [], saleCategoryId: '', saleCategoryName:'', saleSubcategoryId:'', saleSubcategoryIds:[] }));
                                                     setSelectedCategoryId(nextId);
                                                     await fetchServicesByCategoryId(nextId);
                                                   }}
                                                 >{c.name}</button>
                                               ))}
                                             </div>
-                                            {/* Inline services after selecting a business category */}
-                                            {tempValues.categoryName && services.length>0 && (
-                                              <div className="fd-row" style={{ marginTop: 8 }}>
-                                                <label>{t('advancedSearch.services.title')}</label>
-                                                <div className="tags-scroll">
-                                                  {services.map(s => (
-                                                    <label key={s._id} className={`tag-check ${tempValues.services.includes(s.name)?'selected':''}`}>
-                                                      <input type="checkbox" checked={tempValues.services.includes(s.name)} onChange={() => {
-                                                        setTempValues(v => {
-                                                          const exists = v.services.includes(s.name);
-                                                          const next = exists ? v.services.filter(x=>x!==s.name) : [...v.services, s.name];
-                                                          return { ...v, services: next };
-                                                        });
-                                                      }} />
-                                                      <span>{s.name}</span>
-                                                    </label>
-                                                  ))}
-                                                </div>
-                                              </div>
-                                            )}
                                           </>
                                         ) : (
                                           <>
@@ -991,7 +997,7 @@ const SearchResultPage = () => {
                                                     const isSame = tempValues.saleCategoryId===sc._id;
                                                     const nextId = isSame ? '' : sc._id;
                                                     const nextName = isSame ? '' : sc.name;
-                                                    setTempValues(v=>({ ...v, categoryName: nextName, saleCategoryId: nextId, saleSubcategoryId:'' }));
+                                                    setTempValues(v=>({ ...v, saleCategoryName: nextName, saleCategoryId: nextId, saleSubcategoryId:'', saleSubcategoryIds:[] }));
                                                     setSelectedCategoryId('');
                                                     setServices([]);
                                                     if (nextId) {
@@ -1006,69 +1012,53 @@ const SearchResultPage = () => {
                                                 >{sc.name}</button>
                                               ))}
                                             </div>
-                                            {/* Inline subcategories inside advanced drawer only */}
-                                            {tempValues.saleCategoryId && saleSubcategoriesSmall.length>0 && (
-                                              <>
-                                                <label style={{ display: 'block', marginTop: 8, marginBottom: 6 }}>{(t('advancedSearch.subcategories')==='advancedSearch.subcategories' ? 'תת קטגוריות' : t('advancedSearch.subcategories'))}</label>
-                                                <div className="tags-scroll">
-                                                  {saleSubcategoriesSmall.map(ssc => (
-                                                    <button
-                                                      key={`sale-sub-${ssc._id}`}
-                                                      type="button"
-                                                      className={`tag-chip ${tempValues.saleSubcategoryId===ssc._id ? 'selected' : ''}`}
-                                                      onClick={() => {
-                                                        const isSame = tempValues.saleSubcategoryId===ssc._id;
-                                                        setTempValues(v=>({ ...v, saleSubcategoryId: isSame ? '' : ssc._id }));
-                                                      }}
-                                                    >{ssc.name}</button>
-                                                  ))}
-                                                </div>
-                                              </>
-                                            )}
                                           </>
                                         )}
-                                      </div>
+                                      </div></div>
                                     )}
-
-                                    {/* Services */}
-                                    {(drawerMode==='all' || drawerMode==='services') && services.length>0 && categoryTab==='business' && (
-                                        <div className="fd-row">
-                                            {drawerMode==='all' ? <label>{t('advancedSearch.services.title')}</label> : null}
-                                            <div className="tags-scroll">
-                                                {services.map(s => (
-                                                    <label key={s._id} className={`tag-check ${tempValues.services.includes(s.name)?'selected':''}`}>
-                                                        <input type="checkbox" checked={tempValues.services.includes(s.name)} onChange={(e)=>{
-                                                            setTempValues(v=>{
-                                                                const exists = v.services.includes(s.name);
-                                                                const next = exists ? v.services.filter(x=>x!==s.name) : [...v.services, s.name];
-                                                                return { ...v, services: next };
-                                                            });
-                                                        }} />
-                                                        <span>{s.name}</span>
-                                                    </label>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Sale Subcategories - separate drawer */}
-                                    {drawerMode==='saleSubs' && (
-                                      <div className="fd-row">
+                                    {categoryTab==='sale' && Boolean(tempValues.saleCategoryId) && saleSubcategoriesSmall.length>0 && (
+                                      <div className="fd-card"><div className="fd-row">
                                         <label>{t('advancedSearch.subcategories') || 'תת קטגוריות'}</label>
                                         <div className="tags-scroll">
                                           {saleSubcategoriesSmall.map(ssc => (
                                             <button
                                               key={`sale-sub-${ssc._id}`}
                                               type="button"
-                                              className={`tag-chip ${tempValues.saleSubcategoryId===ssc._id ? 'selected' : ''}`}
+                                              className={`tag-chip ${Array.isArray(tempValues.saleSubcategoryIds) && tempValues.saleSubcategoryIds.includes(ssc._id)?'selected':''}`}
                                               onClick={() => {
-                                                const isSame = tempValues.saleSubcategoryId===ssc._id;
-                                                setTempValues(v=>({ ...v, saleSubcategoryId: isSame ? '' : ssc._id }));
+                                                setTempValues(v=>{
+                                                  const list = Array.isArray(v.saleSubcategoryIds) ? [...v.saleSubcategoryIds] : [];
+                                                  const idx = list.indexOf(ssc._id);
+                                                  if (idx>=0) { list.splice(idx,1); } else { list.push(ssc._id); }
+                                                  return { ...v, saleSubcategoryIds: list };
+                                                });
                                               }}
                                             >{ssc.name}</button>
                                           ))}
                                         </div>
-                                      </div>
+                                      </div></div>
+                                    )}
+                                    {/* Services */}
+                                    {(drawerMode==='all' || drawerMode==='services') && services.length>0 && categoryTab==='business' && (
+                                        <div className="fd-card"><div className="fd-row">
+                                            {drawerMode==='all' ? <label>{t('advancedSearch.services.title')}</label> : null}
+                                            <div className="tags-scroll">
+                                                {services.map(s => (
+                                                    <button
+                                                      key={s._id}
+                                                      type="button"
+                                                      className={`tag-chip ${tempValues.services.includes(s.name)?'selected':''}`}
+                                                      onClick={() => {
+                                                        setTempValues(v => {
+                                                          const exists = v.services.includes(s.name);
+                                                          const next = exists ? v.services.filter(x=>x!==s.name) : [...v.services, s.name];
+                                                          return { ...v, services: next };
+                                                        });
+                                                      }}
+                                                    >{s.name}</button>
+                                                ))}
+                                            </div>
+                                        </div></div>
                                     )}
 
                                     {/* Sort */}
@@ -1089,7 +1079,7 @@ const SearchResultPage = () => {
 
                                     {/* City */}
                                     {(drawerMode==='all' || drawerMode==='city') && (
-                                    <div className="fd-row">
+                                    <div className="fd-card"><div className="fd-row">
                                         {drawerMode==='all' ? <label>{t('advancedSearch.city')}</label> : null}
                                         {mapsLoaded ? (
                                             <Autocomplete
@@ -1110,83 +1100,76 @@ const SearchResultPage = () => {
                                         ) : (
                                             <input className="mini-input full" type="text" value={tempValues.city} onChange={(e)=>setTempValues(v=>({...v, city:e.target.value}))} />
                                         )}
-                                    </div>
+                                    </div></div>
                                     )}
 
-                                    {/* Price */}
                                     {(drawerMode==='all' || drawerMode==='price') && (
-                                      <div className="fd-row two">
-                                        <div>
-                                          {drawerMode==='all' ? <label>{t('advancedSearch.min')}</label> : null}
-                                          <input className="mini-input full" type="number" min="0" placeholder={t('advancedSearch.min')} value={tempValues.priceMin} onChange={(e)=>setTempValues(v=>({...v, priceMin:e.target.value}))} />
-                                        </div>
-                                        <div>
-                                          {drawerMode==='all' ? <label>{t('advancedSearch.max')}</label> : null}
-                                          <input className="mini-input full" type="number" min="0" placeholder={t('advancedSearch.max')} value={tempValues.priceMax} onChange={(e)=>setTempValues(v=>({...v, priceMax:e.target.value}))} />
+                                      <div className="fd-card">
+                                        <div className="fd-row"><label>{t('advancedSearch.priceRange') || 'מחיר'}</label></div>
+                                        <div className="fd-row two">
+                                          <div>
+                                            <label>{t('advancedSearch.min')}</label>
+                                            <input className="mini-input full" type="number" min="0" placeholder={t('advancedSearch.min')} value={tempValues.priceMin} onChange={(e)=>setTempValues(v=>({...v, priceMin:e.target.value}))} />
+                                          </div>
+                                          <div>
+                                            <label>{t('advancedSearch.max')}</label>
+                                            <input className="mini-input full" type="number" min="0" placeholder={t('advancedSearch.max')} value={tempValues.priceMax} onChange={(e)=>setTempValues(v=>({...v, priceMax:e.target.value}))} />
+                                          </div>
                                         </div>
                                       </div>
                                     )}
 
                                     {/* Distance */}
                                     {(drawerMode==='all' || drawerMode==='distance') && (
-                                    <div className="fd-row">
+                                    <div className="fd-card"><div className="fd-row">
                                         {drawerMode==='all' ? <label>{t('advancedSearch.distance.title')}</label> : null}
                                         <input className="mini-range full" type="range" min="0" max="100" step="1" value={tempValues.maxDistance} onChange={(e)=>setTempValues(v=>({...v, maxDistance:Number(e.target.value)}))} />
                                         <div className="range-value">{tempValues.maxDistance} {t('advancedSearch.distance.km')}</div>
-                                    </div>
+                                    </div></div>
                                     )}
 
                                     {/* Open now - show only in all mode to avoid confusion; quick toggle chip handles single */}
                                     {drawerMode==='all' && (
-                                    <div className="fd-row">
+                                    <div className="fd-card"><div className="fd-row">
                                         <label className="inline">
                                             <input type="checkbox" checked={new URLSearchParams(location.search).has('openNow')} onChange={toggleOpenNow} /> {t('advancedSearch.openNow')}
                                         </label>
-                                    </div>
+                                    </div></div>
                                     )}
 
                                     {/* Rating */}
                                     {(drawerMode==='all' || drawerMode==='rating') && (
-                                    <div className="fd-row">
+                                    <div className="fd-card"><div className="fd-row">
                                         {drawerMode==='all' ? <label>{t('advancedSearch.rating.title')}</label> : null}
                                         <div className="stars-inline">
                                             {[1,2,3,4,5].map(st => (
                                                 <FaStar key={st} className={`rating-star ${tempValues.rating>=st?'active':''}`} onClick={()=>setTempValues(v=>({...v, rating: v.rating===st?0:st}))} />
                                             ))}
                                         </div>
-                                    </div>
+                                    </div></div>
                                     )}
                                 </div>
                                 <div className="fd-footer">
                                     <button className="submit-button" onClick={() => {
-                                        if (drawerMode==='category') { handleApplyMulti({ categoryName: tempValues.categoryName, services: (categoryTab==='business' ? tempValues.services : []), saleCategoryId: tempValues.saleCategoryId || '', saleSubcategoryId: tempValues.saleSubcategoryId || '' }); return; }
-                                        if (drawerMode==='services') { handleApplyMulti({ services: tempValues.services }); return; }
-                                        if (drawerMode==='saleSubs') { handleApplyMulti({ saleSubcategoryId: tempValues.saleSubcategoryId || '' }); return; }
-                                        if (drawerMode==='city') {
-                                            const updates = { city: tempValues.city };
-                                            if (tempValues.cityLat !== undefined && tempValues.cityLng !== undefined) {
-                                                updates.lat = tempValues.cityLat;
-                                                updates.lng = tempValues.cityLng;
-                                                if (!new URLSearchParams(location.search).get('maxDistance')) updates.maxDistance = tempValues.maxDistance || '10';
-                                            }
-                                            handleApplyMulti(updates);
-                                            return;
+                                        if (drawerMode==='category') { 
+                                          const isBiz = (categoryTab==='business');
+                                          const payload = {
+                                            categoryName: isBiz ? (tempValues.categoryName || '') : '',
+                                            services: isBiz ? (tempValues.services||[]) : [],
+                                            saleCategoryId: !isBiz ? (tempValues.saleCategoryId || '') : '',
+                                            saleSubcategoryId: !isBiz ? (Array.isArray(tempValues.saleSubcategoryIds)? tempValues.saleSubcategoryIds : (tempValues.saleSubcategoryId? [tempValues.saleSubcategoryId] : [])) : ''
+                                          };
+                                          handleApplyMulti(payload); 
+                                          return; 
                                         }
+                                        if (drawerMode==='services') { handleApplyMulti({ services: tempValues.services }); return; }
+                                        if (drawerMode==='saleSubs') { handleApplyMulti({ saleSubcategoryId: Array.isArray(tempValues.saleSubcategoryIds)? tempValues.saleSubcategoryIds : (tempValues.saleSubcategoryId? [tempValues.saleSubcategoryId] : []) }); return; }
+                                        if (drawerMode==='city') { const updates = { city: tempValues.city }; if (tempValues.cityLat!==undefined && tempValues.cityLng!==undefined) { updates.lat = tempValues.cityLat; updates.lng = tempValues.cityLng; if (!new URLSearchParams(location.search).get('maxDistance')) updates.maxDistance = tempValues.maxDistance || '10'; } handleApplyMulti(updates); return; }
                                         if (drawerMode==='price') { handleApplyMulti({ priceMin: tempValues.priceMin || '', priceMax: tempValues.priceMax || '' }); return; }
                                         if (drawerMode==='distance') { handleApplyMulti({ maxDistance: tempValues.maxDistance || '' }); return; }
                                         if (drawerMode==='rating') { handleApplyMulti({ rating: tempValues.rating || '' }); return; }
                                         if (drawerMode==='sort') { handleApplyMulti({ sort: tempSort==='rating' ? 'rating' : tempSort }); return; }
-                                        handleApplyMulti({
-                                            categoryName: tempValues.categoryName,
-                                            services: tempValues.services,
-                                            city: tempValues.city,
-                                            priceMin: tempValues.priceMinN>0 ? String(tempValues.priceMinN) : '',
-                                            priceMax: tempValues.priceMaxN<MAX_PRICE ? String(tempValues.priceMaxN) : '',
-                                            maxDistance: tempValues.maxDistance || '',
-                                            rating: tempValues.rating || '',
-                                            lat: (tempValues.cityLat !== undefined ? tempValues.cityLat : undefined),
-                                            lng: (tempValues.cityLng !== undefined ? tempValues.cityLng : undefined)
-                                        });
+                                        handleApplyMulti({ categoryName: tempValues.categoryName, services: tempValues.services, city: tempValues.city, priceMin: tempValues.priceMinN>0 ? String(tempValues.priceMinN) : '', priceMax: tempValues.priceMaxN<MAX_PRICE ? String(tempValues.priceMaxN) : '', maxDistance: tempValues.maxDistance || '', rating: tempValues.rating || '', lat: (tempValues.cityLat !== undefined ? tempValues.cityLat : undefined), lng: (tempValues.cityLng !== undefined ? tempValues.cityLng : undefined) });
                                     }}>{t('advancedSearch.buttons.apply')}</button>
                                 </div>
                             </div>
@@ -1202,50 +1185,7 @@ const SearchResultPage = () => {
                     <div style={{ color: 'red', margin: '1rem 0', textAlign: 'center' }}>{locationError}</div>
                 )}
 
-                {/* Active filters block - show only when there are filters */}
-                {(() => {
-                    const params = new URLSearchParams(location.search);
-                    const hasAny = ['categoryName','services','rating','maxDistance','priceMin','priceMax','city','openNow','verifiedOnly','reviewsOnly','addedWithin']
-                      .some(k => params.has(k));
-                    if (!hasAny) return null;
-                    const chips = [];
-                    const withColon = (txt) => (txt && /:\s*$/.test(txt) ? txt : `${txt}:`);
-                    if (params.get('categoryName')) chips.push({ key: 'categoryName', value: params.get('categoryName'), label: withColon(t('searchResults.filterTags.category')) });
-                    if (params.get('saleSubcategoryId')) {
-                      const subId = params.get('saleSubcategoryId');
-                      const byMap = saleSubMap[subId];
-                      const bySmall = (saleSubcategoriesSmall.find(s => String(s._id) === String(subId)) || {}).name;
-                      const name = byMap || bySmall || '';
-                      chips.push({ key: 'saleSubcategoryId', value: name, label: withColon(t('advancedSearch.subcategory')||'תת קטגוריה') });
-                    }
-                    (params.getAll('services')||[]).forEach(v=>chips.push({ key: 'services', value: v, label: withColon(t('searchResults.filterTags.service')) }));
-                    if (params.get('rating')) chips.push({ key: 'rating', value: params.get('rating'), label: withColon(t('searchResults.filterTags.rating')) });
-                    if (params.get('maxDistance')) chips.push({ key: 'maxDistance', value: `${params.get('maxDistance')} ${t('searchResults.filterTags.km')}`, rawValue: params.get('maxDistance'), label: withColon(t('searchResults.filterTags.maxDistance')) });
-                    if (params.get('priceMin')) chips.push({ key: 'priceMin', value: params.get('priceMin'), label: withColon(t('advancedSearch.min')||'Min') });
-                    if (params.get('priceMax')) chips.push({ key: 'priceMax', value: params.get('priceMax'), label: withColon(t('advancedSearch.max')||'Max') });
-                    if (params.get('city')) chips.push({ key: 'city', value: params.get('city'), label: withColon(t('advancedSearch.city')||'City') });
-                    if (params.get('openNow')) chips.push({ key: 'openNow', value: '', label: `${t('advancedSearch.openNow')||'Open Now'}` });
-                    if (params.get('addedWithin')) chips.push({ key: 'addedWithin', value: params.get('addedWithin'), label: withColon(t('advancedSearch.addedWithin')||'Added') });
-                    return (
-                      <>
-                      <div className="filters-area">
-                        <div className="filters-header">
-                          <div className="filters-title">{t('searchResults.filters.active')}</div>
-                          <button className="clear-all-filters" onClick={handleClearFilters}>{t('searchResults.filters.clearAll')}</button>
-                        </div>
-                        <div className="active-filters-container">
-                          {chips.map((chip, idx)=> (
-                            <div key={`${chip.key}-${idx}`} className="filter-tag">
-                              <span>{chip.label} {chip.value}</span>
-                              <button onClick={() => handleRemoveFilter(chip.key, chip.key==='services' ? chip.value : undefined)} aria-label="remove filter">×</button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      </>
-                    );
-                })()}
+                {/* Active filters chips removed in favor of showing values inside filter buttons */}
 
                 {/* View mode switcher - always visible under filters */}
                 {activeTab==='promo' && (
