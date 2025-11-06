@@ -1,0 +1,37 @@
+{
+  "name": "זזמן",
+  "short_name": "זזמן",
+  "description": "מדריך עסקים מהיר עם חוויית אפליקציה",
+  "lang": "he",
+  "dir": "rtl",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "categories": ["business", "directory", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/clock-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/clock-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/clock-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
+
+

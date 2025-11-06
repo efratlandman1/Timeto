@@ -5,7 +5,7 @@ import {
     FaSignOutAlt, 
     FaSignInAlt, 
     FaGlobe, 
-    FaPlusCircle,
+    FaArrowAltCircleDown,
     FaPlus,
     FaTags,
     FaBullhorn,
@@ -64,6 +64,10 @@ const Header = () => {
     const mobileMenuRef = useRef(null);
     const mobileMenuBtnRef = useRef(null);
     const [mobileCreateOpen, setMobileCreateOpen] = useState(false);
+    // PWA install prompt handling
+    const deferredPromptRef = useRef(null);
+    const [canInstall, setCanInstall] = useState(false);
+    const [installing, setInstalling] = useState(false);
     
     // Get language and direction from Redux with fallback values
     const uiState = useSelector(state => state.ui);
@@ -431,6 +435,54 @@ const Header = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [showPopover]);
 
+    // Detect standalone display mode
+    const isStandalone = () => {
+        const mql = window.matchMedia('(display-mode: standalone)');
+        return mql.matches || window.navigator.standalone === true;
+    };
+
+    // Handle install events; also support global early event stored in window
+    useEffect(() => {
+        // On mount, if global deferred exists (fired before React), use it
+        if (window.__deferredPWAInstallPrompt && !isStandalone()) {
+            deferredPromptRef.current = window.__deferredPWAInstallPrompt;
+            setCanInstall(true);
+        }
+
+        const handleGlobalBefore = () => {
+            if (window.__deferredPWAInstallPrompt && !isStandalone()) {
+                deferredPromptRef.current = window.__deferredPWAInstallPrompt;
+                setCanInstall(true);
+            }
+        };
+        const handleGlobalInstalled = () => {
+            setCanInstall(false);
+            deferredPromptRef.current = null;
+        };
+        window.addEventListener('pwa-beforeinstallprompt', handleGlobalBefore);
+        window.addEventListener('pwa-appinstalled', handleGlobalInstalled);
+        return () => {
+            window.removeEventListener('pwa-beforeinstallprompt', handleGlobalBefore);
+            window.removeEventListener('pwa-appinstalled', handleGlobalInstalled);
+        };
+    }, []);
+
+    const handleInstallClick = async () => {
+        const promptEvent = deferredPromptRef.current || window.__deferredPWAInstallPrompt;
+        if (!promptEvent) return;
+        setInstalling(true);
+        try {
+            promptEvent.prompt();
+            const { outcome } = await promptEvent.userChoice;
+            if (outcome === 'accepted') {
+                setCanInstall(false);
+            }
+        } finally {
+            setInstalling(false);
+            deferredPromptRef.current = null;
+        }
+    };
+
     const formatAddress = (address) => address || '';
 
     // Safety check: don't render until Redux and i18n are ready
@@ -582,6 +634,19 @@ const Header = () => {
                 </div>
 
                 <div className={navLeftClass}>
+                    {canInstall && (
+                        <button
+                            className="nav-button with-hover"
+                            onClick={handleInstallClick}
+                            type="button"
+                            aria-label={t('header.install')}
+                            title={t('header.install')}
+                            disabled={installing}
+                        >
+                            <FaArrowAltCircleDown />
+                        </button>
+                    )}
+
                     <div className={langSwitchClass}>
                         <button
                             className={`lang-toggle-pill ${direction}`}

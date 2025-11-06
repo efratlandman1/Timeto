@@ -29,7 +29,9 @@
     "addressNotFound": "Address not found",
     "addressError": "Error loading address",
     "noLocation": "No location found",
-    "refreshLocation": "Refresh Location"
+    "refreshLocation": "Refresh Location",
+    "install": "Install App",
+    "installed": "App installed"
   },
   "greetings": {
     "morning": "Good Morning",

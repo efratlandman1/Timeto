@@ -85,8 +85,32 @@
     flex: 0 0 auto;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.2rem;
 }
+
+/* PWA Install button - circular ghost icon */
+.install-button {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid #e5e5e5;
+    background: #ffffff;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+}
+.install-button:hover,
+.install-button:focus {
+    background: #f7f7f7;
+    border-color: #dddddd;
+    color: #e53935;
+}
+.install-button:active { transform: scale(0.98); }
+.install-button[disabled] { opacity: 0.6; cursor: not-allowed; }
+.install-button svg { font-size: 18px; color: currentColor; }
 
 /* Logo styling */
 .logo {
@@ -479,7 +503,7 @@
 
 /* Language Switch Styles - New Beautiful Design */
 .lang-switch {
-    margin: 0 0.5rem;
+    margin: 0 0.25rem;
     display: flex;
     align-items: center;
     position: relative;
@@ -656,9 +680,9 @@
         max-width: 1400px;
     }
     
-    .nav-left, .nav-right {
+    /* .nav-left, .nav-right {
         gap: 1rem;
-    }
+    } */
     
     .logo-text-main {
         font-size: 1.3rem;
@@ -688,9 +712,9 @@
         max-width: 1600px;
     }
     
-    .nav-left, .nav-right {
+    /* .nav-left, .nav-right {
         gap: 1.25rem;
-    }
+    } */
     
     .logo-text-main {
         font-size: 1.4rem;
@@ -738,9 +762,9 @@
         padding: 0.25rem 0.75rem;
     }
     
-    .nav-left, .nav-right {
+    /* .nav-left, .nav-right {
         gap: 0.6rem;
-    }
+    } */
     
     .logo-text-main {
         font-size: 1.05rem;
@@ -807,10 +831,10 @@
         padding: 0.25rem 0.5rem;
     }
     
-    .nav-left, .nav-right {
+    /* .nav-left, .nav-right {
         gap: 0.5rem;
     }
-    
+     */
     .logo-text-main {
         font-size: 1rem;
     }
@@ -862,10 +886,10 @@
         padding: 0.25rem 0.25rem;
     }
     
-    .nav-left, .nav-right {
+    /* .nav-left, .nav-right {
         gap: 0.25rem;
     }
-    
+     */
     .logo-text-main {
         font-size: 0.9rem;
     }
@@ -969,10 +993,10 @@ body.no-scroll {
         padding: 0.25rem 0.1rem;
     }
     
-    .nav-left, .nav-right {
+    /* .nav-left, .nav-right {
         gap: 0.2rem;
     }
-    
+     */
     .logo-text-main {
         font-size: 0.8rem;
     }

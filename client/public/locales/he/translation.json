@@ -29,7 +29,9 @@
     "addressNotFound": "לא נמצאה כתובת",
     "addressError": "שגיאה בשליפת כתובת",
     "noLocation": "לא נמצא מיקום",
-    "refreshLocation": "רענן מיקום"
+    "refreshLocation": "רענן מיקום",
+    "install": "התקן אפליקציה",
+    "installed": "האפליקציה הותקנה"
   },
   "greetings": {
     "morning": "בוקר טוב",
