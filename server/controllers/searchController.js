@@ -112,12 +112,44 @@ exports.getAllUnified = async (req, res) => {
     // the batch will drop and lead to too few results and inconsistent totals across sort modes.
     const batchMultiplier = requireOpenNow ? 10 : 3;
     const batchSize = Math.min(200, limitNum * batchMultiplier);
-    const [bizRaw, salesRaw, promosRaw] = await Promise.all([
-      // Avoid pre-sorting by name here to prevent bias before openNow filtering; final sort applied later
-      Business.find(businessQuery).sort({ updatedAt: -1, createdAt: -1 }).limit(batchSize).lean(),
-      SaleAd.find(saleQuery).sort({ createdAt: -1 }).limit(batchSize).lean(),
-      PromoAd.find(promoQuery).sort({ createdAt: -1 }).limit(batchSize).lean()
-    ]);
+    let bizRaw = [];
+    let salesRaw = [];
+    let promosRaw = [];
+    const hasLatLng = lat && lng;
+    if (hasLatLng) {
+      const latN = parseFloat(lat);
+      const lngN = parseFloat(lng);
+      const nearPoint = { type: 'Point', coordinates: [lngN, latN] };
+      // Distance-first prefetch to avoid missing nearby items due to createdAt ordering
+      const [bizAgg, saleAgg, promoAgg] = await Promise.all([
+        Business.aggregate([
+          { $geoNear: { near: nearPoint, distanceField: 'distance', spherical: true, query: businessQuery } },
+          { $limit: batchSize }
+        ]),
+        SaleAd.aggregate([
+          { $geoNear: { near: nearPoint, distanceField: 'distance', spherical: true, query: saleQuery } },
+          { $limit: batchSize }
+        ]),
+        PromoAd.aggregate([
+          { $geoNear: { near: nearPoint, distanceField: 'distance', spherical: true, query: promoQuery } },
+          { $limit: batchSize }
+        ])
+      ]);
+      bizRaw = bizAgg;
+      salesRaw = saleAgg;
+      promosRaw = promoAgg;
+    } else {
+      // Choose prefetch sort according to requested sort when no geo is present
+      let businessPrefetchSort = { updatedAt: -1, createdAt: -1 };
+      if (sort === 'rating') businessPrefetchSort = { rating: -1, updatedAt: -1 };
+      if (sort === 'name') businessPrefetchSort = { name: 1 };
+
+      [bizRaw, salesRaw, promosRaw] = await Promise.all([
+        Business.find(businessQuery).sort(businessPrefetchSort).limit(batchSize).lean(),
+        SaleAd.find(saleQuery).sort({ createdAt: -1 }).limit(batchSize).lean(),
+        PromoAd.find(promoQuery).sort({ createdAt: -1 }).limit(batchSize).lean()
+      ]);
+    }
 
     // Apply openNow filtering
     const isBusinessOpenNow = (b) => {
