@@ -45,6 +45,7 @@
     white-space: nowrap;
     font-size: inherit; /* respects global text size (accessibility) */
     line-height: 1.4;
+    font-family: var(--font-family-base);
 }
 /* Mobile: horizontal scrollable tabs */
 @media (max-width: 768px) {

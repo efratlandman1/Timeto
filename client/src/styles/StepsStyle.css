@@ -10,7 +10,7 @@
   min-height: 400px;
   overflow-y: auto;
   direction: rtl;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font-family-base);
 }
 
 .step-title {

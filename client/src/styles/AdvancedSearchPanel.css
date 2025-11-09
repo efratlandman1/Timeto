@@ -6,6 +6,7 @@
   padding: 0;
   height: fit-content;
   direction: rtl;
+  font-family: var(--font-family-base);
 }
 
 /* Mobile Styles */
@@ -36,6 +37,7 @@
   justify-content: space-between;
   align-items: center;
   background: white;
+  font-family: var(--font-family-base);
 }
 
 .panel-header h2 {
@@ -68,6 +70,7 @@
 /* Panel Content */
 .panel-content {
   padding: 16px;
+  font-family: var(--font-family-base);
 }
 
 /* Filter Sections */
@@ -125,6 +128,7 @@
   background-position: left 12px center;
   padding-left: 32px;
   direction: rtl;
+  font-family: var(--font-family-base);
 }
 
 .sort-select:focus {
@@ -272,6 +276,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: var(--font-family-base);
 }
 
 .apply-filters-button:hover {

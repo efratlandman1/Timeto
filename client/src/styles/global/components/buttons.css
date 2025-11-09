@@ -12,6 +12,7 @@
     font-size: 0.9rem;
     font-weight: 400;
     transition: all 0.2s ease;
+    font-family: var(--font-family-base);
 }
 
 .nav-button:hover {
@@ -91,6 +92,7 @@
     font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    font-family: var(--font-family-base);
 }
 .btn.primary { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
 .btn.primary:hover { filter: brightness(0.95); }

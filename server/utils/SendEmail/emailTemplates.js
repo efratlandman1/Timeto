@@ -2,10 +2,10 @@
 
 function baseTemplate({ title, message, buttonText, buttonLink }) {
   return `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; padding: 30px; direction: rtl; text-align: right;">
+    <div style="font-family: 'Makabiyg','Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background-color: #f4f4f4; padding: 30px; direction: rtl; text-align: right;">
       <div style="max-width: 600px; margin: auto; background: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
         <h2 style="color: #d32f2f; font-size: 24px; margin-bottom: 20px;">${title}</h2>
-        <p style="font-size: 16px; color: #444; line-height: 1.6;">${message}</p>
+        <p style="font-size: 16px; color: #444; line-height: 1.6; font-family: 'Makabiyg','Segoe UI',Tahoma,Geneva,Verdana,sans-serif;">${message}</p>
         <a href="${buttonLink}" style="
           display: inline-block;
           margin-top: 30px;

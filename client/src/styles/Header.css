@@ -167,6 +167,23 @@
 /* remove subline */
 
 /* Navigation buttons */
+.header-container,
+.navbar,
+.nav-button,
+.auth-button,
+.dropdown-item,
+.mobile-menu,
+.mobile-menu-item,
+.lang-toggle-btn,
+.lang-menu,
+.lang-menu-item,
+.styled-location-btn,
+.refresh-popover-btn,
+.logo-text,
+.logo-text-main {
+    font-family: var(--font-family-base);
+}
+
 .nav-links {
     display: flex;
     align-items: center;

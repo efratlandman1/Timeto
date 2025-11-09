@@ -25,7 +25,9 @@
     --line-height-relaxed: 1.75;
 
     /* Font Families */
-    --font-family-base: -apple-system, BlinkMacSystemFont, "Roboto","Segoe UI","Arimo","Open Sans",sans-serif;
+    /* --font-family-base: "Makabiyg", -apple-system, BlinkMacSystemFont, "Roboto","Segoe UI","Arimo","Open Sans",sans-serif; */
+    /* --font-family-base: "GanCLM", -apple-system, BlinkMacSystemFont, "Roboto","Segoe UI","Arimo","Open Sans",sans-serif; */
+    --font-family-base: "MPLUSRounded1c", -apple-system, BlinkMacSystemFont, "Roboto","Segoe UI","Arimo","Open Sans",sans-serif;
 }
 
 /* Base Typography Styles */
