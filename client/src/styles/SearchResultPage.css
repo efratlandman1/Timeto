@@ -34,7 +34,11 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 20px;
+    padding: 0 0.75rem;
 }
+
+/* Ensure content is not hidden behind bottom nav on small screens */
+.search-results-page { padding-bottom: 80px; }
 
 @media (max-width: 1023px) {
     .business-cards-grid {

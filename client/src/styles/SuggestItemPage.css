@@ -218,8 +218,8 @@
   max-height: 90vh;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  overflow: auto;
-  padding-bottom: 1rem; /* space after last element */
+  overflow: auto; /* allow scrolling when content exceeds height */
+  padding-bottom: 1rem;
 }
 
 /* Ensure all corners render rounded in all directions */
@@ -245,7 +245,12 @@
 }
 
 /* Add inner scroll wrapper to avoid content touching rounded corners */
-.modal-body-scroll { padding: 0 1rem 1rem; }
+.modal-body-scroll { 
+  padding: 0 1rem 1rem; 
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(90vh - 64px); /* header ~64px */
+}
 
 .modal-header h1 { font-size: 1.35rem; margin: 0; font-weight: 700; width: 100%; text-align: end; }
 
@@ -263,8 +268,20 @@
   display: block;
   margin: 0 auto 0.5rem auto;
   font-size: 1.6rem; /* larger title for advanced search too */
+  max-width: 300px; /* align with Google button width in auth */
+  width: 100%;
 }
 .modal-subtitle { margin: 0; color: #555; }
+
+.suggest-modal .button-row {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding: 0.75rem 1rem;
+  margin-inline: 0;
+  border-top: 1px solid #eee;
+  z-index: 3;
+}
 
 .modal-close {
   background: none;

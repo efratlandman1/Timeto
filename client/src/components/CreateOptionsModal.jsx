@@ -11,6 +11,16 @@ const CreateOptionsModal = ({ isOpen, onClose }) => {
   const location = useLocation();
   const user = useSelector(state => state.user.user);
 
+  // Prevent background scroll while modal open (must not be conditional)
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('no-scroll');
+    } else {
+      document.body.classList.remove('no-scroll');
+    }
+    return () => document.body.classList.remove('no-scroll');
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleOptionClick = (path) => {

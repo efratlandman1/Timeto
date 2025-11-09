@@ -45,7 +45,17 @@ const SearchResultPage = () => {
     const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
     const [drawerMode, setDrawerMode] = useState('all'); // 'all' | 'category' | 'services' | 'city' | 'price' | 'distance' | 'rating'
     const contentRef = useRef(null);
-    const [containerRect, setContainerRect] = useState({ left: 0, width: 0 });
+  const [containerRect, setContainerRect] = useState({ left: 0, width: 0 });
+
+  // Lock body scroll when filters drawer is open (must not be after early returns)
+  useEffect(() => {
+      if (showFiltersDrawer) {
+          document.body.classList.add('no-scroll');
+      } else {
+          document.body.classList.remove('no-scroll');
+      }
+      return () => document.body.classList.remove('no-scroll');
+  }, [showFiltersDrawer]);
 
     // Data for standalone popovers/drawer
     const [categories, setCategories] = useState([]);

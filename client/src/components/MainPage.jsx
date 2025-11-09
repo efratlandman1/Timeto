@@ -188,6 +188,15 @@ const MainPage = () => {
         return { value: floored, plus: floored < value };
     };
 
+    const formatWithCommas = (num) => {
+        if (num === '' || num === null || num === undefined) return '';
+        try {
+            return Number(num).toLocaleString('en-US'); // 1,000 style separators
+        } catch {
+            return String(num);
+        }
+    };
+
     const handleFilterChange = (categoryName) => {
         navigate(`/search-results?categoryName=${categoryName}`);
     };
@@ -220,8 +229,7 @@ const MainPage = () => {
                             <div className="top-join-inner">
                                 <h2>{t('mainPage.joinBanner.title')}</h2>
                                 <div className="top-join-accent" aria-hidden="true"></div>
-                                <p>{t('mainPage.footer.aboutDescriptionLine1')}</p>
-                                <p>{t('mainPage.footer.aboutDescriptionLine2')}</p>
+                                <p className="top-join-subtitle">{t('mainPage.heroPitch')}</p>
                             </div>
                         </div>
 
@@ -244,7 +252,7 @@ const MainPage = () => {
                                         <div className="stat-number">
                                             {stats.users !== null && (() => {
                                                 const f = formatStat(stats.users);
-                                                return <>{f.plus && '+ '}{f.value}</>;
+                                                return <>{f.plus && '+ '}{formatWithCommas(f.value)}</>;
                                             })()}
                                         </div>
                                         <div className="stat-label">{t('mainPage.stats.newUsers')}</div>
@@ -256,7 +264,7 @@ const MainPage = () => {
                                     </div>
                                     <div className="stat-content">
                                         <div className="stat-number">
-                                            {!isPromoLoading && (() => { const f = formatStat(newPromoAds.length || 0); return <>+ {f.value}</>; })()}
+                                            {!isPromoLoading && (() => { const f = formatStat(newPromoAds.length || 0); return <>+ {formatWithCommas(f.value)}</>; })()}
                                         </div>
                                         <div className="stat-label">פרסומים חדשים</div>
                                     </div>
@@ -269,7 +277,7 @@ const MainPage = () => {
                                         <div className="stat-number">
                                             {stats.businesses !== null && (() => {
                                                 const f = formatStat(stats.businesses);
-                                                return <>{f.plus && '+ '}{f.value}</>;
+                                                return <>{f.plus && '+ '}{formatWithCommas(f.value)}</>;
                                             })()}
                                         </div>
                                         <div className="stat-label">{t('mainPage.stats.registeredBusinesses')}</div>

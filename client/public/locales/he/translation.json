@@ -69,6 +69,7 @@
       "title": "מצא את העסק המושלם",
       "subtitle": "בקרבתך ובכל הארץ"
     },
+    "heroPitch": "מחפשים? מוכרים? מפרסמים? כאן המקום שבו הכול נפגש",
     "joinNowAndDiscover": "הצטרפו עכשיו והתחילו לגלות דברים מעניינים סביבכם",
     "stats": {
       "newUsers": "משתמשים חדשים",
@@ -103,8 +104,8 @@
       "termsOfService": "תנאי שימוש",
       "termsComingSoon": "תנאי השימוש יהיו זמינים בקרוב",
       "about": "זזמן",
-      "aboutDescriptionLine1": "הקהילה שמחברת בין אנשים לעסקים",
-      "aboutDescriptionLine2": "מצאו עסקים, מודעות מכירה, פרסום והטבות חמות במקום אחד",
+      "aboutDescriptionLine1": "",
+      "aboutDescriptionLine2": "",
       "copyright": "© Zezman 2025 כל הזכויות שמורות."
     }
   },
@@ -146,7 +147,7 @@
   "auth": {
     "login": {
       "title": "התחברות",
-      "simpleLoginWithEmail": "התחברות פשוטה עם כתובת המייל שלכם",
+      "simpleLoginWithEmail": "או",
       "email": "אימייל",
       "emailAddress": "כתובת מייל",
       "password": "סיסמה",
@@ -270,9 +271,9 @@
     "nextImage": "תמונה הבאה"
   },
   "quickCreate": {
-    "business": { "title": "כרטיס עסק", "desc": "פתח כרטיס עסק חדש עם פרטים ושעות" },
-    "sale": { "title": "מודעת מכירה", "desc": "פרסם מוצר יד שנייה במהירות" },
-    "promo": { "title": "מודעת פרסום", "desc": "פרסם ארוע בעל תוקף" }
+    "business": { "title": "כרטיס עסק", "desc": "תן לעסק שלך במה" },
+    "sale": { "title": "מודעת מכירה", "desc": "מוכרים? זה המקום שלך" },
+    "promo": { "title": "מודעת פרסום", "desc": "תן לפרסום שלך לדבר" }
   },
   "saleAd": {
     "pageTitleNew": "הוספת מודעת מכירה",

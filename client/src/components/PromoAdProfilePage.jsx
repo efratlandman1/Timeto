@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getToken } from '../utils/auth';
-import { FaMapMarkerAlt, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaTimes } from 'react-icons/fa';
 import '../styles/BusinessProfilePage.css';
 import '../styles/SuggestItemPage.css';
 
@@ -33,6 +33,11 @@ const PromoAdProfilePage = () => {
     fetchAd();
   }, [id]);
 
+  useEffect(() => {
+    document.body.classList.add('no-scroll');
+    return () => document.body.classList.remove('no-scroll');
+  }, []);
+
   return (
     <div className="modal-overlay-fixed" onClick={() => navigate(-1)}>
       <div className="modal-container suggest-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="promo-modal-title">
@@ -45,16 +50,18 @@ const PromoAdProfilePage = () => {
         ) : error || !ad ? (
           <div className="text-center text-red-600 py-8">{error || 'Not found'}</div>
         ) : (
-          <div className="rounded overflow-hidden border" style={{ width: '100%', height: 360, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa' }}>
-            {ad.image ? (
-              <img
-                src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${ad.image}`}
-                alt={ad.title}
-                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-100">אין תמונה</div>
-            )}
+          <div className="modal-body-scroll">
+            <div className="rounded overflow-hidden border" style={{ width: '100%', height: 360, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa' }}>
+              {ad.image ? (
+                <img
+                  src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${ad.image}`}
+                  alt={ad.title}
+                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gray-100">אין תמונה</div>
+              )}
+            </div>
           </div>
         )}
       </div>

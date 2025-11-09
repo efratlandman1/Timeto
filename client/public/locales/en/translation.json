@@ -70,6 +70,7 @@
       "title": "Find the Perfect Business",
       "subtitle": "Near you and across the country"
     },
+    "heroPitch": "Looking? Selling? Promoting? This is where it all connects",
     "stats": {
       "newUsers": "New Users",
       "verifiedReviews": "Verified Reviews",
@@ -102,8 +103,8 @@
       "termsOfService": "Terms of Service",
       "termsComingSoon": "Terms of service will be available soon",
         "about": "About Zezman",
-      "aboutDescriptionLine1": "The community that connects people and businesses",
-      "aboutDescriptionLine2": "Discover businesses, sale ads and hot promos — in one place.",
+      "aboutDescriptionLine1": "",
+      "aboutDescriptionLine2": "",
       "copyright": "© Zezman 2023 All rights reserved."
     }
   },
@@ -145,7 +146,7 @@
   "auth": {
     "login": {
       "title": "Login",
-      "simpleLoginWithEmail": "Simple login with your email address",
+      "simpleLoginWithEmail": "or",
       "email": "Email",
       "emailAddress": "Email Address",
       "password": "Password",
@@ -258,9 +259,9 @@
     "nextImage": "Next image"
   },
   "quickCreate": {
-    "business": { "title": "Add Business", "desc": "Create a new business card with details and hours" },
-    "sale": { "title": "Sale Ad", "desc": "Post a second‑hand item quickly" },
-    "promo": { "title": "Promo Ad", "desc": "Branding/promo with validity and image" }
+    "business": { "title": "Business Profile", "desc": "Give your business the spotlight" },
+    "sale": { "title": "For Sale", "desc": "Selling? This is your place" },
+    "promo": { "title": "Promo Ad", "desc": "Let your promotion speak" }
   },
   "saleAd": {
     "pageTitleNew": "Create Sale Ad",

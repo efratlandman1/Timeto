@@ -11,6 +11,36 @@ const SaleAdCard = ({ ad, onFavoriteRemoved }) => {
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const [localActive, setLocalActive] = React.useState(ad.active !== false);
   const [isFavorite, setIsFavorite] = React.useState(ad.isFavorite || false);
+  const images = Array.isArray(ad?.images) ? ad.images : (mainImage ? [mainImage] : []);
+  const [hovered, setHovered] = React.useState(false);
+  const [activeIdx, setActiveIdx] = React.useState(0);
+  const hoverTimerRef = React.useRef(null);
+
+  const startHoverCycle = () => {
+    if (!images || images.length <= 1) return;
+    if (hoverTimerRef.current) return;
+    hoverTimerRef.current = setInterval(() => {
+      setActiveIdx((idx) => (idx + 1) % images.length);
+    }, 2000);
+  };
+
+  const stopHoverCycle = () => {
+    if (hoverTimerRef.current) {
+      clearInterval(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+  };
+
+  React.useEffect(() => {
+    if (!hovered) {
+      stopHoverCycle();
+      setActiveIdx(0);
+    } else {
+      startHoverCycle();
+    }
+    return stopHoverCycle;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hovered, images?.length]);
   const handleDelete = async (e) => {
     e.stopPropagation();
     try {
@@ -45,10 +75,33 @@ const SaleAdCard = ({ ad, onFavoriteRemoved }) => {
   };
 
   return (
-    <div className={`business-card ${!localActive ? 'inactive' : ''}`} role="article" aria-label={ad.title} onClick={() => navigate(`/ads/sale/${ad._id}`, { state: { background: location } })} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/ads/sale/${ad._id}`, { state: { background: location } }); }}>
-      <div className="business-card-image-container" style={{ background: '#ffffff' }}>
-        {mainImage ? (
-          <img className="business-card-image" src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${mainImage}`} alt={ad.title} />
+    <div
+      className={`business-card ${!localActive ? 'inactive' : ''}`}
+      role="article"
+      aria-label={ad.title}
+      onClick={() => navigate(`/ads/sale/${ad._id}`, { state: { background: location } })}
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/ads/sale/${ad._id}`, { state: { background: location } }); }}
+    >
+      <div
+        className="business-card-image-container"
+        style={{ background: '#ffffff' }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        {images && images.length > 0 ? (
+          <div className="image-strip" style={{ transform: `translateX(-${activeIdx * 100}%)` }}>
+            {images.map((img, idx) => (
+              <img
+                key={`${ad._id}-img-${idx}`}
+                className="business-card-image"
+                src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${img}`}
+                alt={ad.title}
+                loading={idx === 0 ? 'eager' : 'lazy'}
+                draggable={false}
+              />
+            ))}
+          </div>
         ) : (
           <span className="business-card-placeholder">
             <span className="business-placeholder-name">{ad.title}</span>

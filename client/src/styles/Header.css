@@ -503,11 +503,7 @@
 
 /* Language Switch Styles - New Beautiful Design */
 .lang-switch {
-    margin: 0 0.25rem;
-    display: flex;
-    align-items: center;
-    position: relative;
-    z-index: 10;
+    display: none !important; /* moved to Accessibility modal */
 }
 
 /* Language Dropdown */

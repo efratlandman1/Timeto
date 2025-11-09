@@ -45,6 +45,11 @@ const SaleAdProfilePage = () => {
     fetchAd();
   }, [id]);
 
+  useEffect(() => {
+    document.body.classList.add('no-scroll');
+    return () => document.body.classList.remove('no-scroll');
+  }, []);
+
   if (loading) {
     return (
       <div className="wide-page-container">
@@ -76,6 +81,7 @@ const SaleAdProfilePage = () => {
         </div>
 
         {/* In modal view, show contact below the image for less scrolling and better fit */}
+        <div className="modal-body-scroll">
         <div className="two-column-section" style={{ display: 'block' }}>
           {/* Image Top */}
           <div className="column-card" style={{ marginBottom: 16 }}>
@@ -201,6 +207,7 @@ const SaleAdProfilePage = () => {
               )}
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

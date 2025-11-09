@@ -8,7 +8,7 @@ const JWT_CONFIG = {
   algorithm: 'HS256',
   issuer: 'time-to-app',
   audience: 'time-to-users',
-  expiresIn: '1h'
+  expiresIn: process.env.JWT_EXPIRES_IN || '30d'
 };
 
 const verifyToken = (token) => {

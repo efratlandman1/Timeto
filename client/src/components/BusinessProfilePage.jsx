@@ -83,6 +83,14 @@ const BusinessProfilePage = () => {
     });
   };
 
+  useEffect(() => {
+    // Lock background scroll when modal open
+    document.body.classList.add('no-scroll');
+    return () => {
+      document.body.classList.remove('no-scroll');
+    };
+  }, []);
+
   if (loading) return <div className="loading">{t('businessProfile.loading')}</div>;
   if (error) return <div className="error">{t('businessProfile.error')}: {error}</div>;
   if (!business) return <div className="not-found">{t('businessProfile.notFound')}</div>;
