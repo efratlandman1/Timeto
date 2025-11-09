@@ -8,7 +8,7 @@ import axios from 'axios';
 import '../styles/MainPage.css';
 import '../styles/businessCard.css';
 import { useNavigate } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight, FaArrowLeft, FaArrowRight, FaUserFriends, FaBullhorn, FaCalendarCheck, FaEnvelope, FaPhone, FaWhatsapp } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaArrowLeft, FaArrowRight, FaUserFriends, FaBullhorn, FaCalendarCheck, FaEnvelope, FaPhone, FaWhatsapp, FaTools, FaGlassCheers, FaDumbbell, FaCoffee, FaUmbrellaBeach, FaBook, FaSpa, FaTshirt, FaBriefcase, FaAsterisk, FaStarOfDavid, FaUtensils, FaBuilding, FaCar, FaHammer, FaWrench, FaGraduationCap, FaHome, FaKey, FaGift, FaHandsHelping } from 'react-icons/fa';
 import { buildQueryUrl } from '../utils/buildQueryUrl';
 import { useSelector } from 'react-redux';
 import { getToken } from '../utils/auth';
@@ -216,6 +216,63 @@ const MainPage = () => {
         return shuffled.slice(0, count);
     };
 
+    const getIconByLogoKey = (logo) => {
+        const map = {
+            'fa-tools': <FaTools />,
+            'fa-glass-cheers': <FaGlassCheers />,
+            'fa-dumbbell': <FaDumbbell />,
+            'fa-coffee': <FaCoffee />,
+            'fa-umbrella-beach': <FaUmbrellaBeach />,
+            'fa-book': <FaBook />,
+            'fa-spa': <FaSpa />,
+            'fa-tshirt': <FaTshirt />,
+            'fa-briefcase': <FaBriefcase />,
+            'fa-asterisk': <FaAsterisk />,
+            'fa-star-of-david': <FaStarOfDavid />,
+            'fa-utensils': <FaUtensils />,
+            'fa-building': <FaBuilding />,
+            'fa-car': <FaCar />,
+            'fa-hammer': <FaHammer />,
+            'fa-wrench': <FaWrench />,
+            'fa-graduation-cap': <FaGraduationCap />,
+            'fa-home': <FaHome />,
+            'fa-key': <FaKey />,
+            'fa-gift': <FaGift />,
+            'fa-hands-helping': <FaHandsHelping />,
+        };
+        return map[logo] || null;
+    };
+
+    const getCategoryIcon = (name, logo) => {
+        // Prefer DB-provided logo key
+        const fromDb = logo ? getIconByLogoKey(logo) : null;
+        if (fromDb) return fromDb;
+        const map = {
+            'אחזקה': <FaTools />,
+            'אירועים': <FaGlassCheers />,
+            'בריאות וכושר': <FaDumbbell />,
+            'בתי קפה': <FaCoffee />,
+            'חופשות ובילוי': <FaUmbrellaBeach />,
+            'חינוך והעשרה': <FaBook />,
+            'טיפוח וקוסמטיקה': <FaSpa />,
+            'טקסטיל': <FaTshirt />,
+            'ייעוץ ושירות עסקי': <FaBriefcase />,
+            'כללי': <FaAsterisk />,
+            'מכירת יודאיקה': <FaStarOfDavid />,
+            'מסעדות ומזון': <FaUtensils />,
+            'נדלן': <FaBuilding />,
+            'רכב ותחבורה': <FaCar />,
+            'שיפוצים ובנייה': <FaHammer />,
+            'שירותי תיקונים': <FaWrench />,
+            'השכלה': <FaGraduationCap />,
+            'בית': <FaHome />,
+            'השכרות': <FaKey />,
+            'מתנות ואירועים': <FaGift />,
+            'גמ\"ח': <FaHandsHelping />,
+        };
+        return map[name] || <FaAsterisk />;
+    };
+
     
 
     return (
@@ -307,18 +364,12 @@ const MainPage = () => {
                         {categories && categories.map((category) => (
                             <div key={category._id}
                                 className="category-business"
-                                style={{ background: '#fff' }}
+                                style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}
                                 onClick={() => handleFilterChange(category.name)}>
-                                {category.logo ? (
-                                    <img
-                                        src={`${process.env.REACT_APP_API_DOMAIN}${category.logo}`}
-                                        alt={category.name}
-                                        className="category-logo"
-                                    />
-                                ) : (
-                                    <span className="category-initial" style={{ background: '#fff' }}></span>
-                                )}
-                                <span>{category.name}</span>
+                                <span className="category-initial" style={{ color: '#d32f2f', borderColor: '#d32f2f' }}>
+                                    <span style={{ fontSize: '1.35rem' }}>{getCategoryIcon(category.name, category.logo)}</span>
+                                </span>
+                                <span style={{ color: '#b71c1c', textAlign: 'center' }}>{category.name}</span>
                             </div>
                         ))}
                     </div>

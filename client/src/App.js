@@ -31,6 +31,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Accessibility from './components/Accessibility';
 import MobileBottomNav from './components/MobileBottomNav';
+import { useResponsive } from './utils/ResponsiveProvider';
 import './styles/global/index.css';
 import './i18n';
 import { useTranslation } from 'react-i18next';
@@ -85,6 +86,7 @@ function AppRoutes() {
 function App() {
     const dispatch = useDispatch();
     const { i18n, ready } = useTranslation();
+    const { isMobile, isTablet, width } = useResponsive();
     
     useEffect(() => {
         let user = null;
@@ -166,7 +168,7 @@ function App() {
                     <AppRoutes />
                     <Accessibility />
                 </main>
-                <MobileBottomNav />
+                {(isMobile || isTablet) && <MobileBottomNav />}
             </div>
         </Router>
     );

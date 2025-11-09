@@ -30,6 +30,33 @@
     height: 100%;
 }
 
+/* Stacked layout for non-desktop (header grows, center row goes below) */
+.header-container.stacked {
+    height: auto;
+}
+.navbar.stacked {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    height: auto;
+}
+.navbar.stacked .nav-right,
+.navbar.stacked .nav-left {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.navbar.stacked .nav-center {
+    order: 3;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 0 8px 0;
+    flex-wrap: wrap;
+}
+
 /* RTL/LTR Navigation Layout */
 .navbar.rtl {
     direction: rtl;
