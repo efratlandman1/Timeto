@@ -143,11 +143,6 @@
     background-color: rgba(0, 0, 0, 0.05);
 }
 
-.logo-icon {
-    font-size: 2rem;
-    color: #e53935;
-}
-
 .logo-text {
     display: flex;
     flex-direction: row;
@@ -162,7 +157,37 @@
     align-items: flex-start;
 }
 
-.logo-text-main { font-size: 1.35rem; font-weight: 800; color: #333; letter-spacing: -0.2px; }
+.logo-text-main {
+    font-size: 1.7rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    color: inherit;
+    font-family: 'GanCLM', var(--font-family-base);
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 0.06em; /* base uniform spacing */
+    direction: rtl; /* maintain RTL order for Hebrew */
+}
+/* Per-letter styling to progressively increase size */
+.logo-ch { display: inline-block; margin: 0; line-height: 1; transform-origin: bottom; }
+.logo-ch-1 { transform: rotate(-26deg) scale(0.86); color: transparent; }
+.logo-ch-2 { transform: rotate(-5deg) scale(1.00); color: transparent; }
+.logo-ch-3 { transform: rotate(-2deg) scale(1.14); color: transparent; margin-left: 0.04em; }
+.logo-ch-4 { transform: rotate(2deg) scale(1.28); color: transparent; margin-left: 0.06em; }
+.logo:hover .logo-ch-1 { transform: rotate(-2deg) scale(0.90); }
+.logo:hover .logo-ch-2 { transform: rotate(2deg) scale(1.05); }
+.logo:hover .logo-ch-3 { transform: rotate(-2deg) scale(1.18); }
+.logo:hover .logo-ch-4 { transform: rotate(2deg) scale(1.32); }
+/* Gradient wordmark */
+.logo-gradient {
+    background: linear-gradient(90deg, #b71c1c 0%, #c62828 20%, #d32f2f 40%, #e53935 60%, #ef5350 80%, #ff6f61 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+    transition: transform 160ms ease, color 160ms ease;
+}
+/* hover transforms are handled per-letter above */
 
 /* remove subline */
 
@@ -698,7 +723,7 @@
     } */
     
     .logo-text-main {
-        font-size: 1.3rem;
+        font-size: 1.7rem;
     }
     
     .logo-text-sub {
@@ -730,7 +755,7 @@
     } */
     
     .logo-text-main {
-        font-size: 1.4rem;
+        font-size: 1.8rem;
     }
     
     .logo-text-sub {
@@ -780,7 +805,7 @@
     } */
     
     .logo-text-main {
-        font-size: 1.05rem;
+        font-size: 1.2rem;
     }
     
     .logo-text-sub {
@@ -904,7 +929,7 @@
     }
      */
     .logo-text-main {
-        font-size: 0.9rem;
+        font-size: 1.0rem;
     }
     
     .logo-text-sub {
@@ -1011,7 +1036,7 @@ body.no-scroll {
     }
      */
     .logo-text-main {
-        font-size: 0.8rem;
+        font-size: 0.95rem;
     }
     
     .lang-toggle-btn {

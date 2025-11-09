@@ -18,6 +18,7 @@ import AdminPanelPage from './components/AdminPanelPage';
 import UserProfilePage from './components/UserProfilePage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
+import BrandLogoExport from './components/BrandLogoExport';
 import AdsHubPage from './components/AdsHubPage';
 import CreateSaleAdPage from './components/CreateSaleAdPage';
 import SaleAdProfilePage from './components/SaleAdProfilePage';
@@ -64,6 +65,7 @@ function AppRoutes() {
                 <Route path="/admin" element={<AdminPanelPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/brand/export-logo" element={<BrandLogoExport />} />
             </Routes>
             {state?.background && (
                 <Routes>

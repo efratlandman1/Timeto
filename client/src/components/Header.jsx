@@ -23,6 +23,7 @@ import {
     FaBars
 } from "react-icons/fa";
 import "../styles/Header.css";
+import LogoWordmark from './LogoWordmark';
 import { useSelector, useDispatch } from 'react-redux';
 import { getToken } from "../utils/auth";
 import { useTranslation } from 'react-i18next';
@@ -527,10 +528,9 @@ const Header = () => {
         <div className={headerClass}>
             <nav className={navClass}>
                 <div className={navRightClass}>
-                    <div className="logo" onClick={() => navigate("/")}> 
-                        <FaMapMarkerAlt className="logo-icon" />
+                    <div className="logo" onClick={() => navigate("/")} role="button" tabIndex={0} aria-label={t('header.logo.main')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/'); }}>
                         <div className={logoTextClass}>
-                            <span className="logo-text-main">{t('header.logo.main')}</span>
+                            <LogoWordmark />
                         </div>
                     </div>
                     {(isMobile || isTablet) && (
