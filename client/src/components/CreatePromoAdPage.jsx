@@ -21,6 +21,8 @@ const CreatePromoAdPage = () => {
   const [validTo, setValidTo] = useState('');
   const [image, setImage] = useState(null);
   const [auto, setAuto] = useState(null);
+  const [categoryId, setCategoryId] = useState('');
+  const [categories, setCategories] = useState([]);
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const isEditMode = Boolean(searchParams.get('edit'));
@@ -43,6 +45,21 @@ const CreatePromoAdPage = () => {
     if (value) setCity(value);
   };
 
+  // Always start at the top when entering this page
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
+
+  // Load business categories for promo ads
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_DOMAIN || ''}/api/v1/categories`);
+        const json = await res.json();
+        setCategories(json?.data?.categories || []);
+      } catch {}
+    })();
+  }, []);
   useEffect(() => {
     const token = getToken();
     if (!token) {
@@ -62,6 +79,7 @@ const CreatePromoAdPage = () => {
       setValidFrom(stateAd.validFrom ? new Date(stateAd.validFrom).toISOString().slice(0,16) : '');
       setValidTo(stateAd.validTo ? new Date(stateAd.validTo).toISOString().slice(0,16) : '');
       if (stateAd.image) setImage(stateAd.image);
+      setCategoryId(stateAd.categoryId?._id || stateAd.categoryId || '');
       return;
     }
     (async () => {
@@ -75,6 +93,7 @@ const CreatePromoAdPage = () => {
           setValidFrom(a.validFrom ? new Date(a.validFrom).toISOString().slice(0,16) : '');
           setValidTo(a.validTo ? new Date(a.validTo).toISOString().slice(0,16) : '');
           if (a.image) setImage(a.image);
+          setCategoryId(a.categoryId?._id || a.categoryId || '');
         }
       } catch {}
     })();
@@ -102,6 +121,7 @@ const CreatePromoAdPage = () => {
     fd.append('city', city);
     fd.append('validFrom', validFrom);
     fd.append('validTo', validTo);
+    if (categoryId) fd.append('categoryId', categoryId);
     // Append image only if a new File was chosen; keep existing string filename as-is
     if (image && typeof image !== 'string') fd.append('image', image);
     const editId = searchParams.get('edit');
@@ -120,7 +140,7 @@ const CreatePromoAdPage = () => {
       res = await dispatch(createPromoAd(fd));
     }
     if (res.meta.requestStatus === 'fulfilled') {
-      toast.success(editId ? t('common.success') : 'המודעה פורסמה בהצלחה', { position: 'top-center', className: 'custom-toast' });
+      toast.success(editId ? 'המודעה נערכה בהצלחה' : 'המודעה פורסמה בהצלחה', { position: 'top-center', className: 'custom-toast' });
       setTimeout(() => {
         if (editId) navigate('/user-businesses'); else navigate('/');
       }, 800);
@@ -143,6 +163,15 @@ const CreatePromoAdPage = () => {
           <div className="form-group">
             <label className="form-label">{t('promoAd.fields.title')} <span className="required-asterisk">*</span></label>
             <input className="form-input" value={title} onChange={e => setTitle(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label className="form-label">{t('promoAd.fields.category') !== 'promoAd.fields.category' ? t('promoAd.fields.category') : 'קטגוריה'}</label>
+            <select className="form-select" value={categoryId} onChange={e => setCategoryId(e.target.value || '')}>
+              <option value="">{t('common.select') !== 'common.select' ? t('common.select') : 'בחר'}</option>
+              {categories.map(cat => (
+                <option key={cat._id} value={cat._id}>{cat.name}</option>
+              ))}
+            </select>
           </div>
           <div className="form-group two-col-grid">
             <div>

@@ -387,7 +387,7 @@ const EditBusinessPage = () => {
     }
     const sortedHours = [...businessData.openingHours].sort((a, b) => a.day - b.day);
     formData.append('openingHours', JSON.stringify(sortedHours));
-    if (businessData.logo) {
+    if (businessData.logo && typeof businessData.logo !== 'string') {
       formData.append('logo', businessData.logo);
     }
     if (businessData.id) {

@@ -53,6 +53,7 @@ const SaleAdCard = ({ ad, onFavoriteRemoved }) => {
       if (res.ok) {
         setLocalActive(false);
         setConfirmDelete(false);
+        showToast('✅ המודעה נמחקה');
       }
     } catch {}
   };
@@ -70,7 +71,10 @@ const SaleAdCard = ({ ad, onFavoriteRemoved }) => {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (res.ok) setLocalActive(true);
+      if (res.ok) {
+        setLocalActive(true);
+        showToast('✅ המודעה שוחזרה בהצלחה');
+      }
     } catch {}
   };
 
@@ -89,19 +93,17 @@ const SaleAdCard = ({ ad, onFavoriteRemoved }) => {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
+        {!localActive && (<div className="status-badge inactive">לא פעיל</div>)}
         {images && images.length > 0 ? (
-          <div className="image-strip" style={{ transform: `translateX(-${activeIdx * 100}%)` }}>
-            {images.map((img, idx) => (
-              <img
-                key={`${ad._id}-img-${idx}`}
-                className="business-card-image"
-                src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${img}`}
-                alt={ad.title}
-                loading={idx === 0 ? 'eager' : 'lazy'}
-                draggable={false}
-              />
-            ))}
-          </div>
+          <img
+            key={`${ad._id}-img-active-${activeIdx}`}
+            className="business-card-image fade-in"
+            src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${images[activeIdx]}`}
+            alt={ad.title}
+            loading="eager"
+            draggable={false}
+            style={{ objectFit: 'cover' }}
+          />
         ) : (
           <span className="business-card-placeholder">
             <span className="business-placeholder-name">{ad.title}</span>
@@ -148,10 +150,9 @@ const SaleAdCard = ({ ad, onFavoriteRemoved }) => {
           </div>
         </div>
         <div className="business-card-footer">
-          <div className="business-card-rating">
-            {ad.price !== undefined && (
-              <div className="font-medium">{ad.price} {ad.currency || 'ILS'}</div>
-            )}
+          <div className="business-card-rating" />
+          <div className={`price-slot ${ad.price == null ? 'empty' : ''}`}>
+            {ad.price != null ? (<span className="font-medium">{ad.price} {ad.currency || 'ILS'}</span>) : null}
           </div>
           {ad.canManage ? (
             <div className="business-card-actions">

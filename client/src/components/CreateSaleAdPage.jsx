@@ -55,6 +55,10 @@ const CreateSaleAdPage = () => {
     if (value) setCity(value);
   };
 
+  // Always start at the top when entering this page
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
   useEffect(() => {
     const token = getToken();
     if (!token) {
@@ -192,7 +196,7 @@ const CreateSaleAdPage = () => {
       res = await dispatch(createSaleAd(fd));
     }
     if (res.meta.requestStatus === 'fulfilled') {
-      toast.success(editId ? t('common.success') : 'המודעה פורסמה בהצלחה', { position: 'top-center', className: 'custom-toast' });
+      toast.success(editId ? 'המודעה נערכה בהצלחה' : 'המודעה פורסמה בהצלחה', { position: 'top-center', className: 'custom-toast' });
       setTimeout(() => {
         if (editId) navigate('/user-businesses'); else navigate('/');
       }, 800);

@@ -5,6 +5,7 @@ const promoAdSchema = new mongoose.Schema({
     title: { type: String, required: true, trim: true },
     city: { type: String, required: true, trim: true },
     address: { type: String, trim: true },
+    categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'categories' },
     location: {
         type: {
             type: String,
@@ -32,6 +33,7 @@ promoAdSchema.virtual('isCurrentlyActive').get(function() {
 
 // Indexes
 promoAdSchema.index({ title: 'text', city: 'text' });
+promoAdSchema.index({ categoryId: 1, active: 1 });
 promoAdSchema.index({ location: '2dsphere' });
 promoAdSchema.index({ validFrom: 1, validTo: 1, active: 1 });
 

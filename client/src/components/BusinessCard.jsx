@@ -285,6 +285,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
         className="business-card-image-container"
         style={{ background: '#ffffff' }}
       >
+        {!localActive && (<div className="status-badge inactive">לא פעיל</div>)}
         {business.logo ? (
           <img
             className="business-card-image"
@@ -350,6 +351,7 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
               {renderRatingStars(business.rating)}
             </div>
           </div>
+          <div className="price-slot empty"></div>
 
           <div className="business-card-actions">
             {fromUserBusinesses ? (

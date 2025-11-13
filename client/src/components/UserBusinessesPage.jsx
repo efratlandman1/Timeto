@@ -14,7 +14,7 @@ const UserBusinessesPage = () => {
     const [loading, setLoading] = useState(true);
     const [mySaleAds, setMySaleAds] = useState([]);
     const [myPromoAds, setMyPromoAds] = useState([]);
-    const [activeTab, setActiveTab] = useState('business'); // business | sale | promo | all
+    const [activeTab, setActiveTab] = useState(() => sessionStorage.getItem('userBusinessesActiveTab') || 'all'); // business | sale | promo | all
     const navigate = useNavigate();
     const [showCreateMenu, setShowCreateMenu] = useState(false);
     const createMenuRef = useRef(null);
@@ -97,6 +97,10 @@ const UserBusinessesPage = () => {
         ];
     }, [activeTab, myBusinesses, mySaleAds, myPromoAds]);
 
+    useEffect(() => {
+        sessionStorage.setItem('userBusinessesActiveTab', activeTab);
+    }, [activeTab]);
+
     return (
         <div className='wide-page-container'>
             <div className='wide-page-content'>
@@ -105,59 +109,61 @@ const UserBusinessesPage = () => {
                     {t('common.backToHome')}
                 </button>
                 
-                <div className="page-header">
-                    <div className="page-header__content">
-                        <h1 className="login-title">{t('userBusinesses.title')}</h1>
-                    </div>
-                    <div className="page-header__action" ref={createMenuRef} style={{ position: 'relative' }}>
-                        <button 
-                            className="add-business-button"
-                            onClick={() => setShowCreateMenu(!showCreateMenu)}
-                            aria-expanded={showCreateMenu}
-                            aria-haspopup="true"
-                            title={t('userBusinesses.create')}
-                        >
-                            <FaPlus className="add-business-icon" />
-                            {t('userBusinesses.create')}
-                        </button>
-                        {showCreateMenu && (
-                            <div 
-                                role="menu"
-                                aria-label={t('userBusinesses.createMenuAria')}
-                                className="dropdown-menu"
-                                style={{ position: 'absolute', zIndex: 10, marginTop: 8, left: 0, minWidth: 220 }}
+                <div className="sticky-header-block">
+                    <div className="page-header">
+                        <div className="page-header__content">
+                            <h1 className="login-title">{t('userBusinesses.title')}</h1>
+                        </div>
+                        <div className="page-header__action" ref={createMenuRef} style={{ position: 'relative' }}>
+                            <button 
+                                className="add-business-button"
+                                onClick={() => setShowCreateMenu(!showCreateMenu)}
+                                aria-expanded={showCreateMenu}
+                                aria-haspopup="true"
+                                title={t('userBusinesses.create')}
                             >
-                                <button className="dropdown-item" role="menuitem" onClick={() => { setShowCreateMenu(false); navigate('/business', { state: { reset: Date.now() } }); }}>
-                                    <FaStore style={{ marginInlineEnd: 8 }} /> {t('userBusinesses.createOptions.addBusiness')}
-                                </button>
-                                <button className="dropdown-item" role="menuitem" onClick={() => { setShowCreateMenu(false); navigate('/ads/sale/new'); }}>
-                                    <FaTags style={{ marginInlineEnd: 8 }} /> {t('userBusinesses.createOptions.saleAd')}
-                                </button>
-                                <button className="dropdown-item" role="menuitem" onClick={() => { setShowCreateMenu(false); navigate('/ads/promo/new'); }}>
-                                    <FaBullhorn style={{ marginInlineEnd: 8 }} /> {t('userBusinesses.createOptions.promoAd')}
-                                </button>
-                            </div>
-                        )}
+                                <FaPlus className="add-business-icon" />
+                                {t('userBusinesses.create')}
+                            </button>
+                            {showCreateMenu && (
+                                <div 
+                                    role="menu"
+                                    aria-label={t('userBusinesses.createMenuAria')}
+                                    className="dropdown-menu"
+                                    style={{ position: 'absolute', zIndex: 10, marginTop: 8, left: 0, minWidth: 220 }}
+                                >
+                                    <button className="dropdown-item" role="menuitem" onClick={() => { setShowCreateMenu(false); navigate('/business', { state: { reset: Date.now() } }); }}>
+                                        <FaStore style={{ marginInlineEnd: 8 }} /> {t('userBusinesses.createOptions.addBusiness')}
+                                    </button>
+                                    <button className="dropdown-item" role="menuitem" onClick={() => { setShowCreateMenu(false); navigate('/ads/sale/new'); }}>
+                                        <FaTags style={{ marginInlineEnd: 8 }} /> {t('userBusinesses.createOptions.saleAd')}
+                                    </button>
+                                    <button className="dropdown-item" role="menuitem" onClick={() => { setShowCreateMenu(false); navigate('/ads/promo/new'); }}>
+                                        <FaBullhorn style={{ marginInlineEnd: 8 }} /> {t('userBusinesses.createOptions.promoAd')}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
+                    {/* Segmented tabs like MyFavorites - render only once data is loaded */}
+                    {!loading && (
+                    <div className="favorites-tabs" role="tablist" aria-label={t('userBusinesses.tabs.aria')}>
+                        <button className={`favorites-tab ${activeTab==='all'?'active':''}`} role="tab" aria-selected={activeTab==='all'} onClick={() => setActiveTab('all')}>
+                            {t('userBusinesses.tabs.all')} <span className="count">({counts.all})</span>
+                        </button>
+                        <button className={`favorites-tab ${activeTab==='business'?'active':''}`} role="tab" aria-selected={activeTab==='business'} onClick={() => setActiveTab('business')}>
+                            {t('userBusinesses.tabs.business')} <span className="count">({counts.business})</span>
+                        </button>
+                        <button className={`favorites-tab ${activeTab==='sale'?'active':''}`} role="tab" aria-selected={activeTab==='sale'} onClick={() => setActiveTab('sale')}>
+                            {t('userBusinesses.tabs.sale')} <span className="count">({counts.sale})</span>
+                        </button>
+                        <button className={`favorites-tab ${activeTab==='promo'?'active':''}`} role="tab" aria-selected={activeTab==='promo'} onClick={() => setActiveTab('promo')}>
+                            {t('userBusinesses.tabs.promo')} <span className="count">({counts.promo})</span>
+                        </button>
+                    </div>
+                    )}
                 </div>
-
-                {/* Segmented tabs like MyFavorites - render only once data is loaded */}
-                {!loading && (
-                <div className="favorites-tabs" role="tablist" aria-label={t('userBusinesses.tabs.aria')}>
-                    <button className={`favorites-tab ${activeTab==='business'?'active':''}`} role="tab" aria-selected={activeTab==='business'} onClick={() => setActiveTab('business')}>
-                        {t('userBusinesses.tabs.business')} <span className="count">({counts.business})</span>
-                    </button>
-                    <button className={`favorites-tab ${activeTab==='sale'?'active':''}`} role="tab" aria-selected={activeTab==='sale'} onClick={() => setActiveTab('sale')}>
-                        {t('userBusinesses.tabs.sale')} <span className="count">({counts.sale})</span>
-                    </button>
-                    <button className={`favorites-tab ${activeTab==='promo'?'active':''}`} role="tab" aria-selected={activeTab==='promo'} onClick={() => setActiveTab('promo')}>
-                        {t('userBusinesses.tabs.promo')} <span className="count">({counts.promo})</span>
-                    </button>
-                    <button className={`favorites-tab ${activeTab==='all'?'active':''}`} role="tab" aria-selected={activeTab==='all'} onClick={() => setActiveTab('all')}>
-                        {t('userBusinesses.tabs.all')} <span className="count">({counts.all})</span>
-                    </button>
-                </div>
-                )}
+                <div style={{ height: 8 }} />
 
                 <div className="business-cards-grid">
                     {loading ? (

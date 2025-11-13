@@ -54,7 +54,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
 
   const logoPreviewUrl = businessData.logo
     ? (typeof businessData.logo === 'string'
-        ? `${process.env.REACT_APP_API_DOMAIN}${businessData.logo.replace('/app/config', '')}`
+        ? `${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${String(businessData.logo).split('/').pop()}`
         : URL.createObjectURL(businessData.logo))
     : null;
 

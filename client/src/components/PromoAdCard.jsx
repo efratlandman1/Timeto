@@ -22,6 +22,7 @@ const PromoAdCard = ({ ad, onFavoriteRemoved }) => {
       if (res.ok) {
         setLocalActive(false);
         setConfirmDelete(false);
+        showToast('✅ המודעה נמחקה');
       }
     } catch {}
   };
@@ -39,13 +40,23 @@ const PromoAdCard = ({ ad, onFavoriteRemoved }) => {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (res.ok) setLocalActive(true);
+      if (res.ok) {
+        setLocalActive(true);
+        showToast('✅ המודעה שוחזרה בהצלחה');
+      }
     } catch {}
   };
+
+  const isExpired = (() => {
+    if (!ad?.validTo) return false;
+    try { return new Date(ad.validTo) < new Date(); } catch { return false; }
+  })();
 
   return (
     <div className={`business-card promo ${!localActive ? 'inactive' : ''}`} role="article" aria-label={ad.title} onClick={() => navigate(`/ads/promo/${ad._id}`, { state: { background: location } })} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/ads/promo/${ad._id}`, { state: { background: location } }); }}>
       <div className="business-card-image-container" style={{ background: '#ffffff' }}>
+        {!localActive && (<div className="status-badge inactive">לא פעיל</div>)}
+        {isExpired && localActive && (<div className="status-badge expired">לא בתוקף</div>)}
         {ad.image ? (
           <img className="business-card-image" src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${ad.image}`} alt={ad.title} />
         ) : (
@@ -94,7 +105,13 @@ const PromoAdCard = ({ ad, onFavoriteRemoved }) => {
           </div>
         </div>
         <div className="business-card-footer">
-          <div className="business-card-rating" />
+          <div className="business-card-rating">
+            {(() => {
+              const name = ad?.categoryId?.name || ad?.category?.name || (Array.isArray(ad?.category) ? ad.category[0]?.name : '');
+              return name ? (<div className="font-medium">{name}</div>) : null;
+            })()}
+          </div>
+          <div className="price-slot empty"></div>
           {ad.canManage && (
             <div className="business-card-actions">
               {localActive && (

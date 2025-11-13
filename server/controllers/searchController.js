@@ -137,7 +137,11 @@ exports.getAllUnified = async (req, res) => {
         ]),
         PromoAd.aggregate([
           { $geoNear: { near: nearPoint, distanceField: 'distance', spherical: true, query: promoQuery } },
-          { $limit: batchSize }
+          { $limit: batchSize },
+          // join category to expose name consistently
+          { $lookup: { from: 'categories', localField: 'categoryId', foreignField: '_id', as: 'category' } },
+          { $addFields: { categoryId: { $arrayElemAt: ['$category', 0] } } },
+          { $project: { category: 0 } }
         ])
       ]);
       bizRaw = bizAgg;
@@ -152,7 +156,7 @@ exports.getAllUnified = async (req, res) => {
       [bizRaw, salesRaw, promosRaw] = await Promise.all([
         Business.find(businessQuery).sort(businessPrefetchSort).limit(batchSize).lean(),
         SaleAd.find(saleQuery).sort({ createdAt: -1 }).limit(batchSize).lean(),
-        PromoAd.find(promoQuery).sort({ createdAt: -1 }).limit(batchSize).lean()
+        PromoAd.find(promoQuery).populate('categoryId', 'name').sort({ createdAt: -1 }).limit(batchSize).lean()
       ]);
     }
 
@@ -207,7 +211,13 @@ exports.getAllUnified = async (req, res) => {
       id: it.data?._id,
       title: it.data?.title || it.data?.name || '',
       price: it.type === 'sale' ? it.data?.price ?? null : null,
-      categoryId: it.type === 'sale' ? it.data?.categoryId ?? null : (it.type === 'business' ? it.data?.categoryId ?? null : null),
+      categoryId: it.type === 'sale'
+        ? it.data?.categoryId ?? null
+        : (it.type === 'business'
+            ? it.data?.categoryId ?? null
+            : (it.type === 'promo'
+                ? (it.data?.categoryId?._id || it.data?.categoryId || null)
+                : null)),
       subcategoryId: it.type === 'sale' ? it.data?.subcategoryId ?? null : null,
       serviceIds: it.type === 'business' ? (Array.isArray(it.data?.services) ? it.data.services : []) : [],
       rating: it.type === 'business' ? (it.data?.rating ?? null) : null,

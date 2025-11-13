@@ -420,7 +420,8 @@ const updateBusiness = async (req, res, userId) => {
         existingBusiness.description = req.body.description || existingBusiness.description;
         existingBusiness.services = typeof req.body.services === 'string' ? JSON.parse(req.body.services) : (req.body.services || existingBusiness.services);
         existingBusiness.address = req.body.address || existingBusiness.address;
-        existingBusiness.logo = req.file?.path || existingBusiness.logo;
+        // Normalize to store only filename (same as createBusiness)
+        existingBusiness.logo = req.file?.filename || existingBusiness.logo;
         existingBusiness.openingHours = typeof req.body.openingHours === 'string' ? JSON.parse(req.body.openingHours) : (req.body.openingHours || existingBusiness.openingHours);
 
         await existingBusiness.save();
