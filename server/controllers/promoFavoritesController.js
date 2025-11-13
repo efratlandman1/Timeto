@@ -32,9 +32,12 @@ exports.getUserFavorites = async (req, res) => {
     const logSource = 'promoFavoritesController.getUserFavorites';
     const meta = getRequestMeta(req, logSource);
     try {
-        const favorites = await PromoFavorite.find({ userId: req.user._id, active: true })
-            .populate({ path: 'promoAdId' })
+        const now = new Date();
+        // Only favorites that point to active and in-date promo ads
+        let favorites = await PromoFavorite.find({ userId: req.user._id, active: true })
+            .populate({ path: 'promoAdId', match: { active: true, validFrom: { $lte: now }, validTo: { $gte: now } } })
             .sort({ createdAt: -1 });
+        favorites = favorites.filter(f => f.promoAdId);
         return successResponse({ res, req, data: { favorites }, message: 'Fetched favorites', logSource });
     } catch (err) {
         logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);

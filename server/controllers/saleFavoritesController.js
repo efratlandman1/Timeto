@@ -33,9 +33,11 @@ exports.getUserFavorites = async (req, res) => {
     const logSource = 'saleFavoritesController.getUserFavorites';
     const meta = getRequestMeta(req, logSource);
     try {
-        const favorites = await SaleFavorite.find({ userId: req.user._id, active: true })
-            .populate({ path: 'saleAdId' })
+        // Only favorites that point to active sale ads
+        let favorites = await SaleFavorite.find({ userId: req.user._id, active: true })
+            .populate({ path: 'saleAdId', match: { active: true } })
             .sort({ createdAt: -1 });
+        favorites = favorites.filter(f => f.saleAdId);
         return successResponse({ res, req, data: { favorites }, message: SALE_FAVORITES_MESSAGES.FETCH_SUCCESS, logSource });
     } catch (err) {
         logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
