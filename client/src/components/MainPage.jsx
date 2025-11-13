@@ -140,7 +140,7 @@ const MainPage = () => {
             // Fetch newest active Promo Ads (nearby when location available)
             const promoUrl = buildQueryUrl(
                 `${process.env.REACT_APP_API_DOMAIN}/api/v1/promo-ads`,
-                { status: 'active', sort: 'newest', limit: 12 },
+                { status: 'active', sort: 'newest', limit: 50 },
                 userLocation
             );
             const promoRes = await axios.get(promoUrl, { headers });
@@ -391,8 +391,8 @@ const MainPage = () => {
                                     <span className="view-all-icon" aria-hidden="true">{isRTL ? <FaArrowLeft /> : <FaArrowRight />}</span>
                                 </a>
                             </div>
-                            <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
-                                {newBusinesses.slice(0, (isMobile ? 1 : isTablet ? 2 : 3)).map((business) => (
+                            <div className="business-cards-grid">
+                                {newBusinesses.map((business) => (
                                     <BusinessCard key={business._id} business={business} />
                                 ))}
                             </div>
@@ -410,8 +410,8 @@ const MainPage = () => {
                                     <span className="view-all-icon" aria-hidden="true">{isRTL ? <FaArrowLeft /> : <FaArrowRight />}</span>
                                 </a>
                             </div>
-                            <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
-                                {newSaleAds.slice(0, (isMobile ? 1 : isTablet ? 2 : 3)).map((ad) => (
+                            <div className="business-cards-grid">
+                                {newSaleAds.map((ad) => (
                                     <SaleAdCard key={ad._id} ad={ad} />
                                 ))}
                             </div>
@@ -429,8 +429,8 @@ const MainPage = () => {
                                     <span className="view-all-icon" aria-hidden="true">{isRTL ? <FaArrowLeft /> : <FaArrowRight />}</span>
                                 </a>
                             </div>
-                            <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
-                                {newPromoAds.slice(0, (isMobile ? 1 : isTablet ? 2 : 3)).map((ad) => (
+                            <div className="business-cards-grid">
+                                {newPromoAds.map((ad) => (
                                     <PromoAdCard key={ad._id} ad={ad} />
                                 ))}
                             </div>

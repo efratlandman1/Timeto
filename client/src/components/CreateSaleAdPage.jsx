@@ -232,8 +232,8 @@ const CreateSaleAdPage = () => {
               )}
             </div>
           </div>
-          <div className="form-group" style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-            <label htmlFor="phone" className="form-label" style={{ flexShrink: 0, marginTop: '6px' }}>
+          <div className="form-group" style={{ display: 'flex' }}>
+            <label htmlFor="phonePrefix" className="form-label" style={{ flexShrink: 0, marginTop: '6px' }}>
               {t('saleAd.fields.phone')} <span className="required-asterisk">*</span>
             </label>
             <div style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: 'ltr', alignItems: 'center' }}>
@@ -267,7 +267,9 @@ const CreateSaleAdPage = () => {
                   checked={!!hasWhatsapp}
                   onChange={e => setHasWhatsapp(e.target.checked)}
                 />
-                <label htmlFor="hasWhatsapp" className="form-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>{t('saleAd.fields.hasWhatsapp')}</label>
+                <label htmlFor="hasWhatsapp" className="form-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>
+                  {t('saleAd.fields.hasWhatsapp')}
+                </label>
               </div>
             </div>
           </div>

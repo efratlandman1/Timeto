@@ -156,7 +156,7 @@ exports.getAllUnified = async (req, res) => {
       [bizRaw, salesRaw, promosRaw] = await Promise.all([
         Business.find(businessQuery).sort(businessPrefetchSort).limit(batchSize).lean(),
         SaleAd.find(saleQuery).sort({ createdAt: -1 }).limit(batchSize).lean(),
-        PromoAd.find(promoQuery).populate('categoryId', 'name').sort({ createdAt: -1 }).limit(batchSize).lean()
+        PromoAd.find(promoQuery).populate('categoryId', 'name').sort({ updatedAt: -1, createdAt: -1 }).limit(batchSize).lean()
       ]);
     }
 

@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import PromoBanner from './PromoBanner';
 const GOOGLE_LIBRARIES = ['places'];
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 40;
 
 const SearchResultPage = () => {
     const { t, i18n, ready } = useTranslation();
@@ -95,13 +95,20 @@ const SearchResultPage = () => {
     const [isLoadingBiz, setIsLoadingBiz] = useState(false);
     const [isLoadingSale, setIsLoadingSale] = useState(false);
     const [isLoadingPromo, setIsLoadingPromo] = useState(false);
-    const isLoadingAny = isLoadingBiz || isLoadingSale || isLoadingPromo;
     const [hasMore, setHasMore] = useState(true);
     // Unified 'all' state
     const [unifiedItems, setUnifiedItems] = useState([]);
     const [unifiedPage, setUnifiedPage] = useState(1);
     const [unifiedTotalPages, setUnifiedTotalPages] = useState(1);
-    const [isLoadingUnified, setIsLoadingUnified] = useState(false);
+    const [isLoadingUnifiedActual, setIsLoadingUnified] = useState(false);
+    const isLoadingAny = isLoadingBiz || isLoadingSale || isLoadingPromo || isLoadingUnifiedActual;
+    const isLoadingCurrent = useMemo(() => {
+      if (activeTab === 'all') return isLoadingUnifiedActual;
+      if (activeTab === 'business') return isLoadingBiz;
+      if (activeTab === 'sale') return isLoadingSale;
+      if (activeTab === 'promo') return isLoadingPromo;
+      return false;
+    }, [activeTab, isLoadingUnifiedActual, isLoadingBiz, isLoadingSale, isLoadingPromo]);
   // Cache of sale subcategory id->name for chips
   const [saleSubMap, setSaleSubMap] = useState({});
 
@@ -121,7 +128,7 @@ const SearchResultPage = () => {
 
     const observer = useRef();
     const lastItemRef = useCallback(node => {
-        if (isLoadingAny || (activeTab === 'all' && isLoadingUnified)) return;
+        if (isLoadingAny || (activeTab === 'all' && isLoadingUnifiedActual)) return;
         if (observer.current) observer.current.disconnect();
         observer.current = new IntersectionObserver(entries => {
             if (!entries[0].isIntersecting || !hasMore) return;
@@ -131,7 +138,7 @@ const SearchResultPage = () => {
             else setUnifiedPage(prev => prev + 1);
         });
         if (node) observer.current.observe(node);
-    }, [isLoadingAny, isLoadingUnified, hasMore, activeTab]);
+    }, [isLoadingAny, isLoadingUnifiedActual, hasMore, activeTab]);
 
     // Centralize hasMore computation to avoid race conditions
     useEffect(() => {
@@ -169,7 +176,7 @@ const SearchResultPage = () => {
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isLoadingBiz, isLoadingSale, isLoadingPromo, isLoadingUnified, hasMore, activeTab, unifiedPage, unifiedTotalPages, bizPage, salePage, promoPage, bizTotalPages, saleTotalPages, promoTotalPages]);
+    }, [isLoadingBiz, isLoadingSale, isLoadingPromo, isLoadingUnifiedActual, hasMore, activeTab, unifiedPage, unifiedTotalPages, bizPage, salePage, promoPage, bizTotalPages, saleTotalPages, promoTotalPages]);
 
     // Reset unified on tab change
     useEffect(() => {
@@ -1133,7 +1140,7 @@ const SearchResultPage = () => {
                                     {(drawerMode==='all' || drawerMode==='distance') && (
                                     <div className="fd-card"><div className="fd-row">
                                         {drawerMode==='all' ? <label>{t('advancedSearch.distance.title')}</label> : null}
-                                        <input className="mini-range full" type="range" min="0" max="100" step="1" value={tempValues.maxDistance} onChange={(e)=>setTempValues(v=>({...v, maxDistance:Number(e.target.value)}))} />
+                                        <input className="mini-range full" type="range" min="0" max="1000" step="1" value={tempValues.maxDistance} onChange={(e)=>setTempValues(v=>({...v, maxDistance:Number(e.target.value)}))} />
                                         <div className="range-value">{tempValues.maxDistance} {t('advancedSearch.distance.km')}</div>
                                     </div></div>
                                     )}
@@ -1229,18 +1236,27 @@ const SearchResultPage = () => {
                       </div>
                     ) : (
                     <div className="business-cards-grid">
+                        {activeTab === 'business' && !isLoadingCurrent && queryFilteredBusinesses.length === 0 && (
+                          <div className="no-results" style={{textAlign:'center', gridColumn: '1 / -1'}}>{t('search.noResults')||'לא נמצאו תוצאות'}</div>
+                        )}
                         {activeTab === 'business' && queryFilteredBusinesses.map((business, index) => (
                             <div key={business._id} ref={index === queryFilteredBusinesses.length - 1 ? lastItemRef : undefined}>
                                 <BusinessCard business={business} />
                             </div>
                         ))}
 
+                        {activeTab === 'sale' && !isLoadingCurrent && queryFilteredSaleAds.length === 0 && (
+                          <div className="no-results" style={{textAlign:'center', gridColumn: '1 / -1'}}>{t('search.noResults')||'לא נמצאו תוצאות'}</div>
+                        )}
                         {activeTab === 'sale' && queryFilteredSaleAds.map((ad, index) => (
                             <div key={ad._id} ref={index === queryFilteredSaleAds.length - 1 ? lastItemRef : undefined}>
                                 <SaleAdCard ad={ad} />
                             </div>
                         ))}
 
+                        {activeTab === 'promo' && !isLoadingCurrent && queryFilteredPromoAds.length === 0 && (
+                          <div className="no-results" style={{textAlign:'center', gridColumn: '1 / -1'}}>{t('search.noResults')||'לא נמצאו תוצאות'}</div>
+                        )}
                         {activeTab === 'promo' && queryFilteredPromoAds.map((ad, index) => (
                             <div key={ad._id} ref={index === queryFilteredPromoAds.length - 1 ? lastItemRef : undefined}>
                                 <PromoAdCard ad={ad} />
@@ -1248,11 +1264,13 @@ const SearchResultPage = () => {
                         ))}
 
                         {activeTab === 'all' && (
-                            (isLoadingUnified && unifiedPage === 1)
+                            (isLoadingUnifiedActual && unifiedPage === 1)
                               ? Array.from({ length: ITEMS_PER_PAGE }).map((_, idx) => (
                                   <div key={`skeleton-${idx}`} className="animate-pulse rounded-lg bg-gray-200 h-40" />
                                 ))
-                              : unifiedItems.map((item, index) => (
+                              : (unifiedItems.length === 0
+                                  ? <div className="no-results" style={{textAlign:'center', gridColumn: '1 / -1'}}>{t('search.noResults')||'לא נמצאו תוצאות'}</div>
+                                  : unifiedItems.map((item, index) => (
                                   <div key={`${item.type}-${item.data._id || index}`} ref={index === unifiedItems.length - 1 ? lastItemRef : undefined}>
                                       {item.type === 'business' ? (
                                           <BusinessCard business={item.data} />
@@ -1262,14 +1280,14 @@ const SearchResultPage = () => {
                                           <PromoAdCard ad={item.data} />
                                       )}
                                   </div>
-                                ))
+                                )))
                         )}
                     </div>
                     )}
                 </div>
 
-                {/* לוודר */}
-                {isLoadingAny && (
+                {/* Loader */}
+                {isLoadingCurrent && (
                     <div className="loader-container">
                         <div className="loader"></div>
                     </div>

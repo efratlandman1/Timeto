@@ -108,7 +108,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
         )}
       </div>
 
-      <div className="form-group" style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+      <div className="form-group" style={{ display: 'flex' }}>
         <label htmlFor="phonePrefix" className="form-label" style={{ flexShrink: 0, marginTop: '6px' }}>
           {t('businessForm.fields.phone')}<RequiredMark />
         </label>

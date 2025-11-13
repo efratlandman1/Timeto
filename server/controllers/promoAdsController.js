@@ -105,7 +105,7 @@ exports.getPromoAds = async (req, res) => {
     try {
         const { q, status = 'active', lat, lng, maxDistance, sort = 'newest', page = 1, limit = DEFAULT_LIMIT } = req.query;
         const pageNum = Number(page) || 1;
-        const limitNum = Math.min(Number(limit) || DEFAULT_LIMIT, 40);
+        const limitNum = Math.min(Number(limit) || DEFAULT_LIMIT, 50);
         const skip = (pageNum - 1) * limitNum;
 
         const query = buildPromoQuery(q, status);
@@ -121,7 +121,7 @@ exports.getPromoAds = async (req, res) => {
                     query
                 }
             };
-            const sortStage = { $sort: sort === 'distance' ? { distance: 1 } : { validFrom: -1 } };
+            const sortStage = { $sort: sort === 'distance' ? { distance: 1 } : { updatedAt: -1, createdAt: -1 } };
             const projectStage = {
                 $project: {
                     title: 1,
@@ -157,7 +157,7 @@ exports.getPromoAds = async (req, res) => {
                 PromoAd.countDocuments(query)
             ]);
         } else {
-            const sortOption = sort === 'newest' ? { validFrom: -1 } : { createdAt: -1 };
+            const sortOption = sort === 'newest' ? { updatedAt: -1, createdAt: -1 } : { createdAt: -1 };
             [data, total] = await Promise.all([
                 PromoAd.find(query).populate('categoryId', 'name').sort(sortOption).skip(skip).limit(limitNum).lean(),
                 PromoAd.countDocuments(query)

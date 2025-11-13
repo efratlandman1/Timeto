@@ -20,7 +20,7 @@
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
-  height: 280px;
+  height: 420px;
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -441,7 +441,7 @@
   }
 
   .business-card {
-    height: 260px;
+    height: 340px;
   }
 }
 

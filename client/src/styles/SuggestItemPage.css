@@ -274,18 +274,27 @@
 .modal-subtitle { margin: 0; color: #555; }
 
 .suggest-modal .button-row {
-  position: sticky;
-  bottom: 0;
+  position: static;
   background: #fff;
-  padding: 0.75rem 1rem;
-  margin-inline: 0;
+  padding: 0.75rem 1.25rem;
+  margin-inline: 1.25rem;
   border-top: 1px solid #eee;
-  z-index: 3;
+  width: auto;
+}
+
+/* Override any generic sticky style applied elsewhere for .button-row.fullwidth inside Suggest modal */
+.modal-container.suggest-modal .button-row.fullwidth {
+  position: static !important;
+  bottom: auto !important;
+  box-shadow: none !important;
+  z-index: auto !important;
+  width: auto !important;
+  margin-inline: 1.25rem !important;
 }
 
 .modal-close {
   background: none;
-  border: none;
+  border: 1px solid #dddddd;
   color: #999;
   font-size: 20px;
   cursor: pointer;
@@ -299,7 +308,8 @@
   position: absolute; /* pin relative to header */
   top: 1rem;
 }
-.modal-close:hover { background: #f2f2f2; color: #666; }
+.modal-close:hover { background: #f9f9f9; color: #666; border-color: #cccccc; }
+.modal-close:focus-visible { outline: 2px solid #d32f2f; outline-offset: 2px; }
 /* Ensure X pins to correct side tightly */
 
 /* Use document direction attribute to ensure flipping works globally */
@@ -314,7 +324,6 @@ html[dir="ltr"] .modal-header .modal-close { inset-inline-end: 1rem; inset-inlin
 /* Add comfortable horizontal padding for inner content */
 .suggest-modal .section-card,
 .suggest-modal .standalone-field,
-.suggest-modal .button-row,
 .suggest-modal .segmented-control,
 .suggest-modal .two-col,
 .suggest-modal .form-group { margin-inline: 1.25rem; }

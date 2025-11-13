@@ -173,17 +173,15 @@ const CreatePromoAdPage = () => {
               ))}
             </select>
           </div>
-          <div className="form-group two-col-grid">
-            <div>
-              <label className="form-label">{t('promoAd.fields.city')} <span className="required-asterisk">*</span></label>
-              {mapsLoaded ? (
-                <Autocomplete onLoad={onAutoLoad} onPlaceChanged={onPlaceChanged}>
-                  <input className="form-input" value={city} onChange={e => setCity(e.target.value)} required />
-                </Autocomplete>
-              ) : (
+          <div className="form-group">
+            <label className="form-label">{t('promoAd.fields.city')} <span className="required-asterisk">*</span></label>
+            {mapsLoaded ? (
+              <Autocomplete onLoad={onAutoLoad} onPlaceChanged={onPlaceChanged}>
                 <input className="form-input" value={city} onChange={e => setCity(e.target.value)} required />
-              )}
-            </div>
+              </Autocomplete>
+            ) : (
+              <input className="form-input" value={city} onChange={e => setCity(e.target.value)} required />
+            )}
           </div>
           <div className="form-group">
             <div>
