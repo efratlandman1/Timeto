@@ -38,6 +38,10 @@
     padding: 0;
 }
 
+/* Ensure anonymous wrapper <div> inside grid cannot exceed track width */
+.business-cards-grid > * {
+    min-width: 0;
+}
 /* Ensure content is not hidden behind bottom nav on small screens */
 .search-results-page { padding-bottom: 80px; }
 

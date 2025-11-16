@@ -391,8 +391,8 @@ const MainPage = () => {
                                     <span className="view-all-icon" aria-hidden="true">{isRTL ? <FaArrowLeft /> : <FaArrowRight />}</span>
                                 </a>
                             </div>
-                            <div className="business-cards-grid">
-                                {newBusinesses.map((business) => (
+                            <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
+                                {newBusinesses.slice(0, (isMobile ? 1 : isTablet ? 2 : 3)).map((business) => (
                                     <BusinessCard key={business._id} business={business} />
                                 ))}
                             </div>
@@ -410,8 +410,8 @@ const MainPage = () => {
                                     <span className="view-all-icon" aria-hidden="true">{isRTL ? <FaArrowLeft /> : <FaArrowRight />}</span>
                                 </a>
                             </div>
-                            <div className="business-cards-grid">
-                                {newSaleAds.map((ad) => (
+                            <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
+                                {newSaleAds.slice(0, (isMobile ? 1 : isTablet ? 2 : 3)).map((ad) => (
                                     <SaleAdCard key={ad._id} ad={ad} />
                                 ))}
                             </div>
@@ -429,8 +429,8 @@ const MainPage = () => {
                                     <span className="view-all-icon" aria-hidden="true">{isRTL ? <FaArrowLeft /> : <FaArrowRight />}</span>
                                 </a>
                             </div>
-                            <div className="business-cards-grid">
-                                {newPromoAds.map((ad) => (
+                            <div className="card-slider" style={{ gridTemplateColumns: `repeat(${isMobile ? 1 : isTablet ? 2 : 3}, minmax(0, 1fr))` }}>
+                                {newPromoAds.slice(0, (isMobile ? 1 : isTablet ? 2 : 3)).map((ad) => (
                                     <PromoAdCard key={ad._id} ad={ad} />
                                 ))}
                             </div>

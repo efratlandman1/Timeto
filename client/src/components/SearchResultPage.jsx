@@ -1264,23 +1264,24 @@ const SearchResultPage = () => {
                         ))}
 
                         {activeTab === 'all' && (
-                            (isLoadingUnifiedActual && unifiedPage === 1)
-                              ? Array.from({ length: ITEMS_PER_PAGE }).map((_, idx) => (
-                                  <div key={`skeleton-${idx}`} className="animate-pulse rounded-lg bg-gray-200 h-40" />
-                                ))
-                              : (unifiedItems.length === 0
-                                  ? <div className="no-results" style={{textAlign:'center', gridColumn: '1 / -1'}}>{t('search.noResults')||'לא נמצאו תוצאות'}</div>
-                                  : unifiedItems.map((item, index) => (
-                                  <div key={`${item.type}-${item.data._id || index}`} ref={index === unifiedItems.length - 1 ? lastItemRef : undefined}>
+                          (isLoadingUnifiedActual && unifiedPage === 1)
+                            ? Array.from({ length: ITEMS_PER_PAGE }).map((_, idx) => (
+                                <div key={`skeleton-${idx}`} className="animate-pulse rounded-lg bg-gray-200 h-40" />
+                              ))
+                            : (unifiedItems.length === 0
+                                ? <div className="no-results" style={{textAlign:'center', gridColumn: '1 / -1'}}>{t('search.noResults')||'לא נמצאו תוצאות'}</div>
+                                : unifiedItems.map((item, index) => (
+                                    <div key={`${item.type}-${item.data._id || index}`} ref={index === unifiedItems.length - 1 ? lastItemRef : undefined}>
                                       {item.type === 'business' ? (
-                                          <BusinessCard business={item.data} />
+                                        <BusinessCard business={item.data} />
                                       ) : item.type === 'sale' ? (
-                                          <SaleAdCard ad={item.data} />
+                                        <SaleAdCard ad={item.data} />
                                       ) : (
-                                          <PromoAdCard ad={item.data} />
+                                        <PromoAdCard ad={item.data} />
                                       )}
-                                  </div>
-                                )))
+                                    </div>
+                                  ))
+                              )
                         )}
                     </div>
                     )}
