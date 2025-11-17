@@ -102,7 +102,7 @@ const BusinessProfilePage = () => {
 
   return (
     <div className="modal-overlay-fixed" onClick={() => navigate(-1)}>
-      <div className="modal-container suggest-modal business-profile-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="business-modal-title">
+      <div className="modal-container suggest-modal ads-fullheight business-profile-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="business-modal-title">
         <div className="modal-header">
           <button className="modal-close" aria-label="Close" onClick={() => navigate(-1)}><FaTimes /></button>
           <h1 id="business-modal-title" className="login-title suggest-modal-title">{business.name}</h1>

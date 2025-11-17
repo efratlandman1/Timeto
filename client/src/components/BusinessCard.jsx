@@ -14,7 +14,7 @@ import { getToken } from "../utils/auth";
 import { roundRating, renderStars } from '../utils/ratingUtils';
 
 const BusinessCard = ({ business, fromUserBusinesses }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -268,7 +268,13 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
           }
         } else {
           // Future day: take the earliest open time
-          return { timingText: t('businessCard.timing.opensAt', { time: range.open }), isSoon: false, isOpenNow: false };
+          const hebDays = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+          const engDays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+          const dayName = (i18n?.language === 'he') ? hebDays[dayIndex] : engDays[dayIndex];
+          const openText = (i18n?.language === 'he')
+            ? `נפתח ביום ${dayName} ב${range.open}`
+            : `Opens on ${dayName} at ${range.open}`;
+          return { timingText: openText, isSoon: false, isOpenNow: false };
         }
       }
     }

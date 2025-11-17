@@ -113,17 +113,17 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
           {t('businessForm.fields.phone')}<RequiredMark />
         </label>
 
-        <div style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: "ltr", alignItems: 'center' }}>
+        <div className="phone-row" style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: "ltr", alignItems: 'center' }}>
           <select
             id="phonePrefix"
             name="prefix"
             value={businessData.prefix || ''}
             onChange={handleChange}
             className="form-input phone-prefix-select"
-            style={{ width: '72px', textAlign: 'center' }}
+            style={{ width: '110px', textAlign: 'center' }}
             required
           >
-            <option value="">{t('common.select')}</option>
+            <option value="">{t('businessForm.placeholders.prefix', 'קידומת')}</option>
             {PHONE_PREFIXES.map(prefix => (
               <option key={prefix} value={prefix}>{prefix}</option>
             ))}
@@ -139,9 +139,10 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
             style={{ flexGrow: 1 }}
             inputMode="numeric"
             maxLength={PHONE_NUMBER_MAX_LENGTH}
+            placeholder={t('businessForm.placeholders.phoneNumber', 'מספר')}
           />
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0, direction: 'rtl' }}>
+          <div className="whatsapp-inline" style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0, direction: 'rtl' }}>
             <input
               type="checkbox"
               id="hasWhatsapp"

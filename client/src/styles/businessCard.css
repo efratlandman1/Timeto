@@ -187,9 +187,10 @@
 /* Reserved price slot for uniform layout across card types */
 .price-slot {
   min-width: 72px;
-  text-align: end;
+  text-align: end; /* logical end: right in RTL, left in LTR */
   color: #202125;
 }
+.business-card .price-slot { margin-inline-end: auto; }
 .price-slot.empty {
   visibility: hidden; /* keeps spacing */
 }

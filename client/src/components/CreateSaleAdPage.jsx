@@ -236,16 +236,16 @@ const CreateSaleAdPage = () => {
             <label htmlFor="phonePrefix" className="form-label" style={{ flexShrink: 0, marginTop: '6px' }}>
               {t('saleAd.fields.phone')} <span className="required-asterisk">*</span>
             </label>
-            <div style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: 'ltr', alignItems: 'center' }}>
+            <div className="phone-row" style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: 'ltr', alignItems: 'center' }}>
               <select
                 id="phonePrefix"
                 name="prefix"
                 className="form-input phone-prefix-select"
-                style={{ width: '72px', textAlign: 'center' }}
+                style={{ width: '110px', textAlign: 'center' }}
                 value={prefix}
                 onChange={e => setPrefix(e.target.value)}
               >
-                <option value="">{t('saleAd.placeholders.select')}</option>
+                <option value="">{t('saleAd.placeholders.prefix', 'קידומת')}</option>
                 {PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
               <input
@@ -258,9 +258,10 @@ const CreateSaleAdPage = () => {
                 onChange={e => setPhone(e.target.value)}
                 inputMode="numeric"
                 maxLength={PHONE_NUMBER_MAX_LENGTH}
+                placeholder={t('saleAd.placeholders.phoneNumber', 'מספר')}
                 required
               />
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0, direction: 'rtl' }}>
+              <div className="whatsapp-inline" style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0, direction: 'rtl' }}>
                 <input
                   type="checkbox"
                   id="hasWhatsapp"

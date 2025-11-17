@@ -34,9 +34,9 @@
 }
 
 .sticky-top, .sticky-header-block {
-    position: sticky;
-    top: 60px; /* below fixed header */
-    z-index: 100;
+    position: static; /* release pinning to prevent dropdowns being hidden */
+    top: auto;
+    z-index: auto;
     background: #ffffff;
 }
 

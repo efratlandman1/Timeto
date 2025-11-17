@@ -137,6 +137,26 @@
     font-weight: 600;
 }
 
+/* Tighten progress UI on very small mobile (e.g., 360x740) */
+@media (max-width: 380px) {
+    .edit-business-progress-bar {
+        margin: 28px auto;
+        padding: 0 16px;
+        max-width: 320px;
+    }
+    .edit-business-progress-circle {
+        width: 34px;
+        height: 34px;
+        font-size: 0.95rem;
+    }
+    .edit-business-step-label {
+        font-size: 12px;
+    }
+    .edit-business-progress-bar-line {
+        left: 16px;
+        right: 16px;
+    }
+}
 .edit-business-navigation-buttons {
     display: flex;
     justify-content: center; /* arrows centered */

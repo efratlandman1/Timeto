@@ -203,7 +203,7 @@
   border: 1.5px solid #ddd;
   border-radius: 8px;
   font-size: 0.95rem;
-  width: 140px;
+  width: 150px;
   background: white;
   color: #333;
   transition: all 0.3s ease;
@@ -376,7 +376,7 @@
   }
 
   .time-range input[type="time"] {
-    width: 120px;
+    width: clamp(132px, 44vw, 180px);
   }
 
   .tags-container {
@@ -387,5 +387,15 @@
     padding: 6px 12px;
     font-size: 0.9rem;
   }
+}
+
+/* Phone row robustness on small screens */
+.step-business-details select.phone-prefix-select {
+  flex: 0 0 72px;
+  min-width: 64px;
+}
+.step-business-details input#phone {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 

@@ -222,6 +222,147 @@
   padding-bottom: 1rem;
 }
 
+/* Ads/profile modals: only expand height to fill screen elegantly */
+.modal-container.suggest-modal.ads-fullheight {
+  /* Fill the viewport height for ads modal (portrait benefits most) */
+  height: 120vh;
+  height: 120dvh; /* modern browsers */
+  max-height: 120vh;
+  max-height: 120dvh;
+}
+.ads-fullheight .modal-body-scroll {
+  height: calc(100% - 64px); /* account for sticky header */
+  max-height: none;
+}
+/* Promo images: thin margins around the image */
+.ads-fullheight.promo-landscape .modal-body-scroll,
+.ads-fullheight.promo-portrait .modal-body-scroll {
+  padding: 0.5rem;
+}
+/* Ensure image truly fills the available dimension per orientation */
+.ads-fullheight.promo-portrait .modal-body-scroll img {
+  height: 100%;
+  width: auto;
+  max-height: 100%;
+  max-width: none;
+}
+.ads-fullheight.promo-landscape .modal-body-scroll img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: none;
+}
+@media (max-width: 768px) {
+  .modal-container.suggest-modal.ads-fullheight {
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+  }
+  .ads-fullheight .modal-body-scroll {
+    height: calc(100% - 56px);
+  }
+}
+
+/* Smaller hero/header strip when viewing Business in ads modal (≈10% visual) */
+.ads-fullheight .business-hero {
+  height: 120px;
+  margin-bottom: 0.75rem;
+  border-radius: 12px;
+}
+.ads-fullheight .business-hero-content {
+  padding: 0.5rem 1rem;
+  max-width: 560px;
+}
+.ads-fullheight .business-hero-title {
+  font-size: 1.6rem;
+}
+.ads-fullheight .business-hero-category {
+  font-size: 0.95rem;
+}
+@media (max-width: 768px) {
+  .ads-fullheight .business-hero { height: 100px; }
+  .ads-fullheight .business-hero-title { font-size: 1.4rem; }
+}
+
+/* Compact contact tiles in Business/Sale ads modal */
+.ads-fullheight .contact-section {
+  padding: 0.75rem 0.75rem;
+  margin-bottom: 1rem;
+}
+.ads-fullheight .contact-grid {
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+}
+.ads-fullheight .contact-card {
+  padding: 0.5rem;
+}
+.ads-fullheight .contact-icon { width: 28px; height: 28px; }
+.ads-fullheight .contact-icon svg { width: 14px; height: 14px; }
+.ads-fullheight .contact-label, 
+.ads-fullheight .contact-value { font-size: 0.85rem; }
+/* On mobile show only contact method (hide value) to save space */
+@media (max-width: 768px) {
+  .ads-fullheight .contact-card .contact-value { display: none; }
+}
+
+/* Promo ad orientation: widen for landscape image, keep default for portrait */
+.modal-container.suggest-modal.ads-fullheight.promo-landscape {
+  width: clamp(900px, 92vw, 1200px);
+  max-width: 100%;
+}
+.modal-container.suggest-modal.ads-fullheight.promo-portrait {
+  /* Portrait page - use a wider standard (3:4) so image can reach full height without cropping */
+  width: min(70vw, calc(0.75 * 120dvh), 92vw);
+  height: min(120dvh, calc((4 / 3) * 70vw), calc((4 / 3) * 92vw));
+  max-width: 100%;
+}
+@media (max-width: 768px) {
+  .modal-container.suggest-modal.ads-fullheight.promo-portrait {
+    width: min(80vw, calc(0.75 * 120dvh), 95vw);
+    height: min(120dvh, calc((4 / 3) * 80vw), calc((4 / 3) * 95vw));
+    max-width: 95vw;
+  }
+}
+
+/* Mobile fine-tuning: don't take full screen, keep comfortable margins */
+@media (max-width: 480px) {
+  .modal-container.suggest-modal.ads-fullheight {
+    height: 88vh;
+    height: 88dvh;
+    max-height: 88vh;
+    max-height: 88dvh;
+  }
+  .modal-container.suggest-modal.ads-fullheight.promo-portrait {
+    /* Match landscape feel: wide margins, capped height */
+    width: min(96vw, 560px);
+    height: auto;
+    max-height: 95vh;
+  }
+  .modal-container.suggest-modal.ads-fullheight.promo-landscape {
+    width: min(98vw, 1200px);
+    height: auto;               /* let content dictate height for landscape */
+    max-height: 95vh;
+  }
+  .ads-fullheight.promo-portrait .modal-body-scroll {
+    height: auto;
+    max-height: calc(95vh - 56px);
+  }
+  .ads-fullheight.promo-portrait .modal-body-scroll img {
+    max-height: calc(95vh - 56px - 8px);
+    width: auto;
+    height: auto;
+  }
+  .ads-fullheight.promo-landscape .modal-body-scroll {
+    height: auto;               /* prevent forced tall container */
+    max-height: calc(95vh - 56px); /* leave room for header */
+  }
+  .ads-fullheight.promo-landscape .modal-body-scroll img {
+    width: 100%;
+    height: auto;
+    max-height: calc(95vh - 56px - 8px); /* account small padding */
+  }
+}
 /* Ensure all corners render rounded in all directions */
 /* .modal-container.suggest-modal, .modal-container.suggest-modal * {
   background-clip: padding-box;
