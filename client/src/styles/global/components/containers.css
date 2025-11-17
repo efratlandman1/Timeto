@@ -66,20 +66,22 @@
 @media (max-width: 768px) {
     .wide-page-container,
     .narrow-page-container {
-        padding: 1rem;
+        padding: 0.5rem;
         max-width: 100%;
         width: 100%;
-        overflow-x: hidden;
+        overflow-x: auto; /* allow horizontal pan if content overflows */
+        -webkit-overflow-scrolling: touch;
     }
 
     .wide-page-content,
     .narrow-page-content {
-        padding: 1.5rem;
+        padding: 1rem;
         margin: 0;
         border-radius: 0;
         max-width: 100%;
         width: 100%;
-        overflow-x: hidden;
+        overflow-x: auto; /* allow horizontal pan if content overflows */
+        -webkit-overflow-scrolling: touch;
     }
 
     /* Collapse two-column rows to a single column on small screens */

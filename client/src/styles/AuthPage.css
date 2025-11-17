@@ -17,7 +17,8 @@
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     width: 100%;
-    max-width: 420px;
+    max-width: 360px; /* narrower */
+    min-height: 560px; /* taller */
     position: relative;
     text-align: center;
     animation: fadeIn 0.3s ease-out;
@@ -114,8 +115,18 @@
 
 .auth-content {
     width: 100%;
-    max-width: 420px;
+  max-width: 300px;
     margin: 0 auto;
+}
+
+/* Ensure Google button container matches width */
+.auth-content .google-login-center,
+.auth-content [data-testid='google-login'] {
+  width: 300px !important;
+}
+
+.confirm-button {
+  font-size: 16px;
 }
 
 .password-input-wrapper {

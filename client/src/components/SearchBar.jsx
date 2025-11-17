@@ -13,6 +13,7 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
   const location = useLocation();
   const wrapperRef = useRef(null);
   const inputRef = useRef(null);
+  const debounceRef = useRef(null);
  
   // Initialize from URL (supports arriving with q param)
   useEffect(() => {
@@ -34,11 +35,14 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
     const value = e.target.value;
     setSearchQuery(value);
     if (!isMainPage) {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
       const params = new URLSearchParams(location.search);
       if (value.trim()) params.set('q', value);
       else params.delete('q');
       navigate({ pathname: location.pathname, search: params.toString() });
       if (onSearch) onSearch(value);
+      }, 300);
     }
   };
 

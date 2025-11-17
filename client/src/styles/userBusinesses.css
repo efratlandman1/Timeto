@@ -33,6 +33,27 @@
     max-width: 100%;
 }
 
+.sticky-top, .sticky-header-block {
+    position: static; /* release pinning to prevent dropdowns being hidden */
+    top: auto;
+    z-index: auto;
+    background: #ffffff;
+}
+
+.sticky-header-block {
+    padding: 8px 0 6px 0;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.06);
+}
+
+/* Prevent cards showing under sticky block edges */
+.sticky-header-block::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #ffffff;
+    z-index: -1;
+}
+
 .favorites-tab {
     background: transparent;
     border: none;
@@ -45,6 +66,7 @@
     white-space: nowrap;
     font-size: inherit; /* respects global text size (accessibility) */
     line-height: 1.4;
+    font-family: var(--font-family-base);
 }
 /* Mobile: horizontal scrollable tabs */
 @media (max-width: 768px) {

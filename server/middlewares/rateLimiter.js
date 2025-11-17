@@ -28,7 +28,9 @@ const createRateLimiter = (options, limiterName) => {
             });
         },
         skip: (req, res) => {
-            // Skip rate limiting for certain conditions (optional)
+            // In development and test, disable rate limiting entirely
+            const env = process.env.NODE_ENV || 'development';
+            if (env !== 'production') return true;
             return false;
         }
     });

@@ -34,6 +34,12 @@ const AuthPage = () => {
             navigate('/auth', { replace: true });
         }
     }, [searchParams, navigate]);
+    
+    useEffect(() => {
+        // lock background when auth modal open
+        document.body.classList.add('no-scroll');
+        return () => document.body.classList.remove('no-scroll');
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -50,7 +56,9 @@ const AuthPage = () => {
             const res = await axios.post(`${process.env.REACT_APP_API_DOMAIN}/api/v1/auth`, { email, password });
 
             if (res.data.data.action === 'login') {
-                document.cookie = `token=${res.data.data.token}; path=/`;
+                const maxAge = 60 * 60 * 24 * 30; // 30 days
+                const secure = window.location.protocol === 'https:' ? 'Secure; ' : '';
+                document.cookie = `token=${res.data.data.token}; ${secure}SameSite=Lax; Max-Age=${maxAge}; path=/`;
                 localStorage.setItem('user', JSON.stringify(res.data.data.user));
                 dispatch(setUser(res.data.data.user));
                 navigate('/');
@@ -112,7 +120,7 @@ const AuthPage = () => {
                         <button className="modal-close" aria-label={t('common.cancel')} onClick={handleClose}><FaTimes /></button>
                         <h1 id="auth-modal-title" className="login-title suggest-modal-title">{t('header.letsGo')}</h1>
                     </div>
-                    <p style={{textAlign:'center', marginInline: '1.25rem'}}>{t('mainPage.joinBanner.joinNowAndDiscover')}</p>
+                    {/* removed extra pitch line per design */}
                     
                     <div className="auth-content">
                         <div dir="ltr" style={{display:'flex', justifyContent:'center', marginTop: '12px', direction: 'ltr', unicodeBidi: 'isolate', textAlign: 'left'}}>
@@ -159,7 +167,7 @@ const AuthPage = () => {
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
                             </div>
-                            <button type="submit" className="submit-button" disabled={isLoading}>{t('auth.login.continue')}</button>
+                            <button type="submit" className="confirm-button" disabled={isLoading}>{t('auth.login.continue')}</button>
                              <a href="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password', { state: { background: currentLocation } });}} className="forgot-password-link" style={{textAlign:'center', display:'block'}}>
                              {t('auth.forgotPassword.createNewPassword')}
                         </a>

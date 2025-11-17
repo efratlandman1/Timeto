@@ -11,7 +11,7 @@
     /* Base scale for the whole app (controls rem-based sizing). 
        Set to 0.9rem (~90%) for a slightly more compact UI. 
        Change to 0.8rem if you'd like ~80%. */
-    --base-font-size: 0.9rem;
+    --base-font-size: 1.1rem;
 
     /* Font Weights */
     --font-weight-normal: 400;
@@ -25,7 +25,9 @@
     --line-height-relaxed: 1.75;
 
     /* Font Families */
-    --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    /* --font-family-base: "Makabiyg", -apple-system, BlinkMacSystemFont, "Roboto","Segoe UI","Arimo","Open Sans",sans-serif; */
+    /* --font-family-base: "GanCLM", -apple-system, BlinkMacSystemFont, "Roboto","Segoe UI","Arimo","Open Sans",sans-serif; */
+    --font-family-base: "MPLUSRounded1c", -apple-system, BlinkMacSystemFont, "Roboto","Segoe UI","Arimo","Open Sans",sans-serif;
 }
 
 /* Base Typography Styles */

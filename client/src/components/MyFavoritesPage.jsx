@@ -12,7 +12,7 @@ const MyFavoritesPage = () => {
     const { t } = useTranslation();
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('all'); // all | business | sale | promo
+    const [activeTab, setActiveTab] = useState(() => sessionStorage.getItem('favoritesActiveTab') || 'all'); // all | business | sale | promo
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -51,10 +51,37 @@ const MyFavoritesPage = () => {
                     if (f.saleAdId) f.saleAdId.isFavorite = true;
                     return { type: 'sale', data: f.saleAdId };
                 }).filter(x => x.data && x.data._id);
-                const promoFavs = (promoJson?.data?.favorites || []).map(f => {
-                    if (f.promoAdId) f.promoAdId.isFavorite = true;
-                    return { type: 'promo', data: f.promoAdId };
-                }).filter(x => x.data && x.data._id);
+                // Promo favorites: support both populated objects and raw IDs (fetch details if needed)
+                const rawPromoFavs = Array.isArray(promoJson?.data?.favorites) ? promoJson.data.favorites : [];
+                const idsToFetch = [];
+                const promoFavsPre = [];
+                for (const f of rawPromoFavs) {
+                    const ad = f?.promoAdId;
+                    if (ad && typeof ad === 'object') {
+                        ad.isFavorite = true;
+                        promoFavsPre.push({ type: 'promo', data: ad });
+                    } else if (typeof ad === 'string') {
+                        idsToFetch.push(ad);
+                    }
+                }
+                let fetchedAds = [];
+                if (idsToFetch.length) {
+                    try {
+                        fetchedAds = await Promise.all(idsToFetch.map(async (id) => {
+                            const r = await fetch(`${API}/api/v1/promo-ads/${id}`, { headers });
+                            const j = await r.json();
+                            const ad = j?.data?.ad;
+                            return ad ? { type: 'promo', data: { ...ad, isFavorite: true } } : null;
+                        }));
+                        fetchedAds = fetchedAds.filter(Boolean);
+                    } catch {}
+                }
+                // Fallback: some environments may return ads list directly
+                let promoFromAds = [];
+                if (Array.isArray(promoJson?.data?.ads)) {
+                    promoFromAds = promoJson.data.ads.map(ad => ({ type: 'promo', data: { ...ad, isFavorite: true } }));
+                }
+                const promoFavs = [...promoFavsPre, ...fetchedAds, ...promoFromAds];
 
                 setFavorites([...bizFavs, ...saleFavs, ...promoFavs]);
             } catch (error) {
@@ -72,6 +99,10 @@ const MyFavoritesPage = () => {
     const promoItems = useMemo(() => favorites.filter(f => f.type === 'promo').map(f => f.data), [favorites]);
 
     const counts = { business: bizItems.length, sale: saleItems.length, promo: promoItems.length, all: favorites.length };
+
+    useEffect(() => {
+        sessionStorage.setItem('favoritesActiveTab', activeTab);
+    }, [activeTab]);
 
     const items = useMemo(() => {
         if (activeTab === 'business') return bizItems.map(d => ({ type: 'business', data: d }));
@@ -105,15 +136,15 @@ const MyFavoritesPage = () => {
                     {t('common.backToHome')}
                 </button>
                 
-                <div className="page-header">
-                    <div className="page-header__content vertical">
-                        <h1 className="login-title">{t('favorites.title')}</h1>
+                <div className="sticky-header-block">
+                    <div className="page-header">
+                        <div className="page-header__content vertical">
+                            <h1 className="login-title">{t('favorites.title')}</h1>
+                        </div>
                     </div>
-                </div>
-
-                {/* Segmented tabs - show only after initial load */}
-                {!loading && (
-                <div className="favorites-tabs" role="tablist" aria-label="favorites categories">
+                    {/* Segmented tabs - show only after initial load */}
+                    {!loading && (
+                    <div className="favorites-tabs" role="tablist" aria-label="favorites categories">
                     <button className={`favorites-tab ${activeTab==='all'?'active':''}`} role="tab" aria-selected={activeTab==='all'} onClick={() => setActiveTab('all')}>
                         {t('favorites.tabs.all')} <span className="count">({counts.all})</span>
                     </button>
@@ -126,8 +157,10 @@ const MyFavoritesPage = () => {
                     <button className={`favorites-tab ${activeTab==='promo'?'active':''}`} role="tab" aria-selected={activeTab==='promo'} onClick={() => setActiveTab('promo')}>
                         {t('favorites.tabs.promo')} <span className="count">({counts.promo})</span>
                     </button>
+                    </div>
+                    )}
                 </div>
-                )}
+                <div style={{ height: 8 }} />
 
                 {items.length === 0 ? (
                     <div className="empty-state">

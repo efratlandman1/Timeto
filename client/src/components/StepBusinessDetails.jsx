@@ -54,7 +54,7 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
 
   const logoPreviewUrl = businessData.logo
     ? (typeof businessData.logo === 'string'
-        ? `${process.env.REACT_APP_API_DOMAIN}${businessData.logo.replace('/app/config', '')}`
+        ? `${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${String(businessData.logo).split('/').pop()}`
         : URL.createObjectURL(businessData.logo))
     : null;
 
@@ -108,22 +108,22 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
         )}
       </div>
 
-      <div className="form-group" style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+      <div className="form-group" style={{ display: 'flex' }}>
         <label htmlFor="phonePrefix" className="form-label" style={{ flexShrink: 0, marginTop: '6px' }}>
           {t('businessForm.fields.phone')}<RequiredMark />
         </label>
 
-        <div style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: "ltr", alignItems: 'center' }}>
+        <div className="phone-row" style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: "ltr", alignItems: 'center' }}>
           <select
             id="phonePrefix"
             name="prefix"
             value={businessData.prefix || ''}
             onChange={handleChange}
             className="form-input phone-prefix-select"
-            style={{ width: '72px', textAlign: 'center' }}
+            style={{ width: '110px', textAlign: 'center' }}
             required
           >
-            <option value="">{t('common.select')}</option>
+            <option value="">{t('businessForm.placeholders.prefix', 'קידומת')}</option>
             {PHONE_PREFIXES.map(prefix => (
               <option key={prefix} value={prefix}>{prefix}</option>
             ))}
@@ -139,9 +139,10 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
             style={{ flexGrow: 1 }}
             inputMode="numeric"
             maxLength={PHONE_NUMBER_MAX_LENGTH}
+            placeholder={t('businessForm.placeholders.phoneNumber', 'מספר')}
           />
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0, direction: 'rtl' }}>
+          <div className="whatsapp-inline" style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0, direction: 'rtl' }}>
             <input
               type="checkbox"
               id="hasWhatsapp"

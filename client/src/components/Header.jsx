@@ -5,7 +5,7 @@ import {
     FaSignOutAlt, 
     FaSignInAlt, 
     FaGlobe, 
-    FaPlusCircle,
+    FaArrowAltCircleDown,
     FaPlus,
     FaTags,
     FaBullhorn,
@@ -23,6 +23,7 @@ import {
     FaBars
 } from "react-icons/fa";
 import "../styles/Header.css";
+import LogoWordmark from './LogoWordmark';
 import { useSelector, useDispatch } from 'react-redux';
 import { getToken } from "../utils/auth";
 import { useTranslation } from 'react-i18next';
@@ -33,7 +34,7 @@ import { changeLanguage, getCurrentDirection } from '../i18n';
 import { useResponsive } from '../utils/ResponsiveProvider';
 
 const Header = () => {
-    const { isMobile, isTablet } = useResponsive();
+    const { isMobile, isTablet, width } = useResponsive();
     const navigate = useNavigate();
     const location = useLocation();
     const [showUserMenu, setShowUserMenu] = useState(false);
@@ -64,6 +65,10 @@ const Header = () => {
     const mobileMenuRef = useRef(null);
     const mobileMenuBtnRef = useRef(null);
     const [mobileCreateOpen, setMobileCreateOpen] = useState(false);
+    // PWA install prompt handling
+    const deferredPromptRef = useRef(null);
+    const [canInstall, setCanInstall] = useState(false);
+    const [installing, setInstalling] = useState(false);
     
     // Get language and direction from Redux with fallback values
     const uiState = useSelector(state => state.ui);
@@ -258,13 +263,42 @@ const Header = () => {
 
     const updatePopoverPosition = () => {
         if (!locationButtonRef.current) return;
-        const rect = locationButtonRef.current.getBoundingClientRect();
-        const style = { position: 'fixed', top: rect.bottom + 8, minWidth: 320, zIndex: 3000 };
+        const btnRect = locationButtonRef.current.getBoundingClientRect();
+        const viewport = { w: window.innerWidth, h: window.innerHeight };
+        const padding = 8;
+        const popRect = popoverRef.current ? popoverRef.current.getBoundingClientRect() : null;
+        const estimatedWidth = Math.min((popRect?.width || 320), viewport.w - padding * 2);
+        const estimatedHeight = Math.min((popRect?.height || 240), viewport.h - padding * 2);
+
+        const style = {
+            position: 'fixed',
+            zIndex: 3000,
+            minWidth: 320,
+            maxWidth: viewport.w - padding * 2,
+            maxHeight: 'calc(100vh - 80px)',
+            overflowY: 'auto'
+        };
+
+        // Horizontal clamping
         if (isRTL) {
-            style.right = window.innerWidth - rect.right;
+            const proposedRight = Math.max(padding, viewport.w - btnRect.right);
+            const maxRight = Math.max(padding, viewport.w - estimatedWidth - padding);
+            style.right = Math.min(proposedRight, maxRight);
         } else {
-            style.left = rect.left;
+            const proposedLeft = Math.max(padding, btnRect.left);
+            const maxLeft = Math.max(padding, viewport.w - estimatedWidth - padding);
+            style.left = Math.min(proposedLeft, maxLeft);
         }
+
+        // Prefer below; flip above if overflow
+        const belowTop = btnRect.bottom + 8;
+        if (belowTop + estimatedHeight > viewport.h - padding) {
+            // Place above
+            style.top = Math.max(padding, btnRect.top - estimatedHeight - 8);
+        } else {
+            style.top = Math.max(padding, belowTop);
+        }
+
         setPopoverStyle(style);
     };
 
@@ -293,6 +327,25 @@ const Header = () => {
     const handleToggleMobileCreate = () => {
         setMobileCreateOpen(prev => !prev);
     };
+
+    // Recompute popover position on resize/rotate while open
+    useEffect(() => {
+        if (!showPopover) return;
+        const onResize = () => updatePopoverPosition();
+        window.addEventListener('resize', onResize, { passive: true });
+        window.addEventListener('orientationchange', onResize, { passive: true });
+        return () => {
+            window.removeEventListener('resize', onResize);
+            window.removeEventListener('orientationchange', onResize);
+        };
+    }, [showPopover]);
+
+    // Recompute when content changes (address load) or direction changes
+    useEffect(() => {
+        if (showPopover) {
+            requestAnimationFrame(() => updatePopoverPosition());
+        }
+    }, [showPopover, address, addressLoading, direction]);
 
     // Ensure user menu stays inside viewport
     useEffect(() => {
@@ -431,6 +484,54 @@ const Header = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [showPopover]);
 
+    // Detect standalone display mode
+    const isStandalone = () => {
+        const mql = window.matchMedia('(display-mode: standalone)');
+        return mql.matches || window.navigator.standalone === true;
+    };
+
+    // Handle install events; also support global early event stored in window
+    useEffect(() => {
+        // On mount, if global deferred exists (fired before React), use it
+        if (window.__deferredPWAInstallPrompt && !isStandalone()) {
+            deferredPromptRef.current = window.__deferredPWAInstallPrompt;
+            setCanInstall(true);
+        }
+
+        const handleGlobalBefore = () => {
+            if (window.__deferredPWAInstallPrompt && !isStandalone()) {
+                deferredPromptRef.current = window.__deferredPWAInstallPrompt;
+                setCanInstall(true);
+            }
+        };
+        const handleGlobalInstalled = () => {
+            setCanInstall(false);
+            deferredPromptRef.current = null;
+        };
+        window.addEventListener('pwa-beforeinstallprompt', handleGlobalBefore);
+        window.addEventListener('pwa-appinstalled', handleGlobalInstalled);
+        return () => {
+            window.removeEventListener('pwa-beforeinstallprompt', handleGlobalBefore);
+            window.removeEventListener('pwa-appinstalled', handleGlobalInstalled);
+        };
+    }, []);
+
+    const handleInstallClick = async () => {
+        const promptEvent = deferredPromptRef.current || window.__deferredPWAInstallPrompt;
+        if (!promptEvent) return;
+        setInstalling(true);
+        try {
+            promptEvent.prompt();
+            const { outcome } = await promptEvent.userChoice;
+            if (outcome === 'accepted') {
+                setCanInstall(false);
+            }
+        } finally {
+            setInstalling(false);
+            deferredPromptRef.current = null;
+        }
+    };
+
     const formatAddress = (address) => address || '';
 
     // Safety check: don't render until Redux and i18n are ready
@@ -475,27 +576,14 @@ const Header = () => {
         <div className={headerClass}>
             <nav className={navClass}>
                 <div className={navRightClass}>
-                    <div className="logo" onClick={() => navigate("/")}> 
-                        <FaMapMarkerAlt className="logo-icon" />
+                    <div className="logo" onClick={() => navigate("/")} role="button" tabIndex={0} aria-label={t('header.logo.main')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/'); }}>
                         <div className={logoTextClass}>
-                            <span className="logo-text-main">{t('header.logo.main')}</span>
+                            <LogoWordmark />
                         </div>
                     </div>
-                    {(isMobile || isTablet) && (
-                        <button
-                            onClick={handleToggleLocationPopover}
-                            className="nav-button"
-                            title={t('header.myLocation')}
-                            type="button"
-                            ref={locationButtonRef}
-                            aria-expanded={showPopover}
-                            aria-haspopup="true"
-                        >
-                            <FaMapMarkerAlt />
-                        </button>
-                    )}
                 </div>
 
+                {!(isMobile || isTablet) && (
                 <div className={navCenterClass}>
                     <div className={navLinksClass}>
                         <button 
@@ -565,7 +653,20 @@ const Header = () => {
                             <FaLightbulb />
                             {t('header.suggest')}
                         </button>
-                        {!(isMobile || isTablet) && (
+                        {canInstall && !(isMobile || isTablet) && (
+                          <button
+                              className="nav-button"
+                              onClick={handleInstallClick}
+                              type="button"
+                              aria-label={t('header.install')}
+                              title={t('header.install')}
+                              disabled={installing}
+                          >
+                              <FaArrowAltCircleDown />
+                              {!isMobile && (t('header.installApp') !== 'header.installApp' ? t('header.installApp') : 'התקן אפליקציה')}
+                          </button>
+                        )}
+                        {!isMobile && (
                           <button
                               onClick={handleToggleLocationPopover}
                               className="nav-button"
@@ -580,8 +681,10 @@ const Header = () => {
                         {/* Popover moved outside center on mobile */}
                     </div>
                 </div>
+                )}
 
                 <div className={navLeftClass}>
+
                     <div className={langSwitchClass}>
                         <button
                             className={`lang-toggle-pill ${direction}`}
@@ -603,6 +706,20 @@ const Header = () => {
                         </div>
                     ) : (
                         username ? (
+                            <>
+                                {(isMobile || isTablet) && (
+                                    <button
+                                    className="nav-button"
+                                    onClick={handleToggleLocationPopover}
+                                    type="button"
+                                    aria-label={t('header.myLocation')}
+                                    title={t('header.myLocation')}
+                                    ref={locationButtonRef}
+                                    style={{ marginInlineEnd: '4px' }}
+                                    >
+                                    <FaMapMarkerAlt />
+                                    </button>
+                                )}
                             <div className={userMenuClass} ref={userMenuRef}>
                                 <button 
                                     className="nav-button with-hover" 
@@ -612,7 +729,7 @@ const Header = () => {
                                     aria-haspopup="true"
                                 >
                                     <FaUserCircle />
-                                    {!isMobile && <span>{greeting} <span className="username">{username}</span></span>}
+                                    <span>{greeting} <span className="username">{username}</span></span>
                                 </button>
                                 {showUserMenu && (
                                     <div 
@@ -666,8 +783,22 @@ const Header = () => {
                                     </div>
                                 )}
                             </div>
+                            </>
                         ) : (
                             <div className={authButtonsClass}>
+                                {(isMobile || isTablet) && (
+                                    <button
+                                    className="nav-button"
+                                    onClick={handleToggleLocationPopover}
+                                    type="button"
+                                    aria-label={t('header.myLocation')}
+                                    title={t('header.myLocation')}
+                                    ref={locationButtonRef}
+                                    style={{ marginInlineEnd: '4px' }}
+                                    >
+                                    <FaMapMarkerAlt />
+                                    </button>
+                                )}
                                 <button className="auth-button" onClick={() => navigate("/auth", { state: { background: location } })}>
                                     <FaSignInAlt />
                                     {!isMobile && (<>{t('header.register')} / {t('header.login')}</>)}
@@ -710,6 +841,13 @@ const Header = () => {
                 aria-label="Mobile Menu"
                 ref={mobileMenuRef}
             >
+                <button 
+                    className="mobile-menu-item"
+                    onClick={() => { setShowMobileMenu(false); handleToggleLocationPopover(); }}
+                >
+                    <FaMapMarkerAlt />
+                    <span>{t('header.myLocation')}</span>
+                </button>
                 <button 
                     className="mobile-menu-item"
                     onClick={() => { setShowMobileMenu(false); navigate("/"); }}

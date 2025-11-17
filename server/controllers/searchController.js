@@ -83,7 +83,12 @@ exports.getAllUnified = async (req, res) => {
     let saleQuery = { active: true };
     if (q) saleQuery.$text = { $search: q };
     if (saleCategoryId && toObjectId(saleCategoryId)) saleQuery.categoryId = toObjectId(saleCategoryId);
-    if (saleSubcategoryId && toObjectId(saleSubcategoryId)) saleQuery.subcategoryId = toObjectId(saleSubcategoryId);
+    const saleSubIds = toObjectIdArray(req.query.saleSubcategoryId);
+    if (saleSubIds.length) {
+      saleQuery.subcategoryId = { $in: saleSubIds };
+    } else if (saleSubcategoryId && toObjectId(saleSubcategoryId)) {
+      saleQuery.subcategoryId = toObjectId(saleSubcategoryId);
+    }
     if (city) saleQuery.city = { $regex: new RegExp(city, 'i') };
     const min = priceMin !== undefined && priceMin !== '' ? Number(priceMin) : null;
     const max = priceMax !== undefined && priceMax !== '' ? Number(priceMax) : null;
@@ -112,12 +117,48 @@ exports.getAllUnified = async (req, res) => {
     // the batch will drop and lead to too few results and inconsistent totals across sort modes.
     const batchMultiplier = requireOpenNow ? 10 : 3;
     const batchSize = Math.min(200, limitNum * batchMultiplier);
-    const [bizRaw, salesRaw, promosRaw] = await Promise.all([
-      // Avoid pre-sorting by name here to prevent bias before openNow filtering; final sort applied later
-      Business.find(businessQuery).sort({ updatedAt: -1, createdAt: -1 }).limit(batchSize).lean(),
-      SaleAd.find(saleQuery).sort({ createdAt: -1 }).limit(batchSize).lean(),
-      PromoAd.find(promoQuery).sort({ createdAt: -1 }).limit(batchSize).lean()
-    ]);
+    let bizRaw = [];
+    let salesRaw = [];
+    let promosRaw = [];
+    const hasLatLng = lat && lng;
+    if (hasLatLng) {
+      const latN = parseFloat(lat);
+      const lngN = parseFloat(lng);
+      const nearPoint = { type: 'Point', coordinates: [lngN, latN] };
+      // Distance-first prefetch to avoid missing nearby items due to createdAt ordering
+      const [bizAgg, saleAgg, promoAgg] = await Promise.all([
+        Business.aggregate([
+          { $geoNear: { near: nearPoint, distanceField: 'distance', spherical: true, query: businessQuery } },
+          { $limit: batchSize }
+        ]),
+        SaleAd.aggregate([
+          { $geoNear: { near: nearPoint, distanceField: 'distance', spherical: true, query: saleQuery } },
+          { $limit: batchSize }
+        ]),
+        PromoAd.aggregate([
+          { $geoNear: { near: nearPoint, distanceField: 'distance', spherical: true, query: promoQuery } },
+          { $limit: batchSize },
+          // join category to expose name consistently
+          { $lookup: { from: 'categories', localField: 'categoryId', foreignField: '_id', as: 'category' } },
+          { $addFields: { categoryId: { $arrayElemAt: ['$category', 0] } } },
+          { $project: { category: 0 } }
+        ])
+      ]);
+      bizRaw = bizAgg;
+      salesRaw = saleAgg;
+      promosRaw = promoAgg;
+    } else {
+      // Choose prefetch sort according to requested sort when no geo is present
+      let businessPrefetchSort = { updatedAt: -1, createdAt: -1 };
+      if (sort === 'rating') businessPrefetchSort = { rating: -1, updatedAt: -1 };
+      if (sort === 'name') businessPrefetchSort = { name: 1 };
+
+      [bizRaw, salesRaw, promosRaw] = await Promise.all([
+        Business.find(businessQuery).sort(businessPrefetchSort).limit(batchSize).lean(),
+        SaleAd.find(saleQuery).sort({ createdAt: -1 }).limit(batchSize).lean(),
+        PromoAd.find(promoQuery).populate('categoryId', 'name').sort({ updatedAt: -1, createdAt: -1 }).limit(batchSize).lean()
+      ]);
+    }
 
     // Apply openNow filtering
     const isBusinessOpenNow = (b) => {
@@ -170,7 +211,13 @@ exports.getAllUnified = async (req, res) => {
       id: it.data?._id,
       title: it.data?.title || it.data?.name || '',
       price: it.type === 'sale' ? it.data?.price ?? null : null,
-      categoryId: it.type === 'sale' ? it.data?.categoryId ?? null : (it.type === 'business' ? it.data?.categoryId ?? null : null),
+      categoryId: it.type === 'sale'
+        ? it.data?.categoryId ?? null
+        : (it.type === 'business'
+            ? it.data?.categoryId ?? null
+            : (it.type === 'promo'
+                ? (it.data?.categoryId?._id || it.data?.categoryId || null)
+                : null)),
       subcategoryId: it.type === 'sale' ? it.data?.subcategoryId ?? null : null,
       serviceIds: it.type === 'business' ? (Array.isArray(it.data?.services) ? it.data.services : []) : [],
       rating: it.type === 'business' ? (it.data?.rating ?? null) : null,

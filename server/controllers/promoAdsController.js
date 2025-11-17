@@ -40,7 +40,7 @@ exports.createPromoAd = async (req, res) => {
     const logSource = 'promoAdsController.createPromoAd';
     const meta = getRequestMeta(req, logSource);
     try {
-        const { title, city, address, validFrom, validTo } = req.body;
+        const { title, city, address, validFrom, validTo, categoryId } = req.body;
         if (!req.file) {
             return errorResponse({ res, req, status: 400, message: PROMO_AD_MESSAGES.IMAGE_REQUIRED, logSource });
         }
@@ -52,6 +52,7 @@ exports.createPromoAd = async (req, res) => {
             city,
             address: address || '',
             location: { type: 'Point', coordinates: [location.lng, location.lat] },
+            categoryId: categoryId || undefined,
             image: req.file.filename,
             validFrom: new Date(validFrom),
             validTo: new Date(validTo),
@@ -75,13 +76,14 @@ exports.updatePromoAd = async (req, res) => {
         if (String(ad.userId) !== String(req.user._id) && req.user.role !== 'admin') {
             return errorResponse({ res, req, status: 403, message: PROMO_AD_MESSAGES.UNAUTHORIZED_EDIT, logSource });
         }
-        const { title, city, address, validFrom, validTo, active } = req.body;
+        const { title, city, address, validFrom, validTo, active, categoryId } = req.body;
         if (title) ad.title = title;
         if (city) ad.city = city;
         if (address !== undefined) ad.address = address;
         if (validFrom) ad.validFrom = new Date(validFrom);
         if (validTo) ad.validTo = new Date(validTo);
         if (typeof active !== 'undefined') ad.active = !!active;
+        if (categoryId !== undefined) ad.categoryId = categoryId || undefined;
         if ((address && address !== ad.address) || (city && !address)) {
             const addr = address || city;
             const location = await mapsUtils.geocode(addr, req);
@@ -103,7 +105,7 @@ exports.getPromoAds = async (req, res) => {
     try {
         const { q, status = 'active', lat, lng, maxDistance, sort = 'newest', page = 1, limit = DEFAULT_LIMIT } = req.query;
         const pageNum = Number(page) || 1;
-        const limitNum = Math.min(Number(limit) || DEFAULT_LIMIT, 40);
+        const limitNum = Math.min(Number(limit) || DEFAULT_LIMIT, 50);
         const skip = (pageNum - 1) * limitNum;
 
         const query = buildPromoQuery(q, status);
@@ -119,12 +121,13 @@ exports.getPromoAds = async (req, res) => {
                     query
                 }
             };
-            const sortStage = { $sort: sort === 'distance' ? { distance: 1 } : { validFrom: -1 } };
+            const sortStage = { $sort: sort === 'distance' ? { distance: 1 } : { updatedAt: -1, createdAt: -1 } };
             const projectStage = {
                 $project: {
                     title: 1,
                     city: 1,
                     address: 1,
+                    categoryId: 1,
                     image: 1,
                     validFrom: 1,
                     validTo: 1,
@@ -136,14 +139,27 @@ exports.getPromoAds = async (req, res) => {
                     distance: 1
                 }
             };
+            const lookupStage = {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'categoryId',
+                    foreignField: '_id',
+                    as: 'category'
+                }
+            };
+            const addFieldStage = {
+                $addFields: {
+                    categoryId: { $arrayElemAt: ['$category', 0] }
+                }
+            };
             [data, total] = await Promise.all([
-                PromoAd.aggregate([geoNearStage, sortStage, projectStage, { $skip: skip }, { $limit: limitNum }]),
+                PromoAd.aggregate([geoNearStage, sortStage, projectStage, lookupStage, addFieldStage, { $skip: skip }, { $limit: limitNum }]),
                 PromoAd.countDocuments(query)
             ]);
         } else {
-            const sortOption = sort === 'newest' ? { validFrom: -1 } : { createdAt: -1 };
+            const sortOption = sort === 'newest' ? { updatedAt: -1, createdAt: -1 } : { createdAt: -1 };
             [data, total] = await Promise.all([
-                PromoAd.find(query).sort(sortOption).skip(skip).limit(limitNum).lean(),
+                PromoAd.find(query).populate('categoryId', 'name').sort(sortOption).skip(skip).limit(limitNum).lean(),
                 PromoAd.countDocuments(query)
             ]);
         }
@@ -241,7 +257,7 @@ exports.getUserPromoAds = async (req, res) => {
     const logSource = 'promoAdsController.getUserPromoAds';
     const meta = getRequestMeta(req, logSource);
     try {
-        const ads = await PromoAd.find({ userId: req.user._id }).sort({ active: -1, createdAt: -1 });
+        const ads = await PromoAd.find({ userId: req.user._id }).populate('categoryId', 'name').sort({ active: -1, createdAt: -1 });
         return successResponse({ res, req, data: { ads }, message: PROMO_AD_MESSAGES.GET_ALL_SUCCESS, logSource });
     } catch (err) {
         logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);

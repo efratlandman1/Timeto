@@ -45,6 +45,11 @@ const SaleAdProfilePage = () => {
     fetchAd();
   }, [id]);
 
+  useEffect(() => {
+    document.body.classList.add('no-scroll');
+    return () => document.body.classList.remove('no-scroll');
+  }, []);
+
   if (loading) {
     return (
       <div className="wide-page-container">
@@ -69,19 +74,20 @@ const SaleAdProfilePage = () => {
 
   return (
     <div className="modal-overlay-fixed" onClick={() => navigate(-1)}>
-      <div className="modal-container suggest-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="sale-modal-title">
+      <div className="modal-container suggest-modal ads-fullheight" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="sale-modal-title">
         <div className="modal-header">
           <button className="modal-close" aria-label="Close" onClick={() => navigate(-1)}><FaTimes /></button>
           <h1 id="sale-modal-title" className="login-title suggest-modal-title">{ad.title}</h1>
         </div>
 
         {/* In modal view, show contact below the image for less scrolling and better fit */}
+        <div className="modal-body-scroll">
         <div className="two-column-section" style={{ display: 'block' }}>
           {/* Image Top */}
           <div className="column-card" style={{ marginBottom: 16 }}>
-            <div style={{ position: 'relative', minHeight: 360 }}>
+            <div style={{ position: 'relative', minHeight: 320 }}>
               {selectedImage ? (
-                <div style={{ height: 360, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa', borderRadius: 12 }}>
+                <div style={{ height: 320, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa', borderRadius: 12 }}>
                   <img
                     src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${selectedImage}`}
                     alt={ad.title}
@@ -193,14 +199,11 @@ const SaleAdProfilePage = () => {
               <h3 className="info-card-title">{t('common.details', 'Details')}</h3>
             </div>
             <div className="services-grid">
-              {ad.categoryId?.name && (
-                <div className="service-tag">{t('common.category', 'Category')}: {ad.categoryId.name}</div>
-              )}
-              {ad.price !== undefined && (
-                <div className="service-tag">{t('common.price', 'Price')}: {ad.price} {ad.currency || 'ILS'}</div>
-              )}
+              {ad.categoryId?.name && (<div className="service-tag">{ad.categoryId.name}</div>)}
+              {ad.price !== undefined && (<div className="service-tag">{ad.price} {ad.currency || 'ILS'}</div>)}
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

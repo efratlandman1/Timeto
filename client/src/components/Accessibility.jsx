@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FaUniversalAccess, FaFont, FaTimes, FaAdjust, FaMousePointer, FaAlignRight, FaKeyboard } from 'react-icons/fa';
+import { FaUniversalAccess, FaFont, FaTimes, FaAdjust, FaMousePointer, FaKeyboard, FaGlobe } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import '../styles/Accessibility.css';
+import { changeLanguage } from '../i18n';
 
 const Accessibility = () => {
   const { t } = useTranslation();
@@ -116,6 +117,13 @@ const Accessibility = () => {
 
             <div className="accessibility-options">
               <div className="option-group">
+                <h3><FaGlobe /> {t('header.selectLanguage')}</h3>
+                <div className="button-group">
+                  <button onClick={() => changeLanguage('he')} className={document.documentElement.dir === 'rtl' ? 'active' : ''}>{t('header.languages.he')}</button>
+                  <button onClick={() => changeLanguage('en')} className={document.documentElement.dir === 'ltr' ? 'active' : ''}>{t('header.languages.en')}</button>
+                </div>
+              </div>
+              <div className="option-group">
                 <h3><FaFont /> {t('accessibility.fontSize')}</h3>
                 <div className="button-group">
                                       <button 
@@ -194,9 +202,6 @@ const Accessibility = () => {
               </button>
               <button className="reset-button" style={{ background: '#4caf50' }} onClick={() => setIsOpen(false)}>
                 {t('accessibility.apply')}
-              </button>
-              <button className="cancel-button" type="button" onClick={() => setIsOpen(false)} style={{marginTop: '1.5rem', width: '100%'}}>
-                {t('accessibility.cancel')}
               </button>
             </div>
           </div>

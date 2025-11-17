@@ -7,7 +7,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Autocomplete, useJsApiLoader } from '@react-google-maps/api';
 const GOOGLE_LIBRARIES = ['places'];
 
-const MAX_DISTANCE_KM = 100;
+const MAX_DISTANCE_KM = 1000;
 
 const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   const { t, i18n } = useTranslation();

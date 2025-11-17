@@ -53,14 +53,14 @@
 }
 
 /* Desktop - Hide mobile bottom nav */
-@media (min-width: 768px) {
+@media (min-width: 1025px) {
   .mobile-bottom-nav {
     display: none;
   }
 }
 
-/* Add bottom padding to body when mobile nav is visible */
-@media (max-width: 767px) {
+/* Add bottom padding to body when bottom nav is visible (up to tablet width) */
+@media (max-width: 1024px) {
   body {
     padding-bottom: 80px;
   }

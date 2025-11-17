@@ -11,6 +11,36 @@ const SaleAdCard = ({ ad, onFavoriteRemoved }) => {
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const [localActive, setLocalActive] = React.useState(ad.active !== false);
   const [isFavorite, setIsFavorite] = React.useState(ad.isFavorite || false);
+  const images = Array.isArray(ad?.images) ? ad.images : (mainImage ? [mainImage] : []);
+  const [hovered, setHovered] = React.useState(false);
+  const [activeIdx, setActiveIdx] = React.useState(0);
+  const hoverTimerRef = React.useRef(null);
+
+  const startHoverCycle = () => {
+    if (!images || images.length <= 1) return;
+    if (hoverTimerRef.current) return;
+    hoverTimerRef.current = setInterval(() => {
+      setActiveIdx((idx) => (idx + 1) % images.length);
+    }, 2000);
+  };
+
+  const stopHoverCycle = () => {
+    if (hoverTimerRef.current) {
+      clearInterval(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+  };
+
+  React.useEffect(() => {
+    if (!hovered) {
+      stopHoverCycle();
+      setActiveIdx(0);
+    } else {
+      startHoverCycle();
+    }
+    return stopHoverCycle;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hovered, images?.length]);
   const handleDelete = async (e) => {
     e.stopPropagation();
     try {
@@ -23,6 +53,7 @@ const SaleAdCard = ({ ad, onFavoriteRemoved }) => {
       if (res.ok) {
         setLocalActive(false);
         setConfirmDelete(false);
+        showToast('✅ המודעה נמחקה');
       }
     } catch {}
   };
@@ -40,15 +71,39 @@ const SaleAdCard = ({ ad, onFavoriteRemoved }) => {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (res.ok) setLocalActive(true);
+      if (res.ok) {
+        setLocalActive(true);
+        showToast('✅ המודעה שוחזרה בהצלחה');
+      }
     } catch {}
   };
 
   return (
-    <div className={`business-card ${!localActive ? 'inactive' : ''}`} role="article" aria-label={ad.title} onClick={() => navigate(`/ads/sale/${ad._id}`, { state: { background: location } })} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/ads/sale/${ad._id}`, { state: { background: location } }); }}>
-      <div className="business-card-image-container" style={{ background: '#ffffff' }}>
-        {mainImage ? (
-          <img className="business-card-image" src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${mainImage}`} alt={ad.title} />
+    <div
+      className={`business-card ${!localActive ? 'inactive' : ''}`}
+      role="article"
+      aria-label={ad.title}
+      onClick={() => navigate(`/ads/sale/${ad._id}`, { state: { background: location } })}
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/ads/sale/${ad._id}`, { state: { background: location } }); }}
+    >
+      <div
+        className="business-card-image-container"
+        style={{ background: '#ffffff' }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        {!localActive && (<div className="status-badge inactive">לא פעיל</div>)}
+        {images && images.length > 0 ? (
+          <img
+            key={`${ad._id}-img-active-${activeIdx}`}
+            className="business-card-image fade-in"
+            src={`${process.env.REACT_APP_API_DOMAIN || ''}/uploads/${images[activeIdx]}`}
+            alt={ad.title}
+            loading="eager"
+            draggable={false}
+            style={{ objectFit: 'cover' }}
+          />
         ) : (
           <span className="business-card-placeholder">
             <span className="business-placeholder-name">{ad.title}</span>
@@ -95,10 +150,9 @@ const SaleAdCard = ({ ad, onFavoriteRemoved }) => {
           </div>
         </div>
         <div className="business-card-footer">
-          <div className="business-card-rating">
-            {ad.price !== undefined && (
-              <div className="font-medium">{ad.price} {ad.currency || 'ILS'}</div>
-            )}
+          <div className="business-card-rating" />
+          <div className={`price-slot ${ad.price == null ? 'empty' : ''}`}>
+            {ad.price != null ? (<span className="font-medium">{ad.price} {ad.currency || 'ILS'}</span>) : null}
           </div>
           {ad.canManage ? (
             <div className="business-card-actions">

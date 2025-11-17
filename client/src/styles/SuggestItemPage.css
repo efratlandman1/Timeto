@@ -218,10 +218,151 @@
   max-height: 90vh;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  overflow: auto;
-  padding-bottom: 1rem; /* space after last element */
+  overflow: auto; /* allow scrolling when content exceeds height */
+  padding-bottom: 1rem;
 }
 
+/* Ads/profile modals: only expand height to fill screen elegantly */
+.modal-container.suggest-modal.ads-fullheight {
+  /* Fill the viewport height for ads modal (portrait benefits most) */
+  height: 120vh;
+  height: 120dvh; /* modern browsers */
+  max-height: 120vh;
+  max-height: 120dvh;
+}
+.ads-fullheight .modal-body-scroll {
+  height: calc(100% - 64px); /* account for sticky header */
+  max-height: none;
+}
+/* Promo images: thin margins around the image */
+.ads-fullheight.promo-landscape .modal-body-scroll,
+.ads-fullheight.promo-portrait .modal-body-scroll {
+  padding: 0.5rem;
+}
+/* Ensure image truly fills the available dimension per orientation */
+.ads-fullheight.promo-portrait .modal-body-scroll img {
+  height: 100%;
+  width: auto;
+  max-height: 100%;
+  max-width: none;
+}
+.ads-fullheight.promo-landscape .modal-body-scroll img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: none;
+}
+@media (max-width: 768px) {
+  .modal-container.suggest-modal.ads-fullheight {
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+  }
+  .ads-fullheight .modal-body-scroll {
+    height: calc(100% - 56px);
+  }
+}
+
+/* Smaller hero/header strip when viewing Business in ads modal (≈10% visual) */
+.ads-fullheight .business-hero {
+  height: 120px;
+  margin-bottom: 0.75rem;
+  border-radius: 12px;
+}
+.ads-fullheight .business-hero-content {
+  padding: 0.5rem 1rem;
+  max-width: 560px;
+}
+.ads-fullheight .business-hero-title {
+  font-size: 1.6rem;
+}
+.ads-fullheight .business-hero-category {
+  font-size: 0.95rem;
+}
+@media (max-width: 768px) {
+  .ads-fullheight .business-hero { height: 100px; }
+  .ads-fullheight .business-hero-title { font-size: 1.4rem; }
+}
+
+/* Compact contact tiles in Business/Sale ads modal */
+.ads-fullheight .contact-section {
+  padding: 0.75rem 0.75rem;
+  margin-bottom: 1rem;
+}
+.ads-fullheight .contact-grid {
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+}
+.ads-fullheight .contact-card {
+  padding: 0.5rem;
+}
+.ads-fullheight .contact-icon { width: 28px; height: 28px; }
+.ads-fullheight .contact-icon svg { width: 14px; height: 14px; }
+.ads-fullheight .contact-label, 
+.ads-fullheight .contact-value { font-size: 0.85rem; }
+/* On mobile show only contact method (hide value) to save space */
+@media (max-width: 768px) {
+  .ads-fullheight .contact-card .contact-value { display: none; }
+}
+
+/* Promo ad orientation: widen for landscape image, keep default for portrait */
+.modal-container.suggest-modal.ads-fullheight.promo-landscape {
+  width: clamp(900px, 92vw, 1200px);
+  max-width: 100%;
+}
+.modal-container.suggest-modal.ads-fullheight.promo-portrait {
+  /* Portrait page - use a wider standard (3:4) so image can reach full height without cropping */
+  width: min(70vw, calc(0.75 * 120dvh), 92vw);
+  height: min(120dvh, calc((4 / 3) * 70vw), calc((4 / 3) * 92vw));
+  max-width: 100%;
+}
+@media (max-width: 768px) {
+  .modal-container.suggest-modal.ads-fullheight.promo-portrait {
+    width: min(80vw, calc(0.75 * 120dvh), 95vw);
+    height: min(120dvh, calc((4 / 3) * 80vw), calc((4 / 3) * 95vw));
+    max-width: 95vw;
+  }
+}
+
+/* Mobile fine-tuning: don't take full screen, keep comfortable margins */
+@media (max-width: 480px) {
+  .modal-container.suggest-modal.ads-fullheight {
+    height: 88vh;
+    height: 88dvh;
+    max-height: 88vh;
+    max-height: 88dvh;
+  }
+  .modal-container.suggest-modal.ads-fullheight.promo-portrait {
+    /* Match landscape feel: wide margins, capped height */
+    width: min(96vw, 560px);
+    height: auto;
+    max-height: 95vh;
+  }
+  .modal-container.suggest-modal.ads-fullheight.promo-landscape {
+    width: min(98vw, 1200px);
+    height: auto;               /* let content dictate height for landscape */
+    max-height: 95vh;
+  }
+  .ads-fullheight.promo-portrait .modal-body-scroll {
+    height: auto;
+    max-height: calc(95vh - 56px);
+  }
+  .ads-fullheight.promo-portrait .modal-body-scroll img {
+    max-height: calc(95vh - 56px - 8px);
+    width: auto;
+    height: auto;
+  }
+  .ads-fullheight.promo-landscape .modal-body-scroll {
+    height: auto;               /* prevent forced tall container */
+    max-height: calc(95vh - 56px); /* leave room for header */
+  }
+  .ads-fullheight.promo-landscape .modal-body-scroll img {
+    width: 100%;
+    height: auto;
+    max-height: calc(95vh - 56px - 8px); /* account small padding */
+  }
+}
 /* Ensure all corners render rounded in all directions */
 /* .modal-container.suggest-modal, .modal-container.suggest-modal * {
   background-clip: padding-box;
@@ -245,7 +386,12 @@
 }
 
 /* Add inner scroll wrapper to avoid content touching rounded corners */
-.modal-body-scroll { padding: 0 1rem 1rem; }
+.modal-body-scroll { 
+  padding: 0 1rem 1rem; 
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(90vh - 64px); /* header ~64px */
+}
 
 .modal-header h1 { font-size: 1.35rem; margin: 0; font-weight: 700; width: 100%; text-align: end; }
 
@@ -263,12 +409,33 @@
   display: block;
   margin: 0 auto 0.5rem auto;
   font-size: 1.6rem; /* larger title for advanced search too */
+  max-width: 300px; /* align with Google button width in auth */
+  width: 100%;
 }
 .modal-subtitle { margin: 0; color: #555; }
 
+.suggest-modal .button-row {
+  position: static;
+  background: #fff;
+  padding: 0.75rem 1.25rem;
+  margin-inline: 1.25rem;
+  border-top: 1px solid #eee;
+  width: auto;
+}
+
+/* Override any generic sticky style applied elsewhere for .button-row.fullwidth inside Suggest modal */
+.modal-container.suggest-modal .button-row.fullwidth {
+  position: static !important;
+  bottom: auto !important;
+  box-shadow: none !important;
+  z-index: auto !important;
+  width: auto !important;
+  margin-inline: 1.25rem !important;
+}
+
 .modal-close {
   background: none;
-  border: none;
+  border: 1px solid #dddddd;
   color: #999;
   font-size: 20px;
   cursor: pointer;
@@ -282,7 +449,8 @@
   position: absolute; /* pin relative to header */
   top: 1rem;
 }
-.modal-close:hover { background: #f2f2f2; color: #666; }
+.modal-close:hover { background: #f9f9f9; color: #666; border-color: #cccccc; }
+.modal-close:focus-visible { outline: 2px solid #d32f2f; outline-offset: 2px; }
 /* Ensure X pins to correct side tightly */
 
 /* Use document direction attribute to ensure flipping works globally */
@@ -297,7 +465,6 @@ html[dir="ltr"] .modal-header .modal-close { inset-inline-end: 1rem; inset-inlin
 /* Add comfortable horizontal padding for inner content */
 .suggest-modal .section-card,
 .suggest-modal .standalone-field,
-.suggest-modal .button-row,
 .suggest-modal .segmented-control,
 .suggest-modal .two-col,
 .suggest-modal .form-group { margin-inline: 1.25rem; }

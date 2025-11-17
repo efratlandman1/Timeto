@@ -83,6 +83,14 @@ const BusinessProfilePage = () => {
     });
   };
 
+  useEffect(() => {
+    // Lock background scroll when modal open
+    document.body.classList.add('no-scroll');
+    return () => {
+      document.body.classList.remove('no-scroll');
+    };
+  }, []);
+
   if (loading) return <div className="loading">{t('businessProfile.loading')}</div>;
   if (error) return <div className="error">{t('businessProfile.error')}: {error}</div>;
   if (!business) return <div className="not-found">{t('businessProfile.notFound')}</div>;
@@ -94,7 +102,7 @@ const BusinessProfilePage = () => {
 
   return (
     <div className="modal-overlay-fixed" onClick={() => navigate(-1)}>
-      <div className="modal-container suggest-modal business-profile-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="business-modal-title">
+      <div className="modal-container suggest-modal ads-fullheight business-profile-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="business-modal-title">
         <div className="modal-header">
           <button className="modal-close" aria-label="Close" onClick={() => navigate(-1)}><FaTimes /></button>
           <h1 id="business-modal-title" className="login-title suggest-modal-title">{business.name}</h1>

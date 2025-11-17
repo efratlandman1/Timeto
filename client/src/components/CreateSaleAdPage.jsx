@@ -55,6 +55,10 @@ const CreateSaleAdPage = () => {
     if (value) setCity(value);
   };
 
+  // Always start at the top when entering this page
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
   useEffect(() => {
     const token = getToken();
     if (!token) {
@@ -192,7 +196,7 @@ const CreateSaleAdPage = () => {
       res = await dispatch(createSaleAd(fd));
     }
     if (res.meta.requestStatus === 'fulfilled') {
-      toast.success(editId ? t('common.success') : 'המודעה פורסמה בהצלחה', { position: 'top-center', className: 'custom-toast' });
+      toast.success(editId ? 'המודעה נערכה בהצלחה' : 'המודעה פורסמה בהצלחה', { position: 'top-center', className: 'custom-toast' });
       setTimeout(() => {
         if (editId) navigate('/user-businesses'); else navigate('/');
       }, 800);
@@ -228,20 +232,20 @@ const CreateSaleAdPage = () => {
               )}
             </div>
           </div>
-          <div className="form-group" style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-            <label htmlFor="phone" className="form-label" style={{ flexShrink: 0, marginTop: '6px' }}>
+          <div className="form-group" style={{ display: 'flex' }}>
+            <label htmlFor="phonePrefix" className="form-label" style={{ flexShrink: 0, marginTop: '6px' }}>
               {t('saleAd.fields.phone')} <span className="required-asterisk">*</span>
             </label>
-            <div style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: 'ltr', alignItems: 'center' }}>
+            <div className="phone-row" style={{ display: 'flex', gap: '8px', flexGrow: 1, direction: 'ltr', alignItems: 'center' }}>
               <select
                 id="phonePrefix"
                 name="prefix"
                 className="form-input phone-prefix-select"
-                style={{ width: '72px', textAlign: 'center' }}
+                style={{ width: '110px', textAlign: 'center' }}
                 value={prefix}
                 onChange={e => setPrefix(e.target.value)}
               >
-                <option value="">{t('saleAd.placeholders.select')}</option>
+                <option value="">{t('saleAd.placeholders.prefix', 'קידומת')}</option>
                 {PHONE_PREFIXES.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
               <input
@@ -254,16 +258,19 @@ const CreateSaleAdPage = () => {
                 onChange={e => setPhone(e.target.value)}
                 inputMode="numeric"
                 maxLength={PHONE_NUMBER_MAX_LENGTH}
+                placeholder={t('saleAd.placeholders.phoneNumber', 'מספר')}
                 required
               />
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0, direction: 'rtl' }}>
+              <div className="whatsapp-inline" style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0, direction: 'rtl' }}>
                 <input
                   type="checkbox"
                   id="hasWhatsapp"
                   checked={!!hasWhatsapp}
                   onChange={e => setHasWhatsapp(e.target.checked)}
                 />
-                <label htmlFor="hasWhatsapp" className="form-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>{t('saleAd.fields.hasWhatsapp')}</label>
+                <label htmlFor="hasWhatsapp" className="form-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>
+                  {t('saleAd.fields.hasWhatsapp')}
+                </label>
               </div>
             </div>
           </div>

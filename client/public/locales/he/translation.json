@@ -29,7 +29,9 @@
     "addressNotFound": "לא נמצאה כתובת",
     "addressError": "שגיאה בשליפת כתובת",
     "noLocation": "לא נמצא מיקום",
-    "refreshLocation": "רענן מיקום"
+    "refreshLocation": "רענן מיקום",
+    "install": "התקן אפליקציה",
+    "installed": "האפליקציה הותקנה"
   },
   "greetings": {
     "morning": "בוקר טוב",
@@ -67,6 +69,7 @@
       "title": "מצא את העסק המושלם",
       "subtitle": "בקרבתך ובכל הארץ"
     },
+    "heroPitch": "מחפשים? מוכרים? מפרסמים? כאן המקום שבו הכול נפגש",
     "joinNowAndDiscover": "הצטרפו עכשיו והתחילו לגלות דברים מעניינים סביבכם",
     "stats": {
       "newUsers": "משתמשים חדשים",
@@ -101,8 +104,8 @@
       "termsOfService": "תנאי שימוש",
       "termsComingSoon": "תנאי השימוש יהיו זמינים בקרוב",
       "about": "זזמן",
-      "aboutDescriptionLine1": "הקהילה שמחברת בין אנשים לעסקים",
-      "aboutDescriptionLine2": "מצאו עסקים, מודעות מכירה, פרסום והטבות חמות במקום אחד",
+      "aboutDescriptionLine1": "",
+      "aboutDescriptionLine2": "",
       "copyright": "© Zezman 2025 כל הזכויות שמורות."
     }
   },
@@ -144,7 +147,7 @@
   "auth": {
     "login": {
       "title": "התחברות",
-      "simpleLoginWithEmail": "התחברות פשוטה עם כתובת המייל שלכם",
+      "simpleLoginWithEmail": "או",
       "email": "אימייל",
       "emailAddress": "כתובת מייל",
       "password": "סיסמה",
@@ -268,9 +271,9 @@
     "nextImage": "תמונה הבאה"
   },
   "quickCreate": {
-    "business": { "title": "כרטיס עסק", "desc": "פתח כרטיס עסק חדש עם פרטים ושעות" },
-    "sale": { "title": "מודעת מכירה", "desc": "פרסם מוצר יד שנייה במהירות" },
-    "promo": { "title": "מודעת פרסום", "desc": "פרסם ארוע בעל תוקף" }
+    "business": { "title": "כרטיס עסק", "desc": "תן לעסק שלך במה" },
+    "sale": { "title": "מודעת מכירה", "desc": "מוכרים? זה המקום שלך" },
+    "promo": { "title": "מודעת פרסום", "desc": "תן לפרסום שלך לדבר" }
   },
   "saleAd": {
     "pageTitleNew": "הוספת מודעת מכירה",
@@ -379,11 +382,11 @@
       "hours": "יש להשלים שעות פתיחה וסגירה"
     },
     "buttons": {
-      "update": "עדכן עסק",
-      "create": "צור עסק חדש",
+      "update": "עדכון עסק",
+      "create": "צור הוספת חדש",
       "next": "הבא",
-      "back": "חזור",
-      "save": "שמור"
+      "back": "חזרה",
+      "save": "שמירה"
     },
     "fields": {
       "name": "שם העסק",
@@ -791,7 +794,7 @@
     "loading": "טוען עסקים...",
     "error": "שגיאה בטעינת העסקים",
     "subtitle": "נהל את העסקים והמודעות שהוספת למדריך",
-    "create": "צור",
+    "create": "הוספה",
     "createMenuAria": "תפריט יצירה",
     "createOptions": {
       "addBusiness": "הוספת עסק",

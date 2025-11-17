@@ -78,20 +78,23 @@ exports.getUserFavorites = async (req, res) => {
   try {
     logger.info({ ...meta, userId: req.user._id }, `${logSource} enter`);
 
-    const favorites = await Favorite.find({ 
+    // Only favorites that point to active businesses
+    let favorites = await Favorite.find({ 
       user_id: req.user._id,
       active: true 
     })
     .populate({
       path: 'business_id',
       select: 'name address prefix phone email logo rating categoryId services active',
+      match: { active: true },
       populate: [
         { path: 'categoryId', select: 'name color logo' },
         { path: 'services', select: 'name' }
       ]
     })
     .sort({ createdAt: -1 });
-    const businesses = favorites.map(fav => fav.business_id);
+    // Filter out favorites where the populated business is null (not active)
+    favorites = favorites.filter(f => f.business_id);
 
 
     logger.info({ ...meta, userId: req.user._id, count: favorites.length }, `${logSource} complete`);

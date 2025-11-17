@@ -18,6 +18,7 @@ import AdminPanelPage from './components/AdminPanelPage';
 import UserProfilePage from './components/UserProfilePage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
+import BrandLogoExport from './components/BrandLogoExport';
 import AdsHubPage from './components/AdsHubPage';
 import CreateSaleAdPage from './components/CreateSaleAdPage';
 import SaleAdProfilePage from './components/SaleAdProfilePage';
@@ -30,6 +31,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Accessibility from './components/Accessibility';
 import MobileBottomNav from './components/MobileBottomNav';
+import { useResponsive } from './utils/ResponsiveProvider';
 import './styles/global/index.css';
 import './i18n';
 import { useTranslation } from 'react-i18next';
@@ -64,6 +66,7 @@ function AppRoutes() {
                 <Route path="/admin" element={<AdminPanelPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/brand/export-logo" element={<BrandLogoExport />} />
             </Routes>
             {state?.background && (
                 <Routes>
@@ -83,6 +86,7 @@ function AppRoutes() {
 function App() {
     const dispatch = useDispatch();
     const { i18n, ready } = useTranslation();
+    const { isMobile, isTablet, width } = useResponsive();
     
     useEffect(() => {
         let user = null;
@@ -164,7 +168,7 @@ function App() {
                     <AppRoutes />
                     <Accessibility />
                 </main>
-                <MobileBottomNav />
+                {(isMobile || isTablet) && <MobileBottomNav />}
             </div>
         </Router>
     );
