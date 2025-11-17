@@ -1,4 +1,5 @@
 const rateLimit = require('express-rate-limit');
+const slowDown = require('express-slow-down');
 const logger = require('../logger');
 const { getRequestMeta } = require('../utils/errorUtils');
 const Sentry = require('../sentry');
@@ -63,8 +64,27 @@ const writeLimiter = createRateLimiter({
     message: 'Too many data modification attempts from this IP, please try again after 15 minutes',
 }, 'writeLimiter');
 
+// Soft slowdown for search: deters scraping without blocking real users.
+// Active only in production to avoid affecting developer experience.
+const searchSlowDown = slowDown({
+    windowMs: 60 * 1000,      // 1 minute window
+    delayAfter: 120,          // start adding delay after 120 req/min/IP
+    // Compute delay per request above threshold (up to 2s)
+    delay: (hits, req) => {
+        const over = Math.max(0, hits - 120);
+        const perHit = 250;      // 250ms per extra request
+        const max = 2000;        // cap at 2s
+        return Math.min(max, over * perHit);
+    },
+    skip: () => {
+        const env = process.env.NODE_ENV || 'development';
+        return env !== 'production';
+    }
+});
+
 module.exports = {
     generalLimiter,
     authLimiter,
-    writeLimiter
+    writeLimiter,
+    searchSlowDown
 }; 

@@ -82,7 +82,13 @@ const SearchResultPage = () => {
         saleSubcategoryIds: [],
     });
     const MAX_PRICE = 10000;
-    const { isLoaded: mapsLoaded } = useJsApiLoader({ id: 'google-maps-script', googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', libraries: GOOGLE_LIBRARIES });
+    const { isLoaded: mapsLoaded } = useJsApiLoader({ 
+        id: 'google-maps-script', 
+        googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', 
+        libraries: GOOGLE_LIBRARIES,
+        language: 'he',
+        region: 'IL'
+    });
     const cityAutoRef = useRef(null);
     const [activeFilters, setActiveFilters] = useState({});
     const [sortOption, setSortOption] = useState('rating');
@@ -190,6 +196,7 @@ const SearchResultPage = () => {
     useEffect(() => {
         if (activeTab !== 'all') return;
         setIsLoadingUnified(true);
+        const lastKeyRef = (SearchResultPage.__unifiedLastKeyRef ||= { current: '' });
         const headers = {};
         const token = getToken();
         if (token) headers.Authorization = `Bearer ${token}`;
@@ -217,6 +224,8 @@ const SearchResultPage = () => {
 
         params.set('page', unifiedPage.toString());
         params.set('limit', ITEMS_PER_PAGE.toString());
+        const requestKey = `all|${params.toString()}`;
+        if (lastKeyRef.current === requestKey) { setIsLoadingUnified(false); return; }
         axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/search/all?${params.toString()}`, { headers })
           .then(res => {
             const newItems = res.data?.data?.items || [];
@@ -225,7 +234,7 @@ const SearchResultPage = () => {
             setUnifiedTotalPages(totalPages);
           })
           .catch(() => {})
-          .finally(() => setIsLoadingUnified(false));
+          .finally(() => { lastKeyRef.current = requestKey; setIsLoadingUnified(false); });
     }, [activeTab, unifiedPage, location.search, userLocation, locationLoading, locationError]);
     
     useEffect(() => {
@@ -389,6 +398,7 @@ const SearchResultPage = () => {
 
     useEffect(() => {
         if (activeTab !== 'business') return;
+        const lastKeyRef = (SearchResultPage.__bizLastKeyRef ||= { current: '' });
         const params = new URLSearchParams(location.search);
         const sort = params.get('sort') || 'rating';
         const maxDistance = params.get('maxDistance');
@@ -452,7 +462,9 @@ const SearchResultPage = () => {
             headers.Authorization = `Bearer ${token}`;
         }
         
-                axios.get(url, { headers })
+        const requestKey = `biz|${url}`;
+        if (lastKeyRef.current === requestKey) return;
+        axios.get(url, { headers })
             .then(res => {
                 const newBusinesses = res.data?.data?.businesses || [];
                 setBusinesses(prevBusinesses => 
@@ -466,12 +478,14 @@ const SearchResultPage = () => {
             .catch(error => {
                 console.error('Error fetching businesses:', error);
                 setIsLoadingBiz(false);
-            });
+            })
+            .finally(() => { lastKeyRef.current = requestKey; });
     }, [location.search, bizPage, userLocation, locationLoading, locationError, activeTab]);
 
     // Fetch Sale Ads
     useEffect(() => {
         if (activeTab !== 'sale') return;
+        const lastKeyRef = (SearchResultPage.__saleLastKeyRef ||= { current: '' });
         const token = getToken();
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const params = new URLSearchParams(location.search);
@@ -509,7 +523,10 @@ const SearchResultPage = () => {
         subIds.forEach(id => qsParams.append('subcategoryId', id));
         const qs = qsParams.toString();
         setIsLoadingSale(true);
-        axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-ads?${qs}`, { headers })
+        const url = `${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-ads?${qs}`;
+        const requestKey = `sale|${url}`;
+        if (lastKeyRef.current === requestKey) { setIsLoadingSale(false); return; }
+        axios.get(url, { headers })
             .then(res => {
                 const newAds = res.data?.data?.ads || [];
                 setSaleAds(prev => requestedSalePage === 1 ? newAds : [...prev, ...newAds]);
@@ -521,12 +538,14 @@ const SearchResultPage = () => {
             .catch(err => {
                 console.error('Error fetching sale ads:', err);
                 setIsLoadingSale(false);
-            });
+            })
+            .finally(() => { lastKeyRef.current = requestKey; });
     }, [location.search, salePage, activeTab]);
 
     // Fetch Promo Ads
     useEffect(() => {
         if (activeTab !== 'promo') return;
+        const lastKeyRef = (SearchResultPage.__promoLastKeyRef ||= { current: '' });
         const token = getToken();
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const params = new URLSearchParams(location.search);
@@ -542,7 +561,10 @@ const SearchResultPage = () => {
 
         const qs = new URLSearchParams({ status: 'active', ...paramsObj }).toString();
         setIsLoadingPromo(true);
-        axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/promo-ads?${qs}`, { headers })
+        const url = `${process.env.REACT_APP_API_DOMAIN}/api/v1/promo-ads?${qs}`;
+        const requestKey = `promo|${url}`;
+        if (lastKeyRef.current === requestKey) { setIsLoadingPromo(false); return; }
+        axios.get(url, { headers })
             .then(res => {
                 const newAds = res.data?.data?.ads || [];
                 setPromoAds(prev => requestedPromoPage === 1 ? newAds : [...prev, ...newAds]);
@@ -554,7 +576,8 @@ const SearchResultPage = () => {
             .catch(err => {
                 console.error('Error fetching promo ads:', err);
                 setIsLoadingPromo(false);
-            });
+            })
+            .finally(() => { lastKeyRef.current = requestKey; });
     }, [location.search, promoPage, activeTab]);
 
     const SORT_OPTIONS = {
@@ -1104,7 +1127,22 @@ const SearchResultPage = () => {
                                                 onPlaceChanged={()=>{
                                                     const place = cityAutoRef.current?.getPlace();
                                                     if (!place) return;
-                                                    const inputVal = document.querySelector('.mini-input.full')?.value || place.name || '';
+                                                    // Prefer structured city from address_components to avoid ", ישראל"
+                                                    const comps = Array.isArray(place.address_components) ? place.address_components : [];
+                                                    const findByType = (types) => {
+                                                        for (const c of comps) {
+                                                            const t = c.types || [];
+                                                            if (types.some(tt => t.includes(tt))) {
+                                                                return c.long_name || c.short_name || '';
+                                                            }
+                                                        }
+                                                        return '';
+                                                    };
+                                                    let cityOnly = findByType(['locality']) || findByType(['postal_town']) || '';
+                                                    if (!cityOnly) {
+                                                        cityOnly = place.name || '';
+                                                    }
+                                                    const inputVal = cityOnly;
                                                     const geom = place.geometry && place.geometry.location ? place.geometry.location : null;
                                                     const lat = geom && typeof geom.lat === 'function' ? geom.lat() : undefined;
                                                     const lng = geom && typeof geom.lng === 'function' ? geom.lng() : undefined;
@@ -1181,7 +1219,29 @@ const SearchResultPage = () => {
                                         }
                                         if (drawerMode==='services') { handleApplyMulti({ services: tempValues.services }); return; }
                                         if (drawerMode==='saleSubs') { handleApplyMulti({ saleSubcategoryId: Array.isArray(tempValues.saleSubcategoryIds)? tempValues.saleSubcategoryIds : (tempValues.saleSubcategoryId? [tempValues.saleSubcategoryId] : []) }); return; }
-                                        if (drawerMode==='city') { const updates = { city: tempValues.city }; if (tempValues.cityLat!==undefined && tempValues.cityLng!==undefined) { updates.lat = tempValues.cityLat; updates.lng = tempValues.cityLng; if (!new URLSearchParams(location.search).get('maxDistance')) updates.maxDistance = tempValues.maxDistance || '10'; } handleApplyMulti(updates); return; }
+                                        // city handling below (no default 10km)
+                                        if (drawerMode==='city') {
+                                          const updates = { city: tempValues.city };
+                                          // הוסף lat/lng רק אם המשתמש הגדיר מרחק או מיון לפי מרחק
+                                          const params = new URLSearchParams(location.search);
+                                          const sort = params.get('sort') || 'rating';
+                                          const wantsDistance = (Number(tempValues.maxDistance) > 0) || (sort === 'distance' || sort === 'popular_nearby');
+                                          if (wantsDistance && tempValues.cityLat !== undefined && tempValues.cityLng !== undefined) {
+                                            updates.lat = tempValues.cityLat;
+                                            updates.lng = tempValues.cityLng;
+                                            if (Number(tempValues.maxDistance) > 0) {
+                                              updates.maxDistance = String(tempValues.maxDistance);
+                                            } else {
+                                              // אל תגדיר ברירת מחדל 10 ק״מ; המשתמש יבחר אם צריך
+                                              params.delete('maxDistance');
+                                            }
+                                          } else {
+                                            // הסר פרמטרי מרחק אם היו קיימים
+                                            params.delete('lat'); params.delete('lng'); params.delete('maxDistance');
+                                          }
+                                          handleApplyMulti(updates);
+                                          return;
+                                        }
                                         if (drawerMode==='price') { handleApplyMulti({ priceMin: tempValues.priceMin || '', priceMax: tempValues.priceMax || '' }); return; }
                                         if (drawerMode==='distance') { handleApplyMulti({ maxDistance: tempValues.maxDistance || '' }); return; }
                                         if (drawerMode==='rating') { handleApplyMulti({ rating: tempValues.rating || '' }); return; }

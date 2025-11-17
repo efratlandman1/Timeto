@@ -102,6 +102,7 @@ const businessSchema = [
     body('categoryId').isString().isMongoId().withMessage('Category ID must be a valid MongoDB ID string'),
     body('description').optional().isString().isLength({ max: 1000 }).withMessage('Description must be a string less than 1000 characters'),
     body('logo').optional().isString().withMessage('Logo must be a string'),
+    body('city').optional().isString().isLength({ min: 1, max: 100 }).withMessage('City must be a string between 1 and 100 characters'),
     body('services').optional().isArray().withMessage('Services must be an array'),
     body('openingHours').isArray({ min: 1 }).withMessage('OpeningHours must be a non-empty array'),
     body('openingHours.*.day').isInt({ min: 0, max: 6 }).withMessage('Each openingHours.day must be an integer (0-6)'),

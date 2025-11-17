@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const businessSchema = new mongoose.Schema({
     name: { type: String, required: true },
     address: { type: String, required: true },
+    city: { type: String },               // Human-readable city as entered/derived
+    normalizedCity: { type: String },     // Lowercased/trimmed city for exact matching
     location: {
         type: {
             type: String,
@@ -53,6 +55,7 @@ businessSchema.index({ services: 1 }); // אינדקס לסינון לפי שי�
 businessSchema.index({ rating: -1 }); // אינדקס למיון לפי דירוג
 businessSchema.index({ createdAt: -1 }); // אינדקס למיון לפי תאריך יצירה
 businessSchema.index({ active: 1 }); // אינדקס לסינון לפי סטטוס פעיל
+businessSchema.index({ normalizedCity: 1, active: 1 }); // סינון מהיר לפי עיר
 
 // אינדקס גיאו-מרחבי למיון לפי מרחק
 businessSchema.index({ location: '2dsphere' });

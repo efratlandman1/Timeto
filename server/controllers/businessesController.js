@@ -58,7 +58,7 @@ const buildSearchQuery = async (q) => {
  * @param {number} rating - דירוג מינימלי
  * @returns {Object} קוורי MongoDB
  */
-const buildFilterQuery = async (categoryName, services, rating) => {
+const buildFilterQuery = async (categoryName, services, rating, city) => {
     const query = { active: true };
 
     // קשר בין קטגוריה לשירותים:
@@ -105,6 +105,11 @@ const buildFilterQuery = async (categoryName, services, rating) => {
 
     if (rating) {
         query.rating = { $gte: Number(rating) };
+    }
+
+    // City exact match via normalized field (no regex)
+    if (city && typeof city === 'string') {
+        query.normalizedCity = city.toLowerCase().trim();
     }
 
     return query;
@@ -290,11 +295,11 @@ const createBusiness = async (req, res, userId) => {
         // const services = JSON.parse(req.body.services || '[]');
         const openingHours = req.body.openingHours || [];
         const services = req.body.services || [];
-        // Get coordinates from address
-        const location = await mapsUtils.geocode(req.body.address, req);
+        // Get coordinates + best-effort city from address
+        const geo = await mapsUtils.geocodeWithComponents(req.body.address, req);
         
         // ולידציה נוספת של הקואורדינטות
-        if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
+        if (!geo || !geo.location || typeof geo.location.lat !== 'number' || typeof geo.location.lng !== 'number') {
             logger.warn({ ...meta, address: req.body.address }, BUSINESS_MESSAGES.INVALID_COORDINATES);
             return errorResponse({
                 res,
@@ -307,10 +312,14 @@ const createBusiness = async (req, res, userId) => {
         
         logger.info({ 
             ...meta, 
-            coordinates: [location.lng, location.lat], 
+            coordinates: [geo.location.lng, geo.location.lat], 
             address: req.body.address 
         }, `${logSource} creating with coordinates`);
         
+        const providedCity = typeof req.body.city === 'string' ? req.body.city.trim() : '';
+        const selectedCity = providedCity || (geo.city || '');
+        const normalizedCity = selectedCity ? selectedCity.toLowerCase().trim() : '';
+
         const newBusiness = new Business({
             name: req.body.name,
             email: req.body.email,
@@ -323,10 +332,12 @@ const createBusiness = async (req, res, userId) => {
             openingHours,
             userId: userId,
             address: req.body.address,
+            city: selectedCity || undefined,
+            normalizedCity: normalizedCity || undefined,
             logo: req.file?.filename || '',
             location: {
                 type: 'Point',
-                coordinates: [location.lng, location.lat]
+                coordinates: [geo.location.lng, geo.location.lat]
             }
         });
 
@@ -385,11 +396,11 @@ const updateBusiness = async (req, res, userId) => {
             });
         }
 
-        // עדכון כתובת וקואורדינטות אם השתנתה
+        // עדכון כתובת/עיר וקואורדינטות אם השתנתה הכתובת
         if (req.body.address && req.body.address !== existingBusiness.address) {
-            const location = await mapsUtils.geocode(req.body.address, req);
+            const geo = await mapsUtils.geocodeWithComponents(req.body.address, req);
             
-            if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
+            if (!geo || !geo.location || typeof geo.location.lat !== 'number' || typeof geo.location.lng !== 'number') {
                 logger.warn({ ...meta, address: req.body.address }, BUSINESS_MESSAGES.INVALID_COORDINATES);
                 return errorResponse({
                     res,
@@ -402,8 +413,13 @@ const updateBusiness = async (req, res, userId) => {
             
             existingBusiness.location = {
                 type: 'Point',
-                coordinates: [location.lng, location.lat]
+                coordinates: [geo.location.lng, geo.location.lat]
             };
+            // עדכן עיר משוערת מהכתובת אם לא סופקה עיר ידנית
+            if (!req.body.city && geo.city) {
+                existingBusiness.city = geo.city;
+                existingBusiness.normalizedCity = String(geo.city).toLowerCase().trim();
+            }
         }
 
         // עדכון שדות אחרים
@@ -420,6 +436,11 @@ const updateBusiness = async (req, res, userId) => {
         existingBusiness.description = req.body.description || existingBusiness.description;
         existingBusiness.services = typeof req.body.services === 'string' ? JSON.parse(req.body.services) : (req.body.services || existingBusiness.services);
         existingBusiness.address = req.body.address || existingBusiness.address;
+        if (req.body.city !== undefined) {
+            const providedCity = String(req.body.city || '').trim();
+            existingBusiness.city = providedCity || undefined;
+            existingBusiness.normalizedCity = providedCity ? providedCity.toLowerCase().trim() : undefined;
+        }
         // Normalize to store only filename (same as createBusiness)
         existingBusiness.logo = req.file?.filename || existingBusiness.logo;
         existingBusiness.openingHours = typeof req.body.openingHours === 'string' ? JSON.parse(req.body.openingHours) : (req.body.openingHours || existingBusiness.openingHours);
@@ -504,6 +525,7 @@ exports.getItems = async (req, res) => {
             categoryName, 
             services, 
             rating, 
+            city,
             lat, 
             lng, 
             maxDistance, 
@@ -522,7 +544,7 @@ exports.getItems = async (req, res) => {
 
         let query = q ? 
             await buildSearchQuery(q) : 
-            await buildFilterQuery(categoryName, services, rating);
+            await buildFilterQuery(categoryName, services, rating, city);
 
         let result;
         let sortOption;

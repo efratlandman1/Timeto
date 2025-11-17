@@ -8,6 +8,47 @@ const logger = require('../logger');
 const Sentry = require('../sentry');
 const { successResponse, errorResponse, getRequestMeta, serializeError } = require('../utils/errorUtils');
 
+// Escape user input for safe usage in RegExp
+function escapeRegExp(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Lightweight in-memory caches to avoid repeated lookups per name
+const categoryNameCache = new Map(); // key: lower(name) -> { _id, ts }
+const serviceNamesCache = new Map();  // key: JSON.stringify(sorted(names)) -> { ids[], ts }
+const CACHE_TTL_MS = 60 * 1000; // 60s
+
+async function getCategoryIdByNameCached(nameRaw) {
+  const key = String(nameRaw || '').toLowerCase();
+  const now = Date.now();
+  const cached = categoryNameCache.get(key);
+  if (cached && (now - cached.ts) < CACHE_TTL_MS) {
+    return cached._id;
+  }
+  const safe = escapeRegExp(nameRaw || '');
+  const cat = await Category.findOne({ name: new RegExp(`^${safe}$`, 'i') }).select('_id').lean();
+  const id = cat ? cat._id : null;
+  categoryNameCache.set(key, { _id: id, ts: now });
+  return id;
+}
+
+async function getServiceIdsByNamesCached(namesInput) {
+  const names = (Array.isArray(namesInput) ? namesInput : [namesInput]).filter(Boolean);
+  const sorted = [...names].map(String);
+  sorted.sort((a,b) => a.localeCompare(b));
+  const key = JSON.stringify(sorted);
+  const now = Date.now();
+  const cached = serviceNamesCache.get(key);
+  if (cached && (now - cached.ts) < CACHE_TTL_MS) {
+    return cached.ids;
+  }
+  const serviceDocs = await Service.find({ name: { $in: sorted } }).select('_id').lean();
+  const ids = serviceDocs.map(s => s._id);
+  serviceNamesCache.set(key, { ids, ts: now });
+  return ids;
+}
+
 function haversineKm(lat1, lon1, lat2, lon2) {
   const toRad = (v) => (v * Math.PI) / 180;
   const R = 6371;
@@ -61,22 +102,20 @@ exports.getAllUnified = async (req, res) => {
     if (businessCategoryId && toObjectId(businessCategoryId)) {
       resolvedBusinessCategoryId = toObjectId(businessCategoryId);
     } else if (categoryName) {
-      const cat = await Category.findOne({ name: new RegExp(`^${categoryName}$`, 'i') }).select('_id');
-      if (cat) resolvedBusinessCategoryId = cat._id;
+      resolvedBusinessCategoryId = await getCategoryIdByNameCached(categoryName);
     }
     if (resolvedBusinessCategoryId) businessQuery.categoryId = resolvedBusinessCategoryId;
     let serviceIds = toObjectIdArray(services);
     if (!serviceIds.length && toArray(services).length) {
-      // Resolve by service names
-      const serviceDocs = await Service.find({ name: { $in: toArray(services) } }).select('_id');
-      serviceIds = serviceDocs.map(s => s._id);
+      // Resolve by service names (cached)
+      serviceIds = await getServiceIdsByNamesCached(toArray(services));
     }
     if (serviceIds.length) businessQuery.services = { $in: serviceIds };
     if (rating) businessQuery.rating = { $gte: Number(rating) };
     const city = req.query.city;
     if (city) {
-      // Businesses: filter by address containing the city text
-      businessQuery.address = { $regex: new RegExp(city, 'i') };
+      // Exact city match via normalizedCity (no regex)
+      businessQuery.normalizedCity = String(city).toLowerCase().trim();
     }
 
     // Build Sale query
@@ -89,7 +128,7 @@ exports.getAllUnified = async (req, res) => {
     } else if (saleSubcategoryId && toObjectId(saleSubcategoryId)) {
       saleQuery.subcategoryId = toObjectId(saleSubcategoryId);
     }
-    if (city) saleQuery.city = { $regex: new RegExp(city, 'i') };
+    if (city) saleQuery.city = String(city);
     const min = priceMin !== undefined && priceMin !== '' ? Number(priceMin) : null;
     const max = priceMax !== undefined && priceMax !== '' ? Number(priceMax) : null;
     const allowNoPrice = includeNoPrice === 'true' || includeNoPrice === true;
@@ -107,7 +146,7 @@ exports.getAllUnified = async (req, res) => {
     const now = new Date();
     let promoQuery = { active: true, validFrom: { $lte: now }, validTo: { $gte: now } };
     if (q) promoQuery.$text = { $search: q };
-    if (city) promoQuery.city = { $regex: new RegExp(city, 'i') };
+    if (city) promoQuery.city = String(city);
 
     // Determine openNow requirement before fetching
     const requireOpenNow = String(openNow) === 'true';
@@ -127,21 +166,32 @@ exports.getAllUnified = async (req, res) => {
       const nearPoint = { type: 'Point', coordinates: [lngN, latN] };
       // Distance-first prefetch to avoid missing nearby items due to createdAt ordering
       const [bizAgg, saleAgg, promoAgg] = await Promise.all([
+        // Businesses (aggregation)
         Business.aggregate([
           { $geoNear: { near: nearPoint, distanceField: 'distance', spherical: true, query: businessQuery } },
+          { $project: { 
+            name: 1, address: 1, location: 1, logo: 1, rating: 1, categoryId: 1,
+            services: 1, userId: 1, active: 1, openingHours: 1, createdAt: 1, updatedAt: 1, distance: 1
+          }},
           { $limit: batchSize }
         ]),
+        // Sale (aggregation)
         SaleAd.aggregate([
           { $geoNear: { near: nearPoint, distanceField: 'distance', spherical: true, query: saleQuery } },
+          { $project: { 
+            title: 1, description: 1, city: 1, price: 1, currency: 1, images: 1,
+            location: 1, categoryId: 1, subcategoryId: 1, active: 1, createdAt: 1, updatedAt: 1, distance: 1
+          }},
           { $limit: batchSize }
         ]),
+        // Promo (aggregation)
         PromoAd.aggregate([
           { $geoNear: { near: nearPoint, distanceField: 'distance', spherical: true, query: promoQuery } },
           { $limit: batchSize },
           // join category to expose name consistently
           { $lookup: { from: 'categories', localField: 'categoryId', foreignField: '_id', as: 'category' } },
           { $addFields: { categoryId: { $arrayElemAt: ['$category', 0] } } },
-          { $project: { category: 0 } }
+          { $project: { category: 0, title: 1, city: 1, image: 1, location: 1, categoryId: 1, validFrom: 1, validTo: 1, active: 1, createdAt: 1, updatedAt: 1, distance: 1 } }
         ])
       ]);
       bizRaw = bizAgg;
@@ -154,9 +204,27 @@ exports.getAllUnified = async (req, res) => {
       if (sort === 'name') businessPrefetchSort = { name: 1 };
 
       [bizRaw, salesRaw, promosRaw] = await Promise.all([
-        Business.find(businessQuery).sort(businessPrefetchSort).limit(batchSize).lean(),
-        SaleAd.find(saleQuery).sort({ createdAt: -1 }).limit(batchSize).lean(),
-        PromoAd.find(promoQuery).populate('categoryId', 'name').sort({ updatedAt: -1, createdAt: -1 }).limit(batchSize).lean()
+        Business
+          .find(businessQuery)
+          .select('name address location logo rating categoryId services userId active openingHours createdAt updatedAt')
+          .sort(businessPrefetchSort)
+          .limit(batchSize)
+          .lean(),
+        SaleAd
+          .find(saleQuery)
+          .select('title description city price currency images location categoryId subcategoryId active createdAt updatedAt')
+          .sort({ createdAt: -1 })
+          .limit(batchSize)
+          .collation({ locale: 'he', strength: 2 })
+          .lean(),
+        PromoAd
+          .find(promoQuery)
+          .select('title city image location categoryId validFrom validTo active createdAt updatedAt')
+          .populate('categoryId', 'name')
+          .sort({ updatedAt: -1, createdAt: -1 })
+          .limit(batchSize)
+          .collation({ locale: 'he', strength: 2 })
+          .lean()
       ]);
     }
 
@@ -298,6 +366,11 @@ exports.getAllUnified = async (req, res) => {
     const pageItems = items.slice(start, start + limitNum);
     const total = items.length;
     const totalPages = Math.ceil(total / limitNum) || 1;
+
+    // Short cache for unauthenticated, public search results
+    if (!req.user) {
+      res.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=30');
+    }
 
     logger.info({ ...meta, returned: pageItems.length, total }, `${logSource} complete`);
     return successResponse({ res, req, data: { items: pageItems, pagination: { total, page: pageNum, limit: limitNum, totalPages, hasMore: pageNum < totalPages } }, message: 'GET_ALL_UNIFIED_SUCCESS', logSource });
