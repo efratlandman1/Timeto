@@ -94,8 +94,10 @@
 /* Noot Regular (from Web Font package) */
 @font-face {
     font-family: 'Noot';
-    src: url("../../assets/fonts/Noot_April13/Noot_April13/Web Font/noot-aj.woff") format('woff'),
-         url("../../assets/fonts/Noot_April13/Noot_April13/Web Font/noot-aj.ttf") format('truetype');
+    /* Encode space in folder name to ensure cross-platform resolution */
+    src: url("../../assets/fonts/Noot_April13/Noot_April13/Web%20Font/noot-aj.woff") format('woff'),
+         url("../../assets/fonts/Noot_April13/Noot_April13/Web%20Font/noot-aj.ttf") format('truetype'),
+         url("../../assets/fonts/Noot_April13/Noot_April13/Noot.otf") format('opentype');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
