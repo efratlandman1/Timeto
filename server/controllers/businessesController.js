@@ -38,10 +38,12 @@ const buildSearchQuery = async (q) => {
             {
                 $or: [
                     // חיפוש טקסטואלי בשדות טקסט חופשי
-                    { $text: { $search: q } },
+                    { $text: { $search: q, $language: 'none' } },
                     // חיפוש מדויק באימייל וטלפון
                     { email: searchRegex },
                     { phone: searchRegex },
+                    // חיפוש לפי עיר (טקסט חופשי)
+                    { city: searchRegex },
                     // חיפוש בקטגוריות ושירותים
                     { categoryId: { $in: categoryIds } },
                     { services: { $in: serviceIds } }
@@ -320,6 +322,22 @@ const createBusiness = async (req, res, userId) => {
         const selectedCity = providedCity || (geo.city || '');
         const normalizedCity = selectedCity ? selectedCity.toLowerCase().trim() : '';
 
+        // Resolve denormalized names
+        let categoryName = undefined;
+        try {
+            if (req.body.categoryId && mongoose.Types.ObjectId.isValid(req.body.categoryId)) {
+                const cat = await Category.findById(req.body.categoryId).select('name').lean();
+                categoryName = cat ? cat.name : undefined;
+            }
+        } catch (_) {}
+        let serviceNames = [];
+        try {
+            const serviceIds = Array.isArray(services) ? services.filter(id => mongoose.Types.ObjectId.isValid(id)) : [];
+            if (serviceIds.length) {
+                const svcs = await Service.find({ _id: { $in: serviceIds } }).select('name').lean();
+                serviceNames = svcs.map(s => s.name).filter(Boolean);
+            }
+        } catch (_) {}
         const newBusiness = new Business({
             name: req.body.name,
             email: req.body.email,
@@ -327,8 +345,10 @@ const createBusiness = async (req, res, userId) => {
             prefix: req.body.prefix,
             phone: req.body.phone,
             categoryId: req.body.categoryId,
+            categoryName,
             description: req.body.description || '',
             services,
+            serviceNames,
             openingHours,
             userId: userId,
             address: req.body.address,
@@ -441,6 +461,22 @@ const updateBusiness = async (req, res, userId) => {
             existingBusiness.city = providedCity || undefined;
             existingBusiness.normalizedCity = providedCity ? providedCity.toLowerCase().trim() : undefined;
         }
+        // refresh denormalized names
+        try {
+            if (existingBusiness.categoryId) {
+                const cat = await Category.findById(existingBusiness.categoryId).select('name').lean();
+                existingBusiness.categoryName = cat ? cat.name : undefined;
+            } else {
+                existingBusiness.categoryName = undefined;
+            }
+            const svcIds = Array.isArray(existingBusiness.services) ? existingBusiness.services.filter(id => mongoose.Types.ObjectId.isValid(id)) : [];
+            if (svcIds.length) {
+                const svcs = await Service.find({ _id: { $in: svcIds } }).select('name').lean();
+                existingBusiness.serviceNames = svcs.map(s => s.name).filter(Boolean);
+            } else {
+                existingBusiness.serviceNames = [];
+            }
+        } catch (_) {}
         // Normalize to store only filename (same as createBusiness)
         existingBusiness.logo = req.file?.filename || existingBusiness.logo;
         existingBusiness.openingHours = typeof req.body.openingHours === 'string' ? JSON.parse(req.body.openingHours) : (req.body.openingHours || existingBusiness.openingHours);
@@ -636,30 +672,76 @@ exports.getItems = async (req, res) => {
             };
         } else {
             logger.info({ ...meta }, `${logSource} using regular find pipeline`);
-            
-            // טיפול במיון לפי רלוונטיות טקסטואלית
+            let businesses = [];
+            let total = 0;
+
             if (q) {
-                sortOption = { score: { $meta: "textScore" } };
+                // Atlas Search when q exists and no geo
+                const filterOnly = await buildFilterQuery(categoryName, services, rating, city);
+                // remove $and/$or with text from filterOnly if any (defensive)
+                delete filterOnly.$text;
+                const sortStage = (() => {
+                    if (sort === 'rating') return { $sort: { rating: -1, updatedAt: -1 } };
+                    if (sort === 'name') return { $sort: { name: 1 } };
+                    if (sort === 'newest') return { $sort: { createdAt: -1 } };
+                    return { $sort: { score: { $meta: 'searchScore' } } };
+                })();
+                const agg = await Business.aggregate([
+                    // Enforce AND semantics (all words) by compound.must over tokens
+                    (function buildSearchStage() {
+                        const tokens = String(q || '').trim().split(/\s+/).filter(Boolean);
+                        return {
+                            $search: {
+                                index: 'default',
+                                compound: {
+                                    must: tokens.length ? tokens.map(tok => ({ text: { query: tok, path: ['name', 'description', 'address', 'city', 'categoryName', 'serviceNames'] } })) : [
+                                        { text: { query: String(q || ''), path: ['name', 'description', 'address', 'city', 'categoryName', 'serviceNames'] } }
+                                    ]
+                                }
+                            }
+                        };
+                    })(),
+                    { $match: filterOnly },
+                    // lookups for category/services to keep response shape
+                    { $lookup: { from: 'categories', localField: 'categoryId', foreignField: '_id', as: 'categoryId', pipeline: [{ $project: { name: 1, color: 1, logo: 1 } }] } },
+                    { $unwind: { path: '$categoryId', preserveNullAndEmptyArrays: true } },
+                    { $lookup: { from: 'services', localField: 'services', foreignField: '_id', as: 'services', pipeline: [{ $project: { name: 1 } }] } },
+                    sortStage,
+                    {
+                        $facet: {
+                            data: [
+                                { $skip: skip },
+                                { $limit: limitNum }
+                            ],
+                            total: [
+                                { $count: 'count' }
+                            ]
+                        }
+                    }
+                ]);
+                const bucket = Array.isArray(agg) && agg[0] ? agg[0] : { data: [], total: [] };
+                businesses = bucket.data || [];
+                total = (bucket.total && bucket.total[0] && bucket.total[0].count) ? bucket.total[0].count : 0;
             } else {
                 sortOption = {
                     rating: { rating: -1 },
                     name: { name: 1 },
                     newest: { createdAt: -1 }
                 }[sort] || { rating: -1 };
-            }
 
-            const [businesses, total] = await Promise.all([
-                Business.find(query)
-                    .select(q ? { score: { $meta: "textScore" }, logo: 1, name: 1, address: 1, phone: 1, email: 1, rating: 1, categoryId: 1, services: 1, userId: 1, createdAt: 1, updatedAt: 1, active: 1, location: 1 } : {})
-                    .populate('categoryId', 'name color logo')
-                    .populate('services', 'name')
-                    .populate('userId', 'firstName lastName')
-                    .sort(sortOption)
-                    .skip(skip)
-                    .limit(limitNum)
-                    .lean(),
-                Business.countDocuments(query)
-            ]);
+                [businesses, total] = await Promise.all([
+                    Business.find(query)
+                        .select({ logo: 1, name: 1, address: 1, phone: 1, email: 1, rating: 1, categoryId: 1, services: 1, userId: 1, createdAt: 1, updatedAt: 1, active: 1, location: 1 })
+                        .populate('categoryId', 'name color logo')
+                        .populate('services', 'name')
+                        .populate('userId', 'firstName lastName')
+                        .sort(sortOption)
+                        .skip(skip)
+                        .limit(limitNum)
+                        .lean(),
+                    Business.countDocuments(query)
+                ]);
+            }
 
             // הוספת סטטוס מועדפים אם המשתמש מחובר
             let businessesWithFavorites = businesses;

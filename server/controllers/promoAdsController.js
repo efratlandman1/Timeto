@@ -9,7 +9,10 @@ const { PROMO_AD_MESSAGES } = require('../messages');
 
 const DEFAULT_LIMIT = 20;
 
-const buildPromoQuery = (q, status = 'active') => {
+const Category = require('../models/category');
+const escapeRegExp = (str) => (typeof str === 'string' ? str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : '');
+
+const buildPromoQuery = async (q, status = 'active') => {
     const now = new Date();
     let query;
     switch (status) {
@@ -27,7 +30,16 @@ const buildPromoQuery = (q, status = 'active') => {
             query = { active: true, validFrom: { $lte: now }, validTo: { $gte: now } };
             break;
     }
-    if (q) query.$text = { $search: q };
+    if (q) {
+        query.$text = { $search: q, $language: 'none' };
+        // Also match by category name to include promos linked to a category
+        const safe = escapeRegExp(q);
+        const cats = await Category.find({ name: new RegExp(safe, 'i') }).select('_id');
+        const ids = cats.map(c => c._id);
+        if (ids.length) {
+            query.categoryId = { ...(query.categoryId || {}), $in: ids };
+        }
+    }
     return query;
 };
 
@@ -46,6 +58,14 @@ exports.createPromoAd = async (req, res) => {
         }
         const addressToGeocode = address || city;
         const location = await mapsUtils.geocode(addressToGeocode, req);
+        // denormalize category name for Atlas Search
+        let categoryName;
+        if (categoryId) {
+            try {
+                const cat = await Category.findById(categoryId).select('name');
+                categoryName = cat ? cat.name : undefined;
+            } catch (_) {}
+        }
         const doc = new PromoAd({
             userId: req.user._id,
             title,
@@ -53,6 +73,7 @@ exports.createPromoAd = async (req, res) => {
             address: address || '',
             location: { type: 'Point', coordinates: [location.lng, location.lat] },
             categoryId: categoryId || undefined,
+            categoryName,
             image: req.file.filename,
             validFrom: new Date(validFrom),
             validTo: new Date(validTo),
@@ -83,7 +104,19 @@ exports.updatePromoAd = async (req, res) => {
         if (validFrom) ad.validFrom = new Date(validFrom);
         if (validTo) ad.validTo = new Date(validTo);
         if (typeof active !== 'undefined') ad.active = !!active;
-        if (categoryId !== undefined) ad.categoryId = categoryId || undefined;
+        if (categoryId !== undefined) {
+            ad.categoryId = categoryId || undefined;
+            if (categoryId) {
+                try {
+                    const cat = await Category.findById(categoryId).select('name');
+                    ad.categoryName = cat ? cat.name : undefined;
+                } catch (_) {
+                    ad.categoryName = undefined;
+                }
+            } else {
+                ad.categoryName = undefined;
+            }
+        }
         if ((address && address !== ad.address) || (city && !address)) {
             const addr = address || city;
             const location = await mapsUtils.geocode(addr, req);
@@ -108,7 +141,7 @@ exports.getPromoAds = async (req, res) => {
         const limitNum = Math.min(Number(limit) || DEFAULT_LIMIT, 50);
         const skip = (pageNum - 1) * limitNum;
 
-        const query = buildPromoQuery(q, status);
+        let query = await buildPromoQuery(q, status);
         let data, total;
         const hasGeo = lat && lng && (sort === 'distance' || maxDistance);
         if (hasGeo) {
@@ -157,11 +190,43 @@ exports.getPromoAds = async (req, res) => {
                 PromoAd.countDocuments(query)
             ]);
         } else {
-            const sortOption = sort === 'newest' ? { updatedAt: -1, createdAt: -1 } : { createdAt: -1 };
-            [data, total] = await Promise.all([
-                PromoAd.find(query).populate('categoryId', 'name').sort(sortOption).skip(skip).limit(limitNum).lean(),
-                PromoAd.countDocuments(query)
-            ]);
+            if (q) {
+                const sortStage = (sort === 'newest') ? { $sort: { updatedAt: -1, createdAt: -1 } } : { $sort: { score: { $meta: 'searchScore' } } };
+                const agg = await PromoAd.aggregate([
+                    (function buildSearchStage() {
+                        const tokens = String(q || '').trim().split(/\s+/).filter(Boolean);
+                        return {
+                            $search: {
+                                index: 'default',
+                                compound: {
+                                    must: tokens.length ? tokens.map(tok => ({ text: { query: tok, path: ['title', 'city', 'categoryName'] } })) : [
+                                        { text: { query: String(q || ''), path: ['title', 'city', 'categoryName'] } }
+                                    ]
+                                }
+                            }
+                        };
+                    })(),
+                    { $match: query },
+                    sortStage,
+                    { $lookup: { from: 'categories', localField: 'categoryId', foreignField: '_id', as: 'category' } },
+                    { $addFields: { categoryId: { $arrayElemAt: ['$category', 0] } } },
+                    {
+                        $facet: {
+                            data: [{ $skip: skip }, { $limit: limitNum }],
+                            total: [{ $count: 'count' }]
+                        }
+                    }
+                ]);
+                const bucket = Array.isArray(agg) && agg[0] ? agg[0] : { data: [], total: [] };
+                data = bucket.data || [];
+                total = (bucket.total && bucket.total[0] && bucket.total[0].count) ? bucket.total[0].count : 0;
+            } else {
+                const sortOption = sort === 'newest' ? { updatedAt: -1, createdAt: -1 } : { createdAt: -1 };
+                [data, total] = await Promise.all([
+                    PromoAd.find(query).populate('categoryId', 'name').sort(sortOption).skip(skip).limit(limitNum).lean(),
+                    PromoAd.countDocuments(query)
+                ]);
+            }
         }
 
         // compute dynamic status and favorite flag

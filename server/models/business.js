@@ -5,6 +5,9 @@ const businessSchema = new mongoose.Schema({
     address: { type: String, required: true },
     city: { type: String },               // Human-readable city as entered/derived
     normalizedCity: { type: String },     // Lowercased/trimmed city for exact matching
+    // Denormalized names for Atlas Search (no $lookup on $search)
+    categoryName: { type: String, trim: true },
+    serviceNames: [{ type: String, trim: true }],
     location: {
         type: {
             type: String,
@@ -65,15 +68,21 @@ businessSchema.index(
     { 
         name: 'text',
         address: 'text',
-        description: 'text'
+        description: 'text',
+        city: 'text',
+        categoryName: 'text',
+        serviceNames: 'text'
     },
     {
         weights: {
             name: 10,        // חשיבות גבוהה לשם העסק
             address: 5,      // חשיבות בינונית לכתובת
-            description: 3   // חשיבות נמוכה לתיאור
+            description: 3,  // חשיבות נמוכה לתיאור
+            city: 7,         // חשיבות לעיר
+            categoryName: 6,
+            serviceNames: 5
         },
-        name: "BusinessTextIndex"
+        name: "BusinessTextIndexV2"
     }
 );
 

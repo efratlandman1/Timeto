@@ -85,9 +85,7 @@ const SearchResultPage = () => {
     const { isLoaded: mapsLoaded } = useJsApiLoader({ 
         id: 'google-maps-script', 
         googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', 
-        libraries: GOOGLE_LIBRARIES,
-        language: 'he',
-        region: 'IL'
+        libraries: GOOGLE_LIBRARIES
     });
     const cityAutoRef = useRef(null);
     const [activeFilters, setActiveFilters] = useState({});
@@ -614,8 +612,8 @@ const SearchResultPage = () => {
   };
 
   const filteredBusinesses = useMemo(() => {
+    // Ignore price filters for businesses (no price field); only apply optional category fallback
     let list = businesses;
-    // Apply category filter on client as a fallback (in case server didn't)
     if (priceParams.categoryName) {
       const matchCategory = (b) => {
         const candidates = [
@@ -630,8 +628,7 @@ const SearchResultPage = () => {
       };
       list = list.filter(matchCategory);
     }
-    if (!priceParams.has) return list;
-    return priceParams.includeNoPrice ? list : [];
+    return list;
   }, [businesses, priceParams]);
 
   const filteredSaleAds = useMemo(() => {
@@ -673,40 +670,10 @@ const SearchResultPage = () => {
   const normalize = (v) => (v ? String(v).toLowerCase() : '');
   const ql = normalize(searchText);
 
-  const queryFilteredBusinesses = useMemo(() => {
-    if (!ql) return filteredBusinesses;
-    return filteredBusinesses.filter(b => {
-      return [
-        b?.name,
-        b?.description,
-        b?.address,
-        b?.city,
-        b?.categoryName,
-      ].some(f => normalize(f).includes(ql));
-    });
-  }, [filteredBusinesses, ql]);
-
-  const queryFilteredSaleAds = useMemo(() => {
-    if (!ql) return filteredSaleAds;
-    return filteredSaleAds.filter(a => {
-      return [
-        a?.title || a?.name,
-        a?.description,
-        a?.city,
-        a?.categoryName,
-      ].some(f => normalize(f).includes(ql));
-    });
-  }, [filteredSaleAds, ql]);
-
-  const queryFilteredPromoAds = useMemo(() => {
-    if (!ql) return filteredPromoAds;
-    return filteredPromoAds.filter(a => {
-      return [
-        a?.title || a?.name,
-        a?.description,
-      ].some(f => normalize(f).includes(ql));
-    });
-  }, [filteredPromoAds, ql]);
+  // Rely on backend search relevance; do not re-filter by q on client
+  const queryFilteredBusinesses = filteredBusinesses;
+  const queryFilteredSaleAds = filteredSaleAds;
+  const queryFilteredPromoAds = filteredPromoAds;
 
     // Wait for translations to load
     if (!ready) {

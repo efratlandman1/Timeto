@@ -3,6 +3,8 @@ const Category = require('../models/category');
 const Service = require('../models/service');
 const SaleAd = require('../models/SaleAd');
 const PromoAd = require('../models/PromoAd');
+const SaleCategory = require('../models/SaleCategory');
+const SaleSubcategory = require('../models/SaleSubcategory');
 const mongoose = require('mongoose');
 const logger = require('../logger');
 const Sentry = require('../sentry');
@@ -59,6 +61,33 @@ function haversineKm(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
+// Build Atlas Search stage: 'and' => all tokens must appear; 'phrase' => exact phrase
+function buildAtlasSearchStage(queryString, paths, mode) {
+  const q = (queryString || '').toString().trim();
+  if (!q) return null;
+  const safePaths = Array.isArray(paths) ? paths : [paths];
+  const usePhrase = (mode || '').toString() === 'phrase';
+  if (usePhrase) {
+    return {
+      $search: {
+        index: 'default',
+        compound: { must: [{ phrase: { query: q, path: safePaths } }] }
+      }
+    };
+  }
+  const tokens = q.split(/\s+/).filter(Boolean);
+  return {
+    $search: {
+      index: 'default',
+      compound: {
+        must: tokens.map(tok => ({
+          text: { query: tok, path: safePaths }
+        }))
+      }
+    }
+  };
+}
+
 exports.getAllUnified = async (req, res) => {
   const logSource = 'searchController.getAllUnified';
   const meta = getRequestMeta(req, logSource);
@@ -97,7 +126,12 @@ exports.getAllUnified = async (req, res) => {
 
     // Build Business query
     let businessQuery = { active: true };
-    if (q) businessQuery.$text = { $search: q };
+    const searchMode = (req.query.searchMode || '').toString();
+    const usePhrase = searchMode === 'phrase';
+    if (q && (lat && lng)) {
+      // With geo we keep $text (Atlas $search + geo is handled in non-geo branch)
+      businessQuery.$text = { $search: q, $language: 'none' };
+    }
     let resolvedBusinessCategoryId = null;
     if (businessCategoryId && toObjectId(businessCategoryId)) {
       resolvedBusinessCategoryId = toObjectId(businessCategoryId);
@@ -120,7 +154,9 @@ exports.getAllUnified = async (req, res) => {
 
     // Build Sale query
     let saleQuery = { active: true };
-    if (q) saleQuery.$text = { $search: q };
+    if (q && (lat && lng)) {
+      saleQuery.$text = { $search: q, $language: 'none' };
+    }
     if (saleCategoryId && toObjectId(saleCategoryId)) saleQuery.categoryId = toObjectId(saleCategoryId);
     const saleSubIds = toObjectIdArray(req.query.saleSubcategoryId);
     if (saleSubIds.length) {
@@ -145,7 +181,9 @@ exports.getAllUnified = async (req, res) => {
     // Build Promo query - only valid and active promos should appear in unified search
     const now = new Date();
     let promoQuery = { active: true, validFrom: { $lte: now }, validTo: { $gte: now } };
-    if (q) promoQuery.$text = { $search: q };
+    if (q && (lat && lng)) {
+      promoQuery.$text = { $search: q, $language: 'none' };
+    }
     if (city) promoQuery.city = String(city);
 
     // Determine openNow requirement before fetching
@@ -191,41 +229,148 @@ exports.getAllUnified = async (req, res) => {
           // join category to expose name consistently
           { $lookup: { from: 'categories', localField: 'categoryId', foreignField: '_id', as: 'category' } },
           { $addFields: { categoryId: { $arrayElemAt: ['$category', 0] } } },
-          { $project: { category: 0, title: 1, city: 1, image: 1, location: 1, categoryId: 1, validFrom: 1, validTo: 1, active: 1, createdAt: 1, updatedAt: 1, distance: 1 } }
+          { $unset: 'category' },
+          { $project: { title: 1, city: 1, image: 1, location: 1, categoryId: 1, validFrom: 1, validTo: 1, active: 1, createdAt: 1, updatedAt: 1, distance: 1 } }
         ])
       ]);
       bizRaw = bizAgg;
       salesRaw = saleAgg;
       promosRaw = promoAgg;
     } else {
-      // Choose prefetch sort according to requested sort when no geo is present
+      // Atlas Search for non-geo when q exists; otherwise sort by defaults
+      if (q) {
+        const mode = (req.query.searchMode || 'and').toString();
+        const [bizAgg, saleAgg, promoAgg] = await Promise.all([
+          Business.aggregate([
+            buildAtlasSearchStage(q, ['name', 'description', 'address', 'city', 'categoryName', 'serviceNames'], mode),
+            { $match: { active: true } },
+            { $limit: batchSize },
+            { $project: { name: 1, address: 1, location: 1, logo: 1, rating: 1, categoryId: 1, services: 1, userId: 1, active: 1, openingHours: 1, createdAt: 1, updatedAt: 1 } }
+          ]),
+          SaleAd.aggregate([
+            buildAtlasSearchStage(q, ['title', 'description', 'city', 'categoryName', 'subcategoryNames'], mode),
+            { $match: { active: true } },
+            { $limit: batchSize },
+            { $project: { title: 1, description: 1, city: 1, price: 1, currency: 1, images: 1, location: 1, categoryId: 1, subcategoryId: 1, active: 1, createdAt: 1, updatedAt: 1 } }
+          ]),
+          PromoAd.aggregate([
+            buildAtlasSearchStage(q, ['title', 'city', 'categoryName'], mode),
+            { $match: { active: true } },
+            { $limit: batchSize },
+            { $lookup: { from: 'categories', localField: 'categoryId', foreignField: '_id', as: 'category' } },
+            { $addFields: { categoryId: { $arrayElemAt: ['$category', 0] } } },
+            { $unset: 'category' },
+            { $project: { title: 1, city: 1, image: 1, location: 1, categoryId: 1, validFrom: 1, validTo: 1, active: 1, createdAt: 1, updatedAt: 1 } }
+        ])
+      ]);
+      bizRaw = bizAgg;
+      salesRaw = saleAgg;
+      promosRaw = promoAgg;
+    } else {
+        // Choose prefetch sort according to requested sort when no geo is present and no q
       let businessPrefetchSort = { updatedAt: -1, createdAt: -1 };
       if (sort === 'rating') businessPrefetchSort = { rating: -1, updatedAt: -1 };
       if (sort === 'name') businessPrefetchSort = { name: 1 };
 
       [bizRaw, salesRaw, promosRaw] = await Promise.all([
-        Business
-          .find(businessQuery)
-          .select('name address location logo rating categoryId services userId active openingHours createdAt updatedAt')
-          .sort(businessPrefetchSort)
-          .limit(batchSize)
-          .lean(),
-        SaleAd
-          .find(saleQuery)
-          .select('title description city price currency images location categoryId subcategoryId active createdAt updatedAt')
-          .sort({ createdAt: -1 })
-          .limit(batchSize)
-          .collation({ locale: 'he', strength: 2 })
-          .lean(),
-        PromoAd
-          .find(promoQuery)
-          .select('title city image location categoryId validFrom validTo active createdAt updatedAt')
-          .populate('categoryId', 'name')
-          .sort({ updatedAt: -1, createdAt: -1 })
-          .limit(batchSize)
-          .collation({ locale: 'he', strength: 2 })
-          .lean()
-      ]);
+          // Use Atlas Search for non-geo when q provided; else fallback to .find
+          q
+            ? Business.aggregate([
+                buildAtlasSearchStage(q, ['name', 'description', 'address', 'city', 'categoryName', 'serviceNames'], usePhrase ? 'phrase' : 'and'),
+                { $match: businessQuery }, // includes active true and optional filters
+                { $limit: batchSize },
+                { $project: { name: 1, address: 1, location: 1, logo: 1, rating: 1, categoryId: 1, services: 1, userId: 1, active: 1, openingHours: 1, createdAt: 1, updatedAt: 1 } }
+              ])
+            : Business.find(businessQuery).select('name address location logo rating categoryId services userId active openingHours createdAt updatedAt').sort(businessPrefetchSort).limit(batchSize).lean(),
+          q
+            ? SaleAd.aggregate([
+                buildAtlasSearchStage(q, ['title', 'description', 'city', 'categoryName', 'subcategoryNames'], usePhrase ? 'phrase' : 'and'),
+              { $match: saleQuery },
+              { $limit: batchSize },
+              { $project: { title: 1, description: 1, city: 1, price: 1, currency: 1, images: 1, location: 1, categoryId: 1, subcategoryId: 1, active: 1, createdAt: 1, updatedAt: 1 } }
+            ])
+            : SaleAd.find(singleFilterCleanup(saleQuery)).select('title description city price currency images location categoryId subcategoryId active createdAt updatedAt').sort({ createdAt: -1 }).limit(batchSize).lean(),
+          q
+            ? PromoAd.aggregate([
+                buildAtlasSearchStage(q, ['title', 'city', 'categoryName'], usePhrase ? 'phrase' : 'and'),
+              { $match: promoQuery },
+              { $limit: batchSize },
+              { $lookup: { from: 'categories', localField: 'categoryId', foreignField: '_id', as: 'category' } },
+              { $addFields: { categoryId: { $arrayElemAt: ['$category', 0] } } },
+              { $unset: 'category' },
+              { $project: { title: 1, city: 1, image: 1, location: 1, categoryId: 1, validFrom: 1, validTo: 1, active: 1, createdAt: 1, updatedAt: 1 } }
+            ])
+            : PromoAd.find(promoQuery).select('title city image location categoryId validFrom validTo active createdAt updatedAt').populate('categoryId', 'name').sort({ updatedAt: -1, createdAt: -1 }).limit(batchSize).lean()
+        ]);
+      }
+// Helper to drop $text from filters when using $search
+function singleFilterCleanup(q) {
+  if (!q) return q;
+  const nq = { ...q };
+  if ('$text' in nq) delete nq['$text'];
+  return nq;
+}
+
+// Global search suggestions across collections using Atlas Search (text or phrase)
+exports.globalSearch = async (req, res) => {
+  const logSource = 'searchController.globalSearch';
+  const meta = getRequestMeta(req, logSource);
+  try {
+    const q = (req.query.q || '').toString().trim();
+    const limit = Math.min(parseInt(req.query.limit || '10', 10), 50);
+    const mode = (req.query.mode || 'text').toString(); // 'text' | 'phrase'
+    const usePhrase = mode === 'phrase';
+    if (!q) return successResponse({ res, req, data: { suggestions: [] }, message: 'GLOBAL_SEARCH_EMPTY', logSource });
+
+    const per = Math.max(1, Math.floor(Math.max(1, limit) / 3));
+
+    const [bList, sList, pList] = await Promise.all([
+      Business.aggregate([
+        {
+          $search: usePhrase
+            ? { index: 'default', compound: { must: [{ phrase: { query: q, path: ['name', 'description', 'address', 'city', 'categoryName', 'serviceNames'] } }] } }
+            : { index: 'default', text: { query: q, path: ['name', 'description', 'address', 'city', 'categoryName', 'serviceNames'] } }
+        },
+        { $match: { active: true } },
+        { $limit: per },
+        { $project: { _id: 1, title: '$name', subtitle: '$address', type: { $literal: 'business' } } }
+      ]),
+      SaleAd.aggregate([
+        {
+          $search: usePhrase
+            ? { index: 'default', compound: { must: [{ phrase: { query: q, path: ['title', 'description', 'city'] } }] } }
+            : { index: 'default', text: { query: q, path: ['title', 'description', 'city'] } }
+        },
+        { $match: { active: true } },
+        { $limit: per },
+        { $project: { _id: 1, title: '$title', subtitle: '$city', type: { $literal: 'sale' } } }
+      ]),
+      PromoAd.aggregate([
+        {
+          $search: usePhrase
+            ? { index: 'default', compound: { must: [{ phrase: { query: q, path: ['title', 'city'] } }] } }
+            : { index: 'default', text: { query: q, path: ['title', 'city'] } }
+        },
+        { $match: { active: true } },
+        { $limit: per },
+        { $project: { _id: 1, title: '$title', subtitle: '$city', type: { $literal: 'promo' } } }
+      ])
+    ]);
+
+    const merged = [...bList, ...sList, ...pList].slice(0, limit).map(doc => ({
+      id: doc._id,
+      type: doc.type,
+      title: doc.title,
+      subtitle: doc.subtitle || ''
+    }));
+
+    return successResponse({ res, req, data: { suggestions: merged }, message: 'GLOBAL_SEARCH_OK', logSource });
+  } catch (err) {
+    logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
+    Sentry.captureException(err);
+    return errorResponse({ res, req, status: 500, message: 'GLOBAL_SEARCH_ERROR', logSource });
+  }
+};
     }
 
     // Apply openNow filtering
@@ -367,6 +512,90 @@ exports.getAllUnified = async (req, res) => {
     const total = items.length;
     const totalPages = Math.ceil(total / limitNum) || 1;
 
+    // Fallback: if q present and nothing found via $text, try regex/category-name based matching
+    if (q && total === 0) {
+      const safe = escapeRegExp(q);
+      // Businesses fallback
+      const [catDocs, svcDocs] = await Promise.all([
+        Category.find({ name: new RegExp(safe, 'i') }).select('_id'),
+        Service.find({ name: new RegExp(safe, 'i') }).select('_id')
+      ]);
+      const catIds = catDocs.map(c => c._id);
+      const svcIds = svcDocs.map(s => s._id);
+      const bizFbQuery = {
+        active: true,
+        $or: [
+          { city: new RegExp(safe, 'i') },
+          { address: new RegExp(safe, 'i') },
+          { name: new RegExp(safe, 'i') },
+          ...(catIds.length ? [{ categoryId: { $in: catIds } }] : []),
+          ...(svcIds.length ? [{ services: { $in: svcIds } }] : []),
+        ]
+      };
+      const bizFb = await Business.find(bizFbQuery)
+        .select('name address location logo rating categoryId services userId active openingHours createdAt updatedAt')
+        .limit(limitNum * 3)
+        .lean();
+
+      // Sale fallback
+      const [saleCatDocs, saleSubDocs] = await Promise.all([
+        SaleCategory.find({ name: new RegExp(safe, 'i') }).select('_id'),
+        SaleSubcategory.find({ name: new RegExp(safe, 'i') }).select('_id'),
+      ]);
+      const saleCatIds = saleCatDocs.map(d => d._id);
+      const saleSubIds = saleSubDocs.map(d => d._id);
+      const saleFbQuery = {
+        active: true,
+        $or: [
+          { title: new RegExp(safe, 'i') },
+          { description: new RegExp(safe, 'i') },
+          { city: new RegExp(safe, 'i') },
+          ...(saleCatIds.length ? [{ categoryId: { $in: saleCatIds } }] : []),
+          ...(saleSubIds.length ? [{ subcategoryId: { $in: saleSubIds } }] : []),
+        ]
+      };
+      const saleFb = await SaleAd.find(saleFbQuery)
+        .select('title description price currency images city address phone prefix hasWhatsapp categoryId userId active createdAt updatedAt location')
+        .limit(limitNum * 3)
+        .lean();
+
+      // Promo fallback
+      const promoCatDocs = await Category.find({ name: new RegExp(safe, 'i') }).select('_id');
+      const promoCatIds = promoCatDocs.map(d => d._id);
+      const promoFbQuery = {
+        active: true,
+        $or: [
+          { title: new RegExp(safe, 'i') },
+          { city: new RegExp(safe, 'i') },
+          ...(promoCatIds.length ? [{ categoryId: { $in: promoCatIds } }] : []),
+        ]
+      };
+      const promoFb = await PromoAd.find(promoFbQuery)
+        .select('title city address categoryId image validFrom validTo active userId createdAt updatedAt location')
+        .limit(limitNum * 3)
+        .lean();
+
+      let fbItems = [
+        ...bizFb.map(b => ({ type: 'business', data: b })),
+        ...saleFb.map(s => ({ type: 'sale', data: s })),
+        ...promoFb.map(p => ({ type: 'promo', data: p })),
+      ];
+
+      // Apply the same default sorting logic
+      const getTs = (o) => new Date(o?.data?.updatedAt || o?.data?.createdAt || 0).getTime();
+      if (sort === 'newest') fbItems.sort((a,b)=> getTs(b) - getTs(a));
+      if (sort === 'name') fbItems.sort((a,b)=> ((a.data?.name || a.data?.title || '').localeCompare(b.data?.name || b.data?.title || '')));
+      if (sort === 'rating') fbItems.sort((a,b)=> ((b.data?.rating || 0) - (a.data?.rating || 0)));
+
+      const fbStart = (pageNum - 1) * limitNum;
+      const fbPageItems = fbItems.slice(fbStart, fbStart + limitNum);
+      const fbTotal = fbItems.length;
+      const fbTotalPages = Math.ceil(fbTotal / limitNum) || 1;
+
+      logger.info({ ...meta, returned: fbPageItems.length, total: fbTotal, fallback: true }, `${logSource} complete (fallback)`);
+      return successResponse({ res, req, data: { items: fbPageItems, pagination: { total: fbTotal, page: pageNum, limit: limitNum, totalPages: fbTotalPages, hasMore: pageNum < fbTotalPages } }, message: 'GET_ALL_UNIFIED_SUCCESS', logSource });
+    }
+
     // Short cache for unauthenticated, public search results
     if (!req.user) {
       res.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=30');
@@ -381,4 +610,64 @@ exports.getAllUnified = async (req, res) => {
   }
 };
 
+// Global search suggestions across collections using Atlas Search (text or phrase)
+exports.globalSearch = async (req, res) => {
+  const logSource = 'searchController.globalSearch';
+  const meta = getRequestMeta(req, logSource);
+  try {
+    const q = (req.query.q || '').toString().trim();
+    const limit = Math.min(parseInt(req.requestLimit || req.query.limit || '10', 10), 50);
+    const mode = (req.query.mode || 'text').toString(); // 'text' | 'phrase'
+    const usePhrase = mode === 'phrase';
+    if (!q) return successResponse({ res, req, data: { suggestions: [] }, message: 'GLOBAL_SEARCH_EMPTY', logSource });
+
+    const per = Math.max(1, Math.floor(Math.max(1, limit) / 3));
+
+    const [bList, sList, pList] = await Promise.all([
+      Business.aggregate([
+        {
+          $search: usePhrase
+            ? { index: 'default', compound: { must: [{ phrase: { query: q, path: ['name', 'description', 'address', 'city', 'categoryName', 'serviceNames'] } }] } }
+            : { index: 'default', text: { query: q, path: ['name', 'description', 'address', 'city', 'categoryName', 'serviceNames'] } }
+        },
+        { $match: { active: true } },
+        { $limit: per },
+        { $project: { _id: 1, title: '$name', subtitle: '$address', type: { $literal: 'business' } } }
+      ]),
+      SaleAd.aggregate([
+        {
+          $search: usePhrase
+            ? { index: 'default', compound: { must: [{ phrase: { query: q, path: ['title', 'description', 'city'] } }] } }
+            : { index: 'default', text: { query: q, path: ['title', 'description', 'city'] } }
+        },
+        { $match: { active: true } },
+        { $limit: per },
+        { $project: { _id: 1, title: '$title', subtitle: '$city', type: { $literal: 'sale' } } }
+      ]),
+      PromoAd.aggregate([
+        {
+          $search: usePhrase
+            ? { index: 'default', compound: { must: [{ phrase: { query: q, path: ['title', 'city'] } }] } }
+            : { index: 'default', text: { query: q, path: ['title', 'city'] } }
+        },
+        { $match: { active: true } },
+        { $limit: per },
+        { $project: { _id: 1, title: '$title', subtitle: '$city', type: { $literal: 'promo' } } }
+      ])
+    ]);
+
+    const merged = [...bList, ...sList, ...pList].slice(0, limit).map(doc => ({
+      id: doc._id,
+      type: doc.type,
+      title: doc.title,
+      subtitle: doc.subtitle || ''
+    }));
+
+    return successResponse({ res, req, data: { suggestions: merged }, message: 'GLOBAL_SEARCH_OK', logSource });
+  } catch (err) {
+    logger.error({ ...meta, error: serializeError(err) }, `${logSource} error`);
+    Sentry.captureException(err);
+    return errorResponse({ res, req, status: 500, message: 'GLOBAL_SEARCH_ERROR', logSource });
+  }
+};
 

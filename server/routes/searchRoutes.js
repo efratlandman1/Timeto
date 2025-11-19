@@ -7,6 +7,7 @@ const controller = require('../controllers/searchController');
 
 // Soft slowdown to deter scraping while not blocking normal users
 router.get('/all', searchSlowDown, optionalAuth, sanitizeRequest, controller.getAllUnified);
+router.get('/global', optionalAuth, sanitizeRequest, controller.globalSearch);
 
 module.exports = router;
 
