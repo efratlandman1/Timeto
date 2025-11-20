@@ -494,7 +494,7 @@ exports.globalSearch = async (req, res) => {
     }
 
     // Distance compute/filter/sort
-    const hasGeo = lat && lng && (sort === 'distance' || (maxDistance !== undefined && maxDistance !== ''));
+    const hasGeo = lat && lng && (sort === 'distance' || sort === 'popular_nearby' || (maxDistance !== undefined && maxDistance !== ''));
     if (hasGeo) {
       const latN = parseFloat(lat);
       const lngN = parseFloat(lng);
@@ -520,6 +520,21 @@ exports.globalSearch = async (req, res) => {
           const na = (a?.data?.name || a?.data?.title || '').toString();
           const nb = (b?.data?.name || b?.data?.title || '').toString();
           return na.localeCompare(nb);
+        });
+      }
+      if (sort === 'popular_nearby') {
+        // Popular nearby semantics:
+        // 1) Default radius when none provided (keeps "area" scope predictable)
+        // 2) Sort primarily by rating desc, then recency (updatedAt/createdAt)
+        const radiusKm = (maxD !== null) ? maxD : 25; // default 25km radius
+        items = items.filter(it => it.distanceKm <= radiusKm);
+        items.sort((a, b) => {
+          const ra = (a.data?.rating ?? 0);
+          const rb = (b.data?.rating ?? 0);
+          if (ra !== rb) return rb - ra;
+          const ta = new Date(a?.data?.updatedAt || a?.data?.createdAt || 0).getTime();
+          const tb = new Date(b?.data?.updatedAt || b?.data?.createdAt || 0).getTime();
+          return tb - ta;
         });
       }
     } else {

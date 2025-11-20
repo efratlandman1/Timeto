@@ -331,7 +331,7 @@ const SearchResultPage = () => {
         }
         setActiveFilters(filters);
         setSortOption(sort);
-        setTempSort(sort || 'rating');
+        setTempSort(sort || '');
         // Sync temp values from URL on navigation
         setTempValues(v => ({
             ...v,
@@ -1009,6 +1009,7 @@ const SearchResultPage = () => {
                                         if (drawerMode==='price') { setTempValues(v=>({ ...v, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE })); return; }
                                         if (drawerMode==='distance') { setTempValues(v=>({ ...v, maxDistance:0 })); return; }
                                         if (drawerMode==='rating') { setTempValues(v=>({ ...v, rating:0 })); return; }
+                                        if (drawerMode==='sort') { setTempSort(''); return; }
                                         if (drawerMode==='saleSubs') { setTempValues(v=>({ ...v, saleSubcategoryId:'', saleSubcategoryIds:[] })); return; }
                                         // all
                                         setTempValues(v=>({ ...v, categoryName:'', services:[], city:'', cityLat: undefined, cityLng: undefined, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE, maxDistance:0, rating:0, saleCategoryId:'', saleCategoryName:'', saleSubcategoryId:'', saleSubcategoryIds:[] })); setSelectedCategoryId('');
@@ -1268,7 +1269,14 @@ const SearchResultPage = () => {
                                         if (drawerMode==='price') { handleApplyMulti({ priceMin: tempValues.priceMin || '', priceMax: tempValues.priceMax || '' }); return; }
                                         if (drawerMode==='distance') { handleApplyMulti({ maxDistance: tempValues.maxDistance || '' }); return; }
                                         if (drawerMode==='rating') { handleApplyMulti({ rating: tempValues.rating || '' }); return; }
-                                        if (drawerMode==='sort') { handleApplyMulti({ sort: tempSort==='rating' ? 'rating' : tempSort }); return; }
+                                        if (drawerMode==='sort') { 
+                                          // אם לא נבחר מיון או נבחר "דירוג" – הסר את פרמטר sort מה-URL
+                                          const updates = {};
+                                          if (tempSort && tempSort !== 'rating') { updates.sort = tempSort; }
+                                          else { updates.sort = ''; }
+                                          handleApplyMulti(updates); 
+                                          return; 
+                                        }
                                         handleApplyMulti({ categoryName: tempValues.categoryName, services: tempValues.services, city: tempValues.city, priceMin: tempValues.priceMinN>0 ? String(tempValues.priceMinN) : '', priceMax: tempValues.priceMaxN<MAX_PRICE ? String(tempValues.priceMaxN) : '', maxDistance: tempValues.maxDistance || '', rating: tempValues.rating || '', lat: (tempValues.cityLat !== undefined ? tempValues.cityLat : undefined), lng: (tempValues.cityLng !== undefined ? tempValues.cityLng : undefined) });
                                     }}>{t('advancedSearch.buttons.apply')}</button>
                                 </div>
