@@ -27,6 +27,23 @@ const promoAdSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// Validation: validFrom must be before validTo
+promoAdSchema.pre('validate', function(next) {
+    if (this.validFrom && this.validTo && this.validFrom >= this.validTo) {
+        return next(new Error('validFrom must be before validTo'));
+    }
+    // basic coordinate range sanity
+    try {
+        const coords = this.location?.coordinates;
+        if (Array.isArray(coords) && coords.length === 2) {
+            const [lng, lat] = coords;
+            const ok = typeof lat === 'number' && typeof lng === 'number' && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+            if (!ok) return next(new Error('Invalid location coordinates'));
+        }
+    } catch (_) {}
+    next();
+});
+
 // Virtual computed active by validity (for dynamic checks at query time you can compute client-side too)
 promoAdSchema.virtual('isCurrentlyActive').get(function() {
     const now = new Date();

@@ -213,10 +213,7 @@
 .status-badge.inactive { background:  #c62828; }
 .status-badge.expired { background: #c62828; }
 
-/* Remove top border for promo cards (no content below) */
-.business-card.promo .business-card-footer {
-  border-top: none;
-}
+/* Ensure promo cards use the same footer separator for consistency */
 
 .business-card-rating {
   display: flex;

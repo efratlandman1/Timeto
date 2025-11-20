@@ -803,6 +803,19 @@
 .chip-button:hover { background: #fff; border-color: #ff4d4d; color: #ff4d4d; }
 .chip-button.active { background: #ff4d4d; color: #fff; border-color: #ff4d4d; }
 
+/* Distinct styling for global 'clear all' chip so it doesn't look like another filter */
+.chip-button.danger {
+    background: #fff;
+    color: #ef4444;
+    border-color: #ef4444;
+    font-weight: 700;
+}
+.chip-button.danger:hover {
+    background: #fff0f0;
+    border-color: #dc2626;
+    color: #dc2626;
+}
+
 .chip-with-popover { position: relative; }
 .mini-popover {
     position: absolute;

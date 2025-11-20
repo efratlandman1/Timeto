@@ -14,7 +14,7 @@ const saleAdSchema = new mongoose.Schema({
     // denormalized names for Atlas Search
     categoryName: { type: String, trim: true },
     subcategoryNames: [{ type: String, trim: true }],
-    price: { type: Number },
+    price: { type: Number, min: 0 },
     currency: { type: String, enum: CURRENCIES, default: 'ILS' },
     prefix: { type: String },
     phone: { type: String, required: true },
@@ -45,6 +45,19 @@ saleAdSchema.index({ categoryId: 1, active: 1, createdAt: -1 });
 saleAdSchema.index({ subcategoryId: 1, active: 1, createdAt: -1 });
 saleAdSchema.index({ subcategoryIds: 1, active: 1, createdAt: -1 });
 saleAdSchema.index({ price: 1, active: 1 });
+
+// Basic validation for coordinates range
+saleAdSchema.pre('validate', function(next) {
+    try {
+        const coords = this.location?.coordinates;
+        if (Array.isArray(coords) && coords.length === 2) {
+            const [lng, lat] = coords;
+            const ok = typeof lat === 'number' && typeof lng === 'number' && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+            if (!ok) return next(new Error('Invalid location coordinates'));
+        }
+    } catch (_) {}
+    next();
+});
 
 const SaleAd = mongoose.model('sale_ads', saleAdSchema);
 

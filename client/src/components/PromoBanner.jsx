@@ -12,19 +12,24 @@ const PromoBanner = ({ images = [], autoPlayInterval = 5000, onReady }) => {
   const total = images.length;
   const readySignaledRef = useRef(false);
 
-  useEffect(() => {
-    if (total <= 1) return; // no auto-play for single image
-    const t = setInterval(() => setIndex((i) => (i + 1) % total), autoPlayInterval);
-    return () => clearInterval(t);
-  }, [total, autoPlayInterval]);
+  // Resettable autoplay (resets on manual navigation)
+  const timerRef = useRef(null);
+  const schedule = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (total <= 1) return;
+    timerRef.current = setTimeout(() => setIndex((i) => (i + 1) % total), autoPlayInterval);
+  };
+  useEffect(() => { schedule(); return () => { if (timerRef.current) clearTimeout(timerRef.current); }; }, [total, autoPlayInterval, index]);
 
   const prev = (e) => {
     if (e) e.stopPropagation();
     setIndex((i) => (i - 1 + total) % total);
+    schedule();
   };
   const next = (e) => {
     if (e) e.stopPropagation();
     setIndex((i) => (i + 1) % total);
+    schedule();
   };
 
   const handleClick = (e) => {
@@ -65,7 +70,7 @@ const PromoBanner = ({ images = [], autoPlayInterval = 5000, onReady }) => {
           <div
             key={`ind-${i}`}
             className={`story-indicator ${i === index ? 'active' : ''} ${i < index ? 'viewed' : ''}`}
-            onClick={(e) => { e.stopPropagation(); setIndex(i); }}
+            onClick={(e) => { e.stopPropagation(); setIndex(i); schedule(); }}
           >
             <div className="indicator-progress"></div>
           </div>

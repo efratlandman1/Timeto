@@ -901,6 +901,18 @@ const SearchResultPage = () => {
                         >
                             <FaFilter aria-hidden="true" /> {t('searchResults.advancedFilter')}
                         </button>
+                        {/* Clear all (global) – positioned immediately after advanced filter */}
+                        <button
+                          className="chip-button danger"
+                          onClick={() => {
+                            setTempValues(v=>({ ...v, categoryName:'', services:[], city:'', cityLat: undefined, cityLng: undefined, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE, maxDistance:0, rating:0, saleCategoryId:'', saleSubcategoryId:'', saleSubcategoryIds:[] }));
+                            handleClearFilters();
+                          }}
+                          aria-label="clear all filters"
+                          title="נקה הכל"
+                        >
+                          נקה הכל
+                        </button>
                         {/* Category */}
                         <button className={`chip-button${hasCategory ? ' active' : ''}`} onClick={() => { setDrawerMode('category'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='category'}>
                             {(() => {
@@ -954,17 +966,7 @@ const SearchResultPage = () => {
                             {t('advancedSearch.rating.title')}{tempValues.rating?`: ${tempValues.rating}`:''}
                         </button>
 
-                        {/* Clear all (global) */}
-                        <button
-                          className="chip-button danger"
-                          onClick={() => {
-                            setTempValues(v=>({ ...v, categoryName:'', services:[], city:'', cityLat: undefined, cityLng: undefined, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE, maxDistance:0, rating:0, saleCategoryId:'', saleSubcategoryId:'', saleSubcategoryIds:[] }));
-                            handleClearFilters();
-                          }}
-                          aria-label="clear all filters"
-                        >
-                          נקה הכל
-                        </button>
+                        
                     </div>
                     ); })()}
 

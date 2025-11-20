@@ -193,7 +193,8 @@ exports.getAllUnified = async (req, res) => {
     // Fetch extra to allow merging then slicing.
     // When openNow=true we need a larger prefetch, otherwise many closed businesses inside
     // the batch will drop and lead to too few results and inconsistent totals across sort modes.
-    const batchMultiplier = requireOpenNow ? 10 : 3;
+    // Reduce oversampling to lower memory/CPU while preserving enough buffer for openNow
+    const batchMultiplier = requireOpenNow ? 6 : 3;
     const batchSize = Math.min(200, limitNum * batchMultiplier);
     let bizRaw = [];
     let salesRaw = [];
