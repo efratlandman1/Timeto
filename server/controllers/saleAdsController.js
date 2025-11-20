@@ -16,24 +16,19 @@ const escapeRegExp = (str) => (typeof str === 'string' ? str.replace(/[.*+?^${}(
 
 const buildSaleSearchQuery = async (q, categoryId, minPrice, maxPrice) => {
     const query = { active: true };
+    // IMPORTANT: Do NOT add $text here. We use Atlas Search ($search) in the aggregation
+    // path when q is provided. Adding $text here and then using $match later causes
+    // " $match with $text is only allowed as the first pipeline stage ".
+    // We keep only ID filters and numeric ranges in this helper.
     if (q) {
-        query.$text = { $search: q, $language: 'none' };
-        // Resolve category and subcategory by names (he/en if present on schema)
+        // Optionally resolve category/subcategory names into IDs to narrow results
         const safe = escapeRegExp(q);
-        const catDocs = await SaleCategory.find({
-            name: new RegExp(safe, 'i')
-        }).select('_id');
-        const subDocs = await SaleSubcategory.find({
-            name: new RegExp(safe, 'i')
-        }).select('_id');
+        const catDocs = await SaleCategory.find({ name: new RegExp(safe, 'i') }).select('_id');
+        const subDocs = await SaleSubcategory.find({ name: new RegExp(safe, 'i') }).select('_id');
         const catIds = catDocs.map(d => d._id);
         const subIds = subDocs.map(d => d._id);
-        if (catIds.length) {
-            query.categoryId = { ...(query.categoryId || {}), $in: catIds };
-        }
-        if (subIds.length) {
-            query.subcategoryId = { ...(query.subcategoryId || {}), $in: subIds };
-        }
+        if (catIds.length) query.categoryId = { ...(query.categoryId || {}), $in: catIds };
+        if (subIds.length) query.subcategoryId = { ...(query.subcategoryId || {}), $in: subIds };
     }
     if (categoryId && mongoose.Types.ObjectId.isValid(categoryId)) {
         query.categoryId = new mongoose.Types.ObjectId(categoryId);
@@ -259,12 +254,16 @@ exports.getSaleAds = async (req, res) => {
     const meta = getRequestMeta(req, logSource);
     try {
         logger.info({ ...meta, query: req.query }, `${logSource} enter`);
-        const { q, categoryId, subcategoryId, minPrice, maxPrice, includeNoPrice, lat, lng, maxDistance, sort = 'newest', page = 1, limit = DEFAULT_LIMIT } = req.query;
+        const { q, categoryId, subcategoryId, minPrice, maxPrice, includeNoPrice, lat, lng, maxDistance, sort = 'newest', page = 1, limit = DEFAULT_LIMIT, city } = req.query;
         const pageNum = Number(page) || 1;
         const limitNum = Math.min(Number(limit) || DEFAULT_LIMIT, 40);
         const skip = (pageNum - 1) * limitNum;
 
         const query = await buildSaleSearchQuery(q, categoryId, minPrice, maxPrice);
+        // Exact, non-regex city filter as requested (case-insensitive via collation on .find path)
+        if (city) {
+            query.city = String(city);
+        }
         if (subcategoryId && mongoose.Types.ObjectId.isValid(subcategoryId)) {
             query.$or = [
                 { subcategoryId: new mongoose.Types.ObjectId(subcategoryId) },
@@ -297,19 +296,25 @@ exports.getSaleAds = async (req, res) => {
                 })();
                 const agg = await SaleAd.aggregate([
                     (function buildSearchStage() {
-                        const tokens = String(q || '').trim().split(/\s+/).filter(Boolean);
+                        const raw = String(q || '').trim();
+                        const tokens = raw.split(/[^0-9\p{L}]+/u).filter(Boolean);
                         return {
                             $search: {
                                 index: 'default',
                                 compound: {
-                                    must: tokens.length ? tokens.map(tok => ({ text: { query: tok, path: ['title', 'description', 'city', 'categoryName', 'subcategoryNames'] } })) : [
-                                        { text: { query: String(q || ''), path: ['title', 'description', 'city', 'categoryName', 'subcategoryNames'] } }
-                                    ]
+                                    must: (tokens.length ? tokens : [raw]).map(tok => ({
+                                        text: { query: tok, path: ['title', 'description', 'city', 'categoryName', 'subcategoryNames'] }
+                                    }))
                                 }
                             }
                         };
                     })(),
-                    { $match: query },
+                    // IMPORTANT: remove any accidental $text before $match (see error 17313)
+                    (function cleanMatch() {
+                        const nq = { ...query };
+                        if (nq.$text) delete nq.$text;
+                        return { $match: nq };
+                    })(),
                     sortStage,
                     {
                         $facet: {
@@ -328,7 +333,7 @@ exports.getSaleAds = async (req, res) => {
                     price_desc: { price: -1 }
                 }[sort] || { createdAt: -1 };
                 [data, total] = await Promise.all([
-                    SaleAd.find(query).sort(sortOption).skip(skip).limit(limitNum).lean(),
+                    SaleAd.find(query).collation({ locale: 'he', strength: 1 }).sort(sortOption).skip(skip).limit(limitNum).lean(),
                     SaleAd.countDocuments(query)
                 ]);
             }

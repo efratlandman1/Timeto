@@ -31,7 +31,9 @@ const AdvancedSearchModal = ({ isOpen, onClose, filters, onFilterChange }) => {
   const { isLoaded: mapsLoaded } = useJsApiLoader({
     id: 'google-maps-script',
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-    libraries: GOOGLE_LIBRARIES
+    libraries: GOOGLE_LIBRARIES,
+    language: 'he',
+    region: 'IL'
   });
   const navigate = useNavigate();
   const location = useLocation();

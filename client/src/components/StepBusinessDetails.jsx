@@ -11,7 +11,9 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
   const { isLoaded: mapsLoaded } = useJsApiLoader({
     id: 'google-maps-script',
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-    libraries: ['places']
+    libraries: ['places'],
+    language: 'he',
+    region: 'IL'
   });
 
 

@@ -565,7 +565,7 @@ exports.getItems = async (req, res) => {
             lat, 
             lng, 
             maxDistance, 
-            sort = 'rating', 
+            sort, 
             page = 1, 
             limit = DEFAULT_ITEMS_PER_PAGE,
             openNow 
@@ -575,12 +575,21 @@ exports.getItems = async (req, res) => {
         const limitNum = Number(limit) || DEFAULT_ITEMS_PER_PAGE;
         const skip = (pageNum - 1) * limitNum;
 
+        // Compute current day/minute for openNow aggregation stages
+        const __now = new Date();
+        const dayNow = __now.getDay();
+        const minuteNow = (__now.getHours() * 60) + __now.getMinutes();
+
         // בדיקה אם המשתמש מחובר
         const userId = req.user ? req.user._id : null;
 
-        let query = q ? 
-            await buildSearchQuery(q) : 
-            await buildFilterQuery(categoryName, services, rating, city);
+        // Build precise filters first; if q exists, combine (q does not replace filters)
+        const filterOnly = await buildFilterQuery(categoryName, services, rating, city);
+        let query = { ...filterOnly };
+        if (q) {
+            // For geo branch we can safely add $text inside geoNear.query (first stage)
+            query.$text = { $search: q, $language: 'none' };
+        }
 
         let result;
         let sortOption;
@@ -602,10 +611,15 @@ exports.getItems = async (req, res) => {
                 { $addFields: { textScore: { $meta: "textScore" } } }
             ] : [];
 
+            const requireOpenNow = String(openNow) === 'true';
+            const prefetchSkip = requireOpenNow ? 0 : skip;
+            // Oversample aggressively when openNow to increase chance of filling pages after filtering
+            const prefetchLimit = requireOpenNow ? Math.min(limitNum * 25, 1000) : limitNum;
+
             const pipeline = [
                 ...buildGeoNearPipeline(coordinates, query, sort, maxDistance),
                 ...textScoreStage,
-                ...buildLookupPipeline(skip, limitNum)
+                ...buildLookupPipeline(prefetchSkip, prefetchLimit)
             ];
 
             // שקלול המרחק, הדירוג וציון הרלוונטיות הטקסטואלית
@@ -659,9 +673,50 @@ exports.getItems = async (req, res) => {
                     isFavorite: false
                 }));
             }
-
+            // הוספת דגל isOpenNow וסינון לפי openNow גם בזרוע geo
+            const computeIsOpen = (b) => {
+                try {
+                    if (!Array.isArray(b.openingHours) || !b.openingHours.length) return false;
+                    const now = new Date();
+                    const day = now.getDay();
+                    const todays = (b.openingHours || []).find(h => Number(h.day) === day);
+                    if (!todays || todays.closed) return false;
+                    const toMinutes = (str) => {
+                        if (!str || typeof str !== 'string') return null;
+                        const [hh, mm] = str.split(':').map(Number);
+                        return (hh * 60) + (mm || 0);
+                    };
+                    const minutesNow = now.getHours() * 60 + now.getMinutes();
+                    return (todays.ranges || []).some(r => {
+                        const o = toMinutes(r.open);
+                        const c = toMinutes(r.close);
+                        if (o === null || c === null) return false;
+                        if (c > o) return minutesNow >= o && minutesNow <= c;
+                        return minutesNow >= o || minutesNow <= c;
+                    });
+                } catch (_) { return false; }
+            };
+            businessesWithFavorites = businessesWithFavorites.map(b => ({ ...b, isOpenNow: computeIsOpen(b) }));
+            let finalList = businessesWithFavorites;
+            if (requireOpenNow) {
+                finalList = businessesWithFavorites.filter(b => !!b.isOpenNow);
+                // Apply paging after filtering
+                const start = (pageNum - 1) * limitNum;
+                const end = start + limitNum;
+                const paged = finalList.slice(start, end);
             result = {
-                data: businessesWithFavorites,
+                    data: paged,
+                    pagination: {
+                        total: finalList.length,
+                        page: pageNum,
+                        limit: limitNum,
+                        totalPages: Math.max(1, Math.ceil(finalList.length / limitNum)),
+                        hasMore: end < finalList.length
+                    }
+                };
+            } else {
+                result = {
+                    data: finalList,
                 pagination: {
                     total,
                     page: pageNum,
@@ -670,49 +725,109 @@ exports.getItems = async (req, res) => {
                     hasMore: pageNum < Math.ceil(total / limitNum)
                 }
             };
+            }
         } else {
             logger.info({ ...meta }, `${logSource} using regular find pipeline`);
             let businesses = [];
             let total = 0;
-
+            
             if (q) {
                 // Atlas Search when q exists and no geo
-                const filterOnly = await buildFilterQuery(categoryName, services, rating, city);
                 // remove $and/$or with text from filterOnly if any (defensive)
                 delete filterOnly.$text;
-                const sortStage = (() => {
-                    if (sort === 'rating') return { $sort: { rating: -1, updatedAt: -1 } };
-                    if (sort === 'name') return { $sort: { name: 1 } };
-                    if (sort === 'newest') return { $sort: { createdAt: -1 } };
-                    return { $sort: { score: { $meta: 'searchScore' } } };
+                // Only sort when explicitly requested; otherwise rely on $search default relevance order.
+                const sortStages = (() => {
+                    if (sort === 'rating') return [{ $sort: { rating: -1, updatedAt: -1 } }];
+                    if (sort === 'name') return [{ $sort: { name: 1 } }];
+                    if (sort === 'newest') return [{ $sort: { createdAt: -1 } }];
+                    return [];
                 })();
+                const requireOpenNow = String(openNow) === 'true';
+                const facetDataStages = [{ $skip: skip }, { $limit: limitNum }];
                 const agg = await Business.aggregate([
                     // Enforce AND semantics (all words) by compound.must over tokens
                     (function buildSearchStage() {
-                        const tokens = String(q || '').trim().split(/\s+/).filter(Boolean);
+                        const raw = String(q || '').trim();
+                        const tokens = raw.split(/[^0-9\p{L}]+/u).filter(Boolean);
                         return {
                             $search: {
                                 index: 'default',
                                 compound: {
-                                    must: tokens.length ? tokens.map(tok => ({ text: { query: tok, path: ['name', 'description', 'address', 'city', 'categoryName', 'serviceNames'] } })) : [
-                                        { text: { query: String(q || ''), path: ['name', 'description', 'address', 'city', 'categoryName', 'serviceNames'] } }
-                                    ]
+                                    // AND semantics across meaningful tokens; fall back to raw if nothing splits
+                                    must: (tokens.length ? tokens : [raw]).map(tok => ({
+                                        text: { query: tok, path: ['name', 'description', 'address', 'city', 'categoryName', 'serviceNames'] }
+                                    }))
                                 }
                             }
                         };
                     })(),
                     { $match: filterOnly },
+                    ...(requireOpenNow ? [
+                        { 
+                            $addFields: {
+                                __todays: {
+                                    $arrayElemAt: [
+                                        { $filter: { input: "$openingHours", as: "h", cond: { $and: [ { $eq: ["$$h.day", dayNow] }, { $eq: ["$$h.closed", false] } ] } } },
+                                        0
+                                    ]
+                                },
+                                __mn: minuteNow
+                            }
+                        },
+                        {
+                            $addFields: {
+                                isOpenNow: {
+                                    $cond: [
+                                        { $gt: [ { $size: { $ifNull: [ "$__todays.ranges", [] ] } }, 0 ] },
+                                        {
+                                            $anyElementTrue: {
+                                                $map: {
+                                                    input: { $ifNull: [ "$__todays.ranges", [] ] },
+                                                    as: "rg",
+                                                    in: {
+                                                        $let: {
+                                                            vars: {
+                                                                oh: { $toInt: { $arrayElemAt: [ { $split: ["$$rg.open", ":"] }, 0 ] } },
+                                                                om: { $toInt: { $arrayElemAt: [ { $split: ["$$rg.open", ":"] }, 1 ] } },
+                                                                ch: { $toInt: { $arrayElemAt: [ { $split: ["$$rg.close", ":"] }, 0 ] } },
+                                                                cm: { $toInt: { $arrayElemAt: [ { $split: ["$$rg.close", ":"] }, 1 ] } },
+                                                                mn: "$__mn"
+                                                            },
+                                                            in: {
+                                                                $let: {
+                                                                    vars: {
+                                                                        omins: { $add: [ { $multiply: ["$$oh", 60] }, "$$om" ] },
+                                                                        cmins: { $add: [ { $multiply: ["$$ch", 60] }, "$$cm" ] }
+                                                                    },
+                                                                    in: {
+                                                                        $cond: [
+                                                                            { $gte: [ "$$cmins", "$$omins" ] },
+                                                                            { $and: [ { $gte: [ "$$mn", "$$omins" ] }, { $lte: [ "$$mn", "$$cmins" ] } ] },
+                                                                            { $or: [ { $gte: [ "$$mn", "$$omins" ] }, { $lte: [ "$$mn", "$$cmins" ] } ] }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        false
+                                    ]
+                                }
+                            }
+                        },
+                        { $match: { isOpenNow: true } }
+                    ] : []),
                     // lookups for category/services to keep response shape
                     { $lookup: { from: 'categories', localField: 'categoryId', foreignField: '_id', as: 'categoryId', pipeline: [{ $project: { name: 1, color: 1, logo: 1 } }] } },
                     { $unwind: { path: '$categoryId', preserveNullAndEmptyArrays: true } },
                     { $lookup: { from: 'services', localField: 'services', foreignField: '_id', as: 'services', pipeline: [{ $project: { name: 1 } }] } },
-                    sortStage,
+                    ...sortStages,
                     {
                         $facet: {
-                            data: [
-                                { $skip: skip },
-                                { $limit: limitNum }
-                            ],
+                            data: facetDataStages,
                             total: [
                                 { $count: 'count' }
                             ]
@@ -722,25 +837,143 @@ exports.getItems = async (req, res) => {
                 const bucket = Array.isArray(agg) && agg[0] ? agg[0] : { data: [], total: [] };
                 businesses = bucket.data || [];
                 total = (bucket.total && bucket.total[0] && bucket.total[0].count) ? bucket.total[0].count : 0;
+                // If openNow → compute and filter, then paginate client-side
+                if (requireOpenNow) {
+                    const computeIsOpen = (b) => {
+                        try {
+                            if (!Array.isArray(b.openingHours) || !b.openingHours.length) return false;
+                            const now = new Date();
+                            const day = now.getDay();
+                            const todays = (b.openingHours || []).find(h => Number(h.day) === day);
+                            if (!todays || todays.closed) return false;
+                            const toMinutes = (str) => {
+                                if (!str || typeof str !== 'string') return null;
+                                const [hh, mm] = str.split(':').map(Number);
+                                return (hh * 60) + (mm || 0);
+                            };
+                            const minutesNow = now.getHours() * 60 + now.getMinutes();
+                            return (todays.ranges || []).some(r => {
+                                const o = toMinutes(r.open);
+                                const c = toMinutes(r.close);
+                                if (o === null || c === null) return false;
+                                if (c > o) return minutesNow >= o && minutesNow <= c;
+                                return minutesNow >= o || minutesNow <= c;
+                            });
+                        } catch (_) { return false; }
+                    };
+                    const withFlag = businesses.map(b => ({ ...b, isOpenNow: computeIsOpen(b) }));
+                    const filtered = withFlag.filter(b => !!b.isOpenNow);
+                    const start = (pageNum - 1) * limitNum;
+                    const end = start + limitNum;
+                    businesses = filtered.slice(start, end);
+                    total = filtered.length;
+                }
             } else {
+                // Non-geo, no q
                 sortOption = {
-                    rating: { rating: -1 },
+                    rating: { rating: -1, updatedAt: -1 },
                     name: { name: 1 },
                     newest: { createdAt: -1 }
-                }[sort] || { rating: -1 };
+                }[sort] || {};
 
-                [businesses, total] = await Promise.all([
-                    Business.find(query)
-                        .select({ logo: 1, name: 1, address: 1, phone: 1, email: 1, rating: 1, categoryId: 1, services: 1, userId: 1, createdAt: 1, updatedAt: 1, active: 1, location: 1 })
-                        .populate('categoryId', 'name color logo')
-                        .populate('services', 'name')
-                        .populate('userId', 'firstName lastName')
-                        .sort(sortOption)
-                        .skip(skip)
-                        .limit(limitNum)
-                        .lean(),
-                    Business.countDocuments(query)
-                ]);
+                const requireOpenNow = String(openNow) === 'true';
+                if (requireOpenNow) {
+                    // Compute openNow in-DB before pagination to make counts independent of sort
+                    const baseMatch = { $match: query };
+                    const addOpenAndFilter = [
+                        { 
+                            $addFields: {
+                                __todays: {
+                                    $arrayElemAt: [
+                                        { $filter: { input: "$openingHours", as: "h", cond: { $and: [ { $eq: ["$$h.day", dayNow] }, { $eq: ["$$h.closed", false] } ] } } },
+                                        0
+                                    ]
+                                },
+                                __mn: minuteNow
+                            }
+                        },
+                        {
+                            $addFields: {
+                                isOpenNow: {
+                                    $cond: [
+                                        { $gt: [ { $size: { $ifNull: [ "$__todays.ranges", [] ] } }, 0 ] },
+                                        {
+                                            $anyElementTrue: {
+                                                $map: {
+                                                    input: { $ifNull: [ "$__todays.ranges", [] ] },
+                                                    as: "rg",
+                                                    in: {
+                                                        $let: {
+                                                            vars: {
+                                                                oh: { $toInt: { $arrayElemAt: [ { $split: ["$$rg.open", ":"] }, 0 ] } },
+                                                                om: { $toInt: { $arrayElemAt: [ { $split: ["$$rg.open", ":"] }, 1 ] } },
+                                                                ch: { $toInt: { $arrayElemAt: [ { $split: ["$$rg.close", ":"] }, 0 ] } },
+                                                                cm: { $toInt: { $arrayElemAt: [ { $split: ["$$rg.close", ":"] }, 1 ] } },
+                                                                mn: "$__mn"
+                                                            },
+                                                            in: {
+                                                                $let: {
+                                                                    vars: {
+                                                                        omins: { $add: [ { $multiply: ["$$oh", 60] }, "$$om" ] },
+                                                                        cmins: { $add: [ { $multiply: ["$$ch", 60] }, "$$cm" ] }
+                                                                    },
+                                                                    in: {
+                                                                        $cond: [
+                                                                            { $gte: [ "$$cmins", "$$omins" ] },
+                                                                            { $and: [ { $gte: [ "$$mn", "$$omins" ] }, { $lte: [ "$$mn", "$$cmins" ] } ] },
+                                                                            { $or: [ { $gte: [ "$$mn", "$$omins" ] }, { $lte: [ "$$mn", "$$cmins" ] } ] }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        false
+                                    ]
+                                }
+                            }
+                        },
+                        { $match: { isOpenNow: true } }
+                    ];
+                    const dataPipeline = [
+                        baseMatch,
+                        ...addOpenAndFilter,
+                        Object.keys(sortOption).length ? { $sort: sortOption } : { $sort: { _id: 1 } },
+                        { $skip: skip },
+                        { $limit: limitNum },
+                        { $project: { logo:1, name:1, address:1, phone:1, email:1, rating:1, categoryId:1, services:1, userId:1, createdAt:1, updatedAt:1, active:1, location:1, openingHours:1, isOpenNow:1 } },
+                        { $lookup: { from: 'categories', localField: 'categoryId', foreignField: '_id', as: 'categoryId', pipeline: [{ $project: { name:1, color:1, logo:1 } }] } },
+                        { $unwind: { path: '$categoryId', preserveNullAndEmptyArrays: true } },
+                        { $lookup: { from: 'services', localField: 'services', foreignField: '_id', as: 'services', pipeline: [{ $project: { name:1 } }] } }
+                    ];
+                    const countPipeline = [
+                        baseMatch,
+                        ...addOpenAndFilter,
+                        { $count: 'count' }
+                    ];
+                    const [aggData, aggCount] = await Promise.all([
+                        Business.aggregate(dataPipeline),
+                        Business.aggregate(countPipeline)
+                    ]);
+                    businesses = aggData;
+                    total = (aggCount && aggCount[0] && aggCount[0].count) ? aggCount[0].count : 0;
+                } else {
+                    [businesses, total] = await Promise.all([
+                Business.find(query)
+                            .select({ logo: 1, name: 1, address: 1, phone: 1, email: 1, rating: 1, categoryId: 1, services: 1, userId: 1, createdAt: 1, updatedAt: 1, active: 1, location: 1, openingHours: 1 })
+                    .populate('categoryId', 'name color logo')
+                    .populate('services', 'name')
+                    .populate('userId', 'firstName lastName')
+                            .sort(Object.keys(sortOption).length ? sortOption : {})
+                    .skip(skip)
+                    .limit(limitNum)
+                    .lean(),
+                Business.countDocuments(query)
+            ]);
+                }
             }
 
             // הוספת סטטוס מועדפים אם המשתמש מחובר
@@ -773,12 +1006,10 @@ exports.getItems = async (req, res) => {
                     isFavorite: false
                 }));
             }
-            // openNow post-filter (applies to current page set)
-            const requireOpenNow = String(openNow) === 'true';
-            if (requireOpenNow) {
-                const isBusinessOpenNow = (b) => {
-                    try {
-                        if (!Array.isArray(b.openingHours) || !b.openingHours.length) return true;
+            // הוספת דגל isOpenNow לכל עסק עבור ה־UI
+            const computeIsOpen = (b) => {
+                try {
+                    if (!Array.isArray(b.openingHours) || !b.openingHours.length) return false;
                         const now = new Date();
                         const day = now.getDay();
                         const todays = (b.openingHours || []).find(h => Number(h.day) === day);
@@ -793,11 +1024,18 @@ exports.getItems = async (req, res) => {
                             const o = toMinutes(r.open);
                             const c = toMinutes(r.close);
                             if (o === null || c === null) return false;
-                            return minutesNow >= o && minutesNow <= c;
+                        if (c > o) return minutesNow >= o && minutesNow <= c;
+                        // Overnight window
+                        return minutesNow >= o || minutesNow <= c;
                         });
                     } catch (_) { return false; }
                 };
-                businessesWithFavorites = businessesWithFavorites.filter(isBusinessOpenNow);
+            businessesWithFavorites = businessesWithFavorites.map(b => ({ ...b, isOpenNow: computeIsOpen(b) }));
+
+            // openNow post-filter (applies to current page set)
+            const requireOpenNow = String(openNow) === 'true';
+            if (requireOpenNow) {
+                businessesWithFavorites = businessesWithFavorites.filter(b => !!b.isOpenNow);
             }
 
             result = {

@@ -75,7 +75,8 @@ function buildAtlasSearchStage(queryString, paths, mode) {
       }
     };
   }
-  const tokens = q.split(/\s+/).filter(Boolean);
+  // Split on any non-letter/digit so tokens like "Keeling - Kirlin" won't include "-"
+  const tokens = q.split(/[^0-9\p{L}]+/u).filter(Boolean);
   return {
     $search: {
       index: 'default',
@@ -96,7 +97,7 @@ exports.getAllUnified = async (req, res) => {
       q,
       page = 1,
       limit = 24,
-      sort = 'newest',
+      sort,
       // business filters
       categoryId: businessCategoryId,
       categoryName,
@@ -211,6 +212,9 @@ exports.getAllUnified = async (req, res) => {
             name: 1, address: 1, location: 1, logo: 1, rating: 1, categoryId: 1,
             services: 1, userId: 1, active: 1, openingHours: 1, createdAt: 1, updatedAt: 1, distance: 1
           }},
+          { $lookup: { from: 'users', localField: 'userId', foreignField: '_id', as: 'user' } },
+          { $addFields: { userId: { $let: { vars: { u: { $arrayElemAt: ['$user', 0] } }, in: { _id: '$$u._id', firstName: '$$u.firstName', lastName: '$$u.lastName' } } } } },
+          { $unset: 'user' },
           { $limit: batchSize }
         ]),
         // Sale (aggregation)
@@ -243,19 +247,22 @@ exports.getAllUnified = async (req, res) => {
         const [bizAgg, saleAgg, promoAgg] = await Promise.all([
           Business.aggregate([
             buildAtlasSearchStage(q, ['name', 'description', 'address', 'city', 'categoryName', 'serviceNames'], mode),
-            { $match: { active: true } },
+            { $match: businessQuery },
+            { $lookup: { from: 'users', localField: 'userId', foreignField: '_id', as: 'user' } },
+            { $addFields: { userId: { $let: { vars: { u: { $arrayElemAt: ['$user', 0] } }, in: { _id: '$$u._id', firstName: '$$u.firstName', lastName: '$$u.lastName' } } } } },
+            { $unset: 'user' },
             { $limit: batchSize },
             { $project: { name: 1, address: 1, location: 1, logo: 1, rating: 1, categoryId: 1, services: 1, userId: 1, active: 1, openingHours: 1, createdAt: 1, updatedAt: 1 } }
           ]),
           SaleAd.aggregate([
             buildAtlasSearchStage(q, ['title', 'description', 'city', 'categoryName', 'subcategoryNames'], mode),
-            { $match: { active: true } },
+            { $match: saleQuery },
             { $limit: batchSize },
             { $project: { title: 1, description: 1, city: 1, price: 1, currency: 1, images: 1, location: 1, categoryId: 1, subcategoryId: 1, active: 1, createdAt: 1, updatedAt: 1 } }
           ]),
           PromoAd.aggregate([
             buildAtlasSearchStage(q, ['title', 'city', 'categoryName'], mode),
-            { $match: { active: true } },
+            { $match: promoQuery },
             { $limit: batchSize },
             { $lookup: { from: 'categories', localField: 'categoryId', foreignField: '_id', as: 'category' } },
             { $addFields: { categoryId: { $arrayElemAt: ['$category', 0] } } },
@@ -278,10 +285,13 @@ exports.getAllUnified = async (req, res) => {
             ? Business.aggregate([
                 buildAtlasSearchStage(q, ['name', 'description', 'address', 'city', 'categoryName', 'serviceNames'], usePhrase ? 'phrase' : 'and'),
                 { $match: businessQuery }, // includes active true and optional filters
+                { $lookup: { from: 'users', localField: 'userId', foreignField: '_id', as: 'user' } },
+                { $addFields: { userId: { $let: { vars: { u: { $arrayElemAt: ['$user', 0] } }, in: { _id: '$$u._id', firstName: '$$u.firstName', lastName: '$$u.lastName' } } } } },
+                { $unset: 'user' },
                 { $limit: batchSize },
                 { $project: { name: 1, address: 1, location: 1, logo: 1, rating: 1, categoryId: 1, services: 1, userId: 1, active: 1, openingHours: 1, createdAt: 1, updatedAt: 1 } }
               ])
-            : Business.find(businessQuery).select('name address location logo rating categoryId services userId active openingHours createdAt updatedAt').sort(businessPrefetchSort).limit(batchSize).lean(),
+            : Business.find(businessQuery).select('name address location logo rating categoryId services userId active openingHours createdAt updatedAt').populate('userId', 'firstName lastName').sort(businessPrefetchSort).limit(batchSize).lean(),
           q
             ? SaleAd.aggregate([
                 buildAtlasSearchStage(q, ['title', 'description', 'city', 'categoryName', 'subcategoryNames'], usePhrase ? 'phrase' : 'and'),
@@ -406,7 +416,14 @@ exports.globalSearch = async (req, res) => {
     };
 
     // already computed above
-    const biz = requireOpenNow ? bizRaw.filter(isBusinessOpenNow) : bizRaw;
+      // Attach server-side openNow flag for deterministic UI, then apply filter if requested
+      bizRaw = Array.isArray(bizRaw) ? bizRaw.map(b => ({ ...b, isOpenNow: isBusinessOpenNow(b) })) : [];
+      let biz = requireOpenNow ? bizRaw.filter(isBusinessOpenNow) : bizRaw;
+      // Enforce rating as hard constraint
+      if (rating) {
+        const minR = Number(rating);
+        biz = biz.filter(b => ((b?.rating || 0) >= minR));
+      }
     const promos = requireOpenNow ? promosRaw.filter(isPromoCurrentlyActive) : promosRaw;
     const sales = salesRaw; // openNow not applicable for sale ads
 
@@ -443,6 +460,12 @@ exports.globalSearch = async (req, res) => {
     // If openNow is requested, restrict to businesses only
     if (requireOpenNow) {
       items = items.filter(it => it.type === 'business');
+    }
+
+    // Enforce rating threshold for businesses at merge-level as well
+    if (rating) {
+      const minRating = Number(rating);
+      items = items.filter(it => it.type !== 'business' || ((it.data?.rating || 0) >= minRating));
     }
 
     // Cross-type enforcement: when a filter is applied that a type cannot satisfy, exclude that type
@@ -512,8 +535,13 @@ exports.globalSearch = async (req, res) => {
     const total = items.length;
     const totalPages = Math.ceil(total / limitNum) || 1;
 
-    // Fallback: if q present and nothing found via $text, try regex/category-name based matching
-    if (q && total === 0) {
+    // Fallback only when NO precise filters are applied (to preserve “AND” semantics).
+    const hasBizPrecise =
+      !!(resolvedBusinessCategoryId || (serviceIds && serviceIds.length) || rating || city || requireOpenNow);
+    const hasSalePrecise =
+      !!(toObjectId(saleCategoryId) || toObjectId(saleSubcategoryId) || priceMin !== undefined || priceMax !== undefined);
+    const allowFallback = q && total === 0 && !hasBizPrecise && !hasSalePrecise;
+    if (allowFallback) {
       const safe = escapeRegExp(q);
       // Businesses fallback
       const [catDocs, svcDocs] = await Promise.all([

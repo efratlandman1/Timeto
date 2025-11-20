@@ -20,7 +20,9 @@
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
-  height: 420px;
+  /* allow height to grow so footer לא ייחתך בכרטיסים צרים */
+  height: auto;
+  min-height: 340px;
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -238,16 +240,18 @@
 
 .business-card-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   position: relative;
   z-index: 20;
+  flex-wrap: wrap; /* allow wrapping in narrow cards */
+  row-gap: 6px;
 }
 
 .favorite-button { position: absolute; top: 8px; right: 8px; z-index: 40; }
 
 .action-button {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border: none;
   border-radius: 50%;
   display: flex;
@@ -441,9 +445,17 @@
     padding: 0 16px;
   }
 
+  /* Let the card grow with content so the actions area is never clipped */
   .business-card {
-    height: 340px;
+    height: auto;
+    min-height: 300px;
   }
+
+  /* Slightly tighter spacing on mobile */
+  .business-card-content { padding: 10px; }
+  .business-card-footer { padding-top: 6px; }
+  .action-button { width: 24px; height: 24px; }
+  .rating-stars { font-size: 0.8rem; }
 }
 
 .favorite-button {

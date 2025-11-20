@@ -85,11 +85,13 @@ const SearchResultPage = () => {
     const { isLoaded: mapsLoaded } = useJsApiLoader({ 
         id: 'google-maps-script', 
         googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', 
-        libraries: GOOGLE_LIBRARIES
+        libraries: GOOGLE_LIBRARIES,
+        language: 'he',
+        region: 'IL'
     });
     const cityAutoRef = useRef(null);
     const [activeFilters, setActiveFilters] = useState({});
-    const [sortOption, setSortOption] = useState('rating');
+    const [sortOption, setSortOption] = useState('');
     const [showSortDropdown, setShowSortDropdown] = useState(false);
     const sortDropdownRef = useRef(null);
     const [tempSort, setTempSort] = useState('rating');
@@ -120,6 +122,10 @@ const SearchResultPage = () => {
     const location = useLocation();
     // Local text filter (client-side) from SearchBar
     const [searchText, setSearchText] = useState('');
+    // Grid density: number of columns between 1..5 (affects card size)
+    const [gridCols, setGridCols] = useState(3);
+    const handleIncreaseDensity = () => setGridCols(c => Math.max(1, Math.min(5, c - 1)));
+    const handleDecreaseDensity = () => setGridCols(c => Math.max(1, Math.min(5, c + 1)));
 
     useEffect(() => {
         const q = new URLSearchParams(location.search).get('q') || '';
@@ -182,12 +188,23 @@ const SearchResultPage = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLoadingBiz, isLoadingSale, isLoadingPromo, isLoadingUnifiedActual, hasMore, activeTab, unifiedPage, unifiedTotalPages, bizPage, salePage, promoPage, bizTotalPages, saleTotalPages, promoTotalPages]);
 
-    // Reset unified on tab change
+    // On tab change: clear de-dup keys so next fetch will run; reset lists/pages for target tab
     useEffect(() => {
-        if (activeTab !== 'all') return;
-        setUnifiedItems([]);
-        setUnifiedPage(1);
-        setUnifiedTotalPages(1);
+        // clear all lastKey refs to force refresh after switching tabs
+        if (SearchResultPage.__unifiedLastKeyRef) SearchResultPage.__unifiedLastKeyRef.current = '';
+        if (SearchResultPage.__bizLastKeyRef) SearchResultPage.__bizLastKeyRef.current = '';
+        if (SearchResultPage.__saleLastKeyRef) SearchResultPage.__saleLastKeyRef.current = '';
+        if (SearchResultPage.__promoLastKeyRef) SearchResultPage.__promoLastKeyRef.current = '';
+        // Reset state for the destination tab to avoid stale items when the new fetch returns 0
+        if (activeTab === 'all') {
+            setUnifiedItems([]); setUnifiedPage(1); setUnifiedTotalPages(1);
+        } else if (activeTab === 'business') {
+            setBusinesses([]); setBizPage(1); setBizTotalPages(1);
+        } else if (activeTab === 'sale') {
+            setSaleAds([]); setSalePage(1); setSaleTotalPages(1);
+        } else if (activeTab === 'promo') {
+            setPromoAds([]); setPromoPage(1); setPromoTotalPages(1);
+        }
     }, [activeTab, location.search]);
 
     // Fetch unified items
@@ -201,7 +218,7 @@ const SearchResultPage = () => {
         const params = new URLSearchParams(location.search);
         // אל תעביר tab לשירות המאוחד
         params.delete('tab');
-        const sort = params.get('sort') || 'rating';
+        const sort = params.get('sort') || '';
         const maxDistance = params.get('maxDistance');
         const needsLocationSorting = sort === 'distance' || sort === 'popular_nearby';
         const needsLocationFiltering = !!maxDistance;
@@ -229,7 +246,8 @@ const SearchResultPage = () => {
             const newItems = res.data?.data?.items || [];
             const totalPages = res.data?.data?.pagination?.totalPages || 1;
             setUnifiedItems(prev => unifiedPage === 1 ? newItems : [...prev, ...newItems]);
-            setUnifiedTotalPages(totalPages);
+            // Clamp total pages if server returned an empty page for current filters
+            setUnifiedTotalPages(newItems.length === 0 ? unifiedPage : totalPages);
           })
           .catch(() => {})
           .finally(() => { lastKeyRef.current = requestKey; setIsLoadingUnified(false); });
@@ -300,7 +318,7 @@ const SearchResultPage = () => {
         const params = new URLSearchParams(location.search);
         const urlTab = params.get('tab');
         const filters = {};
-        const sort = params.get('sort') || 'rating';
+        const sort = params.get('sort') || '';
         for (const [key, value] of params.entries()) {
             if (key !== 'sort' && key !== 'q' && key !== 'page' && key !== 'limit') {
                 if (filters[key] === undefined) {
@@ -313,7 +331,7 @@ const SearchResultPage = () => {
         }
         setActiveFilters(filters);
         setSortOption(sort);
-        setTempSort(sort);
+        setTempSort(sort || 'rating');
         // Sync temp values from URL on navigation
         setTempValues(v => ({
             ...v,
@@ -375,7 +393,7 @@ const SearchResultPage = () => {
     useEffect(() => {
         if (activeTab === 'all') return;
         const params = new URLSearchParams(location.search);
-        const sort = params.get('sort') || 'rating';
+        const sort = params.get('sort') || '';
         const filtersString = JSON.stringify(activeFilters);
         const q = params.get('q') || '';
         const combinedKey = `${sort}|${filtersString}|${q}`;
@@ -461,7 +479,7 @@ const SearchResultPage = () => {
         }
         
         const requestKey = `biz|${url}`;
-        if (lastKeyRef.current === requestKey) return;
+        if (lastKeyRef.current === requestKey) { setIsLoadingBiz(false); return; }
         axios.get(url, { headers })
             .then(res => {
                 const newBusinesses = res.data?.data?.businesses || [];
@@ -469,7 +487,13 @@ const SearchResultPage = () => {
                     requestedBizPage === 1 ? newBusinesses : [...prevBusinesses, ...newBusinesses]
                 );
                 let total = res.data?.data?.pagination?.totalPages;
-                if (!total) total = (newBusinesses.length === 0 ? requestedBizPage : 1);
+                // Stop auto-advancing when server returned empty page for the current filters
+                if (newBusinesses.length === 0) {
+                    total = requestedBizPage;
+                    setHasMore(false);
+                } else if (!total) {
+                    total = 1;
+                }
                 setBizTotalPages(total);
                 setIsLoadingBiz(false);
             })
@@ -529,7 +553,12 @@ const SearchResultPage = () => {
                 const newAds = res.data?.data?.ads || [];
                 setSaleAds(prev => requestedSalePage === 1 ? newAds : [...prev, ...newAds]);
                 let total = res.data?.data?.pagination?.totalPages;
-                if (!total) total = (newAds.length === 0 ? requestedSalePage : 1);
+                if (newAds.length === 0) {
+                    total = requestedSalePage;
+                    setHasMore(false);
+                } else if (!total) {
+                    total = 1;
+                }
                 setSaleTotalPages(total);
                 setIsLoadingSale(false);
             })
@@ -567,7 +596,12 @@ const SearchResultPage = () => {
                 const newAds = res.data?.data?.ads || [];
                 setPromoAds(prev => requestedPromoPage === 1 ? newAds : [...prev, ...newAds]);
                 let total = res.data?.data?.pagination?.totalPages;
-                if (!total) total = (newAds.length === 0 ? requestedPromoPage : 1);
+                if (newAds.length === 0) {
+                    total = requestedPromoPage;
+                    setHasMore(false);
+                } else if (!total) {
+                    total = 1;
+                }
                 setPromoTotalPages(total);
                 setIsLoadingPromo(false);
             })
@@ -674,6 +708,8 @@ const SearchResultPage = () => {
   const queryFilteredBusinesses = filteredBusinesses;
   const queryFilteredSaleAds = filteredSaleAds;
   const queryFilteredPromoAds = filteredPromoAds;
+
+  // (dev clock removed)
 
     // Wait for translations to load
     if (!ready) {
@@ -815,7 +851,27 @@ const SearchResultPage = () => {
                         <div className="search-bar-container">
                             <SearchBar isMainPage={false} onSearch={setSearchText} />
                         </div>
-                        <div className="search-controls__actions"></div>
+                        <div className="search-controls__actions" style={{ display: 'flex', gap: 8 }}>
+                          {/* Card size controls: magnifying glass to enlarge/shrink */}
+                          <button
+                            type="button"
+                            className="chip-button"
+                            onClick={handleIncreaseDensity}
+                            aria-label="הגדל כרטיסים"
+                            title="הגדל כרטיסים"
+                          >
+                            🔍+
+                          </button>
+                          <button
+                            type="button"
+                            className="chip-button"
+                            onClick={handleDecreaseDensity}
+                            aria-label="הקטן כרטיסים"
+                            title="הקטן כרטיסים"
+                          >
+                            🔍-
+                          </button>
+                        </div>
                     </div>
 
                     {/* Filters row - standalone buttons + drawer trigger */}
@@ -835,7 +891,7 @@ const SearchResultPage = () => {
                             onClick={() => { setDrawerMode('sort'); setShowFiltersDrawer(true); setShowFilters(true); setTempSort(sortOption || 'rating'); }}
                             aria-expanded={showFiltersDrawer && drawerMode==='sort'}
                         >
-                            <FaSort aria-hidden="true" /> מיון לפי: {SORT_OPTIONS[sortOption]}
+                            <FaSort aria-hidden="true" /> {sortOption ? `מיון לפי: ${SORT_OPTIONS[sortOption]}` : (t('searchResults.sort.title') || 'מיון')}
                         </button>
 
                         <button
@@ -1262,7 +1318,7 @@ const SearchResultPage = () => {
                         ))}
                       </div>
                     ) : (
-                    <div className="business-cards-grid">
+                    <div className="business-cards-grid" style={{ display: 'grid', gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`, gap: 16 }}>
                         {activeTab === 'business' && !isLoadingCurrent && queryFilteredBusinesses.length === 0 && (
                           <div className="no-results" style={{textAlign:'center', gridColumn: '1 / -1'}}>{t('search.noResults')||'לא נמצאו תוצאות'}</div>
                         )}

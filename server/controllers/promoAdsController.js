@@ -30,15 +30,13 @@ const buildPromoQuery = async (q, status = 'active') => {
             query = { active: true, validFrom: { $lte: now }, validTo: { $gte: now } };
             break;
     }
+    // Do NOT attach $text here; we use Atlas Search ($search) when q is present.
+    // Optionally narrow by category by resolving the category name to ids.
     if (q) {
-        query.$text = { $search: q, $language: 'none' };
-        // Also match by category name to include promos linked to a category
         const safe = escapeRegExp(q);
         const cats = await Category.find({ name: new RegExp(safe, 'i') }).select('_id');
         const ids = cats.map(c => c._id);
-        if (ids.length) {
-            query.categoryId = { ...(query.categoryId || {}), $in: ids };
-        }
+        if (ids.length) query.categoryId = { ...(query.categoryId || {}), $in: ids };
     }
     return query;
 };
@@ -136,12 +134,16 @@ exports.getPromoAds = async (req, res) => {
     const logSource = 'promoAdsController.getPromoAds';
     const meta = getRequestMeta(req, logSource);
     try {
-        const { q, status = 'active', lat, lng, maxDistance, sort = 'newest', page = 1, limit = DEFAULT_LIMIT } = req.query;
+        const { q, status = 'active', lat, lng, maxDistance, sort = 'newest', page = 1, limit = DEFAULT_LIMIT, city } = req.query;
         const pageNum = Number(page) || 1;
         const limitNum = Math.min(Number(limit) || DEFAULT_LIMIT, 50);
         const skip = (pageNum - 1) * limitNum;
 
         let query = await buildPromoQuery(q, status);
+        // Exact city equality (no regex) as requested
+        if (city) {
+            query.city = String(city);
+        }
         let data, total;
         const hasGeo = lat && lng && (sort === 'distance' || maxDistance);
         if (hasGeo) {
@@ -194,19 +196,25 @@ exports.getPromoAds = async (req, res) => {
                 const sortStage = (sort === 'newest') ? { $sort: { updatedAt: -1, createdAt: -1 } } : { $sort: { score: { $meta: 'searchScore' } } };
                 const agg = await PromoAd.aggregate([
                     (function buildSearchStage() {
-                        const tokens = String(q || '').trim().split(/\s+/).filter(Boolean);
+                        const raw = String(q || '').trim();
+                        const tokens = raw.split(/[^0-9\p{L}]+/u).filter(Boolean);
                         return {
                             $search: {
                                 index: 'default',
                                 compound: {
-                                    must: tokens.length ? tokens.map(tok => ({ text: { query: tok, path: ['title', 'city', 'categoryName'] } })) : [
-                                        { text: { query: String(q || ''), path: ['title', 'city', 'categoryName'] } }
-                                    ]
+                                    must: (tokens.length ? tokens : [raw]).map(tok => ({
+                                        text: { query: tok, path: ['title', 'city', 'categoryName'] }
+                                    }))
                                 }
                             }
                         };
                     })(),
-                    { $match: query },
+                    // ensure no $text sneaks into $match (to avoid Location17313)
+                    (function cleanMatch() {
+                        const nq = { ...query };
+                        if (nq.$text) delete nq.$text;
+                        return { $match: nq };
+                    })(),
                     sortStage,
                     { $lookup: { from: 'categories', localField: 'categoryId', foreignField: '_id', as: 'category' } },
                     { $addFields: { categoryId: { $arrayElemAt: ['$category', 0] } } },
