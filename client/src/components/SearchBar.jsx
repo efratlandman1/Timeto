@@ -8,6 +8,7 @@ import '../styles/SearchBar.css';
 const SearchBar = ({ onSearch, isMainPage = false }) => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -26,25 +27,42 @@ const SearchBar = ({ onSearch, isMainPage = false }) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     if (isMainPage || !onSearch) {
-      navigate(`/search-results?q=${encodeURIComponent(searchQuery.trim())}`);
+      const params = new URLSearchParams();
+      params.set('q', searchQuery.trim());
+      // ברירת מחדל: חיפוש AND (כל המילים) בעמוד התוצאות
+      params.set('searchMode', 'and');
+      navigate(`/search-results?${params.toString()}`);
       return;
     }
     onSearch(searchQuery.trim());
+    setShowSuggestions(false);
   };
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
     if (!isMainPage) {
       if (debounceRef.current) clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => {
-      const params = new URLSearchParams(location.search);
-      if (value.trim()) params.set('q', value);
-      else params.delete('q');
-      navigate({ pathname: location.pathname, search: params.toString() });
-      if (onSearch) onSearch(value);
+      debounceRef.current = setTimeout(async () => {
+        const params = new URLSearchParams(location.search);
+        if (value.trim()) params.set('q', value);
+        else params.delete('q');
+        // אל תגדל היסטוריה על כל הקלדה
+        navigate({ pathname: location.pathname, search: params.toString() }, { replace: true });
+        if (onSearch) onSearch(value);
+        // לא משתמשים יותר בהצעות חיות
+        setShowSuggestions(false);
       }, 300);
     }
   };
+  useEffect(() => {
+    const onDocClick = (ev) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(ev.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, []);
 
   return (
     <div 

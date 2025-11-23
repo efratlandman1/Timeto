@@ -8,4 +8,8 @@ const ServiceSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Indexes for faster resolution by name/category/active
+ServiceSchema.index({ name: 1 });
+ServiceSchema.index({ categoryId: 1, active: 1, name: 1 });
+
 module.exports = mongoose.model('services', ServiceSchema);

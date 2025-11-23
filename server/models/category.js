@@ -8,4 +8,7 @@ const CategorySchema = new mongoose.Schema({
     timestamps: true
 });
 
+// Indexes to speed up lookups by name (used in search resolution)
+CategorySchema.index({ name: 1 });
+
 module.exports = mongoose.model('categories', CategorySchema);

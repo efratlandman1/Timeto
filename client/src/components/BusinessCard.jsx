@@ -161,6 +161,9 @@ const BusinessCard = ({ business, fromUserBusinesses }) => {
   };
 
   const isBusinessOpen = useMemo(() => {
+    if (typeof business?.isOpenNow === 'boolean') {
+      return business.isOpenNow;
+    }
     const openingHours = business?.openingHours;
     if (!Array.isArray(openingHours) || openingHours.length === 0) {
       return false;

@@ -77,6 +77,71 @@ const mapsUtils = {
     }
   },
 
+  // Returns location + a best-effort city extracted from address_components
+  async geocodeWithComponents(address, req = null) {
+    const logSource = 'mapsUtils.geocodeWithComponents';
+    const meta = req ? {
+      requestId: req.requestId,
+      userId: req.user?._id,
+      ip: req.ip,
+      logSource
+    } : { logSource };
+
+    try {
+      const language = 'he';
+      const response = await client.geocode({
+        params: {
+          address,
+          key: process.env.GOOGLE_MAPS_API_KEY,
+          language
+        }
+      });
+
+      if (!response.data.results || response.data.results.length === 0) {
+        throw new Error('No results found for this address');
+      }
+
+      const first = response.data.results[0];
+      const location = first.geometry.location;
+      const comps = Array.isArray(first.address_components) ? first.address_components : [];
+      const findByType = (types) => {
+        for (const c of comps) {
+          const t = c.types || [];
+          if (types.some(tt => t.includes(tt))) {
+            return c.long_name || c.short_name || '';
+          }
+        }
+        return '';
+      };
+      // Common city-like components
+      const candidatesOrder = [
+        ['locality'],
+        ['postal_town'],
+        ['administrative_area_level_2'],
+        ['administrative_area_level_1']
+      ];
+      let city = '';
+      for (const types of candidatesOrder) {
+        city = findByType(types);
+        if (city) break;
+      }
+      return { 
+        location, 
+        city 
+      };
+    } catch (error) {
+      logger.error({ 
+        ...meta,
+        address: address.substring(0, 50) + (address.length > 50 ? '...' : ''),
+        error: error.message,
+        stack: error.stack,
+        msg: 'geocodeWithComponents failed'
+      });
+      Sentry.captureException(error);
+      throw error;
+    }
+  },
+
   async getDistance(origin, destination, req = null) {
     const logSource = 'mapsUtils.getDistance';
     const meta = req ? {

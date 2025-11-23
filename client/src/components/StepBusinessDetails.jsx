@@ -11,7 +11,9 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
   const { isLoaded: mapsLoaded } = useJsApiLoader({
     id: 'google-maps-script',
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-    libraries: ['places']
+    libraries: ['places'],
+    language: 'he',
+    region: 'IL'
   });
 
 
@@ -38,8 +40,8 @@ const StepBusinessDetails = ({ businessData, setBusinessData, categories }) => {
 
   const onPlaceChanged = () => {
     if (!autocomplete) return;
-    const place = autocomplete.getPlace();
-    const value = place?.formatted_address || place?.name || '';
+    const place = (typeof autocomplete.getPlace === 'function') ? autocomplete.getPlace() : null;
+    const value = (place && (place.formatted_address || place.name)) ? (place.formatted_address || place.name) : '';
     if (value) {
       setBusinessData(prev => ({ ...prev, address: value }));
     }

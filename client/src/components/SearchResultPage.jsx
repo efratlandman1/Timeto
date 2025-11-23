@@ -82,10 +82,16 @@ const SearchResultPage = () => {
         saleSubcategoryIds: [],
     });
     const MAX_PRICE = 10000;
-    const { isLoaded: mapsLoaded } = useJsApiLoader({ id: 'google-maps-script', googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', libraries: GOOGLE_LIBRARIES });
+    const { isLoaded: mapsLoaded } = useJsApiLoader({ 
+        id: 'google-maps-script', 
+        googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '', 
+        libraries: GOOGLE_LIBRARIES,
+        language: 'he',
+        region: 'IL'
+    });
     const cityAutoRef = useRef(null);
     const [activeFilters, setActiveFilters] = useState({});
-    const [sortOption, setSortOption] = useState('rating');
+    const [sortOption, setSortOption] = useState('');
     const [showSortDropdown, setShowSortDropdown] = useState(false);
     const sortDropdownRef = useRef(null);
     const [tempSort, setTempSort] = useState('rating');
@@ -116,6 +122,10 @@ const SearchResultPage = () => {
     const location = useLocation();
     // Local text filter (client-side) from SearchBar
     const [searchText, setSearchText] = useState('');
+    // Grid density: number of columns between 1..5 (affects card size)
+    const [gridCols, setGridCols] = useState(3);
+    const handleIncreaseDensity = () => setGridCols(c => Math.max(1, Math.min(5, c - 1)));
+    const handleDecreaseDensity = () => setGridCols(c => Math.max(1, Math.min(5, c + 1)));
 
     useEffect(() => {
         const q = new URLSearchParams(location.search).get('q') || '';
@@ -178,25 +188,37 @@ const SearchResultPage = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLoadingBiz, isLoadingSale, isLoadingPromo, isLoadingUnifiedActual, hasMore, activeTab, unifiedPage, unifiedTotalPages, bizPage, salePage, promoPage, bizTotalPages, saleTotalPages, promoTotalPages]);
 
-    // Reset unified on tab change
+    // On tab change: clear de-dup keys so next fetch will run; reset lists/pages for target tab
     useEffect(() => {
-        if (activeTab !== 'all') return;
-        setUnifiedItems([]);
-        setUnifiedPage(1);
-        setUnifiedTotalPages(1);
+        // clear all lastKey refs to force refresh after switching tabs
+        if (SearchResultPage.__unifiedLastKeyRef) SearchResultPage.__unifiedLastKeyRef.current = '';
+        if (SearchResultPage.__bizLastKeyRef) SearchResultPage.__bizLastKeyRef.current = '';
+        if (SearchResultPage.__saleLastKeyRef) SearchResultPage.__saleLastKeyRef.current = '';
+        if (SearchResultPage.__promoLastKeyRef) SearchResultPage.__promoLastKeyRef.current = '';
+        // Reset state for the destination tab to avoid stale items when the new fetch returns 0
+        if (activeTab === 'all') {
+            setUnifiedItems([]); setUnifiedPage(1); setUnifiedTotalPages(1);
+        } else if (activeTab === 'business') {
+            setBusinesses([]); setBizPage(1); setBizTotalPages(1);
+        } else if (activeTab === 'sale') {
+            setSaleAds([]); setSalePage(1); setSaleTotalPages(1);
+        } else if (activeTab === 'promo') {
+            setPromoAds([]); setPromoPage(1); setPromoTotalPages(1);
+        }
     }, [activeTab, location.search]);
 
     // Fetch unified items
     useEffect(() => {
         if (activeTab !== 'all') return;
         setIsLoadingUnified(true);
+        const lastKeyRef = (SearchResultPage.__unifiedLastKeyRef ||= { current: '' });
         const headers = {};
         const token = getToken();
         if (token) headers.Authorization = `Bearer ${token}`;
         const params = new URLSearchParams(location.search);
         // אל תעביר tab לשירות המאוחד
         params.delete('tab');
-        const sort = params.get('sort') || 'rating';
+        const sort = params.get('sort') || '';
         const maxDistance = params.get('maxDistance');
         const needsLocationSorting = sort === 'distance' || sort === 'popular_nearby';
         const needsLocationFiltering = !!maxDistance;
@@ -217,15 +239,18 @@ const SearchResultPage = () => {
 
         params.set('page', unifiedPage.toString());
         params.set('limit', ITEMS_PER_PAGE.toString());
+        const requestKey = `all|${params.toString()}`;
+        if (lastKeyRef.current === requestKey) { setIsLoadingUnified(false); return; }
         axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/search/all?${params.toString()}`, { headers })
           .then(res => {
             const newItems = res.data?.data?.items || [];
             const totalPages = res.data?.data?.pagination?.totalPages || 1;
             setUnifiedItems(prev => unifiedPage === 1 ? newItems : [...prev, ...newItems]);
-            setUnifiedTotalPages(totalPages);
+            // Clamp total pages if server returned an empty page for current filters
+            setUnifiedTotalPages(newItems.length === 0 ? unifiedPage : totalPages);
           })
           .catch(() => {})
-          .finally(() => setIsLoadingUnified(false));
+          .finally(() => { lastKeyRef.current = requestKey; setIsLoadingUnified(false); });
     }, [activeTab, unifiedPage, location.search, userLocation, locationLoading, locationError]);
     
     useEffect(() => {
@@ -293,7 +318,7 @@ const SearchResultPage = () => {
         const params = new URLSearchParams(location.search);
         const urlTab = params.get('tab');
         const filters = {};
-        const sort = params.get('sort') || 'rating';
+        const sort = params.get('sort') || '';
         for (const [key, value] of params.entries()) {
             if (key !== 'sort' && key !== 'q' && key !== 'page' && key !== 'limit') {
                 if (filters[key] === undefined) {
@@ -306,7 +331,7 @@ const SearchResultPage = () => {
         }
         setActiveFilters(filters);
         setSortOption(sort);
-        setTempSort(sort);
+        setTempSort(sort || '');
         // Sync temp values from URL on navigation
         setTempValues(v => ({
             ...v,
@@ -368,7 +393,7 @@ const SearchResultPage = () => {
     useEffect(() => {
         if (activeTab === 'all') return;
         const params = new URLSearchParams(location.search);
-        const sort = params.get('sort') || 'rating';
+        const sort = params.get('sort') || '';
         const filtersString = JSON.stringify(activeFilters);
         const q = params.get('q') || '';
         const combinedKey = `${sort}|${filtersString}|${q}`;
@@ -389,6 +414,7 @@ const SearchResultPage = () => {
 
     useEffect(() => {
         if (activeTab !== 'business') return;
+        const lastKeyRef = (SearchResultPage.__bizLastKeyRef ||= { current: '' });
         const params = new URLSearchParams(location.search);
         const sort = params.get('sort') || 'rating';
         const maxDistance = params.get('maxDistance');
@@ -452,26 +478,36 @@ const SearchResultPage = () => {
             headers.Authorization = `Bearer ${token}`;
         }
         
-                axios.get(url, { headers })
+        const requestKey = `biz|${url}`;
+        if (lastKeyRef.current === requestKey) { setIsLoadingBiz(false); return; }
+        axios.get(url, { headers })
             .then(res => {
                 const newBusinesses = res.data?.data?.businesses || [];
                 setBusinesses(prevBusinesses => 
                     requestedBizPage === 1 ? newBusinesses : [...prevBusinesses, ...newBusinesses]
                 );
                 let total = res.data?.data?.pagination?.totalPages;
-                if (!total) total = (newBusinesses.length === 0 ? requestedBizPage : 1);
+                // Stop auto-advancing when server returned empty page for the current filters
+                if (newBusinesses.length === 0) {
+                    total = requestedBizPage;
+                    setHasMore(false);
+                } else if (!total) {
+                    total = 1;
+                }
                 setBizTotalPages(total);
                 setIsLoadingBiz(false);
             })
             .catch(error => {
                 console.error('Error fetching businesses:', error);
                 setIsLoadingBiz(false);
-            });
+            })
+            .finally(() => { lastKeyRef.current = requestKey; });
     }, [location.search, bizPage, userLocation, locationLoading, locationError, activeTab]);
 
     // Fetch Sale Ads
     useEffect(() => {
         if (activeTab !== 'sale') return;
+        const lastKeyRef = (SearchResultPage.__saleLastKeyRef ||= { current: '' });
         const token = getToken();
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const params = new URLSearchParams(location.search);
@@ -509,24 +545,34 @@ const SearchResultPage = () => {
         subIds.forEach(id => qsParams.append('subcategoryId', id));
         const qs = qsParams.toString();
         setIsLoadingSale(true);
-        axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-ads?${qs}`, { headers })
+        const url = `${process.env.REACT_APP_API_DOMAIN}/api/v1/sale-ads?${qs}`;
+        const requestKey = `sale|${url}`;
+        if (lastKeyRef.current === requestKey) { setIsLoadingSale(false); return; }
+        axios.get(url, { headers })
             .then(res => {
                 const newAds = res.data?.data?.ads || [];
                 setSaleAds(prev => requestedSalePage === 1 ? newAds : [...prev, ...newAds]);
                 let total = res.data?.data?.pagination?.totalPages;
-                if (!total) total = (newAds.length === 0 ? requestedSalePage : 1);
+                if (newAds.length === 0) {
+                    total = requestedSalePage;
+                    setHasMore(false);
+                } else if (!total) {
+                    total = 1;
+                }
                 setSaleTotalPages(total);
                 setIsLoadingSale(false);
             })
             .catch(err => {
                 console.error('Error fetching sale ads:', err);
                 setIsLoadingSale(false);
-            });
+            })
+            .finally(() => { lastKeyRef.current = requestKey; });
     }, [location.search, salePage, activeTab]);
 
     // Fetch Promo Ads
     useEffect(() => {
         if (activeTab !== 'promo') return;
+        const lastKeyRef = (SearchResultPage.__promoLastKeyRef ||= { current: '' });
         const token = getToken();
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const params = new URLSearchParams(location.search);
@@ -542,19 +588,28 @@ const SearchResultPage = () => {
 
         const qs = new URLSearchParams({ status: 'active', ...paramsObj }).toString();
         setIsLoadingPromo(true);
-        axios.get(`${process.env.REACT_APP_API_DOMAIN}/api/v1/promo-ads?${qs}`, { headers })
+        const url = `${process.env.REACT_APP_API_DOMAIN}/api/v1/promo-ads?${qs}`;
+        const requestKey = `promo|${url}`;
+        if (lastKeyRef.current === requestKey) { setIsLoadingPromo(false); return; }
+        axios.get(url, { headers })
             .then(res => {
                 const newAds = res.data?.data?.ads || [];
                 setPromoAds(prev => requestedPromoPage === 1 ? newAds : [...prev, ...newAds]);
                 let total = res.data?.data?.pagination?.totalPages;
-                if (!total) total = (newAds.length === 0 ? requestedPromoPage : 1);
+                if (newAds.length === 0) {
+                    total = requestedPromoPage;
+                    setHasMore(false);
+                } else if (!total) {
+                    total = 1;
+                }
                 setPromoTotalPages(total);
                 setIsLoadingPromo(false);
             })
             .catch(err => {
                 console.error('Error fetching promo ads:', err);
                 setIsLoadingPromo(false);
-            });
+            })
+            .finally(() => { lastKeyRef.current = requestKey; });
     }, [location.search, promoPage, activeTab]);
 
     const SORT_OPTIONS = {
@@ -591,8 +646,8 @@ const SearchResultPage = () => {
   };
 
   const filteredBusinesses = useMemo(() => {
+    // Ignore price filters for businesses (no price field); only apply optional category fallback
     let list = businesses;
-    // Apply category filter on client as a fallback (in case server didn't)
     if (priceParams.categoryName) {
       const matchCategory = (b) => {
         const candidates = [
@@ -607,8 +662,7 @@ const SearchResultPage = () => {
       };
       list = list.filter(matchCategory);
     }
-    if (!priceParams.has) return list;
-    return priceParams.includeNoPrice ? list : [];
+    return list;
   }, [businesses, priceParams]);
 
   const filteredSaleAds = useMemo(() => {
@@ -650,40 +704,12 @@ const SearchResultPage = () => {
   const normalize = (v) => (v ? String(v).toLowerCase() : '');
   const ql = normalize(searchText);
 
-  const queryFilteredBusinesses = useMemo(() => {
-    if (!ql) return filteredBusinesses;
-    return filteredBusinesses.filter(b => {
-      return [
-        b?.name,
-        b?.description,
-        b?.address,
-        b?.city,
-        b?.categoryName,
-      ].some(f => normalize(f).includes(ql));
-    });
-  }, [filteredBusinesses, ql]);
+  // Rely on backend search relevance; do not re-filter by q on client
+  const queryFilteredBusinesses = filteredBusinesses;
+  const queryFilteredSaleAds = filteredSaleAds;
+  const queryFilteredPromoAds = filteredPromoAds;
 
-  const queryFilteredSaleAds = useMemo(() => {
-    if (!ql) return filteredSaleAds;
-    return filteredSaleAds.filter(a => {
-      return [
-        a?.title || a?.name,
-        a?.description,
-        a?.city,
-        a?.categoryName,
-      ].some(f => normalize(f).includes(ql));
-    });
-  }, [filteredSaleAds, ql]);
-
-  const queryFilteredPromoAds = useMemo(() => {
-    if (!ql) return filteredPromoAds;
-    return filteredPromoAds.filter(a => {
-      return [
-        a?.title || a?.name,
-        a?.description,
-      ].some(f => normalize(f).includes(ql));
-    });
-  }, [filteredPromoAds, ql]);
+  // (dev clock removed)
 
     // Wait for translations to load
     if (!ready) {
@@ -825,7 +851,27 @@ const SearchResultPage = () => {
                         <div className="search-bar-container">
                             <SearchBar isMainPage={false} onSearch={setSearchText} />
                         </div>
-                        <div className="search-controls__actions"></div>
+                        <div className="search-controls__actions" style={{ display: 'flex', gap: 8 }}>
+                          {/* Card size controls: magnifying glass to enlarge/shrink */}
+                          <button
+                            type="button"
+                            className="chip-button"
+                            onClick={handleIncreaseDensity}
+                            aria-label="הגדל כרטיסים"
+                            title="הגדל כרטיסים"
+                          >
+                            🔍+
+                          </button>
+                          <button
+                            type="button"
+                            className="chip-button"
+                            onClick={handleDecreaseDensity}
+                            aria-label="הקטן כרטיסים"
+                            title="הקטן כרטיסים"
+                          >
+                            🔍-
+                          </button>
+                        </div>
                     </div>
 
                     {/* Filters row - standalone buttons + drawer trigger */}
@@ -845,7 +891,7 @@ const SearchResultPage = () => {
                             onClick={() => { setDrawerMode('sort'); setShowFiltersDrawer(true); setShowFilters(true); setTempSort(sortOption || 'rating'); }}
                             aria-expanded={showFiltersDrawer && drawerMode==='sort'}
                         >
-                            <FaSort aria-hidden="true" /> מיון לפי: {SORT_OPTIONS[sortOption]}
+                            <FaSort aria-hidden="true" /> {sortOption ? `מיון לפי: ${SORT_OPTIONS[sortOption]}` : (t('searchResults.sort.title') || 'מיון')}
                         </button>
 
                         <button
@@ -854,6 +900,18 @@ const SearchResultPage = () => {
                             aria-expanded={showFiltersDrawer && drawerMode==='all'}
                         >
                             <FaFilter aria-hidden="true" /> {t('searchResults.advancedFilter')}
+                        </button>
+                        {/* Clear all (global) – positioned immediately after advanced filter */}
+                        <button
+                          className="chip-button danger"
+                          onClick={() => {
+                            setTempValues(v=>({ ...v, categoryName:'', services:[], city:'', cityLat: undefined, cityLng: undefined, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE, maxDistance:0, rating:0, saleCategoryId:'', saleSubcategoryId:'', saleSubcategoryIds:[] }));
+                            handleClearFilters();
+                          }}
+                          aria-label="clear all filters"
+                          title="נקה הכל"
+                        >
+                          נקה הכל
                         </button>
                         {/* Category */}
                         <button className={`chip-button${hasCategory ? ' active' : ''}`} onClick={() => { setDrawerMode('category'); setShowFiltersDrawer(true); setShowFilters(true); }} aria-expanded={showFiltersDrawer && drawerMode==='category'}>
@@ -908,17 +966,7 @@ const SearchResultPage = () => {
                             {t('advancedSearch.rating.title')}{tempValues.rating?`: ${tempValues.rating}`:''}
                         </button>
 
-                        {/* Clear all (global) */}
-                        <button
-                          className="chip-button danger"
-                          onClick={() => {
-                            setTempValues(v=>({ ...v, categoryName:'', services:[], city:'', cityLat: undefined, cityLng: undefined, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE, maxDistance:0, rating:0, saleCategoryId:'', saleSubcategoryId:'', saleSubcategoryIds:[] }));
-                            handleClearFilters();
-                          }}
-                          aria-label="clear all filters"
-                        >
-                          נקה הכל
-                        </button>
+                        
                     </div>
                     ); })()}
 
@@ -963,6 +1011,7 @@ const SearchResultPage = () => {
                                         if (drawerMode==='price') { setTempValues(v=>({ ...v, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE })); return; }
                                         if (drawerMode==='distance') { setTempValues(v=>({ ...v, maxDistance:0 })); return; }
                                         if (drawerMode==='rating') { setTempValues(v=>({ ...v, rating:0 })); return; }
+                                        if (drawerMode==='sort') { setTempSort(''); return; }
                                         if (drawerMode==='saleSubs') { setTempValues(v=>({ ...v, saleSubcategoryId:'', saleSubcategoryIds:[] })); return; }
                                         // all
                                         setTempValues(v=>({ ...v, categoryName:'', services:[], city:'', cityLat: undefined, cityLng: undefined, priceMin:'', priceMax:'', priceMinN:0, priceMaxN:MAX_PRICE, maxDistance:0, rating:0, saleCategoryId:'', saleCategoryName:'', saleSubcategoryId:'', saleSubcategoryIds:[] })); setSelectedCategoryId('');
@@ -1104,7 +1153,22 @@ const SearchResultPage = () => {
                                                 onPlaceChanged={()=>{
                                                     const place = cityAutoRef.current?.getPlace();
                                                     if (!place) return;
-                                                    const inputVal = document.querySelector('.mini-input.full')?.value || place.name || '';
+                                                    // Prefer structured city from address_components to avoid ", ישראל"
+                                                    const comps = Array.isArray(place.address_components) ? place.address_components : [];
+                                                    const findByType = (types) => {
+                                                        for (const c of comps) {
+                                                            const t = c.types || [];
+                                                            if (types.some(tt => t.includes(tt))) {
+                                                                return c.long_name || c.short_name || '';
+                                                            }
+                                                        }
+                                                        return '';
+                                                    };
+                                                    let cityOnly = findByType(['locality']) || findByType(['postal_town']) || '';
+                                                    if (!cityOnly) {
+                                                        cityOnly = place.name || '';
+                                                    }
+                                                    const inputVal = cityOnly;
                                                     const geom = place.geometry && place.geometry.location ? place.geometry.location : null;
                                                     const lat = geom && typeof geom.lat === 'function' ? geom.lat() : undefined;
                                                     const lng = geom && typeof geom.lng === 'function' ? geom.lng() : undefined;
@@ -1181,11 +1245,40 @@ const SearchResultPage = () => {
                                         }
                                         if (drawerMode==='services') { handleApplyMulti({ services: tempValues.services }); return; }
                                         if (drawerMode==='saleSubs') { handleApplyMulti({ saleSubcategoryId: Array.isArray(tempValues.saleSubcategoryIds)? tempValues.saleSubcategoryIds : (tempValues.saleSubcategoryId? [tempValues.saleSubcategoryId] : []) }); return; }
-                                        if (drawerMode==='city') { const updates = { city: tempValues.city }; if (tempValues.cityLat!==undefined && tempValues.cityLng!==undefined) { updates.lat = tempValues.cityLat; updates.lng = tempValues.cityLng; if (!new URLSearchParams(location.search).get('maxDistance')) updates.maxDistance = tempValues.maxDistance || '10'; } handleApplyMulti(updates); return; }
+                                        // city handling below (no default 10km)
+                                        if (drawerMode==='city') {
+                                          const updates = { city: tempValues.city };
+                                          // הוסף lat/lng רק אם המשתמש הגדיר מרחק או מיון לפי מרחק
+                                          const params = new URLSearchParams(location.search);
+                                          const sort = params.get('sort') || 'rating';
+                                          const wantsDistance = (Number(tempValues.maxDistance) > 0) || (sort === 'distance' || sort === 'popular_nearby');
+                                          if (wantsDistance && tempValues.cityLat !== undefined && tempValues.cityLng !== undefined) {
+                                            updates.lat = tempValues.cityLat;
+                                            updates.lng = tempValues.cityLng;
+                                            if (Number(tempValues.maxDistance) > 0) {
+                                              updates.maxDistance = String(tempValues.maxDistance);
+                                            } else {
+                                              // אל תגדיר ברירת מחדל 10 ק״מ; המשתמש יבחר אם צריך
+                                              params.delete('maxDistance');
+                                            }
+                                          } else {
+                                            // הסר פרמטרי מרחק אם היו קיימים
+                                            params.delete('lat'); params.delete('lng'); params.delete('maxDistance');
+                                          }
+                                          handleApplyMulti(updates);
+                                          return;
+                                        }
                                         if (drawerMode==='price') { handleApplyMulti({ priceMin: tempValues.priceMin || '', priceMax: tempValues.priceMax || '' }); return; }
                                         if (drawerMode==='distance') { handleApplyMulti({ maxDistance: tempValues.maxDistance || '' }); return; }
                                         if (drawerMode==='rating') { handleApplyMulti({ rating: tempValues.rating || '' }); return; }
-                                        if (drawerMode==='sort') { handleApplyMulti({ sort: tempSort==='rating' ? 'rating' : tempSort }); return; }
+                                        if (drawerMode==='sort') { 
+                                          // אם לא נבחר מיון או נבחר "דירוג" – הסר את פרמטר sort מה-URL
+                                          const updates = {};
+                                          if (tempSort && tempSort !== 'rating') { updates.sort = tempSort; }
+                                          else { updates.sort = ''; }
+                                          handleApplyMulti(updates); 
+                                          return; 
+                                        }
                                         handleApplyMulti({ categoryName: tempValues.categoryName, services: tempValues.services, city: tempValues.city, priceMin: tempValues.priceMinN>0 ? String(tempValues.priceMinN) : '', priceMax: tempValues.priceMaxN<MAX_PRICE ? String(tempValues.priceMaxN) : '', maxDistance: tempValues.maxDistance || '', rating: tempValues.rating || '', lat: (tempValues.cityLat !== undefined ? tempValues.cityLat : undefined), lng: (tempValues.cityLng !== undefined ? tempValues.cityLng : undefined) });
                                     }}>{t('advancedSearch.buttons.apply')}</button>
                                 </div>
@@ -1235,7 +1328,7 @@ const SearchResultPage = () => {
                         ))}
                       </div>
                     ) : (
-                    <div className="business-cards-grid">
+                    <div className="business-cards-grid" style={{ display: 'grid', gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`, gap: 16 }}>
                         {activeTab === 'business' && !isLoadingCurrent && queryFilteredBusinesses.length === 0 && (
                           <div className="no-results" style={{textAlign:'center', gridColumn: '1 / -1'}}>{t('search.noResults')||'לא נמצאו תוצאות'}</div>
                         )}

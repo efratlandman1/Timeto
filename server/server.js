@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const multer = require('multer');
+const compression = require('compression');
 const logger = require('./logger');
 const Sentry = require('./sentry');
 const app = express();
@@ -96,6 +97,7 @@ const helmetConfig = {
 
 app.use(helmet(helmetConfig));
 app.use(loggingMiddleware);
+app.set('etag', 'strong'); // enable strong ETags for better caching
 
 // CORS configuration with environment variables
 const corsOptions = {
@@ -119,6 +121,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// Enable gzip/br compression for responses
+app.use(compression());
+
 // Request body size limits to prevent memory attacks
 const MAX_BODY_SIZE = '10mb'; // 10MB limit for JSON payloads
 const MAX_URLENCODED_SIZE = '5mb'; // 5MB limit for URL-encoded data
@@ -137,7 +142,15 @@ app.use(express.urlencoded({
 const path = require('path');
 
 // Serve static files for uploads
-app.use('/uploads', express.static(path.join(__dirname, 'config', 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'config', 'uploads'), {
+  maxAge: '7d',
+  immutable: true,
+  etag: true,
+  setHeaders: (res) => {
+    // Ensure images are cacheable by browsers/CDNs
+    res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+  }
+}));
 
 // Ensure NODE_ENV is set
 if (!process.env.NODE_ENV) {
