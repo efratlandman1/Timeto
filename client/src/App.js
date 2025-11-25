@@ -114,12 +114,13 @@ function App() {
         dispatch(fetchUserLocation());
     }, [dispatch]);
 
-    // Update document direction when language changes
+    // Update document direction and title when language changes
     useEffect(() => {
         const direction = i18n.dir();
         document.documentElement.dir = direction;
         document.documentElement.lang = i18n.language;
         document.body.style.direction = direction;
+        document.title = i18n.language === 'he' ? "יאכנ'ע" : "Yachn'e";
         
         // Add RTL/LTR classes to body for global styling
         document.body.classList.remove('rtl', 'ltr');
