@@ -1,13 +1,24 @@
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const multer = require('multer');
 const compression = require('compression');
+
+process.env.NODE_ENV = process.env.NODE_ENV || 'dev';
+const envFilePath = path.resolve(__dirname, `.env.${process.env.NODE_ENV}`);
+
+if (fs.existsSync(envFilePath)) {
+  require('dotenv').config({ path: envFilePath });
+} else if (process.env.NODE_ENV === 'dev') {
+  console.warn(`[env] Expected ${envFilePath} but file was not found. Falling back to existing environment variables.`);
+}
+
 const logger = require('./logger');
 const Sentry = require('./sentry');
 const app = express();
-require('dotenv').config({ path: '.env' });
 
 // require('dotenv').config({ quiet: true })
 // require('dotenv').config({ path: '.env' });
@@ -138,8 +149,6 @@ app.use(express.urlencoded({
   limit: MAX_URLENCODED_SIZE,
   parameterLimit: 1000 // Limit number of parameters
 }));
-
-const path = require('path');
 
 // Serve static files for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'config', 'uploads'), {

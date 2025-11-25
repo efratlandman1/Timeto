@@ -43,6 +43,10 @@ dist/
 .env*
 server/.env*
 client/.env*
+!client/.env.example
+!server/.env.example
+!client/.env.dev.example
+!server/.env.dev.example
 
 # ⏺️ Logs
 npm-debug.log*

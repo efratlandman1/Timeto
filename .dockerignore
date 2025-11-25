@@ -1,0 +1,15 @@
+.git
+node_modules
+client/node_modules
+server/node_modules
+npm-debug.log
+Dockerfile*
+docker-compose*.yml
+.env*
+client/.env*
+server/.env*
+client/coverage
+server/logs
+server/config/uploads
+client/build
+

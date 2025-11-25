@@ -67,14 +67,12 @@ const writeLimiter = createRateLimiter({
 // Soft slowdown for search: deters scraping without blocking real users.
 // Active only in production to avoid affecting developer experience.
 const searchSlowDown = slowDown({
-    windowMs: 60 * 1000,      // 1 minute window
-    delayAfter: 120,          // start adding delay after 120 req/min/IP
-    // Compute delay per request above threshold (up to 2s)
-    delay: (hits, req) => {
-        const over = Math.max(0, hits - 120);
-        const perHit = 250;      // 250ms per extra request
-        const max = 2000;        // cap at 2s
-        return Math.min(max, over * perHit);
+    windowMs: 60 * 1000,
+    delayAfter: 120,
+    delayMs: (used, req) => {
+        const threshold = req.slowDown?.limit ?? 120;
+        const over = Math.max(0, used - threshold);
+        return Math.min(2000, over * 250);
     },
     skip: () => {
         const env = process.env.NODE_ENV || 'development';
