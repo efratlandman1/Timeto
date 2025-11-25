@@ -1,6 +1,6 @@
 # API Tests
 
-This directory contains automated tests for the Zezman API endpoints.
+This directory contains automated tests for the Yachn'e API endpoints.
 
 ## Test Files
 

@@ -62,3 +62,6 @@ server/config/uploads/
 # 🔧 Misc
 .pnp
 .pnp.js
+
+# Ignore Google Service Account JSON
+server/yachne-8a8bc78b089b.json

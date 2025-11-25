@@ -19,7 +19,7 @@
     },
     "selectLanguage": "Select Language",
     "logo": {
-      "main": "Zezman",
+      "main": "Yachn'e",
       "sub": "Business Directory"
     },
     "myLocation": "My Location",
@@ -87,7 +87,7 @@
       "newPromos": "New Promo Ads Near You"
     },
     "joinBanner": {
-      "title": "Join the Zezman Community",
+      "title": "Join the Yachn'e Community",
       "description": "Add your business and start getting new customers today",
       "descriptionFull": "Add a business, post a sale ad and a promo ad to reach the right customers near you and across the country",
       "button": "Add Business Free",
@@ -102,10 +102,10 @@
       "suggestItem": "Suggest Item",
       "termsOfService": "Terms of Service",
       "termsComingSoon": "Terms of service will be available soon",
-        "about": "About Zezman",
+        "about": "About Yachn'e",
       "aboutDescriptionLine1": "",
       "aboutDescriptionLine2": "",
-      "copyright": "© Zezman 2023 All rights reserved."
+      "copyright": "© Yachn'e 2023 All rights reserved."
     }
   },
   "businessForm": {
@@ -454,7 +454,7 @@
   "footer": {
     "contact": {
       "title": "Contact Us",
-      "email": "info@zezman.app"
+      "email": "yachne2025@gmail.com"
     },
     "quickLinks": {
       "title": "Quick Links",
@@ -463,13 +463,13 @@
       "terms": "Terms of Use"
     },
     "about": {
-      "title": "Zezman",
+      "title": "Yachn'e",
       "description": "Israel's leading business directory. Find the right business near you."
     },
-    "copyright": "© Zezman 2023 All rights reserved."
+    "copyright": "© Yachn'e 2023 All rights reserved."
   },
   "joinBanner": {
-      "title": "Join Zezman Community",
+      "title": "Join Yachn'e Community",
     "subtitle": "Add your business and start getting new customers today",
     "button": "Add Business Free"
   },
@@ -834,11 +834,11 @@
     "sections": {
       "general": {
         "title": "1. General",
-      "content": "Welcome to the Zezman website. The use of the website and the services offered on it is subject to the terms of use detailed below. Using the website constitutes your agreement to these terms."
+      "content": "Welcome to the Yachn'e website. The use of the website and the services offered on it is subject to the terms of use detailed below. Using the website constitutes your agreement to these terms."
       },
       "definitions": {
         "title": "2. Definitions",
-      "content": "\"Website\" - This Zezman website with all its content and services.<br />\"User\" - Any person browsing the website or using its services."
+      "content": "\"Website\" - This Yachn'e website with all its content and services.<br />\"User\" - Any person browsing the website or using its services."
       },
       "usage": {
         "title": "3. Website Usage",
@@ -862,7 +862,7 @@
       },
       "contact": {
         "title": "8. Contact",
-        "content": "For any question or inquiry regarding the terms of use, you can contact us via:<br />Email: info@zezman.app"
+        "content": "For any question or inquiry regarding the terms of use, you can contact us via:<br />Email: yachne2025@gmail.com"
       }
     }
   }
