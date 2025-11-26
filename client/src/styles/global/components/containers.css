@@ -5,16 +5,17 @@
 .wide-page-container {
     min-height: 100vh;
     background-color: var(--background-color);
-    padding: 2rem;
+    padding: 2rem 0 0 0;
     direction: rtl;
-    max-width: 1200px;
-    margin: 0 auto;
+    width: 95vw;
+    max-width: none;
+    margin-inline: auto;
 }
 
 .wide-page-content {
-    max-width: 1200px;
-    width: 100%;
-    margin: 0 auto;
+    width: 95vw;
+    max-width: none;
+    margin-inline: auto;
     background: white;
     border-radius: 12px;
     padding: 2rem;
