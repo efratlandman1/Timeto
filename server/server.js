@@ -67,7 +67,8 @@ logger.info({
   logSource: 'server.js'
 });
 
-const PORT = 5050;
+// Cloud Run provides PORT env variable, fallback to 5050 for local dev
+const PORT = process.env.PORT || 5050;
 const MONGO_URI = process.env.MONGO_URI;
 const usersRouter = require('./routes/usersRoutes');
 const businessesRouter = require('./routes/businessesRoutes');

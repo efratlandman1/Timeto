@@ -1,29 +1,25 @@
-FROM node:18-alpine AS base
+FROM node:20-alpine
+
+# Set the working directory
 WORKDIR /app
+
+# Copy package.json and package-lock.json (אם יש)
 COPY package*.json ./
 
-FROM base AS deps
-ARG NODE_ENV=prod
-RUN if [ "$NODE_ENV" = "prod" ]; then npm ci --omit=dev; else npm install; fi
+# Install ALL dependencies (כולל nodemon ו-google-auth-library)
+RUN npm install
 
-FROM node:18-alpine AS dev_stage
-WORKDIR /app
-ENV NODE_ENV=dev
-COPY --from=deps /app/node_modules ./node_modules
-COPY package*.json ./
+# Copy the rest of the app
 COPY . .
-RUN chown -R node:node /app
-USER node
-EXPOSE 5050
-CMD ["npm", "run", "dev"]
 
-FROM node:18-alpine AS prod_stage
-WORKDIR /app
-ENV NODE_ENV=prod
-COPY --from=deps /app/node_modules ./node_modules
-COPY package*.json ./
-COPY . .
+# Optional: change ownership
 RUN chown -R node:node /app
+
+# Use non-root user
 USER node
+
+# Expose the server port
 EXPOSE 5050
-CMD ["node", "server.js"]
+
+# Start with nodemon
+CMD ["npx", "nodemon", "server.js"]

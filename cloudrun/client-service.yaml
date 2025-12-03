@@ -1,0 +1,63 @@
+# =============================================================================
+# Cloud Run Service Configuration - Client (Frontend)
+# =============================================================================
+# Deploy with: gcloud run services replace cloudrun/client-service.yaml --region=me-west1
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: timeto-client
+  labels:
+    app: timeto
+    component: client
+  annotations:
+    run.googleapis.com/description: "Timeto Business Directory Frontend"
+    run.googleapis.com/ingress: all
+    run.googleapis.com/launch-stage: GA
+spec:
+  template:
+    metadata:
+      annotations:
+        # Auto-scaling configuration
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "10"
+        # CPU allocation - allow bursting
+        run.googleapis.com/cpu-throttling: "true"
+        # Startup boost
+        run.googleapis.com/startup-cpu-boost: "true"
+    spec:
+      containerConcurrency: 250  # Nginx can handle more concurrent requests
+      timeoutSeconds: 60
+      containers:
+        - image: gcr.io/PROJECT_ID/timeto-client:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "1"
+              memory: "256Mi"
+          env:
+            # Runtime configuration (injected via entrypoint)
+            - name: REACT_APP_API_URL
+              value: "https://timeto-api-PROJECT_NUMBER.me-west1.run.app"
+            - name: REACT_APP_GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: GOOGLE_CLIENT_ID
+                  key: latest
+            - name: REACT_APP_GOOGLE_MAPS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: GOOGLE_MAPS_API_KEY
+                  key: latest
+          # Health check
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 30
+  traffic:
+    - percent: 100
+      latestRevision: true
+

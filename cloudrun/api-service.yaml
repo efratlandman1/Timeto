@@ -1,0 +1,109 @@
+# =============================================================================
+# Cloud Run Service Configuration - API
+# =============================================================================
+# Deploy with: gcloud run services replace cloudrun/api-service.yaml --region=me-west1
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: timeto-api
+  labels:
+    app: timeto
+    component: api
+  annotations:
+    run.googleapis.com/description: "Timeto Business Directory API"
+    run.googleapis.com/ingress: all
+    run.googleapis.com/launch-stage: GA
+spec:
+  template:
+    metadata:
+      annotations:
+        # Auto-scaling configuration
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "10"
+        # CPU allocation
+        run.googleapis.com/cpu-throttling: "true"
+        # Startup probe
+        run.googleapis.com/startup-cpu-boost: "true"
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: timeto-api-sa@PROJECT_ID.iam.gserviceaccount.com
+      containers:
+        - image: gcr.io/PROJECT_ID/timeto-api:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          env:
+            - name: NODE_ENV
+              value: "prod"
+            - name: PORT
+              value: "8080"
+            # Secrets from Secret Manager
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: MONGO_URI
+                  key: latest
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: JWT_SECRET
+                  key: latest
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: GOOGLE_CLIENT_ID
+                  key: latest
+            - name: GOOGLE_MAPS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: GOOGLE_MAPS_API_KEY
+                  key: latest
+            - name: EMAIL_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: EMAIL_SERVICE
+                  key: latest
+            - name: EMAIL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: EMAIL_USER
+                  key: latest
+            - name: EMAIL_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: EMAIL_PASS
+                  key: latest
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: SENTRY_DSN
+                  key: latest
+            - name: GCS_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: GCS_BUCKET_NAME
+                  key: latest
+          # Startup probe
+          startupProbe:
+            httpGet:
+              path: /api/v1/stats/health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 30
+          # Liveness probe
+          livenessProbe:
+            httpGet:
+              path: /api/v1/stats/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 30
+  traffic:
+    - percent: 100
+      latestRevision: true
+
